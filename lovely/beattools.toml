@@ -4,6 +4,119 @@ dump_lua = true
 priority = 0
 
 
+# Bounce dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.overlappingEvents = {}'''
+position = "before"
+payload = '''local prevOverlapping = self.overlappingEvents
+local prevBounceSelect = self.bounceSelected
+local prevBounceSelectTime = self.bounceSelectTime
+self.bounceSelected = false
+self.bounceSelectTime = 0
+self.bounceSelectAccumulation = 0
+local bounceSelection = {}'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''-- check end of holds as well'''
+position = "before"
+payload = '''
+-- check bounces of bounces as well
+if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 then
+	for ii = 1, (v.bounces or 1) do
+		local pos2 = self:getPosition(v.angle + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
+		if helpers.collide(
+			{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+			{ x = pos2[1] - 8, y = pos2[2] - 8, width = 16, height = 16 }) then
+			table.insert(self.overlappingEvents, i)
+			table.insert(bounceSelection, { i, ii })
+		end
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''for _, v in ipairs(holdEndSelection) do'''
+position = "before"
+payload = '''
+for _, v in ipairs(bounceSelection) do
+	if v[1] == self.overlappingEvents[1] then
+		self.bounceSelected = v[2]
+		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and (beattoolsTime - prevBounceSelectTime) / 60 <= 0.5 then
+			print("[BT] Double clicked bounce")
+			self.bounceSelectTime = -1
+		else
+			self.bounceSelectTime = beattoolsTime
+		end
+		break
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if not self.holdEndSelected then
+	self.selectedEvent.time = self.selectedEvent.time + beat'''
+position = "at"
+payload = '''
+if mods.beattools.config.bounceDragging and self.bounceSelected then
+	if mods.beattools.config.bounceDoubleClick and self.bounceSelectTime == -1 then
+		self.bounceSelectAccumulation = self.bounceSelectAccumulation + beat
+		if math.abs(self.bounceSelectAccumulation) >= (self.selectedEvent.delay or 1) then
+			local bounceDiff = math.floor(self.bounceSelectAccumulation / (self.selectedEvent.delay or 1))
+			self.selectedEvent.bounces = math.max(self.selectedEvent.bounces + bounceDiff, 1)
+			self.bounceSelected = math.max(self.bounceSelected + bounceDiff, 1)
+			self.bounceSelectAccumulation = self.bounceSelectAccumulation % (self.selectedEvent.delay or 1)
+		end
+	else
+		-- If the user is holding a bounced bounce, we only move the rotation/delay.
+		self.selectedEvent.rotation = (self.selectedEvent.rotation or 0) + angle / self.bounceSelected
+		self.selectedEvent.delay = math.max((self.selectedEvent.delay or 1) + beat / self.bounceSelected, 0)
+	end
+elseif not self.holdEndSelected then
+	self.selectedEvent.time = self.selectedEvent.time + beat
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local angle = self.cursorAngle
+
+					if not self.holdEndSelected then'''
+position = "at"
+payload = '''
+local angle = self.cursorAngle
+if mods.beattools.config.bounceDragging and self.bounceSelected then
+	if mods.beattools.config.bounceDoubleClick and self.bounceSelectTime == -1 then
+		local timeDiff = self.cursorBeat - (self.selectedEvent.time + (self.selectedEvent.delay or 1) * self.bounceSelected)
+		if math.abs(timeDiff) >= (self.selectedEvent.delay or 1) then
+			local bounceDiff = math.floor(timeDiff / (self.selectedEvent.delay or 1))
+			self.selectedEvent.bounces = math.max(self.selectedEvent.bounces + bounceDiff, 1)
+			self.bounceSelected = math.max(self.bounceSelected + bounceDiff, 1)
+			self.bounceSelectAccumulation = 0
+		end
+	else
+		-- see next comment on what this does. - bliv - Penta
+		angle = helpers.closestAngle(angle, self.selectedEvent.angle + (self.selectedEvent.rotation or 0) * self.bounceSelected)
+
+		self.selectedEvent.rotation = (angle - self.selectedEvent.angle) / self.bounceSelected
+		self.selectedEvent.delay = math.max(self.selectedEvent.delay + (self.cursorBeat - (self.selectedEvent.time + (self.selectedEvent.delay or 1) * self.bounceSelected)) / self.bounceSelected, 0)
+	end
+elseif not self.holdEndSelected then
+'''
+match_indent = true
+
+
 # Fix for penta's dream skin ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

@@ -6,6 +6,7 @@ STUFF TO DO:
 
 
 Mod Config:
+- bounce dragging
 
 
 Party Tricks:
@@ -17,10 +18,11 @@ Party Tricks:
 EA FIX:
 - lively cranky (not even possible anymore?)
 - level select non levels/folders
-- expand whitelist with new params
+- expand whitelist with new params   -- Penta: don wanna
 
 
 Low Priority:   -- Penta: very low priority, like in will get implemented next year, if at all
+- hold dragging customization
 - replay system (worked on by someone else?)
 - sfx for selecting events
 - default positions for imgui windows
@@ -32,10 +34,6 @@ Potential:   -- Penta: i have no idea if i will even implement these features
 - overlap warning with ease durations
 - ease tooltips/descriptions
 - auto convert when fakeRepeat is off and event is selected   -- Penta: annoying to make
-
-
-FIX QP:
-	modtime requested before check for file existence
 
 
 

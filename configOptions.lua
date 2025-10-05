@@ -615,6 +615,16 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Show the hidden event parameter" },
 		default = true,
 		off = false
+	}, bounceDragging = {
+		name = "Bounce Dragging",
+		tooltips = { short = "Drag bounces like holds" },
+		default = true,
+		off = false
+	}, bounceDoubleClick = {
+		name = "Bounce Amount Dragging",
+		tooltips = { short = "Double click to adjust bounce amount through dragging" },
+		default = true,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

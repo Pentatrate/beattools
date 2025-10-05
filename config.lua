@@ -43,6 +43,8 @@ Buttons:\
   Buttons to (un)tag event(s)\
   Button to use mouse coordinates for inputs (idea: crisp_chip)\
 Features:\
+  Drag bounces around like holds (idea: crisp_chip)\
+  Double click and drag to adjust bounce amount (idea: k4kadu)\
   Fakes an option to repeat events. Compatible with unmodded\
   Mod specific confirmation, prompts and error popups (some text by: k4kadu, something4803, irember135)\
   Rounds time for all selected events to prevent float inaccuracy\
@@ -503,6 +505,9 @@ if imgui.BeginTabBar("beattoolsConfig") then
 					beattoolsConfigHelpers.InputList("beatSnapValues")
 					imgui.TreePop()
 				end
+				imgui.Separator()
+				beattoolsConfigHelpers.InputBool("bounceDragging")
+				beattoolsConfigHelpers.InputBool("bounceDoubleClick")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("fakeRepeat")
 				imgui.Separator()

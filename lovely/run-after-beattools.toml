@@ -199,7 +199,7 @@ match_indent = true
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
-pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents),'''
+pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents|holdEndSelection|bounceSelection),'''
 position = "at"
 payload = '''table--[[stop wrong injection]].insert($table,'''
 
@@ -217,15 +217,14 @@ pattern = '''(?<indent>[ \t]*)table\.insert\((?<params>[\s\S]+?)(\)\s*\n)[\n\t ]
 position = "at"
 line_prepend = "$indent"
 payload = '''if beattoolsPlaceEvent($params) then
-	table.insert($params)
+table.insert($params)
 -- Beattools Regex Start
 -- Remember that this code is supposed to be indented one further, but doing so with regexes is almost impossible
 $end
 -- Beattools Regex End
-end
-'''
-	# Penta: original before i changed it (without negative lookahead)
-	# table\.insert\((?<params>[\s\S]+?)\)(?<end>([^\S\n]*((?!break|do|else|end|for|function|if|in|repeat|return|then|until|while)(\w*?)[^\n]?)*\n)*)
+end '''
+# Penta: original before i changed it (without negative lookahead)
+# table\.insert\((?<params>[\s\S]+?)\)(?<end>([^\S\n]*((?!break|do|else|end|for|function|if|in|repeat|return|then|until|while)(\w*?)[^\n]?)*\n)*)
 
 [[patches]]
 [patches.regex]
@@ -648,17 +647,46 @@ if self.layers.gameplay == 1 then
 end
 
 --redraw selected event on top
-if self.selectedEvent and beattoolsGetEventVisibility(self.selectedEvent) ~= "hide" and self.selectedEvent.time + ((mods.beattools.config.markRepeat ~= "off" and self.selectedEvent.repeats ~= nil and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay ~= 0 and self.selectedEvent.repeats * (self.selectedEvent.repeatDelay or 1)) or 0) + (((type(Event.editorDraw[self.selectedEvent.type]) == "function" and self.selectedEvent.duration ~= nil) or (mods.beattools.config.showDuration ~= "off" and type(Event.editorDraw[self.selectedEvent.type]) ~= "function" and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0)) and self.selectedEvent.duration or 0) >= self.editorBeat then
-	if self.selectedEvent.type == "ease" or self.selectedEvent.time >= self.editorBeat or (((type(Event.editorDraw[self.selectedEvent.type]) == "function" or mods.beattools.config.showDuration ~= "off") and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0) and self.selectedEvent.time + self.selectedEvent.duration >= self.editorBeat) then
+if self.selectedEvent and beattoolsGetEventVisibility(self.selectedEvent) ~= "hide"
+	and self.selectedEvent.time +
+	(
+		mods.beattools.config.markRepeat ~= "off" and self.selectedEvent.repeats ~= nil and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay ~= 0
+		and self.selectedEvent.repeats * (self.selectedEvent.repeatDelay or 1) or 0
+	) + (
+		(
+			(
+				type(Event.editorDraw[self.selectedEvent.type]) == "function" and self.selectedEvent.duration ~= nil
+			) or (
+				mods.beattools.config.showDuration ~= "off" and type(Event.editorDraw[self.selectedEvent.type]) ~= "function" and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0
+			)
+		) and self.selectedEvent.duration or 0
+	) + (
+		self.selectedEvent.type == "bounce"
+		and (self.selectedEvent.bounces or 1) * (self.selectedEvent.delay or 1) or 0
+	) >= self.editorBeat
+then
+	if self.selectedEvent.type == "ease"
+		or self.selectedEvent.type == "bounce"
+		or self.selectedEvent.time >= self.editorBeat
+		or (
+			(
+				type(Event.editorDraw[self.selectedEvent.type]) == "function" or mods.beattools.config.showDuration ~= "off"
+			) and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0
+			and self.selectedEvent.time + self.selectedEvent.duration >= self.editorBeat
+		)
+	then
 		self:drawEvent(self.selectedEvent, nil, "selected")
 	end
-	if self.selectedEvent.time >= self.editorBeat then
-		local pos = {0, 0}
-		if not self.holdEndSelected then
-			pos = self:getPosition(self.selectedEvent.angle, self.selectedEvent.time)
-		else
-			pos = self:getPosition(self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration)
-		end
+	local tempAngle, tempTime
+	if mods.beattools.config.bounceDragging and self.bounceSelected then
+		tempAngle, tempTime = self.selectedEvent.angle + (self.selectedEvent.rotation or 0) * self.bounceSelected, self.selectedEvent.time + (self.selectedEvent.delay or 1) * self.bounceSelected
+	elseif not self.holdEndSelected then
+		tempAngle, tempTime = self.selectedEvent.angle, self.selectedEvent.time
+	else
+		tempAngle, tempTime = self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration
+	end
+	if tempTime >= self.editorBeat then
+		local pos = self:getPosition(tempAngle, tempTime)
 		if mods.beattools.config.whiteSelected ~= "off" then
 			love.graphics.setColor(mods.beattools.config.selectedBorderColor.r, mods.beattools.config.selectedBorderColor.g, mods.beattools.config.selectedBorderColor.b, mods.beattools.config.selectedBorderColor.a)
 		end
