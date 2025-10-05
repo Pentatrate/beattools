@@ -1,0 +1,1040 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1000000000
+
+
+# Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.copy]
+target = "states/Editor.lua"
+position = "prepend"
+sources = ["beattools.lua"]
+
+
+# Self fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local st = Gamestate:new('Editor')'''
+position = "at"
+payload = ''''''
+match_indent = true
+
+
+# Remove help marker ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(imgui.SameLine\(\)[\n\s]+)?helpers\.imguiHelpMarker'''
+position = "at"
+payload = '''tooltip'''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(?:bgData|(?:self\.(?:level\.(?:metadata|properties)|variant?)))\.\w+ = helpers\.Input(?:Text|Int|Float)\((?<label>['"][\w\s#]+['"])'''
+position = "before"
+payload = '''if mods.beattools.config.fullSize then imgui.SetNextItemWidth(-imgui.GetFontSize() * 7 / 13 * string.len( $label ) --[[Penta's RegEx Marker]]) end '''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''bgData\.\w+Channel\.r, bgData\.\w+Channel\.g, bgData\.\w+Channel\.b = helpers\.imguiColor\((?:[\n\s\t]*)?(?<label>['"]\w+ channel['"])'''
+position = "before"
+payload = '''if mods.beattools.config.fullSize then imgui.SetNextItemWidth(-imgui.GetFontSize() * 7 / 13 * string.len( $label ) --[[Penta's RegEx Marker]]) end '''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''##float(?<keep>\w+['"] \) --\[\[Penta's RegEx Marker\]\])'''
+position = "at"
+payload = ''' $keep'''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) \) --\[\[Penta's RegEx Marker\]\]'''
+position = "at"
+payload = '''$keep ) - ((not mods.beattools.config.hideHelpMarkers) and 25 or 0)'''
+
+
+# Update self ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''st:setUpdate(function(self, dt)'''
+position = "after"
+payload = '''
+	beattoolsTime = beattoolsTime + dt
+	if self.editMode then
+		--[[if beattoolsPlayerSprite == "idle" then
+			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 8 - 0.1 then
+				beattoolsPlayerSprite = "closed"
+				beattoolsLastSpriteChange = beattoolsTime
+			end
+		elseif beattoolsPlayerSprite == "closed" then
+			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 0.1 then
+				beattoolsPlayerSprite = "idle"
+				beattoolsLastSpriteChange = beattoolsTime
+			end
+		else]]if beattoolsPlayerSprite == "><" then
+			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 1 then
+				beattoolsPlayerSprite = "idle"
+				beattoolsLastSpriteChange = beattoolsTime
+			end
+		end
+		if mods.beattools.config.currentSprite then beattoolsGetCurrentEasing(self, "playerSprites", "spriteName", "editorBeat") end
+
+		-- Penta: This code is not optimised, but it doesnt have to be, "lively cranky" is just for fun
+		if mods.beattools.config.livelyCranky and beattoolsPlayerSprite == "><" then
+			self.p.forceSprite = beattoolsPlayerSprite
+		elseif mods.beattools.config.livelyCranky and maininput:down("modifier") then
+			self.p.forceSprite = "happy"
+		else
+			local forcedSprite = false
+			if mods.beattools.config.currentSprite and beattoolsCurrentEasings.editorBeat.playerSprites.spriteName ~= "" then
+				local spriteName = beattoolsCurrentEasings.editorBeat.playerSprites.spriteName
+				if string.lower(string.sub(spriteName, -4)) == ".png" then
+					local filename = cLevel .. spriteName
+					if love.filesystem.exists(filename) then
+						local modTime = love.filesystem.getInfo(cLevel .. spriteName, "file").modtime
+						if beattoolsPlayerSpriteChanged[spriteName] ~= modTime then
+							beattoolsLastSpriteModified = beattoolsTime
+							beattoolsPlayerSpriteChanged[spriteName] = modTime
+						end
+						if cs.p.spr[spriteName] == nil or (beattoolsTime - beattoolsLastSpriteModified) / 60 > 1 then
+							cs.p.spr[spriteName] = love.graphics.newImage(filename)
+						end
+					end
+				end
+
+				if ({ [""] = true, none = true, idle = true, happy = true, miss = true, ["><"] = true, [":3"] = true })[spriteName] or cs.p.spr[spriteName] ~= nil then
+					cs.p.forceSprite = spriteName
+					cs.p.useFaceStencil = beattoolsCurrentEasings.editorBeat.playerSprites.useFaceStencil
+					forcedSprite = true
+				end
+			end
+			if not forcedSprite then
+				--[[if mods.beattools.config.livelyCranky and beattoolsTime - ((#beattoolsChangeList > 0 and beattoolsChangeList[#beattoolsChangeList].time) or 0) > 60 * 60 then
+					self.p.forceSprite = "sleep"
+				else]]if mods.beattools.config.livelyCranky then
+					self.p.forceSprite = beattoolsPlayerSprite
+				else
+					self.p.forceSprite = ""
+				end
+			end
+		end
+	end
+'''
+match_indent = true
+
+
+# Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''for i, v in ipairs(tagEvents) do
+	v.time = v.time - self.multiselectStartBeat
+end'''
+position = "at"
+payload = '''
+for i = #tagEvents, 1 do
+	local v = tagEvents[i]
+	if mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil then
+		table.remove(tagEvents, i)
+	end
+end
+for i, v in ipairs(tagEvents) do
+	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)
+	if mods.beattools.config.fakeRepeat then
+		if v.repeats ~= nil and v.repeats > 0 then
+			for i = 1, v.repeats do
+				local newEvent = helpers.copy(v)
+				newEvent.beattoolsRepeatIndex, newEvent.repeats, newEvent.repeatDelay, newEvent.beattoolsRepeats, newEvent.time = nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
+				table.insert(tagEvents, newEvent)
+			end
+		else
+			v.beattoolsRepeatIndex = nil
+		end
+	end
+end
+'''
+match_indent = true
+
+# Blueprints probably dont work in EA
+# [[patches]]
+# [patches.pattern]
+# target = "states/Editor.lua"
+# pattern = '''for i, v in ipairs(blueprintEvents) do
+# 	v.time = v.time - self.multiselectStartBeat
+# end'''
+# position = "at"
+# payload = '''
+# for i = #blueprintEvents, 1 do
+# 	local v = blueprintEvents[i]
+# 	if mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil then
+# 		table.remove(blueprintEvents, i)
+# 	end
+# end
+# for i, v in ipairs(blueprintEvents) do
+# 	v.time = v.time - self.multiselectStartBeat
+# 	if mods.beattools.config.fakeRepeat then
+# 		if v.repeats ~= nil and v.repeats > 0 then
+# 			for i = 1, v.repeats do
+# 				local newEvent = helpers.copy(v)
+# 				newEvent.beattoolsRepeatIndex, newEvent.repeats, newEvent.repeatDelay, newEvent.beattoolsRepeats, newEvent.time = nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
+# 				table.insert(blueprintEvents, newEvent)
+# 			end
+# 		else
+# 			v.beattoolsRepeatIndex = nil
+# 		end
+# 	end
+# end
+# '''
+# match_indent = true
+
+
+# Add to changes ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents),'''
+position = "at"
+payload = '''table--[[stop wrong injection]].insert($table,'''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''table\.remove\((?<table>self\.multiselect\.events|tagEvents),'''
+position = "at"
+payload = '''table--[[stop wrong injection]].remove($table,'''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(?<indent>[ \t]*)table\.insert\((?<params>[\s\S]+?)(\)\s*\n)[\n\t ]*(?<end>(?:(?:[^\S\n]|(?:--\[\[[\s\S]*?\]\])|(?:--[^\n]*?\n))*(?:(?:[^bdefirtuw\W]\w*|b[^r\s]\w*|b\W|br[^e\s]\w*|br\W|bre[^a\s]\w*|bre\W|brea[^k\s]\w*|brea\W|break\w+|d[^o\s]\w*|d\W|do\w+|e[^ln\s]\w*|e\W|el[^s\s]\w*|el\W|els[^e\s]\w*|els\W|else\w+|en[^d\s]\w*|en\W|end\w+|f[^ou\s]\w*|f\W|fo[^r\s]\w*|fo\W|for\w+|fu[^n\s]\w*|fu\W|fun[^c\s]\w*|fun\W|func[^t\s]\w*|func\W|funct[^i\s]\w*|funct\W|functi[^o\s]\w*|functi\W|functio[^n\s]\w*|functio\W|function\w+|i[^fn\s]\w*|i\W|if\w+|in\w+|r[^e\s]\w*|r\W|re[^pt\s]\w*|re\W|rep[^e\s]\w*|rep\W|repe[^a\s]\w*|repe\W|repea[^t\s]\w*|repea\W|repeat\w+|ret[^u\s]\w*|ret\W|retu[^r\s]\w*|retu\W|retur[^n\s]\w*|retur\W|return\w+|t[^h\s]\w*|t\W|th[^e\s]\w*|th\W|the[^n\s]\w*|the\W|then\w+|u[^n\s]\w*|u\W|un[^t\s]\w*|un\W|unt[^i\s]\w*|unt\W|unti[^l\s]\w*|unti\W|until\w+|w[^h\s]\w*|w\W|wh[^i\s]\w*|wh\W|whi[^l\s]\w*|whi\W|whil[^e\s]\w*|whil\W|while\w+)?[^\n\w]?)*\n)*)''' # Penta: huge.
+position = "at"
+line_prepend = "$indent"
+payload = '''if beattoolsPlaceEvent($params) then
+	table.insert($params)
+-- Beattools Regex Start
+-- Remember that this code is supposed to be indented one further, but doing so with regexes is almost impossible
+$end
+-- Beattools Regex End
+end
+'''
+	# Penta: original before i changed it (without negative lookahead)
+	# table\.insert\((?<params>[\s\S]+?)\)(?<end>([^\S\n]*((?!break|do|else|end|for|function|if|in|repeat|return|then|until|while)(\w*?)[^\n]?)*\n)*)
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''table\.remove\((?<params>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?]]|--[\s\S]*?\n)*?\w+)'''
+position = "at"
+payload = '''beattoolsDeleteEvent($params) table.remove($params)$end'''
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''--\[\[stop wrong injection]]'''
+position = "at"
+payload = ''''''
+
+
+# Add undo shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent.angle = angle'''
+position = "before"
+payload = '''if self.selectedEvent.angle ~= self.cursorAngle then
+	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "angle", self.cursorAngle)
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent.time = self.cursorBeat'''
+position = "before"
+payload = '''if self.selectedEvent.time ~= self.cursorBeat then
+	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "time", self.cursorBeat)
+end
+'''
+match_indent = true
+
+
+# Edits the event position visually ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''function st:drawEvent(event,alpha)'''
+position = "at"
+payload = '''function st:drawEvent(event, alpha, beattoolsLayer)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if type(eventDraw) == 'function' then
+	eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance)
+else
+	local pos = cs:getPosition(event.angle, event.time)
+	love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
+end'''
+position = "at"
+payload = '''
+if type(eventDraw) == "function" then
+	if event.isCursor then
+		if beattoolsOverlap["" .. event.time] ~=nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
+			beattoolsSelect = { event.time, event.angle % 360 }
+		end
+	end
+	local beattoolsTemp2 = event.angle
+	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = event.endAngle end
+	if (beattoolsLayer == "note" and event ~= self.selectedEvent) or beattoolsLayer == "selected" then
+		if event.beattoolsRepeats == nil or mods.beattools.config.displayRepeatEvents or not mods.beattools.config.fakeRepeat then
+			eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance, alpha)
+			if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil and event.time >= self.editorBeat then
+				local pos = cs:getPosition(event.angle, event.time)
+				if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 then
+					if event[mods.beattools.config.showParam] % 1e-3 ~= 0 then event[mods.beattools.config.showParam] = helpers.round(event[mods.beattools.config.showParam] * 1e3) / 1e3 end
+					local beattoolsParam = event[mods.beattools.config.showParam]
+					if beattoolsParam > 99 then
+						beattoolsParam = ">99"
+					elseif beattoolsParam < -99 then
+						beattoolsParam = "<-99"
+					end
+					pos[1] = helpers.round(pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset) - 6 - 20
+					pos[2] = helpers.round(pos[2]) - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset - 2
+					love.graphics.setColor(mods.beattools.config.bgColor.r, mods.beattools.config.bgColor.g, mods.beattools.config.bgColor.b, alpha)
+					if mods.beattools.config.shadow then
+						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 13 + 20, "right")
+					else
+						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2], 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1], pos[2] + 1, 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1] - 1, pos[2], 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1], pos[2] - 1, 13 + 20, "right")
+					end
+					love.graphics.setColor(mods.beattools.config.fgColor.r, mods.beattools.config.fgColor.g, mods.beattools.config.fgColor.b, alpha)
+					love.graphics.printf(beattoolsParam, pos[1], pos[2], 13 + 20, "right")
+				end
+			end
+			love.graphics.setColor(1, 1, 1, alpha)
+		end
+	end
+	if ((beattoolsLayer == "endAngleMarker" and event ~= self.selectedEvent) or (beattoolsLayer == "selected" and mods.beattools.config.markEndAnglePosition ~= "off")) and event.endAngle ~= nil and event.time >= self.editorBeat then
+		if beattoolsLayer == "selected" then love.graphics.setColor(1, 1, 1, 1) end
+		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = beattoolsTemp2 end
+		local pos = cs:getPosition((function () if mods.beattools.config.displayEndAngle then return event.angle else return event.endAngle end end)(), event.time)
+		love.graphics.draw((function () if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex) then return sprites.editor.endAngleMarkerSelected else return sprites.editor.endAngleMarker end end)(), pos[1], pos[2], 0, 1, 1, 11, 11)
+		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = event.endAngle end
+	end
+	if beattoolsLayer == "repeatMarker" and event.beattoolsRepeats ~= nil then
+		local pos = cs:getPosition(event.angle, event.time)
+		if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 and event.time >= self.editorBeat then
+			love.graphics.draw((function () if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then return sprites.editor.repeatMarkerSelected else return sprites.editor.repeatMarker end end)(), pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+		end
+	end
+	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = beattoolsTemp2 end
+else
+	if event.duration ~= nil and event.duration > 0 and (beattoolsLayer == "duration" or (mods.beattools.config.showDuration ~= "off" and beattoolsLayer == "selected")) then
+		if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex) then
+			love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, mods.beattools.config.durationSelectedColor.a)
+		elseif beattoolsSameEasing(event, self.selectedEvent) then
+			love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, mods.beattools.config.durationSameEasingColor.a)
+		else
+			love.graphics.setColor(mods.beattools.config.durationColor.r, mods.beattools.config.durationColor.g, mods.beattools.config.durationColor.b, mods.beattools.config.durationColor.a)
+		end
+		love.graphics.setLineWidth(2)
+		local pos1 = cs:getPosition(event.angle, math.max(event.time, self.editorBeat))
+		local pos2 = cs:getPosition(event.angle, math.max(event.time + event.duration, self.editorBeat))
+		love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+		if event.type == "ease" and event.repeats ~= nil and event.repeats > 0 and event.repeatDelay ~= 0 then
+			for i = 1, event.repeats do
+				if event.time + i * (event.repeatDelay or 1) + event.duration >= self.editorBeat or event.time + i * (event.repeatDelay or 1) <= self.editorBeat + self.drawDistance or (self.editorBeat >= event.time + i * (event.repeatDelay or 1) and self.editorBeat <= event.time + i * (event.repeatDelay or 1) + v.duration) then
+					pos1 = cs:getPosition(event.angle, math.max(event.time + i * (event.repeatDelay or 1), self.editorBeat))
+					pos2 = cs:getPosition(event.angle, math.max(event.time + event.duration + i * (event.repeatDelay or 1), self.editorBeat))
+					if -16 < pos1[1] and pos1[1] < 616 and -16 < pos1[2] and pos1[2] < 376 then
+						love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+					end
+				end
+			end
+		end
+		if beattoolsLayer == "selected" then love.graphics.setColor(1, 1, 1, 1) end
+	end
+	local pos = cs:getPosition(event.angle, event.time)
+	if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 then
+		if ((beattoolsLayer == "event" and event ~= self.selectedEvent) or beattoolsLayer == "selected") and event.time >= self.editorBeat then
+			if event.isCursor and beattoolsOverlap["" .. event.time] ~= nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
+				event.beattoolsIndex = beattoolsOverlap["" .. event.time]["" .. event.angle % 360][1]
+				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = event.beattoolsIndex + 1 end
+			end
+			if event.beattoolsRepeats == nil or mods.beattools.config.displayRepeatEvents or not mods.beattools.config.fakeRepeat then
+				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
+				if beattoolsSameEasing(event, self.selectedEvent) then
+					love.graphics.draw(sprites.editor.sameEasing, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+				end
+				if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil then
+					if event[mods.beattools.config.showParam] % 1e-3 ~= 0 then event[mods.beattools.config.showParam] = helpers.round(event[mods.beattools.config.showParam] * 1e3) / 1e3 end
+					local beattoolsParam = event[mods.beattools.config.showParam]
+					if beattoolsParam > 100 then
+						beattoolsParam = ">100"
+					elseif beattoolsParam < -100 then
+						beattoolsParam = "<-100"
+					end
+					pos[1] = helpers.round(pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset) - 6 - 20
+					pos[2] = helpers.round(pos[2]) - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset - 2
+					love.graphics.setColor(mods.beattools.config.bgColor.r, mods.beattools.config.bgColor.g, mods.beattools.config.bgColor.b, 1)
+					if mods.beattools.config.shadow then
+						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 13 + 20, "right")
+					else
+						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2], 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1], pos[2] + 1, 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1] - 1, pos[2], 13 + 20, "right")
+						love.graphics.printf(beattoolsParam, pos[1], pos[2] - 1, 13 + 20, "right")
+					end
+					love.graphics.setColor(mods.beattools.config.fgColor.r, mods.beattools.config.fgColor.g, mods.beattools.config.fgColor.b, 1)
+					love.graphics.printf(beattoolsParam, pos[1], pos[2], 13 + 20, "right")
+				end
+			end
+		end
+		if beattoolsLayer == "repeatMarker" and event.beattoolsRepeats ~= nil then
+			love.graphics.draw(
+				(function ()
+					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then
+						return sprites.editor.repeatMarkerSelected
+					elseif beattoolsSameEasing(event, self.selectedEvent) then
+						return sprites.editor.repeatMarkerSameEasing
+					else
+						return sprites.editor.repeatMarker
+					end
+				end)(),
+				pos[1], pos[2],
+				0, 1, 1,
+				11, 11
+			)
+		end
+	end
+	if (beattoolsLayer == "repeatMarker" or (beattoolsLayer == "selected" and mods.beattools.config.markRepeat ~= "off")) and event.type == "ease" and event.repeats ~= nil and event.repeats > 0 and event.repeatDelay ~= 0 then
+		if beattoolsLayer == "selected" then love.graphics.setColor(1, 1, 1, 1) end
+		for i = 1, event.repeats do
+			if event.time + i * (event.repeatDelay or 1) >= self.editorBeat and event.time + i * (event.repeatDelay or 1) <= self.editorBeat + self.drawDistance then
+				pos = cs:getPosition(event.angle, event.time + i * (event.repeatDelay or 1))
+				if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 then
+					love.graphics.draw(
+						(function ()
+							if beattoolsLayer == "selected" then
+								return sprites.editor.repeatMarkerSelected
+							elseif beattoolsSameEasing(event, self.selectedEvent) then
+								return sprites.editor.repeatMarkerSameEasing
+							else
+								return sprites.editor.repeatMarker
+							end
+						end)(),
+						pos[1], pos[2],
+						0, 1, 1,
+						11, 11
+					)
+				end
+			end
+		end
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''for i, v in ipairs(self.level.events) do --draw events
+	if Event.info[v.type] and Event.shouldEditorDraw[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
+		local gameplay = Event.info[v.type].gameplayLayer
+		if gameplay == nil then
+			gameplay = Event.info[v.type].storeInChart
+		end
+		if gameplay then
+			love.graphics.setCanvas(self.layerCanvas.gameplay)
+		else
+			love.graphics.setCanvas(self.layerCanvas.vfx)
+		end
+		self:drawEvent(v)
+
+		if self.multiselect then
+			for ii, vv in ipairs(self.multiselect.events) do
+				if v == vv then
+					local pos = self:getPosition(v.angle, v.time)
+					love.graphics.draw(sprites.editor.selected, pos[1], pos[2], 0, 1, 1, 11, 11)'''
+position = "at"
+payload = '''
+local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
+	if beattoolsLayer == nil then
+		print("[BT] Invalid call: beattoolsLayer is nil")
+		return
+	else
+		local gameplay = Event.info[v.type].gameplayLayer
+		if gameplay == nil then
+			gameplay = Event.info[v.type].storeInChart
+		end
+		if gameplay then
+			love.graphics.setCanvas(self.layerCanvas.gameplay)
+		else
+			love.graphics.setCanvas(self.layerCanvas.vfx)
+		end
+
+		local alpha = 1
+		if v.beattoolsInStack ~= nil then alpha = alpha * mods.beattools.config.alpha end
+		if beattoolsGetEventVisibility(v) == "transparent" then alpha = alpha * 0.5 end
+		if beattoolsGetEventVisibility(v) == "ghost" then alpha = alpha * 0.25 end
+		self:drawEvent(v, alpha, beattoolsLayer)
+		if (beattoolsLayer == "event" or beattoolsLayer == "note") and self.multiselect and v.time >= self.editorBeat then
+			for ii, vv in ipairs(self.multiselect.events) do
+				if v == vv then
+					local pos = self:getPosition(v.angle, v.time)
+					if mods.beattools.config.whiteSelected ~= "off" then
+						love.graphics.setColor(mods.beattools.config.selectedBorderColor.r, mods.beattools.config.selectedBorderColor.g, mods.beattools.config.selectedBorderColor.b, mods.beattools.config.selectedBorderColor.a)
+					end
+					love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+					love.graphics.setColor(1, 1, 1, 1)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''love.graphics.setCanvas(self.canv)
+
+--draw layers
+love.graphics.setColor(1,1,1,0.3)
+if self.layers.vfx == 2 then
+	love.graphics.draw(self.layerCanvas.vfx)
+end
+if self.layers.gameplay == 2 then
+	love.graphics.draw(self.layerCanvas.gameplay)
+end
+
+love.graphics.setColor(1,1,1,1)
+if self.layers.vfx == 1 then
+	love.graphics.draw(self.layerCanvas.vfx)
+end
+if self.layers.gameplay == 1 then
+	love.graphics.draw(self.layerCanvas.gameplay)
+end
+
+--redraw selected event on top
+if self.selectedEvent and self.editorBeat <= self.selectedEvent.time then
+	local pos = {0, 0}
+	if not self.holdEndSelected then
+		pos = self:getPosition(self.selectedEvent.angle, self.selectedEvent.time)
+	else
+		local pos = self:getPosition(self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration)
+	end
+	self:drawEvent(self.selectedEvent)
+	love.graphics.draw(sprites.editor.selected, pos[1], pos[2], 0, 1, 1, 11, 11)
+end'''
+position = "at"
+payload = '''
+if true then -- Penta: beattools layer code
+	local layerNote, layerEndAngleMarker, layerDuration, layerEvent, layerRepeatMarker = {}, {}, {}, {}, {}
+
+	for i, v in ipairs(self.level.events) do
+		local visiblility = beattoolsGetEventVisibility(v)
+		if Event.info[v.type] and v ~= self.selectedEvent and visiblility ~= "hide" then
+			local function isBetween(x, low, high)
+				return x >= low and x <= high
+			end
+			local function addTo(list)
+				table--[[stop wrong injection]].insert(list, v)
+			end
+
+			local added, repeating, maxBeat, selected = false, v.type == "ease" and v.repeats ~= nil and v.repeats > 0 and v.repeatDelay ~= 0, self.editorBeat + self.drawDistance, self.selectedEvent ~= nil and self.selectedEvent.beattoolsRepeatIndex ~= nil and v.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex
+
+			if type(Event.editorDraw[v.type]) ~= "function" and (mods.beattools.config.showDuration == "on" or (mods.beattools.config.showDuration ~= "off" and selected)) and v.duration ~= nil and v.duration > 0 then
+				if isBetween(self.editorBeat, v.time, v.time + v.duration) or isBetween(maxBeat, v.time, v.time + v.duration) or isBetween(v.time, self.editorBeat, maxBeat) then
+					addTo(layerDuration)
+					if (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and ((repeating and v.time + v.repeats * (v.repeatDelay or 1) >= self.editorBeat) or (mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil and v.time >= self.editorBeat)) then
+						addTo(layerRepeatMarker)
+					end
+				elseif repeating then
+					for i = 1, v.repeats do
+						if isBetween(self.editorBeat, v.time + i * (v.repeatDelay or 1), v.time + v.duration + i * (v.repeatDelay or 1)) or isBetween(maxBeat, v.time + i * (v.repeatDelay or 1), v.time + v.duration + i * (v.repeatDelay or 1)) or isBetween(v.time + i * (v.repeatDelay or 1), self.editorBeat, maxBeat) then
+							addTo(layerDuration)
+							if v.time + v.repeats * (v.repeatDelay or 1) >= self.editorBeat then
+								addTo(layerRepeatMarker)
+							end
+							break
+						end
+					end
+				end
+			elseif (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and (repeating or (mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil)) then
+				if isBetween(v.time, self.editorBeat, maxBeat) then
+					addTo(layerRepeatMarker)
+				elseif repeating then
+					for i = 1, v.repeats do
+						if isBetween(v.time + i * (v.repeatDelay or 1), self.editorBeat, maxBeat) then
+							addTo(layerRepeatMarker)
+							break
+						end
+					end
+				end
+			end
+			if Event.shouldEditorDraw[v.type](v, self.editorBeat, maxBeat) then
+				if type(Event.editorDraw[v.type]) == "function" then
+					addTo(layerNote)
+					if (mods.beattools.config.markEndAnglePosition == "on" or (mods.beattools.config.markEndAnglePosition ~= "off" and selected)) and v.endAngle ~= nil then
+						addTo(layerEndAngleMarker)
+					end
+				else
+					addTo(layerEvent)
+				end
+			end
+		end
+	end
+	for i, v in ipairs(layerNote) do
+		beattoolsDrawEvent(i, v, "note")
+	end
+	-- Penta: Stacked notes marker
+	if mods.beattools.config.stackingNotes then
+		love.graphics.setColor(1,1,1,1)
+		for time, angles in pairs(beattoolsOverlap) do
+			if time + 0 >= self.editorBeat and time + 0 <= self.editorBeat + self.drawDistance then
+				for angle, values in pairs(angles) do
+					if values[4] then
+						local pos = self:getPosition(angle, time)
+						love.graphics.draw(sprites.editor.stackingNotes, pos[1], pos[2], 0, 1, 1, 11, 11)
+					end
+				end
+			end
+		end
+	end
+	if mods.beattools.config.markEndAnglePosition ~= "off" then
+		for i, v in ipairs(layerEndAngleMarker) do
+			beattoolsDrawEvent(i, v, "endAngleMarker")
+		end
+	end
+	if mods.beattools.config.showDuration ~= "off" then
+		for i, v in ipairs(layerDuration) do
+			beattoolsDrawEvent(i, v, "duration")
+		end
+	end
+	for i, v in ipairs(layerEvent) do
+		beattoolsDrawEvent(i, v, "event")
+	end
+	if mods.beattools.config.markRepeat ~= "off" then
+		for i, v in ipairs(layerRepeatMarker) do
+			beattoolsDrawEvent(i, v, "repeatMarker")
+		end
+	end
+end
+
+love.graphics.setCanvas(self.canv)
+--draw layers
+love.graphics.setColor(1,1,1,0.3)
+if self.layers.vfx == 2 then
+	love.graphics.draw(self.layerCanvas.vfx)
+end
+if self.layers.gameplay == 2 then
+	love.graphics.draw(self.layerCanvas.gameplay)
+end
+
+love.graphics.setColor(1,1,1,1)
+if self.layers.vfx == 1 then
+	love.graphics.draw(self.layerCanvas.vfx)
+end
+if self.layers.gameplay == 1 then
+	love.graphics.draw(self.layerCanvas.gameplay)
+end
+
+--redraw selected event on top
+if self.selectedEvent and beattoolsGetEventVisibility(self.selectedEvent) ~= "hide" and self.selectedEvent.time + ((mods.beattools.config.markRepeat ~= "off" and self.selectedEvent.repeats ~= nil and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay ~= 0 and self.selectedEvent.repeats * (self.selectedEvent.repeatDelay or 1)) or 0) + (((type(Event.editorDraw[self.selectedEvent.type]) == "function" and self.selectedEvent.duration ~= nil) or (mods.beattools.config.showDuration ~= "off" and type(Event.editorDraw[self.selectedEvent.type]) ~= "function" and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0)) and self.selectedEvent.duration or 0) >= self.editorBeat then
+	if self.selectedEvent.type == "ease" or self.selectedEvent.time >= self.editorBeat or (((type(Event.editorDraw[self.selectedEvent.type]) == "function" or mods.beattools.config.showDuration ~= "off") and self.selectedEvent.duration ~= nil and self.selectedEvent.duration > 0) and self.selectedEvent.time + self.selectedEvent.duration >= self.editorBeat) then
+		self:drawEvent(self.selectedEvent, nil, "selected")
+	end
+	if self.selectedEvent.time >= self.editorBeat then
+		local pos = {0, 0}
+		if not self.holdEndSelected then
+			pos = self:getPosition(self.selectedEvent.angle, self.selectedEvent.time)
+		else
+			pos = self:getPosition(self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration)
+		end
+		if mods.beattools.config.whiteSelected ~= "off" then
+			love.graphics.setColor(mods.beattools.config.selectedBorderColor.r, mods.beattools.config.selectedBorderColor.g, mods.beattools.config.selectedBorderColor.b, mods.beattools.config.selectedBorderColor.a)
+		end
+		love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + (self.selectedEvent.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (self.selectedEvent.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+		love.graphics.setColor(1, 1, 1, 1)
+	end
+end
+if beattoolsRecordPosition and beattoolsRecordFunc then
+	love.graphics.setColor(mods.beattools.config.lineColor.r, mods.beattools.config.lineColor.g, mods.beattools.config.lineColor.b, 1)
+	love.graphics.setLineWidth(2)
+	love.graphics.line(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision - 5, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision - 5, helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision + 5, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision + 5)
+	love.graphics.line(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision + 5, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision - 5, helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision - 5, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision + 5)
+	local beattoolsParam = helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision .. "/" ..  helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision .. " (press \"r\")"
+	local leftside = helpers.round(mouse.rx) <= 300
+	local pos = { helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision - (leftside and -10 or 210), helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision - 3 + (helpers.round(mouse.ry) <= 180 and 10 or -10) }
+	love.graphics.setColor(mods.beattools.config.bgColor2.r, mods.beattools.config.bgColor2.g, mods.beattools.config.bgColor2.b, 1)
+	if mods.beattools.config.shadow2 then
+		love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 200, (leftside and "left" or "right"))
+	else
+		love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2], 200, (leftside and "left" or "right"))
+		love.graphics.printf(beattoolsParam, pos[1], pos[2] + 1, 200, (leftside and "left" or "right"))
+		love.graphics.printf(beattoolsParam, pos[1] - 1, pos[2], 200, (leftside and "left" or "right"))
+		love.graphics.printf(beattoolsParam, pos[1], pos[2] - 1, 200, (leftside and "left" or "right"))
+	end
+	love.graphics.setColor(mods.beattools.config.fgColor2.r, mods.beattools.config.fgColor2.g, mods.beattools.config.fgColor2.b, 1)
+	love.graphics.printf(beattoolsParam, pos[1], pos[2], 200, (leftside and "left" or "right"))
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self:drawEvent({type = eventType, angle = angle, time = time, isCursor = true},alpha)'''
+position = "at"
+payload = '''
+self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected", "show")
+'''
+match_indent = true
+
+
+# Determines event beattoolsOverlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''  color(cs.voidColor)'''
+position = "at"
+payload = '''
+	beattoolsSelect = nil
+	love.graphics.setFont(fonts.main)
+	if self.editMode then
+		love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
+	else
+		color(cs.voidColor)
+	end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''--trigger auto-backup every five minutes'''
+position = "before"
+payload = '''if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect ~= nil and (beattoolsSelect[1] ~= beattoolsPrevSelect[1] or beattoolsSelect[2] ~= beattoolsPrevSelect[2])) then
+	beattoolsPrevSelect = beattoolsSelect
+	self:updateBiggestBeat()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''function st:updateBiggestBeat()'''
+position = "after"
+payload = '''
+	beattoolsOverlap = {}
+	for k, v in pairs(beattoolsDefaultEasings) do
+		beattoolsEasings[k] = {}
+	end
+	beattoolsCurrentEasings = {}
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''--trigger auto-backup every five minutes'''
+position = "before"
+payload = '''if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
+	beattoolsEditorBeat = helpers.round(self.editorBeat)
+	self:updateBiggestBeat()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
+position = "after"
+payload = '''
+if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
+if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin then
+	local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
+	if v.time == -0 then v.time = 0 end
+	if beattoolsOverlap["" .. v.time] == nil then
+		beattoolsOverlap["" .. v.time] = {}
+	end
+	if beattoolsOverlap["" .. v.time][beattoolsAngle] == nil then
+		beattoolsOverlap["" .. v.time][beattoolsAngle] = {0, false, 0, false}
+	end
+	if type(Event.editorDraw[v.type]) == "function" then
+		if beattoolsOverlap["" .. v.time][beattoolsAngle][2] then
+			beattoolsOverlap["" .. v.time][beattoolsAngle][4] = true
+		end
+		beattoolsOverlap["" .. v.time][beattoolsAngle][2] = true
+	else
+		beattoolsOverlap["" .. v.time][beattoolsAngle][1] = beattoolsOverlap["" .. v.time][beattoolsAngle][1] + 1
+	end
+end
+-- Penta's Beattools code marker'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''	-- Penta's Beattools code marker
+end'''
+position = "after"
+payload = '''
+	for kk, vv in pairs(beattoolsEasings) do
+		if beattoolsEasingFor[kk] == true then
+			table.sort(vv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end)
+		elseif type(beattoolsEasingFor[kk]) == "table" then
+			for kkk, vvv in beattoolsEasingFor[kk][1](vv) do
+				if vvv ~= nil then
+					for kkkk, vvvv in beattoolsEasingFor[kk][2](vvv) do
+						if vvvv ~= nil then table.sort(vvvv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end) end
+					end
+				end
+			end
+		else
+			for kkk, vvv in beattoolsEasingFor[kk](vv) do
+				if vvv ~= nil then table.sort(vvv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end) end
+			end
+		end
+	end
+	for i, v in ipairs(self.level.events) do
+		if (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" then
+			local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
+			if v.time == -0 then v.time = 0 end
+			v.beattoolsIndex, v.beattoolsInStack = 0, nil
+			local noGameplay = true
+			if (beattoolsOverlap["" .. v.time][beattoolsAngle][2] or beattoolsOverlap["" .. v.time][beattoolsAngle][1] > 1) then
+				v.beattoolsInStack = true
+				v.beattoolsIndex = beattoolsOverlap["" .. v.time][beattoolsAngle][3]
+				beattoolsOverlap["" .. v.time][beattoolsAngle][3] = beattoolsOverlap["" .. v.time][beattoolsAngle][3] + 1
+				if beattoolsOverlap["" .. v.time][beattoolsAngle][2] then
+					v.beattoolsIndex = v.beattoolsIndex + 1 noGameplay = false
+				end
+			end
+			if beattoolsSelect ~= nil and noGameplay then
+				if true and beattoolsSelect[1] == v.time and beattoolsSelect[2] == v.angle % 360 then
+					v.beattoolsIndex = v.beattoolsIndex + 1
+					v.beattoolsInStack = true
+				end
+			end
+		end
+	end
+'''
+match_indent = false
+
+
+# Making the seletion hitbox offset as well ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+if helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
+position = "at"
+payload = '''
+if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos[1] - 8 + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, y = pos[2] - 8 - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, width = 16, height = 16 }
+'''
+match_indent = true
+# currently expect 1 default match and 1 match for "Hold Dragging" v1.0.0 by Kakadu and "Ctrl Select" v1.2.0 by Kakadu each
+
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
+position = "at"
+payload = '''
+if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) then $func .multiselect.events, $event ) end $end'''
+
+# Updating stack detection more often ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if maininput:pressed("move_up") then'''
+position = "before"
+payload = '''
+self:updateBiggestBeat()
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if maininput:pressed("move_down") then'''
+position = "before"
+payload = '''
+self:updateBiggestBeat()
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent.angle = angle'''
+position = "before"
+payload = '''
+local beattoolsTemp = false
+if self.selectedEvent.angle ~= self.cursorAngle or self.selectedEvent.time ~= self.cursorBeat then beattoolsTemp = true end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent.time = self.cursorBeat'''
+position = "after"
+payload = '''
+if beattoolsTemp then self:updateBiggestBeat() end
+'''
+match_indent = true
+
+
+# Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
+position = "before"
+payload = '''beattoolsRemoveParameters(self)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
+position = "before"
+payload = '''beattoolsRemoveParameters(self)
+'''
+match_indent = true
+times = 3
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
+position = "before"
+payload = '''beattoolsRemoveParameters(self)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if imgui.Button('Make tag') then'''
+position = "after"
+payload = '''
+beattoolsRemoveParameters(self)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
+position = "after"
+payload = '''
+self:updateBiggestBeat()'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
+position = "after"
+payload = '''
+self:updateBiggestBeat()'''
+match_indent = true
+times = 3
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
+position = "after"
+payload = '''
+self:updateBiggestBeat()'''
+match_indent = true
+
+
+# End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''(?<func>self:getPosition)\((?<param>[^\n]+?)\.angle,'''
+position = "at"
+payload = '''
+self:getPosition((function () if mods.beattools.config.displayEndAngle and $param.endAngle ~= nil then return $param.endAngle else return $param.angle end end)(),'''
+
+
+# Random Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''[^\S\n]*helpers\.SetNextWindowPos\([^\S\n]*?(?<param1>\d+)[^\S\n]*?,[^\S\n]*?(?<param2>\d+)[^\S\n]*?,[^\S\n]*?(?<param3>[\w"'_ ]+?)[^\S\n]*?\)[^\S\n]*?\n(?<indent>\s+)helpers\.SetNextWindowSize\([^\S\n]*?(?<param5>\d+)[^\S\n]*?,[^\S\n]*?(?<param6>\d+)[^\S\n]*?,[^\S\n]*?(?<param7>[\w"'_ ]+?)[^\S\n]*?\)'''
+position = "at"
+line_prepend = "$indent"
+payload = '''
+if mods.beattools.config.randomizeWindows ~= "off" and beattoolsRandomizeWindows then
+	local sx, sy = math.random(100, 400), math.random(100, 400)
+	helpers.SetNextWindowPos(math.random(0, 1200 - sx), math.random(0, 720 - sy), "ImGuiCond_Always")
+	helpers.SetNextWindowSize(sx, sy, "ImGuiCond_Always")
+else
+	helpers.SetNextWindowPos( $param1 , $param2 , $param3 )
+	helpers.SetNextWindowSize( $param5 , $param6 , $param7 )
+end
+'''
+
+
+# Editor Colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
+position = "at"
+payload = '''
+love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''color('black')'''
+position = "at"
+payload = '''
+love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''color()'''
+position = "at"
+payload = '''
+love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''color('white')'''
+position = "at"
+payload = '''
+love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
+'''
+match_indent = true

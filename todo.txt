@@ -1,0 +1,53 @@
+STUFF TO DO:
+- better backup   -- Penta: +1 (multiple different types of backups to ensure nothing gets lost when the base game backup happens at a bad timing)
+
+- angles dial (spin over the limit)
+	buttons for multiplying?
+
+
+Mod Config:
+
+
+Party Tricks:
+- swap color channels? (tags!!!)
+- in-editor code evaluator
+- gif in imgui (Are you sure? :skull:)
+
+
+EA FIX:
+- lively cranky (not even possible anymore?)
+- level select non levels/folders
+- expand whitelist with new params
+
+
+Low Priority:   -- Penta: very low priority, like in will get implemented next year, if at all
+- replay system (worked on by someone else?)
+- sfx for selecting events
+- default positions for imgui windows
+
+
+Potential:   -- Penta: i have no idea if i will even implement these features
+- better level duplicate scan + auto .redirect conversion + updates redirects with folder rename/move
+- move player in editor   -- Penta: -1
+- overlap warning with ease durations
+- ease tooltips/descriptions
+- auto convert when fakeRepeat is off and event is selected   -- Penta: annoying to make
+
+
+FIX QP:
+	modtime requested before check for file existence
+
+
+
+Penta:
+MOD THE RHYTHM AND NOTES
+A test of wit and know-how, & a series of challenging UI
+with the intent to enhance
+
+Kakadu:
+We won't let the devs take us for fools:
+this is clearly sponsored by Penta's Beattools.
+
+WhenPigFly:
+This collab is sponsored by Penta's Beattools. Have you ever been in need of things the editor just won't provide ? Well, with Penta's Beattools, many things, such as a particle generator, a bpm corrector, and many more become available to you !
+Click the download link in the description and use code "WHENP16FL7" to get 50% off on your first purchase !

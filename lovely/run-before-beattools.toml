@@ -1,0 +1,55 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1000000000
+
+
+# Honestly dont know what this was for anymore, i think its for the faster event scrolling? ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+if self.editMode then
+	self.cBeat = self.editorBeat --for hold rendering
+end
+'''
+position = "at"
+payload = '''
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if mouse.pressed == 1 and not self.altSliderHovered and not self.altRingHovered then -- on mouse press'''
+position = "before"
+payload = '''
+if self.editMode then
+	self.cBeat = self.editorBeat -- Penta: for hold rendering?
+end
+'''
+match_indent = true
+
+
+# Full update ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''--trigger auto-backup every five minutes'''
+position = "before"
+payload = '''if beattoolsTime - beattoolsLastCheck > mods.beattools.config.scanInterval * 100 then beattoolsCheckEvents(self) end
+'''
+match_indent = true
+
+
+# Lag back in option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''self.innerOptionsMenu:addOption('back', function() self.inOptionsMenu = false end, ySpacing * 7)'''
+position = "before"
+payload = '''
+self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)
+'''
+match_indent = true

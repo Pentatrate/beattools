@@ -1,0 +1,942 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+
+# Fix for penta's dream skin ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/Player.lua"
+pattern = '''if bodyShape == "2p5d" then'''
+position = "at"
+payload = '''
+if costume.body and (bodyShape ~= "2p5d" or costume.body.bodyInvisible) and costume.body.body2p5d then
+	if costume.body.bodyInvisible then bodyShape = "invisible" end
+	self:drawToCanvas(costume, bodyShape, 3)
+	self:drawToCanvas(costume, bodyShape, 0)
+elseif bodyShape == "2p5d" then
+'''
+match_indent = true
+
+
+# Event transparency drawing ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Block
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/block.lua"
+pattern = '''local function editorDraw(event)'''
+position = "at"
+payload = '''
+local function editorDraw(event, a, b, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/block.lua"
+pattern = '''local note = Block:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/notes/Block.lua"
+pattern = '''color()'''
+position = "after"
+payload = '''
+love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
+'''
+match_indent = true
+
+# Inverse
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/inverse.lua"
+pattern = '''local function editorDraw(event)'''
+position = "at"
+payload = '''
+local function editorDraw(event, a, b, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/inverse.lua"
+pattern = '''local note = Block:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+# Side
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/side.lua"
+pattern = '''local function editorDraw(event)'''
+position = "at"
+payload = '''
+local function editorDraw(event, a, b, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/side.lua"
+pattern = '''local note = Side:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/notes/Side.lua"
+pattern = '''color()'''
+position = "after"
+payload = '''
+love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
+'''
+match_indent = true
+
+# Mine
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mine.lua"
+pattern = '''local function editorDraw(event)'''
+position = "at"
+payload = '''
+local function editorDraw(event, a, b, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mine.lua"
+pattern = '''local note = Mine:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+# Hold
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''local function editorDraw(event, beat, endBeat)'''
+position = "at"
+payload = '''
+local function editorDraw(event, beat, endBeat, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''local hold = Hold:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/notes/Hold.lua"
+pattern = '''color()'''
+position = "after"
+payload = '''
+love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/notes/Hold.lua"
+pattern = '''color('black')'''
+position = "after"
+payload = '''
+love.graphics.setColor(0, 0, 0, self.beattoolsAlpha or 1)
+'''
+match_indent = true
+
+# Minehold
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mineHold.lua"
+pattern = '''local function editorDraw(event, beat, endBeat)'''
+position = "at"
+payload = '''
+local function editorDraw(event, beat, endBeat, alpha)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mineHold.lua"
+pattern = '''local hold = MineHold:new({'''
+position = "after"
+payload = '''
+	beattoolsAlpha = alpha,
+'''
+match_indent = true
+
+
+# Place custom event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+if self.placeEvent ~= '' and Event.info[self.placeEvent] then
+'''
+position = "at"
+payload = '''
+if self.placeEvent ~= '' and string.match(self.placeEvent, "beattoolsEvent;") then
+	local placingEvent = { time = self.cursorBeat, angle = self.cursorAngle }
+	for w in string.gmatch(self.placeEvent, "[^;]+") do
+		if w ~= "beattoolsEvent" then
+			if string.match(w, ",") == nil then
+				placingEvent.type = w
+			else
+				local temp = {}
+				for ww in string.gmatch(w, "[^,]+") do
+					table--[[stop wrong injection]].insert(temp, ww)
+				end
+				if false then end
+				({
+					string = function () end,
+					number = function () temp[2] = tonumber(temp[2]) end,
+					boolean = function () temp[2] = temp[2] == "true" and true or false end,
+					["nil"] = function () temp[2] = nil end
+				})[temp[3]]()
+				placingEvent[temp[1]] = temp[2]
+			end
+		end
+	end
+	if Event.info[placingEvent.type] then
+		table.insert(self.level.events, placingEvent)
+		self.selectedEvent = self.level.events[#self.level.events]
+		self.unsavedChanges = true
+		self:updateBiggestBeat()
+	else
+		print("[BT] Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
+	end
+elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
+'''
+match_indent = true
+
+
+# Acc bar ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''if cs.vfx.drawCombo and cs.vfx.drawUI then'''
+position = "before"
+payload = '''
+if mods.beattools.config.accBar then
+	local realAcc = (((cs.currentMaxHits or 1) - (cs.misses or 0) - ((cs.barelies or 0) / 4)) / (cs.currentMaxHits or 1))
+	if realAcc ~= realAcc then realAcc = 1 end
+	if cs.beattoolsPrevAcc == nil or cs.beattoolsPrevAcc ~= cs.beattoolsPrevAcc then cs.beattoolsPrevAcc = realAcc end
+	local acc = cs.beattoolsPrevAcc + (realAcc - cs.beattoolsPrevAcc) * mods.beattools.config.accBarSmooth
+	cs.beattoolsPrevAcc = acc
+	if acc > 0 then
+		local gradeMargins = {
+			{100, 'perfect'},
+			{98, 's','plus'},
+			{95, 's'},
+			{93, 'a','plus'},
+			{90, 'a'},
+			{87, 'b','plus'},
+			{83, 'b'},
+			{80, 'b','minus'},
+			{77, 'c','plus'},
+			{73, 'c'},
+			{70, 'c','minus'},
+			{64, 'd','plus'},
+			{56, 'd'},
+			{50, 'd','minus'},
+			{0, 'f'}
+		}
+		for i, v in ipairs(gradeMargins) do
+			if acc * 100 >= v[1] then
+				local accBarBgColors = { note = 0, player = cs.p.fillColor, ["UI/BG"] = cs.bgColor, ["outline/BG"] = cs.bgColor }
+				local accBarFgColors = { note = 1, player = cs.p.outlineColor, ["UI/BG"] = cs.vfx.uiColor, ["outline/BG"] = cs.outline or 0 }
+				local accBarColorScheme = mods.beattools.config.accBarColors
+				if accBarColorScheme == "auto" then
+					local accBarColorDiff
+					for k, vv in pairs(accBarBgColors) do
+						local colorDiff = math.abs((shuv.pal[accBarFgColors[k]].r + shuv.pal[accBarFgColors[k]].g + shuv.pal[accBarFgColors[k]].b) - (shuv.pal[vv].r + shuv.pal[vv].g + shuv.pal[vv].b))
+						if accBarColorDiff == nil or accBarColorDiff < colorDiff then
+							accBarColorScheme = k
+							accBarColorDiff = colorDiff
+						end
+					end
+				end
+				if v[2] ~= "perfect" then
+					color(accBarBgColors[accBarColorScheme])
+					love.graphics.rectangle("fill", 0, 0, project.res.x, mods.beattools.config.accBarWidth)
+				end
+				color(accBarFgColors[accBarColorScheme])
+				local subAcc, subAcc2
+				if v[2] == "perfect" then
+					subAcc = 0
+					subAcc2 = 1
+				elseif mods.beattools.config.accBarReverse then
+					subAcc = 1 - (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+					subAcc2 = 1
+				else
+					subAcc = 0
+					subAcc2 = (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+				end
+				({
+					top = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x * subAcc, 0,
+							project.res.x * subAcc2, mods.beattools.config.accBarWidth
+						)
+					end,
+					bottom = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x * subAcc, project.res.y - mods.beattools.config.accBarWidth,
+							project.res.x * subAcc2, project.res.y
+						)
+					end,
+					left = function ()
+						love.graphics.rectangle(
+							"fill",
+							0, project.res.y * subAcc,
+							mods.beattools.config.accBarWidth, project.res.y * subAcc2
+						)
+					end,
+					right = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x - mods.beattools.config.accBarWidth, project.res.y * subAcc,
+							project.res.x, project.res.y * subAcc2
+						)
+					end
+				})[mods.beattools.config.accBarSide]()
+				color(cs.vfx.uiColor)
+				break
+			end
+		end
+	end
+end
+'''
+match_indent = true
+
+
+# Custom level visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''local loadBeatQueue = {}'''
+position = "after"
+payload = '''
+local beattoolsNoColors = true
+local alreadyHasDamoclism = false
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''if cs.level.properties.loadBeat and cs.cBeat < 0 and v.time <= cs.level.properties.loadBeat then'''
+position = "before"
+payload = '''
+if mods.beattools.config.customLevelVisuals then
+	if v.type == "setColor" then
+		beattoolsNoColors = false
+	elseif v.type == "outline" then
+		if not ({ [0] = true, [1] = true })[v.color] then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "noise" then
+		if (not ({ [0] = true, [1] = true })[v.color]) then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "setBgColor" then
+		if (not ({ [0] = true, [1] = true })[v.color]) and (not ({ [0] = true, [1] = true })[v.voidColor]) then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "deco" then
+		if v.hide ~= true then
+			beattoolsNoColors = false
+		end
+	end
+end
+if mods.beattools.config.damoclismCataclism then
+	if v.type == "initObject" and v.objectName == "Damoclism" then alreadyHasDamoclism = true end
+end
+'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''table.sort(loadBeatQueue,function(k1, k2)'''
+position = "before"
+payload = '''
+if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
+	shuv.pal[0].r, shuv.pal[0].g, shuv.pal[0].b = mods.beattools.config.customWhiteColor.r * 255, mods.beattools.config.customWhiteColor.g * 255, mods.beattools.config.customWhiteColor.b * 255
+	shuv.pal[1].r, shuv.pal[1].g, shuv.pal[1].b = mods.beattools.config.customBlackColor.r * 255, mods.beattools.config.customBlackColor.g * 255, mods.beattools.config.customBlackColor.b * 255
+end
+if mods.beattools.config.damoclismCataclism and not alreadyHasDamoclism then
+	table--[[stop wrong injection]].insert(cs.playEvents, { time = -999, angle = 0, type = "initObject", objectName = "Damoclism", variableName = "damoclism_beattools" })
+end
+'''
+match_indent = true
+
+
+# Better Level Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''function st:newLevel(levelMetadata, filename, originalFilename)'''
+# position = "at"
+# payload = '''
+# function st:loadLevel(index)
+# 	local v = self.directoryList[index]
+# 	if v == nil then return end
+# 	if not self.menuItems[index].beattoolsTemp then return end
+
+# 	local folderInfo = love.filesystem.getInfo(self.currentDirectory .. v .. "/")
+
+# 	if love.filesystem.getInfo(self.currentDirectory .. v .. "/manifest.json") then
+# 		local levelMetadata = LevelManager:loadMetadata(self.currentDirectory..v..'/')
+# 		self:newLevel(levelMetadata, self.currentDirectory..v..'/', index)
+# 	elseif love.filesystem.getInfo(self.currentDirectory .. v .. "/level.json") then
+# 		local levelMetadata = LevelManager:loadMetadata(self.currentDirectory..v..'/')
+# 		self:newLevel(levelMetadata, self.currentDirectory..v..'/', index)
+# 	elseif folderInfo and folderInfo.type == "directory" then
+# 		self:newFolder(v, index)
+# 	elseif v:match("(.+)%.redirect") then
+# 		--Eventually we will need to implement a more robust song unlocking system, but since we only have 1 locked song, this should work. -DPS
+# 		local filename = love.filesystem.read(self.currentDirectory..v)
+# 		if (not (filename == 'levels/Finished levels/TerabyteConnection/' and (not savedata.terabyteUnlocked))) and
+# 			(not (filename == 'levels/Other/fishing/' and (not (self.playedLevelsJson['Tutorial_CV35W_CV35W_easy'] or self.playedLevelsJson['Tutorial_CV35W_DPS2004'])))) then
+# 			local levelMetadata = LevelManager:loadMetadata(filename)
+# 			self:newLevel(levelMetadata, filename, index)
+# 		end
+# 	end
+# end
+# function st:newLevel(levelMetadata, filename, originalFilename, index)
+# '''
+# match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''function st:newFolder(filename)'''
+# position = "at"
+# payload = '''function st:newFolder(filename, index)'''
+# match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''table.insert(self.menuItems, menuItem)'''
+# position = "at"
+# payload = '''
+# if index then
+# 	self.menuItems[index] = menuItem
+# else
+# 	table.insert(self.menuItems, menuItem)
+# end
+# '''
+# match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''
+# local directoryList = love.filesystem.getDirectoryItems(self.currentDirectory)
+#   self.menuItems = {}
+
+# -- If it's loading the Songwheel, grab the currently unlocked levels from the save file & add them to the menuItems list.
+
+# if self.currentDirectory == "levels/Songwheel/" then
+
+# 	local unlockData = UnlockManager.getUnlockedMapLevels('levels/AtomMap.json')
+# 	print('Unlock Data: ' .. table.concat(unlockData, ', '))
+# 	for i, path in ipairs(unlockData) do
+# 		if love.filesystem.getInfo(path .. "/manifest.json") then
+# 			local levelMetadata = LevelManager:loadMetadata(path .. '/')
+# 			self:newLevel(levelMetadata, path.. '/')
+# 		elseif love.filesystem.getInfo(path .. "/level.json") then
+# 			local levelMetadata = LevelManager:loadMetadata(path .. '/')
+# 			self:newLevel(levelMetadata, path .. '/')
+# 		elseif love.filesystem.getInfo(path .. "/marathon.json") then
+# 			self:newMarathon(path .. '/')
+# 		else
+# 			print('Error: Level not found at path: ' .. path)
+# 		end
+# 	end
+# end
+
+# -- Checks if we're loading the Marathon menu, and loads any marathons if so.
+
+# -- Still do this code anyway so we can add in levels manually that might not be in the atom map. (Why would we ever do this?)
+
+# 	for i,v in ipairs(directoryList) do
+# 		local folderInfo = love.filesystem.getInfo(self.currentDirectory .. v .. "/")
+
+# 		if love.filesystem.getInfo(self.currentDirectory .. v .. "/manifest.json") then
+# 			local levelMetadata = LevelManager:loadMetadata(self.currentDirectory..v..'/')
+# 			self:newLevel(levelMetadata, self.currentDirectory..v..'/')
+# 		elseif love.filesystem.getInfo(self.currentDirectory .. v .. "/level.json") then
+# 				local levelMetadata = LevelManager:loadMetadata(self.currentDirectory..v..'/')
+# 				self:newLevel(levelMetadata, self.currentDirectory..v..'/')
+# 		elseif love.filesystem.getInfo(self.currentDirectory .. v .. "/marathon.json") then
+# 				self:newMarathon(self.currentDirectory..v..'/')
+# 		elseif folderInfo and folderInfo.type == "directory" then
+# 			self:newFolder(v)
+# 		elseif v:match("(.+)%.redirect") then
+
+# 			--Eventually we will need to implement a more robust song unlocking system, but since we only have 1 locked song, this should work. -DPS
+# 			local filename = love.filesystem.read(self.currentDirectory..v)
+# 			if not (filename == 'levels/Other/fishing/' and (not UnlockManager.isLevelPassed({
+# 	level = "Finished levels/Rhythmic Shield/",
+# 	percent = 80,
+# }))) then
+# 						local levelMetadata = LevelManager:loadMetadata(filename)
+# 						self:newLevel(levelMetadata, filename)
+# 			end
+# 		end
+# 	end
+
+# 	if self.currentDirectory == 'Custom Levels/' then
+# 		local menuItem = {}
+# 		menuItem.isLevel = false
+# 		menuItem.multiLine = true
+# 		menuItem.openCustomsFolder = true
+
+# 		menuItem.name = loc.get('openCustomsFolder')
+# 		menuItem.artist = loc.get('putLevelsInHere')
+# 		if index then
+# 			self.menuItems[index] = menuItem
+# 		else
+# 			table.insert(self.menuItems, menuItem)
+# 		end
+# 	end
+# '''
+# position = "at"
+# payload = '''
+# self.directoryList = love.filesystem.getDirectoryItems(self.currentDirectory)
+# self.menuItems = {}
+# if not mods.beattools.config.levelSelectShowIncompatible then
+# 	for i = #self.directoryList, 1, -1 do
+# 		local v = self.directoryList[i]
+# 		local folderInfo = love.filesystem.getInfo(self.currentDirectory .. v .. "/")
+# 		if love.filesystem.getInfo(self.currentDirectory .. v .. "/manifest.json") or love.filesystem.getInfo(self.currentDirectory .. v .. "/level.json") or (folderInfo and folderInfo.type == "directory") or v:match("(.+)%.redirect") then
+# 		else
+# 			table.remove(self.directoryList, i)
+# 		end
+# 	end
+# end
+# if self.currentDirectory == "levels/Songwheel/" then
+# 	local unlockData = UnlockManager.getUnlockedMapLevels('levels/AtomMap.json')
+# 	for i, path in ipairs(unlockData) do
+# 		if love.filesystem.getInfo(path .. "/manifest.json") then
+# 			local levelMetadata = LevelManager:loadMetadata(path .. '/')
+# 			self:newLevel(levelMetadata, path.. '/')
+# 		elseif love.filesystem.getInfo(path .. "/level.json") then
+# 			local levelMetadata = LevelManager:loadMetadata(path .. '/')
+# 			self:newLevel(levelMetadata, path .. '/')
+# 		elseif love.filesystem.getInfo(path .. "/marathon.json") then
+# 			self:newMarathon(path .. '/')
+# 		else
+# 			print('Error: Level not found at path: ' .. path)
+# 		end
+# 	end
+# end
+# if self.currentDirectory == 'Custom Levels/' then
+# 	for i, v in ipairs(self.directoryList) do
+# 		self.menuItems[i] = {
+# 			multiLine = true,
+# 			name = '"' .. tostring(v) .. '"',
+# 			artist = self.topDirectory == "Custom Levels/" and "  [ Invalid file ]  " or "  [ Locked Level ]  ",
+# 			beattoolsTemp = true
+# 		}
+# 		if not mods.beattools.config.levelSelectDynamicLoading then
+# 			st:loadLevel(i)
+# 		end
+# 	end
+# end
+# '''
+# match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''function st:updateSelection()'''
+# position = "after"
+# payload = '''
+# 	if mods.beattools.config.levelSelectDynamicLoading then
+# 		for i = -3, 3 do
+# 			st:loadLevel(self.selection + i)
+# 		end
+# 	end
+# '''
+# match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "states/SongSelect.lua"
+# pattern = '''if maininput:pressed("accept") or clickedOnLevel then'''
+# position = "after"
+# payload = '''
+# 	if self.menuItems[self.selection].beattoolsTemp then return end
+# '''
+# match_indent = true
+
+
+# Bpm with rateMod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/LevelManager.lua"
+pattern = '''level.metadata.bpm = loc.get('bpm',{level.metadata.bpm})'''
+position = "before"
+payload = '''
+level.metadata.rawBpm = level.metadata.bpm
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/LevelManager.lua"
+pattern = '''level.metadata.bpm = minBPM .. '-' .. maxBPM'''
+position = "before"
+payload = '''
+level.metadata.rawMinBpm = minBPM
+level.metadata.rawMaxBpm = maxBPM
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')'''
+position = "at"
+payload = '''
+if mods.beattools.config.levelSelectMultiplyBpm and self.rateMod and self.rateMod ~= 1 then
+	if type(level.rawMetadata.rawBpm) == "number" then
+		love.graphics.printf(loc.get("bpm", { level.rawMetadata.rawBpm * self.rateMod .. " (" .. level.rawMetadata.rawBpm .. " x" .. self.rateMod .. ")" }), xBorder + xOffset, bpmY, wrapLimit, "left")
+	elseif type(level.rawMetadata.rawMinBpm) == "number" then
+		love.graphics.printf(loc.get("bpm", { level.rawMetadata.rawMinBpm * self.rateMod .. "-" .. level.rawMetadata.rawMaxBpm * self.rateMod .. " (" .. level.rawMetadata.rawBpm .. " x" .. self.rateMod .. ")" }), xBorder + xOffset, bpmY, wrapLimit, "left")
+	end
+else
+	love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')
+end
+'''
+match_indent = true
+
+
+# Fix play sound annoyance ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''local oLTotal = 0'''
+position = "before"
+payload = '''cs.loadingBeats = true'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''prof.pop("GameManager update")'''
+position = "after"
+payload = '''cs.loadingBeats = false'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/playSound.lua"
+pattern = '''te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)'''
+position = "at"
+payload = '''
+if not cs.loadingBeats then
+	te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)
+end
+'''
+match_indent = true
+
+
+# Cheat ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''function GameManager:resetLevel()'''
+position = "after"
+payload = '''
+	self.CHEATmaxBeat = nil
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''function GameManager:update(dt)'''
+position = "before"
+payload = '''
+function GameManager:CHEATconvertToBeat(number, forceSeconds)
+	if forceSeconds or mods.beattools.config.lagUseSeconds then
+		return number / (60 / GameManager:getBPM() / (GameManager.rateMod or 1))
+	end
+	return number
+end
+
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''cs.cBeat = cs.source:getBeat()'''
+position = "at"
+payload = '''
+local tempTime = cs.source:getBeat()
+-- Penta:
+-- cs.cBeat is the old one
+-- tempTime is the new one
+if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBeat + self:CHEATconvertToBeat(mods.beattools.config.lagThreshhold) <= tempTime then
+	print("LAG DETECTED!!!")
+	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
+	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
+	if cs.cBeat - tempTime >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click', soundObject = sounds['click']}) end
+	if cs.cBeat - tempTime >= 2 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 2, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
+	if cs.cBeat - tempTime >= 1 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 1, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
+	if cs.cBeat - tempTime >= 0 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 0, type = 'playSound', volume = '1', pitch = '1.75', sound = 'side', soundObject = sounds['side']}) end
+	cs.pauseBeat = cs.cBeat
+	cs.source:setBeat(tempTime)
+	self.CHEATlagBack = (self.CHEATlagBack or 0) + 1
+end
+cs.cBeat = tempTime
+'''
+match_indent = true
+
+
+# Better multiselect move ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''v.time = v.time + deltaBeat'''
+position = "before"
+payload = '''
+if mods.beattools.config.betterMoveSelection and v.endAngle then
+	v.endAngle = v.endAngle * deltaScale + deltaAngle
+end
+'''
+match_indent = true
+
+
+# Fix multiselect bug with untagger ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if changed then'''
+position = "at"
+payload = '''
+if (function () for k, v in pairs(changed) do return true end return false end)() then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if first[k] ~= v then'''
+position = "at"
+payload = '''
+if tostring(first[k]) ~= tostring(v) then
+'''
+match_indent = true
+
+
+# Restart in playtest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+function st:playLevel()
+'''
+position = "after"
+payload = '''
+	beattoolsStartBeat = self.startBeat
+	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
+	beattoolsPlayerSprite = ""
+	self.p.forceSprite = ""
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+function st:stopLevel()
+'''
+position = "after"
+payload = '''
+	beattoolsPlayerSprite = "><"
+	beattoolsLastSpriteChange = beattoolsTime
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+if maininput:pressed("back") then
+	self:stopLevel()
+'''
+position = "before"
+payload = '''
+if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
+	self.gm:stopLevel()
+
+	pq = ""
+	self.noteRadius = 8
+
+	entities = { self.p }
+
+	self.startBeat = beattoolsStartBeat
+
+	self.gm:resetLevel()
+end
+'''
+match_indent = true
+
+
+# End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to activate on', { step = beatStep })'''
+position = "before"
+payload = '''
+local beattoolsTemp1 = self.selectedEvent.endAngle
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if imgui.Button('Delete event') then'''
+position = "before"
+payload = '''
+if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle == 0 then
+	self.selectedEvent.endAngle = self.selectedEvent.angle
+end
+'''
+match_indent = true
+
+
+# Angle/Beat snap saving ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''imgui.Text("Angle: " .. angleSnapText)
+end'''
+position = "after"
+payload = '''
+mods.beattools.config.angleSnap = self.angleSnap
+mods.beattools.config.customAngleSnap = self.customAngleSnap
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.angleSnapValues = { 8, 12, 16, 24, 32 }
+self.angleSnap = 3
+self.customAngleSnap = 32'''
+position = "at"
+payload = '''
+self.angleSnapValues = mods.beattools.config.angleSnapValues
+self.angleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.angleSnap or mods.beattools.config.angleDefault
+self.customAngleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customAngleSnap or mods.beattools.config.customAngleDefault
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''imgui.Text("Beat: " .. beatSnapText)
+end'''
+position = "after"
+payload = '''
+mods.beattools.config.beatSnap = self.beatSnap
+mods.beattools.config.customBeatSnap = self.customBeatSnap
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.beatSnapValues = { 1, 2, 3, 4, 6, 8, 12, 16 }
+self.beatSnap = 2
+self.customBeatSnap = 16'''
+position = "at"
+payload = '''
+self.beatSnapValues = mods.beattools.config.beatSnapValues
+self.beatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.beatSnap or mods.beattools.config.beatDefault
+self.customBeatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customBeatSnap or mods.beattools.config.customBeatDefault
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''entities = { self.p }'''
+position = "after"
+payload = '''
+beattoolsSaveConfig()
+'''
+match_indent = true
+
+
+# Adjusting zoom limits ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, 20), 300)'''
+position = "at"
+payload = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, mods.beattools.config.zoomMin), mods.beattools.config.zoomMax)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.drawDistance = 10'''
+position = "at"
+payload = '''self.drawDistance = mods.beattools.config.editorBeats'''
+match_indent = true
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''self\.zoom, self\.smallestBeat\)'''
+position = "at"
+payload = '''self.zoom, self.smallestBeat - mods.beattools.config.scrollPast)'''
+
+
+# Drag threshhold ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= 10 then'''
+position = "at"
+payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
+match_indent = true

@@ -1,0 +1,1192 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+
+# Silly nisenen gimmick ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/bounce.lua"
+pattern = '''Event.property(event,'string', 'easeSequence', 'Ease sequence to use, if any', {optional = true, default = ''})'''
+position = "after"
+payload = '''
+if mods.beattools.config.sillyNisenenGimmick then
+	Event.property(event, "bool", "sillyNisenenGimmick", "Randomizes angles for bounces\nOverrides rotation with a high value", { optional = true, default = true })
+end
+'''
+match_indent = true
+
+
+# Cheat in results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''cs.songOffset = 0'''
+position = "before"
+payload = '''
+self.CHEATlagBack = 0
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Game.lua"
+pattern = '''cs.levelinfo = self.levelinfo'''
+position = "after"
+payload = '''
+cs.CHEATlagBack = self.gm.CHEATlagBack
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''if 	savedata.options.accessibility.taps ~= 'default' or
+	savedata.options.accessibility.vfx ~= 'full' or
+	savedata.options.accessibility.sides ~= 'default' or
+	savedata.costumes.currentCostume == "invisible" or
+	self.paused == true
+then'''
+position = "at"
+payload = '''
+if self.CHEATlagBack ~= 0 or savedata.options.accessibility.vfx ~= 'full' or savedata.options.accessibility.taps ~= 'default' or savedata.options.accessibility.sides ~= 'default' or self.paused then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
+position = "before"
+payload = '''
+self.CHEATlagBack ~= 0 or
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''local textWidth = fonts.digitalDisco:getWidth(str)'''
+position = "before"
+payload = '''
+if self.CHEATlagBack ~= 0 then
+	if str ~= '' then str = str .. ', ' end
+	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
+end
+'''
+match_indent = true
+
+
+# Incompatibilities and config defaults ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Menu.lua"
+pattern = '''self.menuMusicManager:addOnBeatHook(function(b)'''
+position = "before"
+payload = '''
+--[[if mods["high-score-restart"] then -- Penta: High Score Restart not ported to EA yet, it's their problem now >:)
+	print("[BT] Unstable compatibility with \"high-score-restart\" established")
+	loc.json.optionsMenuDescription8 = {}
+	loc.json.optionsMenuDescription8.en = loc.json.optionsMenuDescription7.en
+	loc.json.optionsMenuDescription8.owo = loc.json.optionsMenuDescription7.owo
+	loc.json.optionsMenuDescription7.en = "Sets you back some time before you started lagging\nYou will not miss any notes because of lag anymore this way\nHold ctrl to ignore the lagback"
+	loc.json.optionsMenuDescription7.owo = "Sets youwu bwack some time befowo youwu stawted wagging\nYouwu wiww nowot mish any nowotes because of wag anymowo this way\nHowod ctrl to ignowo the wagback"
+end]]
+if true then
+	self.beattoolsCurrentIncompatibilities = {}
+	local incompatibleMods = { ["event-stacking"] = true, ["editor-shortcuts"] = true, undo = true, ["editor-alt-bookmark-fix"] = true, ["editor-overhaul"] = true }
+	for k, v in pairs(incompatibleMods) do
+		if mods[k] then
+			table--[[stop wrong injection]].insert(self.beattoolsCurrentIncompatibilities, k)
+		end
+	end
+	if #self.beattoolsCurrentIncompatibilities > 0 then print("[BT] Incompatibities detected. Showing menu.") end
+
+	-- Penta: config defaults
+	if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+	local modifiedConfig = ""
+	for k, v in pairs(beattoolsOptions) do
+		if mods.beattools.config[k] == nil then
+			mods.beattools.config[k] = v.default
+			modifiedConfig = modifiedConfig .. (modifiedConfig == "" and "" or ",") .. " \"" .. v.name .. "\""
+		end
+	end
+	if modifiedConfig ~= "" then
+		print("[BT] Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
+		mods.beattools.configRenderer = nil
+		dpf.saveJson("Mods/beattools/mod.json", mods.beattools)
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Menu.lua"
+pattern = '''st:setBgDraw(function(self)'''
+position = "before"
+payload = '''
+st:setFgDraw(function(self)
+	if #self.beattoolsCurrentIncompatibilities > 0 then
+		if project.useImgui then
+			imgui.SetNextWindowPos(imgui.ImVec2_Float(0, 0), imgui["ImGuiCond_Always"])
+			imgui.SetNextWindowSize(imgui.ImVec2_Float(1200, 720), imgui["ImGuiCond_Always"])
+			imgui.SetNextWindowCollapsed(false, imgui["ImGuiCond_Always"])
+			imgui.Begin("MOD INCOMPATIBILITIES")
+
+			imgui.TextWrapped("CRASHES POSSIBLE:\nThese current mods are absolutely incompatible with \"beattools\" because they are already included in this mod.\nPlease remove them as they are outdated.\nMake sure to check the \"disabled\" folder in your \"Mods\" folder for those mods as well.\nFor badly written mods the folder name may not be accurate.")
+			for i, v in ipairs(self.beattoolsCurrentIncompatibilities) do
+				imgui.Text("(folder name?) " .. v .. " (display name) " .. mods[v].name)
+			end
+
+			imgui.End()
+		end
+	end
+end)
+'''
+match_indent = true
+
+
+# Prompts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if self.quitDialogue then'''
+position = "before"
+payload = '''
+if beattoolsConfirmationOpen and not imgui.IsPopupOpen("beattoolsConfirmation") then
+	imgui.OpenPopup_Str("beattoolsConfirmation")
+end
+beattoolsConfirmationOpen = false
+if imgui.BeginPopup("beattoolsConfirmation") then
+	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+	imgui.TextUnformatted("Are you sure?")
+	imgui.Separator()
+	imgui.TextUnformatted(tostring(beattoolsConfirmationText))
+	imgui.PopTextWrapPos()
+	local confirmationTexts = mods.beattools.config.confirmationTexts
+	-- { "Confirm", "Accept", "Yes", "Yeah", "Ye", "Sure", "True", "Positive", "Okay", "Ok", "Do it", "Ready", --[[ something4803: ]] "Yippee!" }
+	if beattoolsConfirmationFunc and imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized * #confirmationTexts) + 1]) .. "##beatools") then
+		local tempFunc = beattoolsConfirmationFunc
+		beattoolsConfirmationText = ""
+		beattoolsConfirmationFunc = nil
+		beattoolsConfirmationRandomized = 0
+		if tempFunc then tempFunc() end
+		imgui.CloseCurrentPopup()
+	end
+	imgui.EndPopup("beattoolsConfirmation")
+elseif beattoolsConfirmationText ~= "" then
+	beattoolsConfirmationText = ""
+	beattoolsConfirmationFunc = nil
+	beattoolsConfirmationRandomized = 0
+end
+if beattoolsPromptOpen and not imgui.IsPopupOpen("beattoolsPrompt") then
+	imgui.OpenPopup_Str("beattoolsPrompt")
+end
+beattoolsPromptOpen = false
+if imgui.BeginPopup("beattoolsPrompt") then
+	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+	imgui.TextUnformatted(tostring(beattoolsPromptText))
+	imgui.PopTextWrapPos()
+	if beattoolsPromptButtons then
+		for i, v in ipairs(beattoolsPromptButtons) do
+			if i ~= 1 then imgui.SameLine() end
+			if imgui.Button(tostring(v[1])) then
+				beattoolsPromptOpen = false
+				beattoolsPromptText = ""
+				beattoolsPromptButtons = nil
+				if v[2] then v[2]() end
+				imgui.CloseCurrentPopup()
+			end
+		end
+	end
+	imgui.EndPopup("beattoolsPrompt")
+elseif beattoolsPromptText ~= "" then
+	beattoolsPromptText = ""
+	beattoolsPromptRandomized = 0
+end
+if beattoolsErrorOpen and not imgui.IsPopupOpen("beattoolsError") then
+	imgui.OpenPopup_Str("beattoolsError")
+end
+beattoolsErrorOpen = false
+if imgui.BeginPopup("beattoolsError") then
+	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+	-- Penta: I can imagine ppl screenshotting their error code to report it just to realize its just a random number :skull:
+	-- Penta: Don't think it's gonna happen though :/
+	local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.", ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]] "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you" }
+	table--[[stop wrong injection]].insert(errorTexts, 1, "Error Code " .. tostring(math.floor(beattoolsErrorRandomized * (#errorTexts + 1) * 999)))
+	imgui.TextUnformatted(tostring(errorTexts[math.floor(beattoolsErrorRandomized * #errorTexts) + 1]))
+	imgui.Separator()
+	imgui.TextUnformatted(tostring(beattoolsErrorText))
+	imgui.PopTextWrapPos()
+	imgui.EndPopup("beattoolsError")
+elseif beattoolsErrorText ~= "" then
+	beattoolsErrorText = ""
+	beattoolsErrorRandomized = 0
+end
+'''
+match_indent = true
+
+
+# Hide menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self:imgui()'''
+position = "at"
+payload = '''
+if not beattoolsRecordPosition then self:imgui() beattoolsRandomizeWindows = false end
+for i = 1, 7 do
+	if mods.beattools.config.currentPaddle then
+		beattoolsGetCurrentEasing(self, "paddles", "enabled", "editorBeat", i, "enabled")
+		beattoolsGetCurrentEasing(self, "paddles", "newWidth", "editorBeat", i, "newWidth")
+		beattoolsGetCurrentEasing(self, "paddles", "newAngle", "editorBeat", i, "newAngle")
+		self.p.paddles[i].enabled = beattoolsCurrentEasings.editorBeat.paddles[i].enabled.enabled
+		self.p.paddles[i].paddleSize = beattoolsCurrentEasings.editorBeat.paddles[i].newWidth.newWidth
+		self.p.paddles[i].baseAngle = beattoolsCurrentEasings.editorBeat.paddles[i].newAngle.newAngle
+	else
+		self.p.paddles[i].enabled = i == 1
+		self.p.paddles[i].paddleSize = 70
+		self.p.paddles[i].baseAngle = 0
+	end
+end
+'''
+match_indent = true
+
+
+# Coordinate copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/deco.lua"
+pattern = '''Event.property(event,'decimal','y', 'Y position', {step = 1, optional = true, default = project.res.cy})'''
+position = "after"
+payload = '''
+if mods.beattools.config.mouseCoordsButton then
+	local pressed = imgui.Button("Use Mouse")
+	if imgui.IsItemHovered() then
+		imgui.BeginTooltip()
+		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+		imgui.TextUnformatted("Copy mouse coordinates")
+		imgui.PopTextWrapPos()
+		imgui.EndTooltip()
+	end
+	if pressed then
+		local tempFunc = function ()
+			beattoolsPromptOpen = true
+			beattoolsPromptText = "Choose axis"
+			beattoolsPromptButtons = {
+				{ "Both", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.x = x event.y = y end
+				end },
+				{ "X", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.x = x end
+				end },
+				{ "Y", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.y = y end
+				end }
+			}
+		end
+		beattoolsPromptOpen = true
+		beattoolsPromptText = "Choose precision"
+		beattoolsPromptButtons = {
+			{ "1px", function ()
+				beattoolsRecordPrecision = 1
+				tempFunc()
+			end },
+			{ "5px", function ()
+				beattoolsRecordPrecision = 5
+				tempFunc()
+			end },
+			{ "10px", function ()
+				beattoolsRecordPrecision = 10
+				tempFunc()
+			end },
+			{ "30px", function ()
+				beattoolsRecordPrecision = 30
+				tempFunc()
+			end },
+			{ "60px", function ()
+				beattoolsRecordPrecision = 60
+				tempFunc()
+			end },
+			{ "90px", function ()
+				beattoolsRecordPrecision = 90
+				tempFunc()
+			end },
+			{ "100px", function ()
+				beattoolsRecordPrecision = 100
+				tempFunc()
+			end }
+		}
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/ease.lua"
+pattern = '''Event.property(event,'decimal', 'value', 'Ending value', {step = 0.01, default = 0})'''
+position = "after"
+payload = '''
+if mods.beattools.config.mouseCoordsButton and event.var ~= nil and (string.sub(event.var, -2, -1) == ".x" or string.sub(event.var, -2, -1) == ".y") then
+	local pressed = imgui.Button("Use Mouse")
+	if imgui.IsItemHovered() then
+		imgui.BeginTooltip()
+		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+		imgui.TextUnformatted("Copy mouse coordinates")
+		imgui.PopTextWrapPos()
+		imgui.EndTooltip()
+	end
+	if pressed then
+		local tempFunc = function ()
+			beattoolsRecordPosition = true
+			beattoolsRecordFunc = function (x, y) event.value = string.sub(event.var, -2, -1) == ".x" and x or y end
+		end
+		beattoolsPromptOpen = true
+		beattoolsPromptText = "Choose precision"
+		beattoolsPromptButtons = {
+			{ "1px", function ()
+				beattoolsRecordPrecision = 1
+				tempFunc()
+			end },
+			{ "5px", function ()
+				beattoolsRecordPrecision = 5
+				tempFunc()
+			end },
+			{ "10px", function ()
+				beattoolsRecordPrecision = 10
+				tempFunc()
+			end },
+			{ "30px", function ()
+				beattoolsRecordPrecision = 30
+				tempFunc()
+			end },
+			{ "60px", function ()
+				beattoolsRecordPrecision = 60
+				tempFunc()
+			end },
+			{ "90px", function ()
+				beattoolsRecordPrecision = 90
+				tempFunc()
+			end },
+			{ "100px", function ()
+				beattoolsRecordPrecision = 100
+				tempFunc()
+			end }
+		}
+	end
+end
+'''
+match_indent = true
+
+
+# Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
+position = "at"
+payload = '''
+if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then
+'''
+match_indent = true
+
+
+# Ctrl + i menu resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''9999)'''
+position = "at"
+payload = '''
+9999, mods.beattools.config.fullSize and "max" or nil)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "lib/imguihelper.lua"
+pattern = '''function helpers.InputTextMultiline(label, text, size)'''
+position = "at"
+payload = '''
+function helpers.InputTextMultiline(label, text, size, size2)
+	if size2 ~= nil and string.sub(size2, 1, 3) == "max" then
+		local temp = 1
+		for w in string.gmatch(text, "\n") do
+			temp = temp + 1
+		end
+		size2 = imgui.ImVec2_Float(-imgui.GetFontSize() * 7 / 13 * string.len(string.sub(label, 1, -(string.find(string.reverse(label), "##") or -1) - 2)) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 25 or 0), imgui.GetFontSize() * temp + 6)
+	end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "lib/imguihelper.lua"
+pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
+position = "at"
+payload = '''
+imgui.InputTextMultiline(label, buffer, size, size2)
+'''
+match_indent = true
+
+
+# Input resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''local enabled = true'''
+position = "after"
+payload = '''
+local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or imguiUniqueName
+local length = -imgui.GetFontSize() * 7 / 13 * string.len(string.sub(imguiUniqueName, 1, -(string.find(string.reverse(imguiUniqueName), "##") or -1) - 2)) - ((not mods.beattools.config.hideHelpMarkers) and 25 or 0)
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''imgui.PushItemWidth(100)'''
+position = "at"
+payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length) end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''imgui.InputFloat(imguiUniqueName, numptr, properties.step or 0.01, 0.001)'''
+position = "at"
+payload = '''imgui.InputFloat(label, numptr, properties.step or 0.01, 0.001, mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or nil)'''
+match_indent = true
+
+[[patches]]
+[patches.regex]
+target = "obj/GameManager.lua"
+pattern = '''imguiUniqueName, (?<param>numptr|event)'''
+position = "at"
+payload = '''label, $param'''
+
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''else
+	imgui.Text(string.sub(label, 1, -(string.find(string.reverse(propertyName), "##") or -1) - 2))
+end
+
+
+if properties.default then
+		tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
+end
+
+helpers.imguiHelpMarker(tooltip)'''
+position = "at"
+payload = '''
+else imgui.Text(label) end
+if mods.beattools.config.hideHelpMarkers then
+	if imgui.IsItemHovered() then
+		imgui.BeginTooltip()
+		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+		imgui.TextUnformatted(tooltip)
+		imgui.PopTextWrapPos()
+		imgui.EndTooltip()
+	end
+else helpers--[[stop wrong injection]].imguiHelpMarker(tooltip) end
+'''
+match_indent = true
+
+
+# Charter fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if not self.variant then
+	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
+else'''
+position = "at"
+payload = '''
+if mods.beattools.config.browserCharter or (not self.variant) then
+	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
+	helpers.imguiHelpMarker("This is the name that will be displayed on the Beatblock Browser.")
+end
+if self.variant then
+'''
+match_indent = true
+
+[[patches]]
+[patches.regex]
+target = "states/Editor.lua"
+pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = \'\' ?\}'''
+position = "at"
+payload = '''
+self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }
+'''
+
+[[patches]]
+[patches.pattern]
+target = "obj/LevelManager.lua"
+pattern = '''charter = 'Charter','''
+position = "at"
+payload = '''
+charter = mods.beattools.config.charter,
+'''
+match_indent = true
+
+
+# Bookmark ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+local prevBookmarkBeat = 0
+local currBookmarkBeat = 0
+'''
+position = "at"
+payload = '''
+local prevBookmarkBeat = self.smallestBeat - (mods.beattools.config.scrollPast == 0 and 1 or mods.beattools.config.scrollPast)
+local currBookmarkBeat = prevBookmarkBeat
+local prevSectionName = "Start"
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''prevBookmarkBeat = v.time'''
+position = "after"
+payload = '''prevSectionName = v.name'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName'''
+position = "at"
+payload = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName = self:findBookmarkBeats()'''
+position = "at"
+payload = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName = self:findBookmarkBeats()'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat)'''
+position = "at"
+payload = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat ~= 0 and nextBookmarkBeat - currBookmarkBeat or 1)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''love.graphics.printf(sectionName, project.res.cx - 499, project.res.cy - 60, 1000, "center")'''
+position = "at"
+payload = '''
+beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
+love.graphics.printf((mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 ~= 0 and self.editorBeat == beattoolsCurrentEasings.editorBeat.bookmarks.time and prevSectionName .. " >> " or "") .. sectionName .. (mods.beattools.config.betterBookmarks and " (" .. (beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1) .. "/" .. #(beattoolsEasings.bookmarks or {}) .. ")" or ""), project.res.cx - 499, project.res.cy - 60, 1000, "center")
+if mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.bookmarks.description ~= nil and beattoolsCurrentEasings.editorBeat.bookmarks.description ~= "" then
+	love.graphics.printf(beattoolsCurrentEasings.editorBeat.bookmarks.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))'''
+position = "at"
+payload = '''
+love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))
+if mods.beattools.config.betterBookmarks then
+	love.graphics.setColor(beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
+	love.graphics.arc("line", "open", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat), 0, 2 * math.pi, 100)
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local textWidth = love.graphics.getFont():getWidth(tostring(math.floor(self.editorBeat)))
+love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)'''
+position = "at"
+payload = '''
+local beatText = tostring(math.floor(self.editorBeat))
+local easingPrevBookmarkTime = beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 == 0 and 0 or beattoolsCurrentEasings.editorBeat.bookmarks.time
+local bookmarkBeatText = math.floor(self.editorBeat - easingPrevBookmarkTime) .. "/" .. math.floor(nextBookmarkBeat - easingPrevBookmarkTime)
+local textWidth = love.graphics.getFont():getWidth(beatText)
+local bookmarkBeatTextWidth = love.graphics.getFont():getWidth(bookmarkBeatText)
+
+if mods.beattools.config.betterBookmarks then
+	love.graphics.setColor(beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
+	love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''love.graphics.printf(math.floor(self.editorBeat), project.res.cx - 18.5, project.res.cy - 7, 50, "center")'''
+position = "at"
+payload = '''
+love.graphics.printf(beatText, project.res.cx - 18.5, project.res.cy - 7, 50, "center")
+if mods.beattools.config.betterBookmarks then love.graphics.printf(bookmarkBeatText, project.res.cx - 18.5, project.res.cy - 7 + 11, 50, "center") end
+'''
+match_indent = true
+
+
+# Menu in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if self.goToBeatDialogue then'''
+position = "before"
+payload = '''
+if beattoolsConfigHelpers == nil then -- config helpers
+	local chunk, e = love.filesystem.load("Mods/beattools/configHelpers.lua")
+	if e then beattoolsError("Error while loading the config helper functions of Beattools") print("[BT] Error while loading the config helper functions of Beattools. " .. e) else
+		beattoolsConfigHelpers = setfenv(chunk, setmetatable({ mod = mods.beattools }, { __index = _G }))()
+	end
+end
+if mods.beattools.config.showEventGroups then
+	if self.level then
+		if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
+		if beattoolsHighestEventGroupIndex == -1 then
+			if self.level.properties.beattools.eventGroups == nil then
+				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+				self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+			end
+			beattoolsUpdateEventGroups()
+		end
+	end
+	helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
+	helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
+	if imgui.Begin("Event Groups") then
+		if self.level then
+			local function checkOverlapping(group, index)
+				local overlapping = false
+				if beattoolsEventIndices[index] then
+					if beattoolsEventIndices[index].events.custom or group.events.custom then
+						overlapping = true
+					else
+						for k, v in pairs(group.events) do
+							if beattoolsEventIndices[index].events[k] then
+								overlapping = true
+								break
+							end
+						end
+					end
+				end
+				return overlapping
+			end
+			if imgui.Button("Reset##EditorLayers") then
+				if self.level.properties.beattools.customEventGroups then
+					beattoolsMakeSpace(1, 3)
+				end
+				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+				self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+				beattoolsUpdateEventGroups()
+				if self.level.properties.beattools.customEventGroups then
+					for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+						v.visibility = " - "
+					end
+					local i = 1
+					while i <= beattoolsHighestEventGroupIndex do
+						local v = beattoolsEventIndices[i]
+						if v then
+							while beattoolsEventIndices[i - 1] == nil and i > 1 do
+								beattoolsMakeSpace(i, true)
+								beattoolsUpdateEventGroups()
+								i = i - 1
+							end
+						end
+						i = i + 1
+					end
+				end
+				changing = true
+			end
+
+			local changing = false
+			if true then
+				local buffer = ffi.new("char[?]", 256)
+				ffi.copy(buffer, "Add Custom Group", #("Add Custom Group"))
+				imgui.SetNextItemWidth(-1e-9)
+				imgui.InputText("##addCustomEditorLayers", buffer, 256, 2^12)
+				local value = ffi.string(buffer)
+				if imgui.IsItemDeactivatedAfterEdit() and value and value ~= "" and value ~= "Add Custom Group" then
+					if self.level.properties.beattools.customEventGroups == nil then self.level.properties.beattools.customEventGroups = {} end
+					if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then beattoolsError("Group name already exists") else
+						self.level.properties.beattools.customEventGroups[value] = {
+							events = { custom = true },
+							visibility = " - ",
+							index = #beattoolsEventIndices + 1
+						}
+						beattoolsUpdateEventGroups()
+						changing = true
+					end
+				end
+			end
+			local indexGroup = 0
+			for i, v in ipairs(beattoolsEventGroups) do
+				if v.index ~= indexGroup then
+					imgui.Separator()
+					indexGroup = v.index
+				end
+				imgui.AlignTextToFramePadding()
+				local currentPosition = imgui.GetCursorScreenPos()
+				imgui.PushClipRect(imgui.ImVec2_Float(currentPosition.x, currentPosition.y), imgui.ImVec2_Float(currentPosition.x + beattoolsEventGroupLongest, currentPosition.y + 20), true)
+				imgui.Text(v.name)
+				imgui.PopClipRect()
+				if v.name ~= "all" then
+					if not changing and (v.index > 1 or beattoolsEventIndices[v.index].groups > 1) then
+						imgui.SameLine(beattoolsEventGroupLongest + 10)
+						if imgui.Button("^##" .. v.name .. "_editorLayers") then
+							if beattoolsEventIndices[v.index].groups > 1 then
+								beattoolsMakeSpace(v.index)
+								v.index = v.index - 1
+							else
+								beattoolsMakeSpace(v.index, true)
+								if checkOverlapping(v, v.index) then
+									beattoolsMakeSpace(v.index)
+									v.index = v.index - 1
+								end
+							end
+							beattoolsUpdateEventGroups()
+							changing = true
+						end
+					end
+					if not changing and (beattoolsEventIndices[v.index + 1] or beattoolsEventIndices[v.index].groups > 1) then
+						imgui.SameLine(beattoolsEventGroupLongest + 28)
+						if imgui.Button("v##" .. v.name .. "_editorLayers") then
+							if beattoolsEventIndices[v.index].groups > 1 then
+								beattoolsMakeSpace(v.index + 1)
+								v.index = v.index + 1
+							else
+								beattoolsMakeSpace(v.index + 1, true)
+								if checkOverlapping(v, v.index + 1) then
+									beattoolsMakeSpace(v.index + 1)
+									v.index = v.index + 1
+								end
+							end
+							beattoolsUpdateEventGroups()
+							changing = true
+						end
+					end
+					if not changing then
+						imgui.SameLine(beattoolsEventGroupLongest + 46)
+						local valptr = ffi.new("int[1]", { v.index })
+						imgui.SetNextItemWidth(15)
+						imgui.InputInt("##" .. v.name .. "_insertEditorLayers", valptr, 0, nil, 2^12)
+						local value = valptr[0]
+						if imgui.IsItemDeactivatedAfterEdit() and value and value ~= v.index then
+							local origIndex = v.index
+							if value < 1 then
+								value = 1
+							elseif value > #beattoolsEventIndices + 1 then
+								value = #beattoolsEventIndices + 1
+							end
+							if checkOverlapping(v, value) then
+								beattoolsMakeSpace(value)
+							end
+							v.index = value
+							if beattoolsEventIndices[origIndex].groups <= 1 then
+								beattoolsMakeSpace(origIndex + 1, true)
+							end
+							beattoolsUpdateEventGroups()
+							changing = true
+						end
+					end
+				end
+				imgui.SameLine(beattoolsEventGroupLongest + 64)
+				local isOpen = imgui.BeginCombo("##" .. v.name .. "_visibilityEditorLayers", v.visibility, 2^4 + 2^5 + 2^7)
+				if isOpen then
+					for i, vv in ipairs(v.name ~= "all" and { " - ", "show", "transparent", "ghost", "hide" } or { "show", "transparent", "ghost", "hide" }) do
+						local isSelected = imgui.Selectable_Bool(vv, vv == v.visibility)
+						if isSelected and vv ~= v.visibility then
+							v.visibility = vv
+							beattoolsEventVisibilities = {}
+							self.selectedEvent = nil
+							self.multiselect = nil
+							self.multiselectStartBeat = nil
+							self.multiselectEndBeat = nil
+						end
+					end
+					imgui.EndCombo()
+				end
+				if v.events.custom then
+					imgui.SameLine()
+					if imgui.Button("Delete##" .. v.name .. "_deleteEditorLayers") then
+						self.level.properties.beattools.customEventGroups[v.name] = nil
+						local customEventsAmount = 0
+						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+							customEventsAmount = customEventsAmount + 1
+						end
+						if customEventsAmount == 0 then
+							self.level.properties.beattools.customEventGroups = nil
+						end
+						beattoolsMakeSpace(v.index + 1, true)
+						beattoolsUpdateEventGroups()
+						changing = true
+					end
+				end
+			end
+		end
+		imgui.End()
+	end
+end
+if mods.beattools.config.easeList then
+	helpers.SetNextWindowPos(750, 420, window_flag)
+	helpers.SetNextWindowSize(200, 300, window_flag)
+	if imgui.Begin("Ease List") then
+		if imgui.TreeNode_Str("Filters") then
+			if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+			beattoolsConfigHelpers.InputBool("easeListUse")
+			beattoolsConfigHelpers.InputBool("easeListUsed")
+			beattoolsConfigHelpers.InputBool("easeListSerious")
+			beattoolsConfigHelpers.InputBool("easeListSelectChanged")
+			beattoolsConfigHelpers.InputBool("easeListSelected")
+			beattoolsConfigHelpers.InputBool("easeListRound")
+			imgui.TreePop()
+		end
+
+		imgui.BeginTable("easeList", 2, 2^6 + 2^7 + 2^9 + 1 * 2^13)
+		for i, v in ipairs(beattoolsAllEasesSorted) do
+			if ((not mods.beattools.config.easeListUse) or beattoolsUselessEases[v] == nil)
+			and ((not mods.beattools.config.easeListSerious) or beattoolsTrollEases[v] == nil)
+			and ((not mods.beattools.config.easeListSelected) or beattoolsEasesSelected[v]) then
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", v)
+				if (not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0 then
+					imgui.TableNextRow()
+					imgui.TableNextColumn()
+
+					local text
+					if type(beattoolsAllEases[v]) == "boolean" then
+						text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].enable)
+					elseif type(beattoolsAllEases[v]) == "number" or v == "outline" then
+						if beattoolsCurrentEasings.editorBeat.ease[v].value == nil or not mods.beattools.config.easeListRound then
+							text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].value)
+						else
+							text = tostring(helpers.round(beattoolsCurrentEasings.editorBeat.ease[v].value * 1e3) / 1e3)
+						end
+					end
+					if mods.beattools.config.easeListSelectChanged then
+						beattoolsEasesSelected[v] = beattoolsCurrentEasings.editorBeat.ease[v][type(beattoolsAllEases[v]) == "boolean" and "enable" or "value"] ~= beattoolsAllEases[v] or nil
+					end
+
+					local pressed = imgui.Selectable_Bool(v, beattoolsEasesSelected[v], 2^1)
+					beattoolsConfigHelpers.Tooltip(nil, (beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(beattoolsEasings.ease[v] or {}) .. " events")
+
+					if pressed then
+						local function shouldSelect(v2)
+							if v == "bgColor" and v2.type == "setBgColor" and v2.color ~= nil then return true end
+							if v == "voidColor" and v2.type == "setBgColor" and v2.voidColor ~= nil then return true end
+							if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
+							if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
+							if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
+							if string.sub(v, 1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[string.sub(v, 19)] ~= nil then return true end
+							return v2.type == (type(beattoolsAllEases[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
+						end
+						local eventsDeleted = 0
+						if self.multiselect ~= nil then
+							for i2 = #self.multiselect.events, 1, -1 do
+								local v2 = self.multiselect.events[i2]
+								if shouldSelect(v2) then
+									table.remove(self.multiselect.events, i2)
+									eventsDeleted = eventsDeleted + 1 + (v2.type == "ease" and v2.repeats and v2.repeats > 0 and (v2.repeatDelay or 1) ~= 0 and v2.repeats or 0)
+								end
+							end
+						end
+						local function addEases()
+							if self.multiselect == nil then
+								beattoolsNewMultiSelection()
+							end
+							local function addToMultiSelect(v2)
+								table.insert(self.multiselect.events, v2)
+								self.multiselect.eventTypes[v2.type] = true
+								if self.multiselectStartBeat == nil then
+									self.multiselectStartBeat = v2.time
+									self.multiselectEndBeat = v2.time
+								else
+									if self.multiselectStartBeat > v2.time then
+										self.multiselectStartBeat = v2.time
+									end
+									if self.multiselectEndBeat < v2.time then
+										self.multiselectEndBeat = v2.time
+									end
+								end
+							end
+							if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.ease[v].runEvents == 1 then
+								for i2, v2 in ipairs(self.level.events) do
+									if shouldSelect(v2) then addToMultiSelect(v2) end
+								end
+							elseif eventsDeleted == 0 then
+								local v3
+								for i2, v2 in ipairs(self.level.events) do
+									if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
+										v3 = v2
+									end
+								end
+								if v3 ~= nil then
+									addToMultiSelect(v3)
+								end
+							end
+
+							self.p:hurtPulse()
+						end
+						if not mods.beattools.config.easeListSelectChanged then
+							if beattoolsEasesSelected[v] and (#(beattoolsEasings.ease[v] or {}) == 0 or eventsDeleted == #(beattoolsEasings.ease[v] or {})) then
+								beattoolsEasesSelected[v] = nil
+							else
+								beattoolsEasesSelected[v] = true
+								if #(beattoolsEasings.ease[v] or {}) > 0 then addEases() end
+							end
+						elseif #(beattoolsEasings.ease[v] or {}) > 0 and (eventsDeleted == 0 or eventsDeleted ~= #(beattoolsEasings.ease[v] or {})) then
+							addEases()
+						end
+					end
+					if imgui.IsItemClicked(1) then
+						print("[BT] Copied to clipboard: " .. text)
+						love.system.setClipboardText(text)
+						self.p:hurtPulse()
+					end
+					if imgui.IsItemClicked(2) then
+						if type(beattoolsAllEases[v]) == "boolean" then
+							self.placeEvent = "beattoolsEvent;setBoolean;var," .. v .. ",string;enable," .. text .. ",boolean"
+						else
+							self.placeEvent = "beattoolsEvent;ease;var," .. v .. ",string;value," .. text .. "," .. (type(beattoolsAllEases[v]) == "number" and "number" or "nil")
+						end
+					end
+
+					imgui.TableNextColumn()
+					if #(beattoolsEasings.ease[v] or {}) == 0 then
+						imgui.TextDisabled(text)
+					else
+						imgui.Text(text)
+					end
+				end
+			end
+		end
+		imgui.EndTable()
+
+		imgui.End()
+	end
+end
+if mods.beattools.config.bookmarkList then
+	helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
+	helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
+	if imgui.Begin("Bookmarks") then
+		beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
+		for i, v in ipairs(beattoolsEasings.bookmarks) do
+			if i ~= 1 then imgui.Separator() end
+			imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
+			imgui.SameLine()
+			local name = "Unnamed Bookmark"
+			if v.name and v.name ~= "" then name = v.name end
+			if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
+				self.editorBeat = v.time
+				self.selectedEvent = self.level.events[v.indexInLevel]
+			end
+			if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
+		end
+		imgui.End()
+	end
+end
+if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
+	helpers.SetNextWindowPos(750, 420, window_flag)
+	helpers.SetNextWindowSize(200, 300, window_flag)
+	if imgui.Begin("Beattools") then
+
+		if mods.beattools.config.colorPreview then
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "bgColor")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "voidColor")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "outline")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoise")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoiseColor")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.hom")
+
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.faceColor")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.fillColor")
+			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.outlineColor")
+			beattoolsGetCurrentEasing(self, "songNameOverride", "newname", "editorBeat")
+			for i = 1, 8 do
+				beattoolsGetCurrentEasing(self, "color", "r", "editorBeat", i, "r")
+				beattoolsGetCurrentEasing(self, "color", "g", "editorBeat", i, "g")
+				beattoolsGetCurrentEasing(self, "color", "b", "editorBeat", i, "b")
+
+				local ColorButtonPos = imgui.GetCursorScreenPos()
+				local additionalInfo = ""
+
+				if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+					if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+						additionalInfo = additionalInfo .. "\nBackground Color"
+					end
+					if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+						additionalInfo = additionalInfo .. "\nVoid Color"
+					end
+				end
+				if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+					additionalInfo = additionalInfo .. "\nOutline"
+				end
+				if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+					additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
+				end
+				if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
+					additionalInfo = additionalInfo .. "\nPlayer Face Color"
+				end
+				if beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
+					additionalInfo = additionalInfo .. "\nPlayer Fill Color"
+				end
+				if beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
+					additionalInfo = additionalInfo .. "\nPlayer Outline Color"
+				end
+
+				if imgui.ColorButton(
+					"Color channel " .. i - 1 .. " (" .. (beattoolsCurrentEasings.editorBeat.color[i].r.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].r or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].g.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].g or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].b.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].b or {}) .. " - " .. (beattoolsEasings.color[i].eventAmount or 0) .. " events)" .. additionalInfo,
+					imgui.ImVec4_Float(
+						(beattoolsCurrentEasings.editorBeat.color[i].r.r or 0) / 255,
+						(beattoolsCurrentEasings.editorBeat.color[i].g.g or 0) / 255,
+						(beattoolsCurrentEasings.editorBeat.color[i].b.b or 0) / 255,
+						1
+					),
+					2^1,
+					imgui.ImVec2_Float(20, 20)
+				) then
+					print("pressed")
+					local function shouldSelect(v2)
+						return v2.type == "setColor" and v2.color == i - 1
+					end
+					local eventsDeleted = 0
+					if self.multiselect ~= nil then
+						for i2 = #self.multiselect.events, 1, -1 do
+							local v2 = self.multiselect.events[i2]
+							if shouldSelect(v2) then
+								table.remove(self.multiselect.events, i2)
+								eventsDeleted = eventsDeleted + 1
+							end
+						end
+					end
+					local function addEases()
+						if self.multiselect == nil then
+							beattoolsNewMultiSelection()
+						end
+						local function addToMultiSelect(v2)
+							table.insert(self.multiselect.events, v2)
+							self.multiselect.eventTypes[v2.type] = true
+							if self.multiselectStartBeat == nil then
+								self.multiselectStartBeat = v2.time
+								self.multiselectEndBeat = v2.time
+							else
+								if self.multiselectStartBeat > v2.time then
+									self.multiselectStartBeat = v2.time
+								end
+								if self.multiselectEndBeat < v2.time then
+									self.multiselectEndBeat = v2.time
+								end
+							end
+						end
+						if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.color[i].runEvents == 1 then
+							for i2, v2 in ipairs(self.level.events) do
+								if shouldSelect(v2) then addToMultiSelect(v2) end
+							end
+						elseif eventsDeleted == 0 then
+							local v3
+							for i2, v2 in ipairs(self.level.events) do
+								if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
+									v3 = v2
+								end
+							end
+							if v3 ~= nil then
+								addToMultiSelect(v3)
+							end
+						end
+
+						self.p:hurtPulse()
+					end
+					if (beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (beattoolsEasings.color[i].eventAmount or 0)) then
+						addEases()
+					end
+				end
+				if imgui.IsItemClicked(1) then
+					local hex = beattoolsRGB2Hex(beattoolsCurrentEasings.editorBeat.color[i].r.r, beattoolsCurrentEasings.editorBeat.color[i].g.g, beattoolsCurrentEasings.editorBeat.color[i].b.b)
+					print("[BT] Copied to clipboard: " .. hex)
+					love.system.setClipboardText(hex)
+					self.p:hurtPulse()
+				end
+				if imgui.IsItemClicked(2) then
+					self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
+				end
+
+				if mods.beattools.config.colorEasePreview then
+					if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+						if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
+							imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
+						end
+						if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
+							imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
+						end
+					end
+					if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+						imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
+						imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
+					end
+					if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+						imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
+						imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
+					end
+				end
+
+				imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 25, ColorButtonPos.y))
+			end
+			imgui.SameLine()
+			local additionalInfo = ""
+			if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
+				if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+				additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
+			end
+			if beattoolsCurrentEasings.editorBeat.songNameOverride.newname then
+				if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+				additionalInfo = additionalInfo ..  "Song Name (" .. beattoolsCurrentEasings.editorBeat.songNameOverride.newname .. ")"
+			end
+			if additionalInfo ~= "" then
+				imgui.Text("[+]")
+				beattoolsConfigHelpers.Tooltip(nil, additionalInfo)
+			else
+				imgui.NewLine()
+			end
+		end
+		if mods.beattools.config.coordsDisplay then
+			imgui.TextUnformatted("X/Y: " .. helpers.round(mouse.rx) .. "/" ..  helpers.round(mouse.ry))
+		end
+		if mods.beattools.config.editorMenu then
+			beattoolsMenuCode()
+			if self.zoom then
+				if self.zoom < mods.beattools.config.zoomMin then self.zoom = mods.beattools.config.zoomMin end
+				if self.zoom > mods.beattools.config.zoomMax then self.zoom = mods.beattools.config.zoomMax end
+				self.drawDistance = mods.beattools.config.editorBeats
+				self.angleSnapValues = mods.beattools.config.angleSnapValues
+				self.beatSnapValues = mods.beattools.config.beatSnapValues
+			end
+		end
+
+		imgui.End()
+	end
+end
+if mods.beattools.config.imguiGuide then
+	helpers.SetNextWindowPos(750, 420, window_flag)
+	helpers.SetNextWindowSize(200, 300, window_flag)
+	imgui.ShowDemoWindow()
+end
+'''
+match_indent = true

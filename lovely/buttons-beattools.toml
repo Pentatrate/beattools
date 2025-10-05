@@ -1,0 +1,652 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+
+# Hotkeys ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''i = { "key:i" },'''
+position = "after"
+payload = '''
+t = { "key:t" },
+n = { "key:n" },
+z = { "key:z" },
+f = { "key:f" },
+h = { "key:h" },
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''end, 'delete selected event', 'delete')'''
+position = "after"
+payload = '''
+-- reload config/record position
+self:addKeybind(function()
+	if self.editMode then
+		if beattoolsRecordPosition and beattoolsRecordFunc then
+			if beattoolsRecordFunc then beattoolsRecordFunc(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision) end
+			beattoolsRecordPosition = false
+			beattoolsRecordFunc = nil
+			beattoolsRecordPrecision = 1
+		elseif mods.beattools.config.editorMenu then
+			beattoolsConfigHelpers = nil
+			local chunk, errormsg = love.filesystem.load("Mods/beattools/config.lua")
+			if errormsg then
+				beattoolsError("Error while reloading the config renderer of Beattools")
+				print("[BT] Error while reloading the config renderer of Beattools. " .. errormsg)
+			else
+				local env = setmetatable({ mod = mods.beattools }, { __index = _G })
+				beattoolsMenuCode = setfenv(chunk, env)
+				beattoolsOptions = nil
+				-- beattoolsTest = nil
+			end
+		end
+	end
+end, "reload config/record position", "r")
+-- fold all config
+self:addKeybind(function()
+	if self.editMode and mods.beattools.config.editorMenu then mods.beattools.config.foldAll = true end
+end, "fold all config", "f")
+-- select none
+self:addKeybind(function()
+	if mods.beattools.config.selectNoneInPalette and self.placeEvent ~= "" then
+		self.placeEvent = ""
+	end
+	dofile("Mods/beattools/test.lua")
+end, "select none", "n")
+-- tag/untag selection
+self:addKeybind(function()
+	-- tag selection
+	if mods.beattools.config.untaggingHotkeys and (self.multiselect or self.selectedEvent) and (not maininput:down("shift")) and (not maininput:down("ctrl")) then
+		self.changeToTagDialogue = true
+		self.newTagName = ''
+	end
+	-- untag single tag
+	if mods.beattools.config.untaggingHotkeys and maininput:down("shift") and (not maininput:down("ctrl")) then
+		if self.selectedEvent then
+			beattoolsUntag(self, { self.selectedEvent })
+		elseif self.multiselect then
+			beattoolsUntag(self, self.multiselect.events)
+		end
+	end
+	-- untag same tags
+	if mods.beattools.config.untaggingHotkeys and maininput:down("ctrl") and (not maininput:down("shift")) then
+		if self.selectedEvent then
+			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, { self.selectedEvent.tag }) return end
+			beattoolsConfirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+				beattoolsUntag(self, { self.selectedEvent.tag })
+			end)
+		elseif self.multiselect then
+			local tempEvents = {}
+			for i, v in ipairs(self.multiselect.events) do
+				if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
+			end
+			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, tempEvents) return end
+			beattoolsConfirm("Continuing will untag all tags with the same name as those in the selection!", function ()
+				beattoolsUntag(self, tempEvents)
+			end)
+		end
+	end
+end, "tag selection", "t")
+-- select all
+self:addKeybind(function()
+	if mods.beattools.config.selectAll then
+		beattoolsNewMultiSelection()
+		for i, event in ipairs(self.level.events) do
+			table.insert(self.multiselect.events, event)
+		end
+		for i, event in ipairs(self.multiselect.events) do
+			self.multiselect.eventTypes[event.type] = true
+			if self.multiselectStartBeat == nil then self.multiselectStartBeat, self.multiselectEndBeat = event.time, event.time end
+			if self.multiselectStartBeat > event.time then self.multiselectStartBeat = event.time end
+			if self.multiselectEndBeat < event.time then self.multiselectEndBeat = event.time end
+		end
+	end
+end, "select all", "ctrl", "a")
+-- move to next
+self:addKeybind(function()
+	if mods.beattools.config.jumpEvents then
+		if self.multiselect then
+			local closest = nil
+			for i, v in ipairs(self.multiselect.events) do
+				if v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		elseif self.selectedEvent then
+			self.editorBeat = self.selectedEvent.time
+		elseif self.endDragEvent then
+			self.editorBeat = self.endDragEvent.time
+		else
+			local closest = nil
+			for i, v in ipairs(self.level.events) do
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		end
+	end
+end, "move to next", "ctrl", "move_up")
+-- move to previous
+self:addKeybind(function()
+	if mods.beattools.config.jumpEvents then
+		if self.multiselect then
+			local closest = nil
+			for i, v in ipairs(self.multiselect.events) do
+				if v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		elseif self.selectedEvent then
+			self.editorBeat = self.selectedEvent.time
+		elseif self.endDragEvent then
+			self.editorBeat = self.endDragEvent.time
+		else
+			local closest = nil
+			for i, v in ipairs(self.level.events) do
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		end
+	end
+end, "move to previous", "ctrl", "move_down")
+-- undo
+self:addKeybind(function()
+	if mods.beattools.config.undoHotkeys then beattoolsUndo(self, maininput:down("shift") and "redo" or "undo", maininput:down("ctrl")) end
+end, "undo", "z")
+-- hide menus
+self:addKeybind(function()
+	if mods.beattools.config.hideMenus and not beattoolsRecordFunc then
+		beattoolsRecordPosition = not beattoolsRecordPosition
+		beattoolsRecordFunc = nil
+	end
+end, "hide menus", "h")
+'''
+match_indent = true
+
+
+# Exit mouse capture ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if self.unsavedChanges then'''
+position = "at"
+payload = '''
+if beattoolsRecordPosition then
+	beattoolsRecordPosition = false
+	beattoolsRecordFunc = nil
+	beattoolsRecordPrecision = 1
+elseif self.unsavedChanges then
+'''
+match_indent = true
+
+
+# Spread events ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''imgui.Text("Select which event to edit:")'''
+position = "after"
+payload = '''
+if mods.beattools.config.spreadButtons then
+	local beattoolsShowSpreadPrompt = true
+	for i, v in ipairs(self.overlappingEvents) do
+		if type(Event.editorDraw[self.level.events[v].type]) ~= "function" and self.level.events[v].time ~= self.level.events[self.overlappingEvents[1]].time then
+			beattoolsShowSpreadPrompt = false
+		end
+	end
+	if beattoolsShowSpreadPrompt then
+		local function beattoolsGetSameTime(sameTime)
+			for i, v in ipairs(self.level.events) do
+				if v.time == self.level.events[self.overlappingEvents[1]].time then
+					beattoolsPlaceEvent(sameTime, v) table.insert(sameTime, v)
+				end
+			end
+		end
+		local function beattoolsSnapAngle(angle, snap)
+			return ((math.floor(angle / (360 / snap) + 0.5) * (360 / snap))) % 360
+		end
+		local function beattoolsSameAngle(event, sameTime)
+			for i, v in ipairs(sameTime) do
+				if event.angle % 360 == v.angle % 360 and event ~= v then
+					return true
+				end
+			end
+			return false
+		end
+		local function beattoolsSpread(snap, sameTime, snappedAngle, event)
+			if snappedAngle == nil then
+				if event == nil then
+					beattoolsError("Spread incorrect: snappedAngle is nil")
+					print("[BT] Spread incorrect: snappedAngle is nil")
+					snappedAngle = 0
+				else
+					snappedAngle = beattoolsSnapAngle(event.angle, snap)
+				end
+			end
+			local newAngle
+			for ii = 1, snap - 1 do
+				if mods.beattools.config.spreadType == "around" then
+					newAngle = (snappedAngle + 360 / snap * math.floor((ii + 1) / 2) * ((ii % 2) - 0.5) * 2) % 360
+				elseif mods.beattools.config.spreadType == "clockwise" then
+					newAngle = (snappedAngle + 360 / snap * ii) % 360
+				elseif mods.beattools.config.spreadType == "counterclockwise" then
+					newAngle = (snappedAngle + 360 / snap * -ii) % 360
+				elseif mods.beattools.config.spreadType == "absolute" then
+					newAngle = (360 / snap * ii) % 360
+				end
+				if newAngle == -0 then newAngle = 0 end
+				local beattoolsFree = true
+				for iii, vv in ipairs(sameTime) do
+					if newAngle == vv.angle % 360 then -- Penta: vv.angle cannot be -0
+						beattoolsFree = false
+						break
+					end
+				end
+				if beattoolsFree then break end
+				if ii == snap - 1 then
+					return beattoolsSpread(snap * 2, sameTime, snappedAngle)
+				end
+			end
+			return newAngle
+		end
+
+
+		if imgui.Button("Spread events") then
+			local beattoolsSameTime = {}
+			beattoolsGetSameTime(beattoolsSameTime)
+			for i, v in ipairs(self.overlappingEvents) do
+				v = self.level.events[v]
+				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			for i, v in ipairs(self.overlappingEvents) do
+				v = self.level.events[v]
+				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			self:updateBiggestBeat()
+			self.overlappingEventsDialogue = false
+		end
+
+
+		beattoolsShowSpreadPrompt = true
+		for i, v in ipairs(self.overlappingEvents) do
+			if self.level.events[v].angle % 360 ~= self.level.events[self.overlappingEvents[1]].angle % 360 then
+				beattoolsShowSpreadPrompt = false
+			end
+		end
+		if beattoolsShowSpreadPrompt then
+			if imgui.Button("Spread all events at angle") then
+				local beattoolsSameTime, beattoolsAngle = {}, self.level.events[self.overlappingEvents[1]].angle % 360
+				beattoolsGetSameTime(beattoolsSameTime)
+				for i, v in ipairs(beattoolsSameTime) do
+					if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 == beattoolsAngle and (v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) or beattoolsSameAngle(v, beattoolsSameTime)) then
+						v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+					end
+				end
+				self:updateBiggestBeat()
+				self.overlappingEventsDialogue = false
+			end
+		end
+
+
+		if imgui.Button("Spread all events at time") then
+			local beattoolsSameTime = {}
+			beattoolsGetSameTime(beattoolsSameTime)
+			for i, v in ipairs(beattoolsSameTime) do
+				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			for i, v in ipairs(beattoolsSameTime) do
+				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			self:updateBiggestBeat()
+			self.overlappingEventsDialogue = false
+		end
+	end
+end
+'''
+match_indent = true
+
+
+# Deselect ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent = nil'''
+position = "before"
+payload = '''if mods.beattools.config.deleteNothing and self.selectedEvent == nil and self.placeEvent ~= "" then
+	self.placeEvent = ""
+end
+'''
+match_indent = true
+
+
+# Fake repeat and (un)tagging buttons ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if imgui.Button('Delete event') then'''
+position = "before"
+payload = '''
+if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
+	if beattoolsAllEases[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
+		beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", self.selectedEvent.var)
+		beattoolsGetCurrentEasing(self, "ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, beattoolsGetEventIndex(self, self.selectedEvent))
+		local eventTime = beattoolsCurrentEasings[self.selectedEvent.time].ease[self.selectedEvent.var][type(beattoolsAllEases[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
+		local editorTime = beattoolsCurrentEasings.editorBeat.ease[self.selectedEvent.var][type(beattoolsAllEases[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
+		if mods.beattools.config.easeListRound then
+			if type(eventTime) == "number" then
+				eventTime = helpers.round(eventTime * 1e3) / 1e3
+			end
+			if type(editorTime) == "number" then
+				editorTime = helpers.round(editorTime * 1e3) / 1e3
+			end
+		end
+		imgui.Text(
+			"Value at event time: " ..
+			tostring(eventTime) ..
+			"\nValue at editor beat: " ..
+			tostring(editorTime)
+		)
+	else
+		imgui.Text("Invalid Ease")
+	end
+	imgui.Separator()
+end
+if self.selectedEvent and mods.beattools.config.fakeRepeat and self.selectedEvent.type ~= "ease" then
+	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
+	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
+		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
+	else self.selectedEvent.repeatDelay = nil end
+	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
+		beattoolsConfirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
+			beattoolsUpdateRepeat(self, self.selectedEvent, true)
+		end)
+	end
+	imgui.Separator()
+end
+if self.selectedEvent and mods.beattools.config.showEventGroups then
+	if self.level.properties.beattools.customEventGroups then
+		if imgui.TreeNode_Str("Event Groups##beattoolsSelectedEventGroups") then
+			local hasAllCustomGroups = true
+			for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+				if not (self.selectedEvent.beattoolsCustomEventGroups and self.selectedEvent.beattoolsCustomEventGroups[k]) then
+					hasAllCustomGroups = false
+					break
+				end
+			end
+			if not hasAllCustomGroups then
+				local isOpen = imgui.BeginCombo("##beattoolsAddSelectedEventGroup", "Add Custom Event Group", 2^4 + 2^5 + 2^7)
+				if isOpen then
+					for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+						if not (self.selectedEvent.beattoolsCustomEventGroups and self.selectedEvent.beattoolsCustomEventGroups[k]) then
+							local isSelected = imgui.Selectable_Bool(k .. "##beattoolsAddSelectedEventGroup")
+							if isSelected then
+								if self.selectedEvent.beattoolsCustomEventGroups == nil then self.selectedEvent.beattoolsCustomEventGroups = {} end
+								self.selectedEvent.beattoolsCustomEventGroups[k] = true
+							end
+						end
+					end
+					imgui.EndCombo()
+				end
+			end
+			local selectedCustomEventGroups = 0
+			if self.selectedEvent.beattoolsCustomEventGroups then
+				for k, v in pairs(self.selectedEvent.beattoolsCustomEventGroups) do
+					if self.level.properties.beattools.customEventGroups[k] then
+						if imgui.Button(k .. "##beattoolsSelectedEventGroup") then
+							self.selectedEvent.beattoolsCustomEventGroups[k] = nil
+						end
+						selectedCustomEventGroups = selectedCustomEventGroups + 1
+					else
+						self.selectedEvent.beattoolsCustomEventGroups[k] = nil
+					end
+				end
+				if selectedCustomEventGroups == 0 then
+					self.selectedEvent.beattoolsCustomEventGroups = nil
+				end
+			end
+			imgui.TreePop()
+		end
+		imgui.Separator()
+	elseif self.selectedEvent.beattoolsCustomEventGroups then
+		self.selectedEvent.beattoolsCustomEventGroups = nil
+	end
+end
+if self.selectedEvent and mods.beattools.config.roundSelectedTimes then self.selectedEvent.time = helpers.round(self.selectedEvent.time * 1e3) / 1e3 end
+if self.selectedEvent and mods.beattools.config.untaggingButtons then
+	if imgui.Button('Change to tag') then
+		self.changeToTagDialogue = true
+		self.newTagName = ""
+	end
+	imgui.Separator()
+end
+if self.selectedEvent and mods.beattools.config.untaggingButtons and self.selectedEvent.type == "tag" then
+	if imgui.Button("Untag") then
+		beattoolsUntag(self, { self.selectedEvent })
+	end
+	imgui.SameLine()
+	if imgui.Button("Untag same tag name") then
+		beattoolsConfirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+			beattoolsUntag(self, { self.selectedEvent.tag })
+		end)
+	end
+	imgui.Separator()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/ease.lua"
+pattern = '''Event.property(event,'decimal','repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(),optional = true, default = 1})'''
+position = "at"
+payload = '''
+if event.repeats and event.repeats > 0 then
+	Event.property(event, 'decimal', 'repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(), default = 1})
+else event.repeatDelay = nil end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if imgui.Button('Delete selected events') then'''
+position = "before"
+payload = '''
+if mods.beattools.config.untaggingButtons then
+	if imgui.Button("Untag") then
+		beattoolsUntag(self, self.multiselect.events)
+	end
+	imgui.SameLine()
+	if imgui.Button("Untag same tag name") then
+		local tempEvents = {}
+		for i, v in ipairs(self.multiselect.events) do
+			if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
+		end
+		beattoolsConfirm("Continuing will untag all tags with the same name as those in the selection!", function ()
+			beattoolsUntag(self, tempEvents)
+		end)
+	end
+	imgui.Separator()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if #self.multiselect.events == 0 and #self.markers == 0 then'''
+position = "at"
+payload = '''if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then'''
+match_indent = true
+
+
+# Untagging but idk whats going on ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if self.changeToTagDialogue and (not self.multiselect) then'''
+position = "at"
+payload = '''if self.changeToTagDialogue and (not (self.multiselect or self.selectedEvent)) then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''local tagEvents = helpers.copy(self.multiselect.events)'''
+position = "at"
+payload = '''local tagEvents = helpers.copy(self.multiselect and self.multiselect.events or { self.selectedEvent })'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''for i, v in ipairs(self.multiselect.events) do
+	for _i, _v in ipairs(self.level.events) do
+		if _v == v then
+			table.remove(self.level.events, _i)
+		end
+	end
+end
+self.multiselect.events = {}'''
+position = "at"
+payload = '''if self.multiselect then
+	for i, v in ipairs(self.multiselect.events) do
+		for _i, _v in ipairs(self.level.events) do
+			if _v == v then
+				table.remove(self.level.events, _i)
+			end
+		end
+	end
+	self.multiselect.events = {}
+else
+	self.multiselectStartBeat = self.selectedEvent.time
+	self:deleteSelectedEvent()
+end'''
+match_indent = true
+
+
+# Move/Delete multiselectiion ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if maininput:down("move_up") then'''
+position = "at"
+payload = '''if mods.beattools.config.moveSelection and maininput:down("move_up") and (not (maininput:down("ctrl") and mods.beattools.config.jumpEvents)) and self.multiselect then
+	-- Moves up a step.
+	moveMultiselection(self, 1 / self:getBeatSnapValue(), 0)
+	self.deltaTimeCooldown = 4 * self.deltaTimeRepeatInterval
+
+	if maininput:pressed("move_up") then
+		self.deltaTimeCooldown = self.deltaTimeCooldown + 2.5
+	end
+end
+if maininput:down("move_up") and (not (maininput:down("ctrl") and mods.beattools.config.jumpEvents)) then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if maininput:down("move_down") then'''
+position = "at"
+payload = '''if mods.beattools.config.moveSelection and maininput:down("move_down") and (not (maininput:down("ctrl") and mods.beattools.config.jumpEvents)) and self.multiselect then
+	-- Moves down a step.
+	moveMultiselection(self, -1 / self:getBeatSnapValue(), 0)
+	self.deltaTimeCooldown = 4 * self.deltaTimeRepeatInterval
+
+	if maininput:pressed("move_down") then
+		self.deltaTimeCooldown = self.deltaTimeCooldown + 2.5
+	end
+end
+if maininput:down("move_down") and (not (maininput:down("ctrl") and mods.beattools.config.jumpEvents)) then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''-- Move left with left arrow'''
+position = "before"
+payload = '''if mods.beattools.config.moveSelection and maininput:down("move_left") and self.multiselect then
+	-- Sets deltatime window back to the interval.
+
+	-- If they are not holding modifier key, the interval is set to 3* to prevent it spinning too quick
+	local newangle
+	if not maininput:down('modifier') then
+		moveMultiselection(self, 0, -360 / self:getAngleSnapValue())
+		self.deltaTimeCooldown = 3 * self.deltaTimeRepeatInterval
+	else
+		moveMultiselection(self, 0, -1)
+		self.deltaTimeCooldown = self.deltaTimeRepeatInterval
+	end
+
+	-- the user has just pressed the button. let's wait another ???ms before moving.
+	if maininput:pressed('move_left') then
+		self.deltaTimeCooldown = self.deltaTimeCooldown + 2.5
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''-- Move right with right arrow'''
+position = "before"
+payload = '''if mods.beattools.config.moveSelection and maininput:down("move_right") and self.multiselect then
+	-- this does the same as above but the opposite way around because you're holding right
+	-- there's probably a cleaner way to do this. sue me. -- bliv
+	-- Penta: damn you bliv making me copy paste around basically the same stuff
+
+	local newangle
+	if not maininput:down('modifier') then
+		moveMultiselection(self, 0, 360 / self:getAngleSnapValue())
+		self.deltaTimeCooldown = 3 * self.deltaTimeRepeatInterval
+	else
+		moveMultiselection(self, 0, 1)
+		self.deltaTimeCooldown = self.deltaTimeRepeatInterval
+	end
+
+	-- the user has just pressed the button. let's wait another ???ms before moving.
+	if maininput:pressed('move_right') then
+		self.deltaTimeCooldown = self.deltaTimeCooldown + 7.5
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''end, 'delete selected event', 'delete')'''
+position = "before"
+payload = '''
+	if mods.beattools.config.deleteSelectionHotkey and self.multiselect then
+		local i = 0
+		while i < #self.level.events do
+			i = i + 1
+			local v = self.level.events[i]
+			for ii, event in ipairs(self.multiselect.events) do
+				if v == event then
+					table.remove(self.level.events, i)
+					self.unsavedChanges = true
+					i = i - 1
+					break
+				end
+			end
+		end
+		self.multiselect, self.multiselectStartBeat, self.multiselectEndBeat = nil, nil, nil
+		self:updateBiggestBeat()
+		self.p:hurtPulse()
+	end
+'''
+match_indent = true
