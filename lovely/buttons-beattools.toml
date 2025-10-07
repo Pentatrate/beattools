@@ -119,8 +119,6 @@ self:addKeybind(function()
 			if closest ~= nil then self.editorBeat = closest end
 		elseif self.selectedEvent then
 			self.editorBeat = self.selectedEvent.time
-		elseif self.endDragEvent then
-			self.editorBeat = self.endDragEvent.time
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
@@ -141,8 +139,6 @@ self:addKeybind(function()
 			if closest ~= nil then self.editorBeat = closest end
 		elseif self.selectedEvent then
 			self.editorBeat = self.selectedEvent.time
-		elseif self.endDragEvent then
-			self.editorBeat = self.endDragEvent.time
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do

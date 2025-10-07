@@ -3,9 +3,8 @@ STUFF TO DO:
 
 - angles dial (spin over the limit)
 	buttons for multiplying?
-- arrow keys bug
-- ctrl undo crash????
 - normalize sides
+- compat with replay mod
 
 
 Mod Config:

@@ -576,7 +576,6 @@ local function beattoolsNewMultiSelection()
 
 	st.multiselectStartBeat = 0
 	st.multiselectEndBeat = 0
-
 	st.multiselectStartAngle = 0
 	st.multiselectEndAngle = 360
 end
@@ -912,7 +911,7 @@ end
 local function beattoolsUndo(self, type, group)
 	if (type == "undo" and beattoolsChangeIndex == 0) or (type == "redo" and beattoolsChangeIndex == #beattoolsChangeList) then beattoolsError("Undo failed. End of history") print("[BT] Undo failed. End of history") return nil end
 	local lastChangeTime = nil
-	self.selectedEvent, self.multiselect, self.multiselectStartBeat, self.multiselectEndBeat, self.endDragEvent = nil, { ["events"] = {}, ["eventTypes"] = {} }, nil, nil, nil
+	beattoolsNewMultiSelection()
 	while ((type == "undo" and beattoolsChangeIndex ~= 0) or (type == "redo" and beattoolsChangeIndex ~= #beattoolsChangeList)) and (lastChangeTime == nil or ((group or (beattoolsChangeIndex ~= 0 and beattoolsChangeIndex ~= #beattoolsChangeList and beattoolsChangeList[beattoolsChangeIndex].action == "place" and beattoolsChangeList[beattoolsChangeIndex + 1].action == "change")) and math.abs(lastChangeTime - beattoolsChangeList[beattoolsChangeIndex + (type == "redo" and 1 or 0)].time) < mods.beattools.config.groupTimeDifference * 60)) do -- Penta: at this point i dont even know what "dt" in the update loop is (undoTime based off of dt), maybe ill find out later? maybe its centiseconds? maybe its frames?
 		if type == "redo" then beattoolsChangeIndex = beattoolsChangeIndex + 1 end
 		lastChangeTime = beattoolsChangeList[beattoolsChangeIndex].time
@@ -1170,8 +1169,11 @@ local function beattoolsUpdateEventGroups()
 	if st then
 		st.selectedEvent = nil
 		st.multiselect = nil
+
 		st.multiselectStartBeat = nil
 		st.multiselectEndBeat = nil
+		st.multiselectStartAngle = nil
+		st.multiselectEndAngle = nil
 	end
 
 	beattoolsEventGroups = {}

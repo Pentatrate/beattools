@@ -817,8 +817,11 @@ if mods.beattools.config.showEventGroups then
 							beattoolsEventVisibilities = {}
 							self.selectedEvent = nil
 							self.multiselect = nil
+
 							self.multiselectStartBeat = nil
 							self.multiselectEndBeat = nil
+							self.multiselectStartAngle = nil
+							self.multiselectEndAngle = nil
 						end
 					end
 					imgui.EndCombo()
