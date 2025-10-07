@@ -63,7 +63,6 @@ Hotkeys:\
   - Right click empty space or \"n\" while placing event to deselect the placable event\
     (select \"None\" in event palette)\
   Multiselect in Editor\
-  - Arrow keys to move selections around\
   - Delete keys to delete selections\
   - \"ctrl + a\" to select all events\
   - \"ctrl + up/down arrow\" to snap to the next event\
@@ -538,7 +537,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("untaggingHotkeys")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("selectAll")
-				beattoolsConfigHelpers.InputBool("moveSelection")
 				beattoolsConfigHelpers.InputBool("deleteSelectionHotkey")
 				beattoolsConfigHelpers.InputBool("jumpEvents")
 				imgui.TreePop()

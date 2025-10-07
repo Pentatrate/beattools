@@ -582,11 +582,6 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { long = "Hotkey to select all events (ctrl + a)", short = "Hotkey to select all events" },
 		default = true,
 		off = false
-	}, moveSelection = {
-		name = "Move Selection Hotkeys",
-		tooltips = { long = "Hotkeys to move entire selections (arrow keys)\nYou can specify whether to move other angles as well", short = "arrow keys" },
-		default = true,
-		off = false
 	}, deleteSelectionHotkey = {
 		name = "Delete Selection Hotkey",
 		tooltips = { long = "Hotkey to delete selected events (backspace / delete)", short = "backspace / delete" },
