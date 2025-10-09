@@ -808,7 +808,18 @@ if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= se
 		beattoolsOverlap["" .. v.time][beattoolsAngle][1] = beattoolsOverlap["" .. v.time][beattoolsAngle][1] + 1
 	end
 end
--- Penta's Beattools code marker'''
+if mods.beattools.config.autoFixSides and v.type == "side" then
+	local prev = v.endAngle or v.angle
+	local after = prev % 360
+	if after ~= prev then
+		v[v.endAngle and "endAngle" or "angle"] = after
+		if v.endAngle then
+			v.angle = v.angle + (after - before)
+		end
+	end
+end
+-- Penta's Beattools code marker
+'''
 match_indent = true
 
 [[patches]]

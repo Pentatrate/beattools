@@ -199,6 +199,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		end
 		if beattoolsConfigHelpers.TreeNode("Advanced") then
 			Doc("general_advanced")
+			beattoolsConfigHelpers.InputBool("speedScrolling")
+			imgui.Separator()
 			beattoolsConfigHelpers.InputInt("scanMargin")
 			imgui.Separator()
 			beattoolsConfigHelpers.InputFloat("scanInterval", nil, nil, "%.2f")
@@ -481,6 +483,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputInt("dragThreshhold")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("roundSelectedTimes")
+				beattoolsConfigHelpers.InputBool("autoFixSides")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("betterMoveSelection")
 				beattoolsConfigHelpers.InputBool("betterUntagging")

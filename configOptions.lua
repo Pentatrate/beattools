@@ -620,6 +620,16 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Double click to adjust bounce amount through dragging" },
 		default = true,
 		off = false
+	}, speedScrolling = {
+		name = "Speed Scrolling",
+		tooltips = { short = "Removes cooldown when scrolling some menus" },
+		default = true,
+		off = false
+	}, autoFixSides = {
+		name = "Fix Sides",
+		tooltips = { short = "Normalizes the angle of sides in any level you edit" },
+		default = false,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

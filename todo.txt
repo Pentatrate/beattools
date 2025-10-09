@@ -3,9 +3,6 @@ STUFF TO DO:
 
 - angles dial (spin over the limit)
 	buttons for multiplying?
-- normalize sides
-- move selected move range
-- menu scrolling umlimiter
 
 
 Mod Config:

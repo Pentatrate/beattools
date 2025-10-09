@@ -4,6 +4,16 @@ dump_lua = true
 priority = 0
 
 
+# Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/OptionsList.lua"
+pattern = '''self.cooldownMax = 10'''
+position = "at"
+payload = '''self.cooldownMax = mods.beattools.config.speedScrolling and 0 or 10'''
+match_indent = true
+
+
 # Multiselect movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
