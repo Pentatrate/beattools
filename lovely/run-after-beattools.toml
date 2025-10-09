@@ -199,7 +199,7 @@ match_indent = true
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
-pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents|holdEndSelection|bounceSelection),'''
+pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents|holdEndSelection|bounceSelection|Event\.enum\.variants|self\.markers|newMarkers),'''
 position = "at"
 payload = '''table--[[stop wrong injection]].insert($table,'''
 

@@ -1,36 +1,768 @@
-{"id":"beattools","version":"2.1.4","author":"Pentatrate","description":"Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.","config":{"easeListSelected":false,"scanInterval":0.1,"lagUseSeconds":true,"deleteSelectionHotkey":true,"stackingNotes":true,"lagBack":false,"lagThreshhold":0.25,"editorMenu":true,"lagOffset":2,"untaggingButtons":true,"angleSnapValues":[8,12,16,24,32],"bgColor2":{"r":1,"b":1,"g":1}
-,"foldAll":false,"fgColor2":{"r":0,"b":1,"g":0.259}
-,"shortenParams":false,"keysWhiteList":{"parentid":"par","rotationinfluence":"rotInf","duration":"dur","pitch":"ptch","drawOrder":"dOrd","effectCanvasRaw":"fxCanvR","orbit":true,"volume":"vol","angle":"ang","drawLayer":"dLayer","bpm":true,"a":true,"tag":true,"tap":true,"chance":true,"color":"col","reps":true,"offset":"off","miss":true,"mineHold":"mineH","outline":"outl","x":true,"y":true,"ox":true,"oy":true,"enabled":"on","ky":true,"spriteName":"sprName","repeats":"rep","repeatDelay":"delay","angleOffset":"angOff","hide":true,"voidColor":"void","recolor":"col","angle2":"ang2","segments":"seg","sound":true,"time":true,"endAngle":"endAng","spinEase":"spEase","sx":true,"var":true,"doDithering":"dither","startTap":"stTap","endTap":true,"order":"ord","variableName":"var","paddles":"pdls","id":true,"traceEase":"trEase","speedMult":"spdMlt","b":true,"name":true,"newWidth":"nWidth","newAngle":"nAngle","start":true,"holdEase":"ease","r":true,"block":"blk","kx":true,"mine":true,"value":"val","side":true,"intensity":"inten","sy":true,"description":"desc","paddle":"pdl","file":true,"g":true,"sprite":"spr","enable":"on","objectName":"obj","ease":true,"type":true,"effectCanvas":"fxCanv","delay":true,"tickRate":"tickR"}
-,"hideHelpMarkers":false,"colorPreview":true,"coordsDisplay":false,"easeCurrentValues":true,"lineColor":{"r":0.373,"a":0.5,"b":0.373,"g":0.373}
-,"fullSize":true,"easeListRound":true,"selectAll":true,"preciseTimeInput":false,"jumpEvents":true,"betterBookmarks":true,"levelSelectMultiplyBpm":true,"loopSingleSelectionEventAmount":2000,"undoHotkeys":true,"hideMenus":true,"betterCombo":true,"loopEventsDuringSelectionAmount":2000,"betterUntagging":true,"bgColor":{"r":0,"b":0,"g":0}
-,"roundSelectedTimes":false,"ignoreUntagPrompt":false,"untaggingHotkeys":true,"showParam":"order","groupTimeDifference":0.5,"selectNoneInPalette":true,"accBarWidth":6,"confirmationTexts":["Confirm","Accept","Yes","Yeah","Ye","Sure","True","Positive","Okay","Ok","Do it","Ready","Yippee!"],"browserCharter":true,"durationColor":{"r":0,"a":0.5,"b":0,"g":1}
-,"fakeRepeat":true,"keyHandling":"blacklist","bookmarkList":true,"whiteSelected":"off","spreadButtons":true,"spreadSnap":32,"charter":"Me","mouseCoordsButton":true,"accBar":true,"xOffset":4,"editorBlackColor":{"r":0,"b":0,"g":0}
-,"accBarSmooth":0.35,"editorSnapColor":{"r":0.75,"b":0.75,"g":0.75}
-,"zoomMin":2,"displayEndAngle":true,"editorBgColor":{"r":1,"b":1,"g":1}
-,"bounceDragging":true,"markRepeat":"on","accBarColors":"auto","levelSelectShowIncompatible":true,"customBlackColor":{"r":0,"b":0,"g":0}
-,"sillyNisenenGimmick":true,"randomizeWindows":"off","durationSameEasingColor":{"r":0,"a":0.5,"b":1,"g":0}
-,"accBarReverse":false,"accBarSide":"top","angleDefault":3,"customAngleSnap":64,"customAngleDefault":32,"beatSnapValues":[1,2,3,4,6,8,12,16],"beatSnap":2,"alpha":0.5,"customBeatSnap":3,"bounceDoubleClick":true,"docInMenu":"none","damoclismCataclism":false,"customLevelVisuals":true,"customWhiteColor":{"r":1,"b":1,"g":1}
-,"scanMargin":64,"levelSelectDynamicLoading":true,"shadow":true,"deleteNothing":true,"spreadType":"around","dragThreshhold":5,"showDuration":"on","durationSelectedColor":{"r":1,"a":0.5,"b":0,"g":0}
-,"tooltipsInMenu":"long","currentSprite":true,"livelyCranky":true,"shadow2":false,"customEditorLayers":[],"markSameEasing":true,"betterMoveSelection":true,"colorEasePreview":true,"angleSnapValues2":" 8, 16, 32","currentPaddle":true,"levelSelectAcc":true,"zoomMax":120,"scrollPast":1,"restartInPlaytest":true,"customBeatDefault":16,"saveAngleBeatSnap":true,"imguiGuide":false,"angleSnap":1,"eventGroups":{"bookmarks":{"visibility":" - ","index":3,"events":{"bookmark":true}
+{
+	"enabled": true,
+	"version": "2.1.5",
+	"id": "beattools",
+	"name": "Beattools",
+	"author": "Pentatrate",
+	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
+	"config": {
+		"untaggingButtons": true,
+		"charter": "Pentatrate",
+		"levelSelectAcc": true,
+		"xOffset": 4,
+		"spreadType": "absolute",
+		"customEditorLayers": [],
+		"yOffset": 4,
+		"markRepeat": "on",
+		"selectAll": true,
+		"easeCurrentValues": true,
+		"loopVisibleEventsAmount": 5000,
+		"loopSingleSelectionEventAmount": 2000,
+		"easeListRound": true,
+		"currentSprite": true,
+		"groupTimeDifference": 0.5,
+		"bgColor": {
+			"b": 0,
+			"r": 0,
+			"g": 0
+		},
+		"coordsDisplay": false,
+		"accBarSide": "top",
+		"fakeRepeat": true,
+		"docInMenu": "none",
+		"displayEndAngle": true,
+		"angleSnapValues2": " 8, 16, 32",
+		"bounceDragging": true,
+		"ignoreUntagPrompt": true,
+		"spreadButtons": true,
+		"roundSelectedTimes": false,
+		"keyHandling": "blacklist",
+		"loopEventsDuringSelectionAmount": 2000,
+		"scrollPast": 1,
+		"zoomMax": 120,
+		"betterCombo": true,
+		"fgColor": {
+			"b": 0,
+			"r": 1,
+			"g": 0.5
+		},
+		"betterMoveSelection": true,
+		"markEndAnglePosition": "on",
+		"accBar": true,
+		"alpha": 0.5,
+		"levelSelectMultiplyBpm": true,
+		"browserCharter": true,
+		"durationSelectedColor": {
+			"a": 0.5,
+			"b": 0,
+			"r": 1,
+			"g": 0
+		},
+		"durationSameEasingColor": {
+			"a": 0.5,
+			"b": 1,
+			"r": 0,
+			"g": 0
+		},
+		"durationColor": {
+			"a": 0.5,
+			"b": 0,
+			"r": 0,
+			"g": 1
+		},
+		"customBlackColor": {
+			"b": 0.74901962280273,
+			"r": 0.74901962280273,
+			"g": 0.74901962280273
+		},
+		"confirmationTexts": [
+			"Confirm",
+			"Accept",
+			"Yes",
+			"Yeah",
+			"Ye",
+			"Sure",
+			"True",
+			"Positive",
+			"Okay",
+			"Ok",
+			"Do it",
+			"Ready",
+			"Yippee!"
+		],
+		"undoHotkeys": true,
+		"scanMargin": 64,
+		"hideMenus": true,
+		"betterUntagging": true,
+		"editorBgColor": {
+			"b": 0,
+			"r": 0,
+			"g": 0
+		},
+		"randomizeWindows": "off",
+		"editorSnapColor": {
+			"b": 0.12156862765551,
+			"r": 0.12156862765551,
+			"g": 0.12156862765551
+		},
+		"editorBlackColor": {
+			"b": 0.24705882370472,
+			"r": 0.24705882370472,
+			"g": 0.24705882370472
+		},
+		"selectNoneInPalette": true,
+		"deleteNothing": true,
+		"markSameEasing": true,
+		"livelyCranky": true,
+		"hideHelpMarkers": false,
+		"zoomMin": 2,
+		"whiteSelected": "cut corners",
+		"levelSelectShowIncompatible": true,
+		"currentPaddle": true,
+		"saveAngleBeatSnap": true,
+		"accBarWidth": 4,
+		"tooltipsInMenu": "long",
+		"levelSelectDynamicLoading": true,
+		"beatSnapValues2": "1, 2, 4, 8,, 16",
+		"customLevelVisuals": true,
+		"eventGroups": {
+			"visuals": {
+				"name": "visuals",
+				"index": 1,
+				"visibility": " - ",
+				"events": {
+					"setBoolean": true,
+					"forcePlayerSprite": true,
+					"outline": true,
+					"deco": true,
+					"ease": true,
+					"setColor": true,
+					"toggleParticles": true,
+					"setBgColor": true,
+					"noise": true,
+					"hom": true
+				}
+			},
+			"song": {
+				"name": "song",
+				"index": 1,
+				"visibility": " - ",
+				"events": {
+					"playSound": true,
+					"play": true,
+					"showResults": true,
+					"setBPM": true
+				}
+			},
+			"deco": {
+				"name": "deco",
+				"index": 3,
+				"visibility": " - ",
+				"events": {
+					"deco": true
+				}
+			},
+			"color": {
+				"name": "color",
+				"index": 2,
+				"visibility": " - ",
+				"events": {
+					"setColor": true,
+					"noise": true,
+					"outline": true,
+					"setBgColor": true,
+					"hom": true
+				}
+			},
+			"eases": {
+				"name": "eases",
+				"index": 3,
+				"visibility": " - ",
+				"events": {
+					"setBoolean": true,
+					"ease": true
+				}
+			},
+			"all": {
+				"name": "all",
+				"index": 0,
+				"visibility": "show",
+				"events": {
+					"setBoolean": true,
+					"setBPM": true,
+					"bookmark": true,
+					"paddles": true,
+					"tag": true,
+					"showResults": true,
+					"hold": true,
+					"hom": true,
+					"mine": true,
+					"forcePlayerSprite": true,
+					"inverse": true,
+					"play": true,
+					"extraTap": true,
+					"outline": true,
+					"setBgColor": true,
+					"ease": true,
+					"block": true,
+					"side": true,
+					"deco": true,
+					"mineHold": true,
+					"playSound": true,
+					"noise": true,
+					"toggleParticles": true,
+					"setColor": true
+				}
+			},
+			"tags": {
+				"name": "tags",
+				"index": 3,
+				"visibility": " - ",
+				"events": {
+					"tag": true
+				}
+			},
+			"gameplay": {
+				"name": "gameplay",
+				"index": 1,
+				"visibility": " - ",
+				"events": {
+					"mine": true,
+					"extraTap": true,
+					"inverse": true,
+					"block": true,
+					"mineHold": true,
+					"side": true,
+					"hold": true,
+					"paddles": true
+				}
+			},
+			"bookmarks": {
+				"name": "bookmarks",
+				"index": 3,
+				"visibility": " - ",
+				"events": {
+					"bookmark": true
+				}
+			}
+		},
+		"inputSize": 150,
+		"bookmarkList": true,
+		"easeListUse": false,
+		"showEventGroups": true,
+		"deleteSelectionHotkey": true,
+		"colorPreview": true,
+		"editorMenu": true,
+		"dragThreshhold": 5,
+		"imguiColors": {
+			"ImGuiCol_Border": [
+				0.43,
+				0.43,
+				0.5,
+				0.5
+			],
+			"ImGuiCol_BorderShadow": [
+				0,
+				0,
+				0,
+				0
+			],
+			"ImGuiCol_FrameBg": [
+				0.16,
+				0.29,
+				0.48,
+				0.29
+			],
+			"ImGuiCol_FrameBgHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.31
+			],
+			"ImGuiCol_FrameBgActive": [
+				0.26,
+				0.59,
+				0.98,
+				0.67
+			],
+			"ImGuiCol_TitleBg": [
+				0.04,
+				0.04,
+				0.04,
+				0.78
+			],
+			"ImGuiCol_TitleBgActive": [
+				0.16,
+				0.29,
+				0.48,
+				0.9
+			],
+			"ImGuiCol_TitleBgCollapsed": [
+				0,
+				0,
+				0,
+				0.51
+			],
+			"ImGuiCol_MenuBarBg": [
+				0.14,
+				0.14,
+				0.14,
+				0.38
+			],
+			"ImGuiCol_ScrollbarGrabActive": [
+				0.51,
+				0.51,
+				0.51,
+				1
+			],
+			"ImGuiCol_Text": [
+				1,
+				1,
+				1,
+				0.93
+			],
+			"ImGuiCol_WindowBg": [
+				0.06,
+				0.06,
+				0.06,
+				0.67
+			],
+			"ImGuiCol_TextDisabled": [
+				0.5,
+				0.5,
+				0.5,
+				1
+			],
+			"ImGuiCol_ScrollbarBg": [
+				0.02,
+				0.02,
+				0.02,
+				0.56
+			],
+			"ImGuiCol_ScrollbarGrab": [
+				0.31,
+				0.31,
+				0.31,
+				1
+			],
+			"ImGuiCol_ScrollbarGrabHovered": [
+				0.41,
+				0.41,
+				0.41,
+				1
+			],
+			"ImGuiCol_CheckMark": [
+				0.26,
+				0.59,
+				0.98,
+				0.82
+			],
+			"ImGuiCol_SliderGrab": [
+				0.24,
+				0.52,
+				0.88,
+				0.83
+			],
+			"ImGuiCol_SliderGrabActive": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_Button": [
+				0.26,
+				0.59,
+				0.98,
+				0.36
+			],
+			"ImGuiCol_ButtonHovered": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_ButtonActive": [
+				0.06,
+				0.53,
+				0.98,
+				1
+			],
+			"ImGuiCol_Header": [
+				0.26,
+				0.59,
+				0.98,
+				0.21
+			],
+			"ImGuiCol_HeaderHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.76
+			],
+			"ImGuiCol_HeaderActive": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_Separator": [
+				0.43,
+				0.43,
+				0.5,
+				0.5
+			],
+			"ImGuiCol_SeparatorHovered": [
+				0.1,
+				0.4,
+				0.75,
+				0.78
+			],
+			"ImGuiCol_SeparatorActive": [
+				0.1,
+				0.4,
+				0.75,
+				1
+			],
+			"ImGuiCol_ResizeGrip": [
+				0.26,
+				0.59,
+				0.98,
+				0.2
+			],
+			"ImGuiCol_ResizeGripHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.67
+			],
+			"ImGuiCol_ResizeGripActive": [
+				0.26,
+				0.59,
+				0.98,
+				0.95
+			],
+			"ImGuiCol_TabHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.8
+			],
+			"ImGuiCol_Tab": [
+				0.18,
+				0.35,
+				0.58,
+				0.62
+			],
+			"ImGuiCol_TabSelected": [
+				0.28,
+				0.52,
+				0.82,
+				0.72
+			],
+			"ImGuiCol_TabSelectedOverline": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_TabDimmed": [
+				0.07,
+				0.1,
+				0.15,
+				0.97
+			],
+			"ImGuiCol_TabDimmedSelected": [
+				0.14,
+				0.26,
+				0.42,
+				1
+			],
+			"ImGuiCol_TabDimmedSelectedOverline": [
+				0.5,
+				0.5,
+				0.5,
+				0.76
+			],
+			"ImGuiCol_DockingPreview": [
+				0.26,
+				0.59,
+				0.98,
+				0.7
+			],
+			"ImGuiCol_DockingEmptyBg": [
+				0.2,
+				0.2,
+				0.2,
+				1
+			],
+			"ImGuiCol_PlotLines": [
+				0.61,
+				0.61,
+				0.61,
+				1
+			],
+			"ImGuiCol_PlotLinesHovered": [
+				1,
+				0.43,
+				0.35,
+				1
+			],
+			"ImGuiCol_PlotHistogram": [
+				0.9,
+				0.7,
+				0,
+				1
+			],
+			"ImGuiCol_PlotHistogramHovered": [
+				1,
+				0.6,
+				0,
+				1
+			],
+			"ImGuiCol_TableHeaderBg": [
+				0.19,
+				0.19,
+				0.2,
+				1
+			],
+			"ImGuiCol_TableBorderStrong": [
+				0.31,
+				0.31,
+				0.35,
+				1
+			],
+			"ImGuiCol_TableBorderLight": [
+				0.23,
+				0.23,
+				0.25,
+				1
+			],
+			"ImGuiCol_TableRowBg": [
+				0,
+				0,
+				0,
+				0
+			],
+			"ImGuiCol_TableRowBgAlt": [
+				1,
+				1,
+				1,
+				0.06
+			],
+			"ImGuiCol_TextLink": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_TextSelectedBg": [
+				0.26,
+				0.59,
+				0.98,
+				0.35
+			],
+			"ImGuiCol_DragDropTarget": [
+				1,
+				1,
+				0,
+				0.9
+			],
+			"ImGuiCol_NavHighlight": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_NavWindowingHighlight": [
+				1,
+				1,
+				1,
+				0.7
+			],
+			"ImGuiCol_NavWindowingDimBg": [
+				0.8,
+				0.8,
+				0.8,
+				0.2
+			],
+			"ImGuiCol_ModalWindowDimBg": [
+				0.8,
+				0.8,
+				0.8,
+				0.35
+			],
+			"ImGuiCol_ChildBg": [
+				0,
+				0,
+				0,
+				0.67
+			],
+			"ImGuiCol_PopupBg": [
+				0.08,
+				0.08,
+				0.08,
+				1
+			]
+		},
+		"selectedBorderColor": {
+			"a": 1,
+			"b": 1,
+			"r": 1,
+			"g": 1
+		},
+		"lineColor": {
+			"a": 0.5,
+			"b": 0.37299999594688,
+			"r": 0.37299999594688,
+			"g": 0.37299999594688
+		},
+		"foldAll": false,
+		"stackingNotes": true,
+		"shortenParams": false,
+		"keysWhiteList": {
+			"enabled": "on",
+			"var": true,
+			"effectCanvas": "fxCanv",
+			"recolor": "col",
+			"drawOrder": "dOrd",
+			"effectCanvasRaw": "fxCanvR",
+			"orbit": true,
+			"repeats": "rep",
+			"repeatDelay": "delay",
+			"angleOffset": "angOff",
+			"voidColor": "void",
+			"block": "blk",
+			"tickRate": "tickR",
+			"time": true,
+			"enable": "on",
+			"b": true,
+			"paddles": "pdls",
+			"drawLayer": "dLayer",
+			"newWidth": "nWidth",
+			"newAngle": "nAngle",
+			"order": "ord",
+			"mine": true,
+			"side": true,
+			"sx": true,
+			"sy": true,
+			"chance": true,
+			"x": true,
+			"y": true,
+			"intensity": "inten",
+			"angle": "ang",
+			"type": true,
+			"a": true,
+			"angle2": "ang2",
+			"value": "val",
+			"sprite": "spr",
+			"holdEase": "ease",
+			"traceEase": "trEase",
+			"endAngle": "endAng",
+			"spinEase": "spEase",
+			"speedMult": "spdMlt",
+			"outline": "outl",
+			"ox": true,
+			"oy": true,
+			"kx": true,
+			"miss": true,
+			"rotationinfluence": "rotInf",
+			"doDithering": "dither",
+			"objectName": "obj",
+			"parentid": "par",
+			"paddle": "pdl",
+			"file": true,
+			"ky": true,
+			"color": "col",
+			"start": true,
+			"tag": true,
+			"offset": "off",
+			"pitch": "ptch",
+			"name": true,
+			"tap": true,
+			"r": true,
+			"duration": "dur",
+			"hide": true,
+			"reps": true,
+			"g": true,
+			"volume": "vol",
+			"spriteName": "sprName",
+			"mineHold": "mineH",
+			"bpm": true,
+			"ease": true,
+			"startTap": "stTap",
+			"endTap": true,
+			"delay": true,
+			"id": true,
+			"variableName": "var",
+			"sound": true,
+			"description": "desc",
+			"segments": "seg"
+		},
+		"fgColor2": {
+			"b": 1,
+			"r": 0,
+			"g": 0.25900000333786
+		},
+		"untaggingHotkeys": true,
+		"betterBookmarks": true,
+		"spreadSnap": 32,
+		"showParam": "order",
+		"fullSize": true,
+		"accBarReverse": false,
+		"scanInterval": 0.10000000149012,
+		"preciseTimeInput": false,
+		"jumpEvents": true,
+		"accBarSmooth": 0.35,
+		"damoclismCataclism": false,
+		"editorBeats": 24,
+		"angleSnapValues": [
+			8,
+			16,
+			32
+		],
+		"angleSnap": 1,
+		"sillyNisenenGimmick": true,
+		"angleDefault": 3,
+		"customAngleSnap": 64,
+		"customAngleDefault": 32,
+		"imguiGuide": true,
+		"beatSnap": 2,
+		"beatDefault": 2,
+		"customBeatSnap": 3,
+		"customBeatDefault": 16,
+		"colorEasePreview": true,
+		"shadow": true,
+		"customWhiteColor": {
+			"b": 0,
+			"r": 0,
+			"g": 0
+		},
+		"mouseCoordsButton": true,
+		"easeList": true,
+		"beatSnapValues": [
+			1,
+			2,
+			4,
+			8,
+			16
+		],
+		"lagUseSeconds": true,
+		"easeListUsed": false,
+		"easeListSerious": false,
+		"easeListSelectChanged": true,
+		"easeListSelected": false,
+		"bounceDoubleClick": true,
+		"lagBack": true,
+		"lagThreshhold": 0.25,
+		"showDuration": "on",
+		"lagOffset": 2,
+		"restartInPlaytest": true,
+		"accBarColors": "auto",
+		"shadow2": false,
+		"bgColor2": {
+			"b": 1,
+			"r": 1,
+			"g": 1
+		}
+	}
 }
-,"deco":{"visibility":" - ","index":3,"events":{"deco":true,"textdeco":true,"advancetextdeco":true}
-}
-,"gameplay":{"visibility":" - ","index":1,"events":{"side":true,"paddles":true,"mineHold":true,"extraTap":true,"inverse":true,"bounce":true,"setBounceHeight":true,"block":true,"hold":true,"mine":true}
-}
-,"color":{"visibility":" - ","index":2,"events":{"setColor":true,"outline":true,"setBgColor":true,"hom":true,"noise":true}
-}
-,"visuals":{"visibility":" - ","index":1,"events":{"forcePlayerSprite":true,"setColor":true,"textdeco":true,"outline":true,"toggleParticles":true,"noise":true,"deco":true,"advancetextdeco":true,"easeSequence":true,"aft":true,"ease":true,"songNameOverride":true,"setBgColor":true,"hom":true,"setBoolean":true}
-}
-,"song":{"visibility":" - ","index":1,"events":{"showResults":true,"playSound":true,"play":true,"retime":true,"setBPM":true}
-}
-,"eases":{"visibility":" - ","index":3,"events":{"easeSequence":true,"ease":true,"setBoolean":true}
-}
-,"tags":{"visibility":" - ","index":3,"events":{"tag":true}
-}
-,"all":{"visibility":"show","index":0,"events":{"setBounceHeight":true,"forcePlayerSprite":true,"paddles":true,"bounce":true,"textdeco":true,"outline":true,"hom":true,"setBPM":true,"retime":true,"easeSequence":true,"aft":true,"playSound":true,"songNameOverride":true,"hold":true,"toggleParticles":true,"mine":true,"bookmark":true,"side":true,"setColor":true,"mineHold":true,"deco":true,"extraTap":true,"inverse":true,"setBgColor":true,"advancetextdeco":true,"noise":true,"showResults":true,"ease":true,"play":true,"block":true,"tag":true,"setBoolean":true}
-}
-}
-,"selectedBorderColor":{"r":0,"a":1,"b":0,"g":0}
-,"yOffset":4,"loopVisibleEventsAmount":5000,"showEventGroups":true,"fgColor":{"r":1,"b":0,"g":0.5}
-,"beatDefault":2,"markEndAnglePosition":"on","beatSnapValues2":"1, 2, 4, 8,, 16","inputSize":150,"easeList":true,"editorBeats":24,"easeListUse":false,"easeListUsed":true,"easeListSerious":false,"easeListSelectChanged":true}
-,"enabled":true,"name":"Beattools"}

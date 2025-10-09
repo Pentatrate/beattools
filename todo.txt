@@ -4,7 +4,8 @@ STUFF TO DO:
 - angles dial (spin over the limit)
 	buttons for multiplying?
 - normalize sides
-- compat with replay mod
+- move selected move range
+- menu scrolling umlimiter
 
 
 Mod Config:
@@ -25,16 +26,18 @@ EA FIX:
 Low Priority:   -- Penta: very low priority, like in will get implemented next year, if at all
 - hold dragging customization
 - replay system (worked on by someone else?)
-- sfx for selecting events
-- default positions for imgui windows
+- ctrl select (worked on by someone else?)
+- sfx for selecting events (more info required)
+- default positions for imgui windows (too lazy)
 
 
 Potential:   -- Penta: i have no idea if i will even implement these features
 - better level duplicate scan + auto .redirect conversion + updates redirects with folder rename/move
-- move player in editor   -- Penta: -1
-- overlap warning with ease durations
-- ease tooltips/descriptions
-- auto convert when fakeRepeat is off and event is selected   -- Penta: annoying to make
+- move player in editor (i see no use)
+- overlap warning with ease durations (blue durations for eases with same var kinda cover this)
+- ease tooltips/descriptions (too much work)
+- auto convert when fakeRepeat is off and event is selected (annoying to make)
+
 
 
 

@@ -474,11 +474,7 @@ payload = '''label, $param'''
 [[patches]]
 [patches.pattern]
 target = "obj/GameManager.lua"
-pattern = '''else
-	imgui.Text(string.sub(label, 1, -(string.find(string.reverse(propertyName), "##") or -1) - 2))
-end
-
-
+pattern = '''
 if properties.default then
 		tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
 end
@@ -486,7 +482,9 @@ end
 helpers.imguiHelpMarker(tooltip)'''
 position = "at"
 payload = '''
-else imgui.Text(label) end
+if properties.default then
+	tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
+end
 if mods.beattools.config.hideHelpMarkers then
 	if imgui.IsItemHovered() then
 		imgui.BeginTooltip()
