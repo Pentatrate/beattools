@@ -2,7 +2,7 @@ STUFF TO DO:
 - better backup   -- Penta: +1 (multiple different types of backups to ensure nothing gets lost when the base game backup happens at a bad timing)
 
 - angles dial (spin over the limit)
-	buttons for multiplying?
+- - buttons for multiplying?
 
 
 Mod Config:

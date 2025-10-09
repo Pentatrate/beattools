@@ -937,20 +937,23 @@ pattern = '''
 if maininput:pressed("back") then
 	self:stopLevel()
 '''
-position = "before"
+position = "at"
 payload = '''
 if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
+	self.pauseBeat = nil
 	self.gm:stopLevel()
 
 	pq = ""
 	self.noteRadius = 8
 
-	entities = { self.p }
-
 	self.startBeat = beattoolsStartBeat
 
 	self.gm:resetLevel()
 end
+if maininput:pressed("back") then
+	print(self.pauseBeat)
+	self.pauseBeat = nil
+	self:stopLevel()
 '''
 match_indent = true
 
@@ -1040,11 +1043,9 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''entities = { self.p }'''
-position = "after"
-payload = '''
-beattoolsSaveConfig()
-'''
+pattern = '''self:leave()'''
+position = "before"
+payload = '''beattoolsSaveConfig()'''
 match_indent = true
 
 
