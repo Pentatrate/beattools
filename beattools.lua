@@ -912,6 +912,8 @@ local function beattoolsUndo(self, type, group)
 	if (type == "undo" and beattoolsChangeIndex == 0) or (type == "redo" and beattoolsChangeIndex == #beattoolsChangeList) then beattoolsError("Undo failed. End of history") print("[BT] Undo failed. End of history") return nil end
 	local lastChangeTime = nil
 	beattoolsNewMultiSelection()
+	self.multiselectStartBeat = nil
+	self.multiselectEndBeat = nil
 	while ((type == "undo" and beattoolsChangeIndex ~= 0) or (type == "redo" and beattoolsChangeIndex ~= #beattoolsChangeList)) and (lastChangeTime == nil or ((group or (beattoolsChangeIndex ~= 0 and beattoolsChangeIndex ~= #beattoolsChangeList and beattoolsChangeList[beattoolsChangeIndex].action == "place" and beattoolsChangeList[beattoolsChangeIndex + 1].action == "change")) and math.abs(lastChangeTime - beattoolsChangeList[beattoolsChangeIndex + (type == "redo" and 1 or 0)].time) < mods.beattools.config.groupTimeDifference * 60)) do -- Penta: at this point i dont even know what "dt" in the update loop is (undoTime based off of dt), maybe ill find out later? maybe its centiseconds? maybe its frames?
 		if type == "redo" then beattoolsChangeIndex = beattoolsChangeIndex + 1 end
 		lastChangeTime = beattoolsChangeList[beattoolsChangeIndex].time
@@ -958,6 +960,10 @@ local function beattoolsUndo(self, type, group)
 			self.level.events, beattoolsPrevEvents = helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or beattoolsChangeList[beattoolsChangeIndex].eventsAfter), helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or beattoolsChangeList[beattoolsChangeIndex].eventsAfter)
 		else beattoolsError("Undo failed. Unrecognized change type") print("[BT] Undo failed. Unrecognized change type") return end
 		if type == "undo" then beattoolsChangeIndex = beattoolsChangeIndex - 1 end
+	end
+	if self.multiselectStartBeat == nil then
+		self.multiselectStartBeat = 0
+		self.multiselectEndBeat = 360
 	end
 	self.p:hurtPulse()
 	self:updateBiggestBeat()

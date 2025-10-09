@@ -4,6 +4,24 @@ dump_lua = true
 priority = 0
 
 
+# Multiselect movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''function st:moveSelectedEvents(angle,beat)
+	if self.multiselect then'''
+position = "after"
+payload = '''
+	self.multiselectStartBeat = self.multiselectStartBeat + beat
+	self.multiselectEndBeat = self.multiselectEndBeat + beat
+	if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) then
+		self.multiselectStartAngle = self.multiselectStartAngle + angle
+		self.multiselectEndAngle = self.multiselectEndAngle + angle
+	end
+'''
+match_indent = true
+
+
 # Bounce dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

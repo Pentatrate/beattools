@@ -97,6 +97,8 @@ end, "tag selection", "t")
 self:addKeybind(function()
 	if mods.beattools.config.selectAll then
 		beattoolsNewMultiSelection()
+		self.multiselectStartBeat = nil
+		self.multiselectEndBeat = nil
 		for i, event in ipairs(self.level.events) do
 			table.insert(self.multiselect.events, event)
 		end
@@ -105,6 +107,10 @@ self:addKeybind(function()
 			if self.multiselectStartBeat == nil then self.multiselectStartBeat, self.multiselectEndBeat = event.time, event.time end
 			if self.multiselectStartBeat > event.time then self.multiselectStartBeat = event.time end
 			if self.multiselectEndBeat < event.time then self.multiselectEndBeat = event.time end
+		end
+		if self.multiselectStartBeat == nil then
+			self.multiselectStartBeat = 0
+			self.multiselectEndBeat = 360
 		end
 	end
 end, "select all", "ctrl", "a")

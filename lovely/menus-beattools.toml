@@ -910,6 +910,8 @@ if mods.beattools.config.easeList then
 						local function addEases()
 							if self.multiselect == nil then
 								beattoolsNewMultiSelection()
+								self.multiselectStartBeat = nil
+								self.multiselectEndBeat = nil
 							end
 							local function addToMultiSelect(v2)
 								table.insert(self.multiselect.events, v2)
@@ -940,6 +942,10 @@ if mods.beattools.config.easeList then
 								if v3 ~= nil then
 									addToMultiSelect(v3)
 								end
+							end
+							if self.multiselectStartBeat == nil then
+								self.multiselectStartBeat = 0
+								self.multiselectEndBeat = 360
 							end
 
 							self.p:hurtPulse()
@@ -1079,6 +1085,8 @@ if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mod
 					local function addEases()
 						if self.multiselect == nil then
 							beattoolsNewMultiSelection()
+							self.multiselectStartBeat = nil
+							self.multiselectEndBeat = nil
 						end
 						local function addToMultiSelect(v2)
 							table.insert(self.multiselect.events, v2)
@@ -1109,6 +1117,10 @@ if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mod
 							if v3 ~= nil then
 								addToMultiSelect(v3)
 							end
+						end
+						if self.multiselectStartBeat == nil then
+							self.multiselectStartBeat = 0
+							self.multiselectEndBeat = 360
 						end
 
 						self.p:hurtPulse()
