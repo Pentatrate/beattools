@@ -419,23 +419,9 @@ if mods.beattools.config.accBar then
 						end
 					end
 				end
-				if v[2] ~= "perfect" then
-					color(accBarBgColors[accBarColorScheme])
-					love.graphics.rectangle("fill", 0, 0, project.res.x, mods.beattools.config.accBarWidth)
-				end
-				color(accBarFgColors[accBarColorScheme])
-				local subAcc, subAcc2
-				if v[2] == "perfect" then
-					subAcc = 0
-					subAcc2 = 1
-				elseif mods.beattools.config.accBarReverse then
-					subAcc = 1 - (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
-					subAcc2 = 1
-				else
-					subAcc = 0
-					subAcc2 = (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
-				end
-				({
+				local subAcc = 0
+				local subAcc2 = 1
+				local drawBar = ({
 					top = function ()
 						love.graphics.rectangle(
 							"fill",
@@ -464,7 +450,20 @@ if mods.beattools.config.accBar then
 							project.res.x, project.res.y * subAcc2
 						)
 					end
-				})[mods.beattools.config.accBarSide]()
+				})[mods.beattools.config.accBarSide]
+				if v[2] ~= "perfect" then
+					color(accBarBgColors[accBarColorScheme])
+					drawBar()
+					if mods.beattools.config.accBarReverse then
+						subAcc = 1 - (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+						subAcc2 = 1
+					else
+						subAcc = 0
+						subAcc2 = (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+					end
+				end
+				color(accBarFgColors[accBarColorScheme])
+				drawBar()
 				color(cs.vfx.uiColor)
 				break
 			end
