@@ -35,7 +35,7 @@ returnValue.InputInt = function (key, step, step_fast)
 	if mod.config[key] == nil then mod.config[key] = beattoolsOptions[key].default end
 	local valptr = ffi.new("int[1]", { mod.config[key] })
 	returnValue.SetWidth(key)
-	imgui.InputInt(beattoolsOptions[key].name .. "##BeattoolsConfig", valptr, step or 0, step_fast, beattoolsOptions[key].flags or 2^12)
+	imgui.InputInt(beattoolsOptions[key].name .. "##BeattoolsConfig", valptr, step or 0, step_fast, beattoolsOptions[key].flags or (2^12))
 	returnValue.Tooltip(key)
 	mod.config[key] = valptr[0]
 end
@@ -43,7 +43,7 @@ returnValue.InputFloat = function (key, step, step_fast, format)
 	if mod.config[key] == nil then mod.config[key] = beattoolsOptions[key].default end
 	local valptr = ffi.new("float[1]", { mod.config[key] })
 	returnValue.SetWidth(key)
-	imgui.InputFloat(beattoolsOptions[key].name .. "##BeattoolsConfig", valptr, step or 0, step_fast, format, beattoolsOptions[key].flags or 2^12)
+	imgui.InputFloat(beattoolsOptions[key].name .. "##BeattoolsConfig", valptr, step or 0, step_fast, format, beattoolsOptions[key].flags or (2^12))
 	returnValue.Tooltip(key)
 	mod.config[key] = valptr[0]
 end
@@ -53,7 +53,7 @@ returnValue.InputText = function (key, size)
 	local buffer = ffi.new("char[?]", size)
 	ffi.copy(buffer, mod.config[key], #mod.config[key])
 	returnValue.SetWidth(key)
-	imgui.InputText(beattoolsOptions[key].name .. "##BeattoolsConfig", buffer, size, beattoolsOptions[key].flags or 2^12)
+	imgui.InputText(beattoolsOptions[key].name .. "##BeattoolsConfig", buffer, size, beattoolsOptions[key].flags or (2^12))
 	mod.config[key] = ffi.string(buffer)
 end
 returnValue.InputCombo = function (key)
@@ -74,7 +74,7 @@ end
 returnValue.InputColor = function (key)
 	if mod.config[key] == nil then mod.config[key] = beattoolsOptions[key].default end
 	local valptr = ffi.new("float[" .. (mod.config[key].a and 4 or 3) .. "]", mod.config[key].a and { mod.config[key].r, mod.config[key].g, mod.config[key].b, mod.config[key].a } or { mod.config[key].r, mod.config[key].g, mod.config[key].b })
-	imgui["ColorEdit" .. (mod.config[key].a and 4 or 3)](beattoolsOptions[key].name, valptr, beattoolsOptions[key].flags or 2^5)
+	imgui["ColorEdit" .. (mod.config[key].a and 4 or 3)](beattoolsOptions[key].name, valptr, beattoolsOptions[key].flags or (2^5))
 	returnValue.Tooltip(key)
 	mod.config[key].r, mod.config[key].g, mod.config[key].b, mod.config[key].a = valptr[0], valptr[1], valptr[2], mod.config[key].a and valptr[3] or nil
 end
@@ -85,7 +85,7 @@ returnValue.InputList = function (key, size)
 	local buffer = ffi.new("char[?]", size)
 	ffi.copy(buffer, formatted, #formatted)
 	returnValue.SetWidth(key)
-	imgui.InputText(beattoolsOptions[key].name .. "##BeattoolsConfig", buffer, size, beattoolsOptions[key].flags or 2^12)
+	imgui.InputText(beattoolsOptions[key].name .. "##BeattoolsConfig", buffer, size, beattoolsOptions[key].flags or (2^12))
 	returnValue.Tooltip(key)
 	local value = ffi.string(buffer)
 	if formatted ~= value and value ~= mod.config[key .. "2"] then

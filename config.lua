@@ -420,17 +420,20 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				Doc("editor_visuals_markers")
 				beattoolsConfigHelpers.InputCombo("markRepeat")
 				beattoolsConfigHelpers.InputCombo("showDuration")
-				beattoolsConfigHelpers.ConditionalTreeNode("Line Colors", "showDuration", "off", false, function ()
+				imgui.Separator()
+				beattoolsConfigHelpers.InputBool("markSameEasing")
+				if (mod.config.markRepeat ~= "off" or mod.config.showDuration ~= "off" or mod.config.markSameEasing) and beattoolsConfigHelpers.TreeNode("Marker Colors") then
 					if mod.config.showDuration == "on" then
 						beattoolsConfigHelpers.InputColor("durationColor")
 					end
-					beattoolsConfigHelpers.InputColor("durationSelectedColor")
-					if mod.config.showDuration == "on" and mod.config.markSameEasing then
+					if mod.config.markRepeat ~= "off" or mod.config.showDuration ~= "off" then
+						beattoolsConfigHelpers.InputColor("durationSelectedColor")
+					end
+					if mod.config.markSameEasing then
 						beattoolsConfigHelpers.InputColor("durationSameEasingColor")
 					end
-				end)
-				imgui.Separator()
-				beattoolsConfigHelpers.InputBool("markSameEasing")
+					imgui.TreePop()
+				end
 				imgui.Separator()
 				beattoolsConfigHelpers.InputCombo("markEndAnglePosition")
 				beattoolsConfigHelpers.InputBool("displayEndAngle")

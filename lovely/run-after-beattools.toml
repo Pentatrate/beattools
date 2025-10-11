@@ -334,7 +334,18 @@ if type(eventDraw) == "function" then
 	if beattoolsLayer == "repeatMarker" and event.beattoolsRepeats ~= nil then
 		local pos = cs:getPosition(event.angle, event.time)
 		if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 and event.time >= self.editorBeat then
-			love.graphics.draw((function () if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then return sprites.editor.repeatMarkerSelected else return sprites.editor.repeatMarker end end)(), pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+			love.graphics.draw(
+				(function ()
+					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then
+						love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, 1)
+						return sprites.editor.repeatMarkerSelected
+					else
+						return sprites.editor.repeatMarker
+					end
+				end)(),
+				pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset,
+				0, 1, 1, 11, 11
+			)
 		end
 	end
 	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = beattoolsTemp2 end
@@ -374,7 +385,9 @@ else
 			if event.beattoolsRepeats == nil or mods.beattools.config.displayRepeatEvents or not mods.beattools.config.fakeRepeat then
 				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
 				if beattoolsSameEasing(event, self.selectedEvent) then
+					love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
 					love.graphics.draw(sprites.editor.sameEasing, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+					love.graphics.setColor(1, 1, 1, 1)
 				end
 				if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil then
 					if event[mods.beattools.config.showParam] % 1e-3 ~= 0 then event[mods.beattools.config.showParam] = helpers.round(event[mods.beattools.config.showParam] * 1e3) / 1e3 end
@@ -404,16 +417,17 @@ else
 			love.graphics.draw(
 				(function ()
 					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then
+						love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, 1)
 						return sprites.editor.repeatMarkerSelected
 					elseif beattoolsSameEasing(event, self.selectedEvent) then
+						love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
 						return sprites.editor.repeatMarkerSameEasing
 					else
 						return sprites.editor.repeatMarker
 					end
 				end)(),
 				pos[1], pos[2],
-				0, 1, 1,
-				11, 11
+				0, 1, 1, 11, 11
 			)
 		end
 	end
@@ -426,16 +440,17 @@ else
 					love.graphics.draw(
 						(function ()
 							if beattoolsLayer == "selected" then
+								love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, 1)
 								return sprites.editor.repeatMarkerSelected
 							elseif beattoolsSameEasing(event, self.selectedEvent) then
+								love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
 								return sprites.editor.repeatMarkerSameEasing
 							else
 								return sprites.editor.repeatMarker
 							end
 						end)(),
 						pos[1], pos[2],
-						0, 1, 1,
-						11, 11
+						0, 1, 1, 11, 11
 					)
 				end
 			end

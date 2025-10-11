@@ -3,6 +3,10 @@ STUFF TO DO:
 
 - angles dial (spin over the limit)
 - - buttons for multiplying?
+- fix save imgui colors
+- acc bar outline visual bug
+- current color channel in event
+- maybe see original channel colors in channel preview
 
 
 Mod Config:
@@ -10,7 +14,7 @@ Mod Config:
 
 Party Tricks:
 - swap color channels? (tags!!!)
-- in-editor code evaluator
+- in-editor code evaluator +1 by others who want calculator
 - gif in imgui (Are you sure? :skull:)
 
 
