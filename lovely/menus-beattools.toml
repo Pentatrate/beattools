@@ -170,7 +170,7 @@ if imgui.BeginPopup("beattoolsConfirmation") then
 	if beattoolsConfirmationFunc and imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized * #confirmationTexts) + 1]) .. "##beatools") then
 		local tempFunc = beattoolsConfirmationFunc
 		beattoolsConfirmationText = ""
-		beattoolsConfirmationFunc = nil
+		beattoolsConfirmationFunc = function () end
 		beattoolsConfirmationRandomized = 0
 		if tempFunc then tempFunc() end
 		imgui.CloseCurrentPopup()
@@ -178,7 +178,7 @@ if imgui.BeginPopup("beattoolsConfirmation") then
 	imgui.EndPopup("beattoolsConfirmation")
 elseif beattoolsConfirmationText ~= "" then
 	beattoolsConfirmationText = ""
-	beattoolsConfirmationFunc = nil
+	beattoolsConfirmationFunc = function () end
 	beattoolsConfirmationRandomized = 0
 end
 if beattoolsPromptOpen and not imgui.IsPopupOpen("beattoolsPrompt") then
@@ -1183,7 +1183,7 @@ if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mod
 			imgui.TextUnformatted("X/Y: " .. helpers.round(mouse.rx) .. "/" ..  helpers.round(mouse.ry))
 		end
 		if mods.beattools.config.editorMenu then
-			beattoolsMenuCode()
+			if beattoolsMenuCode then beattoolsMenuCode() end
 			if self.zoom then
 				if self.zoom < mods.beattools.config.zoomMin then self.zoom = mods.beattools.config.zoomMin end
 				if self.zoom > mods.beattools.config.zoomMax then self.zoom = mods.beattools.config.zoomMax end

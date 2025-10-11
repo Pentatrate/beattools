@@ -61,7 +61,7 @@ Hotkeys:\
   - \"ctrl + shift + z\" to redo multiple changes grouped by time difference\
   Select in Editor\
   - Right click empty space or \"n\" while placing event to deselect the placable event\
-    (select \"None\" in event palette)\
+	(select \"None\" in event palette)\
   Multiselect in Editor\
   - Delete keys to delete selections\
   - \"ctrl + a\" to select all events\
@@ -145,17 +145,17 @@ end
 
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
-		if beattoolsConfigHelpers.TreeNode("Menu Options", 2^5) then
+		if beattoolsConfigHelpers.TreeNode("Menu Options", 2 ^ 5) then
 			Doc("general_menuOptions")
 			beattoolsConfigHelpers.InputBool("editorMenu")
 			imgui.Separator()
 			beattoolsConfigHelpers.InputCombo("docInMenu")
 			beattoolsConfigHelpers.InputCombo("tooltipsInMenu")
 			imgui.Separator()
-			if imgui.Button("Default") and not imgui.IsPopupOpen("beattoolsConfirmation2") then
-				imgui.OpenPopup_Str("beattoolsConfirmation2")
+			if imgui.Button("Default") then
+				beattoolsConfirmationOpen = true
 				beattoolsConfirmationText2 = "You will reset all config options for this large mod back to default"
-				beattoolsConfirmationFunc2 = function ()
+				beattoolsConfirmationFunc2 = function()
 					mods.beattools.config.imguiColors = nil
 					for key, v in pairs(beattoolsOptions) do
 						mod.config[key] = v.default
@@ -164,36 +164,16 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfirmationRandomized2 = math.random()
 			end
 			imgui.SameLine()
-			if imgui.Button("Off") and not imgui.IsPopupOpen("beattoolsConfirmation2") then
-				imgui.OpenPopup_Str("beattoolsConfirmation2")
+			if imgui.Button("Off") then
+				beattoolsConfirmationOpen = true
 				beattoolsConfirmationText2 = "You will turn all mod features off"
-				beattoolsConfirmationFunc2 = function ()
+				beattoolsConfirmationFunc2 = function()
 					mods.beattools.config.imguiColors = nil
 					for key, v in pairs(beattoolsOptions) do
 						if v.off ~= nil then mod.config[key] = v.off end
 					end
 				end
 				beattoolsConfirmationRandomized2 = math.random()
-			end
-			if imgui.BeginPopup("beattoolsConfirmation2") then
-				imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-				imgui.TextUnformatted("Are you sure?")
-				imgui.TextUnformatted(tostring(beattoolsConfirmationText2))
-				imgui.PopTextWrapPos()
-				local confirmationTexts = mods.beattools.config.confirmationTexts
-				if imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized2 * #confirmationTexts) + 1]) .. "##beattools") then
-					local tempFunc = beattoolsConfirmationFunc2
-					beattoolsConfirmationText2 = ""
-					beattoolsConfirmationFunc2 = nil
-					beattoolsConfirmationRandomized2 = 0
-					if tempFunc then tempFunc() end
-					imgui.CloseCurrentPopup()
-				end
-				imgui.EndPopup("beattoolsConfirmation2")
-			elseif beattoolsConfirmationText2 ~= "" then
-				beattoolsConfirmationText2 = ""
-				beattoolsConfirmationFunc2 = nil
-				beattoolsConfirmationRandomized2 = 0
 			end
 			imgui.TreePop()
 		end
@@ -212,6 +192,11 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			beattoolsConfigHelpers.InputCombo("randomizeWindows")
 			beattoolsConfigHelpers.InputBool("imguiGuide")
 			if imgui.Button("Save Colors Permanently") then
+				local function fail()
+					beattoolsErrorText2 = "ImGui data detected, but it's invalid :skull:"
+					beattoolsErrorRandomized2 = math.random()
+					beattoolsErrorOpen2 = true
+				end
 				local text = love.system.getClipboardText()
 				for w in string.gmatch(string.gsub(text, "colors%[", "?"), "[^?]+") do
 					local i1 = string.find(w, "]", 1, true)
@@ -222,29 +207,49 @@ if imgui.BeginTabBar("beattoolsConfig") then
 							if i3 then
 								local values = {}
 								for ww in string.gmatch(string.gsub(string.sub(w, i2 + 1, i3 - 1), "f, ", "?"), "[^?]+") do
-									table--[[stop wrong injection]].insert(values, tonumber(ww))
+									table --[[stop wrong injection]].insert(values, tonumber(ww))
 								end
 								if #values == 4 then
 									-- print(string.sub(w, 1, i1 - 1) .. " " .. values[1] .. " " .. values[2] .. " " .. values[3] .. " " .. tostring(values[4]))
-									imgui.PushStyleColor_Vec4(imgui[string.sub(w, 1, i1 - 1)], imgui.ImVec4_Float(values[1], values[2], values[3], values[4]))
+									imgui.PushStyleColor_Vec4(imgui[string.sub(w, 1, i1 - 1)],
+										imgui.ImVec4_Float(values[1], values[2], values[3], values[4]))
 									if mods.beattools.config.imguiColors == nil then mods.beattools.config.imguiColors = {} end
 									mods.beattools.config.imguiColors[string.sub(w, 1, i1 - 1)] = values
-								else print("[BT] Failed.") end
-							else print("[BT] Failed.") end
-						else print("[BT] Failed.") end
-					elseif string.find(w, "ImVec4* colors = ImGui::GetStyle().Colors;", 1, true) == nil then print("[BT] Failed.") end
+                                else
+									fail()
+									print("[BT] Failed.")
+								end
+                            else
+								fail()
+								print("[BT] Failed.")
+							end
+                        else
+							fail()
+							print("[BT] Failed.")
+						end
+                    elseif string.find(w, "ImVec4* colors = ImGui::GetStyle().Colors;", 1, true) == nil then
+						beattoolsErrorText2 = "You have to export your ImGui colors to your clipboard\n(which you didnt do apparently)"
+						beattoolsErrorRandomized2 = math.random()
+						beattoolsErrorOpen2 = true
+                        print("[BT] Failed.")
+					end
 				end
 			end
 			if imgui.Button("Reset Colors") then
-				mods.beattools.config.imguiColors = nil
-				imgui.PopStyleColor(100)
+				beattoolsConfirmationOpen = true
+				beattoolsConfirmationText2 = "You will reset your custom ImGui colors to default"
+				beattoolsConfirmationFunc2 = function()
+					mods.beattools.config.imguiColors = nil
+					imgui.PopStyleColor(100)
+				end
+				beattoolsConfirmationRandomized2 = math.random()
 			end
 			imgui.TreePop()
 		end
-		beattoolsConfigHelpers.ConditionalTreeNode("Full Mod Description", "docInMenu", "long", true, function ()
+		beattoolsConfigHelpers.ConditionalTreeNode("Full Mod Description", "docInMenu", "long", true, function()
 			Doc("general_fullDescription")
 		end)
-		beattoolsConfigHelpers.ConditionalTreeNode("ImGui User Guide", "docInMenu", "long", true, function ()
+		beattoolsConfigHelpers.ConditionalTreeNode("ImGui User Guide", "docInMenu", "long", true, function()
 			imgui.ShowUserGuide()
 		end)
 		imgui.EndTabItem("General##beattoolsConfig")
@@ -253,13 +258,13 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		if beattoolsConfigHelpers.TreeNode("Visuals") then
 			Doc("game_visuals")
 			beattoolsConfigHelpers.InputBool("customLevelVisuals")
-			beattoolsConfigHelpers.ConditionalTreeNode("Colors", "customLevelVisuals", true, true, function ()
+			beattoolsConfigHelpers.ConditionalTreeNode("Colors", "customLevelVisuals", true, true, function()
 				beattoolsConfigHelpers.InputColor("customWhiteColor")
 				beattoolsConfigHelpers.InputColor("customBlackColor")
 			end)
 			imgui.Separator()
 			beattoolsConfigHelpers.InputBool("accBar")
-			beattoolsConfigHelpers.ConditionalTreeNode("Bar Visuals", "accBar", true, true, function ()
+			beattoolsConfigHelpers.ConditionalTreeNode("Bar Visuals", "accBar", true, true, function()
 				beattoolsConfigHelpers.InputInt("accBarWidth")
 				beattoolsConfigHelpers.InputCombo("accBarSide")
 				beattoolsConfigHelpers.InputBool("accBarReverse")
@@ -273,7 +278,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			beattoolsConfigHelpers.InputBool("damoclismCataclism")
 			imgui.Separator()
 			beattoolsConfigHelpers.InputBool("lagBack")
-			beattoolsConfigHelpers.ConditionalTreeNode("Lag Back Options", "lagBack", true, true, function ()
+			beattoolsConfigHelpers.ConditionalTreeNode("Lag Back Options", "lagBack", true, true, function()
 				beattoolsConfigHelpers.InputFloat("lagThreshhold")
 				beattoolsConfigHelpers.InputFloat("lagOffset")
 				beattoolsConfigHelpers.InputBool("lagUseSeconds")
@@ -297,23 +302,28 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			beattoolsConfigHelpers.InputBool("levelSelectDynamicLoading")
 			imgui.EndDisabled()
 			imgui.Separator()
-			if imgui.Button("Scan Duplicates") and not imgui.IsPopupOpen("beattoolsConfirmation3") then
-				imgui.OpenPopup_Str("beattoolsConfirmation3")
-				beattoolsConfirmationText3 = "You will scan all custom levels for duplicate level folder names\nThe results will be printed in the console"
-				beattoolsConfirmationFunc3 = function ()
+			if imgui.Button("Scan Duplicates") then
+				beattoolsConfirmationOpen = true
+				beattoolsConfirmationText2 =
+				"You will scan all custom levels for duplicate level folder names\nThe results will be printed in the console"
+				beattoolsConfirmationFunc2 = function()
 					local levels = {}
 					local function scanDuplicates(path)
 						local content = love.filesystem.getDirectoryItems(path)
 						for i, v in ipairs(content) do
 							if love.filesystem.getInfo(path .. "/" .. v .. "/manifest.json") then
-								if levels[v] == nil then levels[v] = {} else
+								if levels[v] == nil then
+									levels[v] = {}
+								else
 								end
 								table.insert(levels[v], {
 									type = "manifest",
 									path = path .. "/" .. v
 								})
 							elseif love.filesystem.getInfo(path .. "/" .. v .. "/level.json") then
-								if levels[v] == nil then levels[v] = {} else
+								if levels[v] == nil then
+									levels[v] = {}
+								else
 								end
 								table.insert(levels[v], {
 									type = "no manifest",
@@ -337,27 +347,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 						end
 					end
 				end
-				beattoolsConfirmationRandomized3 = math.random()
-			end
-			if imgui.BeginPopup("beattoolsConfirmation3") then
-				imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-				imgui.TextUnformatted("Are you sure?")
-				imgui.TextUnformatted(tostring(beattoolsConfirmationText3))
-				imgui.PopTextWrapPos()
-				local confirmationTexts = mods.beattools.config.confirmationTexts
-				if imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized3 * #confirmationTexts) + 1]) .. "##beattools") then
-					local tempFunc = beattoolsConfirmationFunc3
-					beattoolsConfirmationText3 = ""
-					beattoolsConfirmationFunc3 = nil
-					beattoolsConfirmationRandomized3 = 0
-					if tempFunc then tempFunc() end
-					imgui.CloseCurrentPopup()
-				end
-				imgui.EndPopup("beattoolsConfirmation3")
-			elseif beattoolsConfirmationText3 ~= "" then
-				beattoolsConfirmationText3 = ""
-				beattoolsConfirmationFunc3 = nil
-				beattoolsConfirmationRandomized3 = 0
+				beattoolsConfirmationRandomized2 = math.random()
 			end
 			imgui.TreePop()
 		end
@@ -396,7 +386,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("coordsDisplay")
 				beattoolsConfigHelpers.InputBool("easeList")
 				beattoolsConfigHelpers.InputBool("bookmarkList")
-				beattoolsConfigHelpers.ConditionalTreeNode("Ease List", "easeList", true, true, function ()
+				beattoolsConfigHelpers.ConditionalTreeNode("Ease List", "easeList", true, true, function()
 					beattoolsConfigHelpers.InputBool("easeListUse")
 					beattoolsConfigHelpers.InputBool("easeListUsed")
 					beattoolsConfigHelpers.InputBool("easeListSerious")
@@ -408,7 +398,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("currentPaddle")
 				beattoolsConfigHelpers.InputBool("currentSprite")
 				imgui.Separator()
-				beattoolsConfigHelpers.ConditionalTreeNode("Coords colors", "mouseCoordsButton", true, true, function ()
+				beattoolsConfigHelpers.ConditionalTreeNode("Coords colors", "mouseCoordsButton", true, true, function()
 					beattoolsConfigHelpers.InputColor("lineColor")
 					beattoolsConfigHelpers.InputBool("shadow2")
 					beattoolsConfigHelpers.InputColor("fgColor2")
@@ -439,14 +429,11 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("displayEndAngle")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputCombo("showParam")
-				beattoolsConfigHelpers.ConditionalTreeNode("Text Colors", "showParam", "none", false, function ()
+				beattoolsConfigHelpers.ConditionalTreeNode("Text Colors", "showParam", "none", false, function()
 					beattoolsConfigHelpers.InputBool("shadow")
 					beattoolsConfigHelpers.InputColor("fgColor")
 					beattoolsConfigHelpers.InputColor("bgColor")
 				end)
-				-- mod.config.displayRepeatEvents = helpers.InputBool("Draw Repeat", mod.config.displayRepeatEvents)
-				-- tooltip("Repeated events are drawn (they will still not be selectable)\nIt is a very bad idea to have this on but \"Mark Repeat\" off, because you will troll yourself into pressing ghost events")
-				-- Penta: didnt even convert this to the new config because this is such a bad idea
 				imgui.TreePop()
 			end
 			if beattoolsConfigHelpers.TreeNode("Stacking") then
@@ -499,12 +486,13 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("deleteNothing")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("saveAngleBeatSnap")
-				beattoolsConfigHelpers.ConditionalTreeNode("Angle/Beat Defaults", "saveAngleBeatSnap", false, true, function ()
-					beattoolsConfigHelpers.InputInt("angleDefault")
-					beattoolsConfigHelpers.InputInt("customAngleDefault")
-					beattoolsConfigHelpers.InputInt("beatDefault")
-					beattoolsConfigHelpers.InputInt("customBeatDefault")
-				end)
+				beattoolsConfigHelpers.ConditionalTreeNode("Angle/Beat Defaults", "saveAngleBeatSnap", false, true,
+					function()
+						beattoolsConfigHelpers.InputInt("angleDefault")
+						beattoolsConfigHelpers.InputInt("customAngleDefault")
+						beattoolsConfigHelpers.InputInt("beatDefault")
+						beattoolsConfigHelpers.InputInt("customBeatDefault")
+					end)
 				if beattoolsConfigHelpers.TreeNode("Snap List") then
 					beattoolsConfigHelpers.InputList("angleSnapValues")
 					beattoolsConfigHelpers.InputList("beatSnapValues")
@@ -520,7 +508,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				beattoolsConfigHelpers.InputFloat("groupTimeDifference", nil, nil, "%.3f")
 				imgui.Separator()
-				beattoolsConfigHelpers.ConditionalTreeNode("Spreading", "spreadButtons", true, true, function ()
+				beattoolsConfigHelpers.ConditionalTreeNode("Spreading", "spreadButtons", true, true, function()
 					beattoolsConfigHelpers.InputInt("spreadSnap")
 					beattoolsConfigHelpers.InputCombo("spreadType")
 				end)
@@ -552,4 +540,49 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		imgui.EndTabItem("Editor##beattoolsConfig")
 	end
 	if mod.config.foldAll then mod.config.foldAll = false end
+end
+
+if beattoolsConfirmationOpen and not imgui.IsPopupOpen("beattoolsConfirmation2") then
+	imgui.OpenPopup_Str("beattoolsConfirmation2")
+end
+beattoolsConfirmationOpen = false
+if imgui.BeginPopup("beattoolsConfirmation2") then
+    imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+    imgui.TextUnformatted("Are you sure?")
+    imgui.TextUnformatted(tostring(beattoolsConfirmationText2))
+    imgui.PopTextWrapPos()
+    local confirmationTexts = mods.beattools.config.confirmationTexts
+    if imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized2 * #confirmationTexts) + 1]) .. "##beattools") then
+        local tempFunc = beattoolsConfirmationFunc2
+        beattoolsConfirmationText2 = ""
+        beattoolsConfirmationFunc2 = function () end
+        beattoolsConfirmationRandomized2 = 0
+        if tempFunc then tempFunc() end
+        imgui.CloseCurrentPopup()
+    end
+    imgui.EndPopup("beattoolsConfirmation2")
+elseif beattoolsConfirmationText2 ~= "" then
+    beattoolsConfirmationText2 = ""
+    beattoolsConfirmationFunc2 = function() end
+    beattoolsConfirmationRandomized2 = 0
+end
+
+if beattoolsErrorOpen2 and not imgui.IsPopupOpen("beattoolsError2") then
+	imgui.OpenPopup_Str("beattoolsError2")
+end
+beattoolsErrorOpen2 = false
+if imgui.BeginPopup("beattoolsError2") then
+	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+	-- Penta: I can imagine ppl screenshotting their error code to report it just to realize its just a random number :skull:
+	-- Penta: Don't think it's gonna happen though :/
+	local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.", ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]] "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you" }
+	table--[[stop wrong injection]].insert(errorTexts, 1, "Error Code " .. tostring(math.floor(beattoolsErrorRandomized2 * (#errorTexts + 1) * 999)))
+	imgui.TextUnformatted(tostring(errorTexts[math.floor(beattoolsErrorRandomized2 * #errorTexts) + 1]))
+	imgui.Separator()
+	imgui.TextUnformatted(tostring(beattoolsErrorText2))
+	imgui.PopTextWrapPos()
+	imgui.EndPopup("beattoolsError2")
+elseif beattoolsErrorText2 ~= "" then
+	beattoolsErrorText2 = ""
+	beattoolsErrorRandomized2 = 0
 end

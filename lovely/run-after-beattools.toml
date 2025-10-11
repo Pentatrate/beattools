@@ -139,7 +139,7 @@ pattern = '''for i, v in ipairs(tagEvents) do
 end'''
 position = "at"
 payload = '''
-for i = #tagEvents, 1 do
+for i = #tagEvents, 1, -1 do
 	local v = tagEvents[i]
 	if mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil then
 		table.remove(tagEvents, i)
@@ -294,7 +294,7 @@ if type(eventDraw) == "function" then
 	local beattoolsTemp2 = event.angle
 	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = event.endAngle end
 	if (beattoolsLayer == "note" and event ~= self.selectedEvent) or beattoolsLayer == "selected" then
-		if event.beattoolsRepeats == nil or mods.beattools.config.displayRepeatEvents or not mods.beattools.config.fakeRepeat then
+		if event.beattoolsRepeats == nil or not mods.beattools.config.fakeRepeat then
 			eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance, alpha)
 			if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil and event.time >= self.editorBeat then
 				local pos = cs:getPosition(event.angle, event.time)
@@ -382,7 +382,7 @@ else
 				event.beattoolsIndex = beattoolsOverlap["" .. event.time]["" .. event.angle % 360][1]
 				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = event.beattoolsIndex + 1 end
 			end
-			if event.beattoolsRepeats == nil or mods.beattools.config.displayRepeatEvents or not mods.beattools.config.fakeRepeat then
+			if event.beattoolsRepeats == nil or not mods.beattools.config.fakeRepeat then
 				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
 				if beattoolsSameEasing(event, self.selectedEvent) then
 					love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
@@ -738,7 +738,7 @@ target = "states/Editor.lua"
 pattern = '''self:drawEvent({type = eventType, angle = angle, time = time, isCursor = true},alpha)'''
 position = "at"
 payload = '''
-self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected", "show")
+self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected")
 '''
 match_indent = true
 

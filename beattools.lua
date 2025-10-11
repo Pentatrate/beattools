@@ -101,7 +101,7 @@ local beattoolsMenuCode -- configs in editor
 
 beattoolsConfirmationOpen = false -- prompts
 beattoolsConfirmationText = ""
-beattoolsConfirmationFunc= nil
+beattoolsConfirmationFunc = function () end
 beattoolsConfirmationRandomized = 0
 local beattoolsErrorOpen = false
 local beattoolsErrorText = ""
@@ -121,7 +121,7 @@ local beattoolsChangeIndex = 0
 local beattoolsLastCheck = 0
 
 beattoolsRecordPosition = false -- record position
-beattoolsRecordFunc = nil
+beattoolsRecordFunc = function () end
 
 local beattoolsPlayerSpriteChanged = {}
 local beattoolsLastSpriteModified = 0
