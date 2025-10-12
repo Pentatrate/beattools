@@ -625,6 +625,11 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Normalizes the angle of sides in any level you edit" },
 		default = false,
 		off = false
+	}, ctrlSelect = {
+		name = "Ctrl Select",
+		tooltips = { long = "Replaces the ctrl click with a ctrl select feature, taking overlapping events into account\n\"c\" click to copy single events", short = "Toggles the ctrl select feature" },
+		default = true,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

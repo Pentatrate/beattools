@@ -1,208 +1,35 @@
 {
+	"id": "beattools",
+	"author": "Pentatrate",
+	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
 	"config": {
-		"zoomMax": 120,
-		"spreadSnap": 32,
-		"scrollPast": 1,
-		"scanInterval": 0.10000000149012,
-		"easeListSelected": false,
-		"customBeatDefault": 16,
-		"betterUntagging": true,
-		"spreadButtons": true,
-		"yOffset": 4,
-		"randomizeWindows": "off",
-		"betterCombo": true,
-		"groupTimeDifference": 0.5,
 		"dragThreshhold": 5,
-		"bookmarkList": true,
-		"stackingNotes": true,
-		"accBar": true,
-		"customAngleDefault": 32,
-		"mouseCoordsButton": true,
-		"lineColor": {
-			"a": 0.5,
-			"r": 0.37299999594688,
-			"g": 0.37299999594688,
-			"b": 0.37299999594688
-		},
-		"fakeRepeat": true,
-		"bgColor2": {
-			"r": 1,
-			"g": 1,
-			"b": 1
-		},
-		"shadow2": false,
-		"fgColor2": {
-			"r": 0,
-			"g": 0.25900000333786,
-			"b": 1
-		},
-		"restartInPlaytest": true,
-		"betterBookmarks": true,
-		"foldAll": false,
-		"saveAngleBeatSnap": true,
-		"selectNoneInPalette": true,
-		"easeListUsed": false,
-		"browserCharter": true,
-		"easeListSelectChanged": true,
-		"ignoreUntagPrompt": true,
-		"accBarReverse": true,
-		"accBarSide": "left",
-		"betterMoveSelection": true,
-		"angleSnapValues": [
-			8,
-			16,
-			32
-		],
-		"selectAll": true,
-		"markSameEasing": true,
+		"imguiGuide": true,
 		"jumpEvents": true,
-		"untaggingButtons": true,
-		"xOffset": 4,
-		"loopEventsDuringSelectionAmount": 2000,
+		"showParam": "order",
+		"ctrlSelect": true,
+		"untaggingHotkeys": true,
 		"undoHotkeys": true,
 		"hideMenus": true,
-		"fullSize": true,
-		"sillyNisenenGimmick": true,
-		"angleSnapValues2": " 8, 16, 32",
-		"beatSnapValues2": "1, 2, 4, 8,, 16",
-		"bgColor": {
-			"r": 0,
-			"g": 0,
-			"b": 0
-		},
-		"easeCurrentValues": true,
-		"eventGroups": {
-			"color": {
-				"events": {
-					"hom": true,
-					"setBgColor": true,
-					"noise": true,
-					"outline": true,
-					"setColor": true
-				},
-				"visibility": " - ",
-				"name": "color",
-				"index": 2
-			},
-			"eases": {
-				"events": {
-					"ease": true,
-					"setBoolean": true
-				},
-				"visibility": " - ",
-				"name": "eases",
-				"index": 3
-			},
-			"bookmarks": {
-				"events": {
-					"bookmark": true
-				},
-				"visibility": " - ",
-				"name": "bookmarks",
-				"index": 3
-			},
-			"tags": {
-				"events": {
-					"tag": true
-				},
-				"visibility": " - ",
-				"name": "tags",
-				"index": 3
-			},
-			"song": {
-				"events": {
-					"setBPM": true,
-					"showResults": true,
-					"play": true,
-					"playSound": true
-				},
-				"visibility": " - ",
-				"name": "song",
-				"index": 1
-			},
-			"visuals": {
-				"events": {
-					"ease": true,
-					"setBgColor": true,
-					"hom": true,
-					"setColor": true,
-					"deco": true,
-					"toggleParticles": true,
-					"forcePlayerSprite": true,
-					"outline": true,
-					"setBoolean": true,
-					"noise": true
-				},
-				"visibility": " - ",
-				"name": "visuals",
-				"index": 1
-			},
-			"gameplay": {
-				"events": {
-					"mine": true,
-					"paddles": true,
-					"block": true,
-					"extraTap": true,
-					"side": true,
-					"mineHold": true,
-					"hold": true,
-					"inverse": true
-				},
-				"visibility": " - ",
-				"name": "gameplay",
-				"index": 1
-			},
-			"deco": {
-				"events": {
-					"deco": true
-				},
-				"visibility": " - ",
-				"name": "deco",
-				"index": 3
-			},
-			"all": {
-				"events": {
-					"ease": true,
-					"setBgColor": true,
-					"playSound": true,
-					"hold": true,
-					"mineHold": true,
-					"mine": true,
-					"bookmark": true,
-					"side": true,
-					"setBoolean": true,
-					"forcePlayerSprite": true,
-					"play": true,
-					"inverse": true,
-					"deco": true,
-					"block": true,
-					"extraTap": true,
-					"showResults": true,
-					"toggleParticles": true,
-					"setColor": true,
-					"tag": true,
-					"noise": true,
-					"setBPM": true,
-					"outline": true,
-					"hom": true,
-					"paddles": true
-				},
-				"visibility": "show",
-				"name": "all",
-				"index": 0
-			}
-		},
-		"keyHandling": "blacklist",
-		"easeListRound": true,
-		"levelSelectShowIncompatible": true,
-		"levelSelectDynamicLoading": true,
 		"fgColor": {
+			"b": 0,
 			"r": 1,
-			"g": 0.5,
-			"b": 0
+			"g": 0.5
 		},
-		"accBarSmooth": 0.34999999403954,
-		"charter": "Pentatrate",
+		"mouseCoordsButton": true,
+		"markEndAnglePosition": "on",
+		"customLevelVisuals": true,
+		"editorBlackColor": {
+			"b": 0.24705882370472,
+			"r": 0.24705882370472,
+			"g": 0.24705882370472
+		},
+		"durationSelectedColor": {
+			"g": 0,
+			"b": 0,
+			"a": 0.5,
+			"r": 1
+		},
 		"confirmationTexts": [
 			"Confirm",
 			"Accept",
@@ -218,78 +45,158 @@
 			"Ready",
 			"Yippee!"
 		],
+		"showDuration": "on",
+		"durationSameEasingColor": {
+			"g": 0,
+			"b": 1,
+			"a": 0.5,
+			"r": 0
+		},
+		"preciseTimeInput": false,
+		"keysWhiteList": {
+			"spriteName": "sprName",
+			"offset": "off",
+			"name": true,
+			"hide": true,
+			"enable": "on",
+			"y": true,
+			"objectName": "obj",
+			"duration": "dur",
+			"effectCanvas": "fxCanv",
+			"var": true,
+			"ease": true,
+			"variableName": "var",
+			"delay": true,
+			"newAngle": "nAngle",
+			"sx": true,
+			"sy": true,
+			"start": true,
+			"ox": true,
+			"oy": true,
+			"kx": true,
+			"ky": true,
+			"tickRate": "tickR",
+			"startTap": "stTap",
+			"endTap": true,
+			"outline": "outl",
+			"file": true,
+			"angle2": "ang2",
+			"segments": "seg",
+			"holdEase": "ease",
+			"paddle": "pdl",
+			"endAngle": "endAng",
+			"spinEase": "spEase",
+			"r": true,
+			"speedMult": "spdMlt",
+			"doDithering": "dither",
+			"g": true,
+			"miss": true,
+			"mineHold": "mineH",
+			"type": true,
+			"order": "ord",
+			"bpm": true,
+			"value": "val",
+			"volume": "vol",
+			"chance": true,
+			"sprite": "spr",
+			"reps": true,
+			"b": true,
+			"a": true,
+			"newWidth": "nWidth",
+			"drawLayer": "dLayer",
+			"voidColor": "void",
+			"enabled": "on",
+			"x": true,
+			"block": "blk",
+			"time": true,
+			"parentid": "par",
+			"repeatDelay": "delay",
+			"pitch": "ptch",
+			"description": "desc",
+			"rotationinfluence": "rotInf",
+			"mine": true,
+			"tap": true,
+			"side": true,
+			"color": "col",
+			"tag": true,
+			"traceEase": "trEase",
+			"angle": "ang",
+			"recolor": "col",
+			"sound": true,
+			"id": true,
+			"drawOrder": "dOrd",
+			"effectCanvasRaw": "fxCanvR",
+			"orbit": true,
+			"repeats": "rep",
+			"intensity": "inten",
+			"paddles": "pdls",
+			"angleOffset": "angOff"
+		},
+		"restartInPlaytest": true,
+		"durationColor": {
+			"g": 1,
+			"b": 0,
+			"a": 0.5,
+			"r": 0
+		},
+		"livelyCranky": true,
+		"easeListSelected": false,
+		"randomizeWindows": "off",
+		"betterCombo": true,
 		"imguiColors": {
-			"ImGuiCol_PlotLines": [
-				0.61,
-				0.61,
-				0.61,
-				1
+			"ImGuiCol_TableRowBg": [
+				0,
+				0,
+				0,
+				0
 			],
-			"ImGuiCol_DockingEmptyBg": [
-				0.2,
-				0.2,
-				0.2,
-				1
+			"ImGuiCol_TableRowBgAlt": [
+				1,
+				1,
+				1,
+				0.06
 			],
-			"ImGuiCol_DockingPreview": [
+			"ImGuiCol_TextLink": [
 				0.26,
 				0.59,
 				0.98,
+				1
+			],
+			"ImGuiCol_TextSelectedBg": [
+				0.26,
+				0.59,
+				0.98,
+				0.35
+			],
+			"ImGuiCol_DragDropTarget": [
+				1,
+				1,
+				0,
+				0.9
+			],
+			"ImGuiCol_NavHighlight": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_NavWindowingHighlight": [
+				1,
+				1,
+				1,
 				0.7
 			],
-			"ImGuiCol_TabDimmedSelectedOverline": [
-				0.5,
-				0.5,
-				0.5,
-				0.76
+			"ImGuiCol_NavWindowingDimBg": [
+				0.8,
+				0.8,
+				0.8,
+				0.2
 			],
-			"ImGuiCol_TabDimmedSelected": [
-				0.14,
-				0.26,
-				0.42,
-				1
-			],
-			"ImGuiCol_TabDimmed": [
-				0.07,
-				0.1,
-				0.15,
-				0.97
-			],
-			"ImGuiCol_TabSelectedOverline": [
-				0.26,
-				0.59,
-				0.98,
-				1
-			],
-			"ImGuiCol_TabSelected": [
-				0.28,
-				0.52,
-				0.82,
-				0.72
-			],
-			"ImGuiCol_Tab": [
-				0.18,
-				0.35,
-				0.58,
-				0.62
-			],
-			"ImGuiCol_TabHovered": [
-				0.26,
-				0.59,
-				0.98,
-				0.8
-			],
-			"ImGuiCol_ResizeGripActive": [
-				0.26,
-				0.59,
-				0.98,
-				0.95
-			],
-			"ImGuiCol_ResizeGripHovered": [
-				0.26,
-				0.59,
-				0.98,
-				0.67
+			"ImGuiCol_ModalWindowDimBg": [
+				0.8,
+				0.8,
+				0.8,
+				0.35
 			],
 			"ImGuiCol_Text": [
 				1,
@@ -423,6 +330,132 @@
 				0.98,
 				0.36
 			],
+			"ImGuiCol_ButtonHovered": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_ButtonActive": [
+				0.06,
+				0.53,
+				0.98,
+				1
+			],
+			"ImGuiCol_Header": [
+				0.26,
+				0.59,
+				0.98,
+				0.21
+			],
+			"ImGuiCol_HeaderHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.76
+			],
+			"ImGuiCol_HeaderActive": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_Separator": [
+				0.43,
+				0.43,
+				0.5,
+				0.5
+			],
+			"ImGuiCol_SeparatorHovered": [
+				0.1,
+				0.4,
+				0.75,
+				0.78
+			],
+			"ImGuiCol_SeparatorActive": [
+				0.1,
+				0.4,
+				0.75,
+				1
+			],
+			"ImGuiCol_ResizeGrip": [
+				0.26,
+				0.59,
+				0.98,
+				0.2
+			],
+			"ImGuiCol_ResizeGripHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.67
+			],
+			"ImGuiCol_ResizeGripActive": [
+				0.26,
+				0.59,
+				0.98,
+				0.95
+			],
+			"ImGuiCol_TabHovered": [
+				0.26,
+				0.59,
+				0.98,
+				0.8
+			],
+			"ImGuiCol_Tab": [
+				0.18,
+				0.35,
+				0.58,
+				0.62
+			],
+			"ImGuiCol_TabSelected": [
+				0.28,
+				0.52,
+				0.82,
+				0.72
+			],
+			"ImGuiCol_TabSelectedOverline": [
+				0.26,
+				0.59,
+				0.98,
+				1
+			],
+			"ImGuiCol_TabDimmed": [
+				0.07,
+				0.1,
+				0.15,
+				0.97
+			],
+			"ImGuiCol_TabDimmedSelected": [
+				0.14,
+				0.26,
+				0.42,
+				1
+			],
+			"ImGuiCol_TabDimmedSelectedOverline": [
+				0.5,
+				0.5,
+				0.5,
+				0.76
+			],
+			"ImGuiCol_DockingPreview": [
+				0.26,
+				0.59,
+				0.98,
+				0.7
+			],
+			"ImGuiCol_DockingEmptyBg": [
+				0.2,
+				0.2,
+				0.2,
+				1
+			],
+			"ImGuiCol_PlotLines": [
+				0.61,
+				0.61,
+				0.61,
+				1
+			],
 			"ImGuiCol_PlotLinesHovered": [
 				1,
 				0.43,
@@ -458,152 +491,56 @@
 				0.23,
 				0.25,
 				1
-			],
-			"ImGuiCol_TableRowBg": [
-				0,
-				0,
-				0,
-				0
-			],
-			"ImGuiCol_TableRowBgAlt": [
-				1,
-				1,
-				1,
-				0.06
-			],
-			"ImGuiCol_TextLink": [
-				0.26,
-				0.59,
-				0.98,
-				1
-			],
-			"ImGuiCol_TextSelectedBg": [
-				0.26,
-				0.59,
-				0.98,
-				0.35
-			],
-			"ImGuiCol_DragDropTarget": [
-				1,
-				1,
-				0,
-				0.9
-			],
-			"ImGuiCol_NavHighlight": [
-				0.26,
-				0.59,
-				0.98,
-				1
-			],
-			"ImGuiCol_NavWindowingHighlight": [
-				1,
-				1,
-				1,
-				0.7
-			],
-			"ImGuiCol_NavWindowingDimBg": [
-				0.8,
-				0.8,
-				0.8,
-				0.2
-			],
-			"ImGuiCol_ModalWindowDimBg": [
-				0.8,
-				0.8,
-				0.8,
-				0.35
-			],
-			"ImGuiCol_ResizeGrip": [
-				0.26,
-				0.59,
-				0.98,
-				0.2
-			],
-			"ImGuiCol_SeparatorActive": [
-				0.1,
-				0.4,
-				0.75,
-				1
-			],
-			"ImGuiCol_SeparatorHovered": [
-				0.1,
-				0.4,
-				0.75,
-				0.78
-			],
-			"ImGuiCol_Separator": [
-				0.43,
-				0.43,
-				0.5,
-				0.5
-			],
-			"ImGuiCol_HeaderActive": [
-				0.26,
-				0.59,
-				0.98,
-				1
-			],
-			"ImGuiCol_HeaderHovered": [
-				0.26,
-				0.59,
-				0.98,
-				0.76
-			],
-			"ImGuiCol_Header": [
-				0.26,
-				0.59,
-				0.98,
-				0.21
-			],
-			"ImGuiCol_ButtonActive": [
-				0.06,
-				0.53,
-				0.98,
-				1
-			],
-			"ImGuiCol_ButtonHovered": [
-				0.26,
-				0.59,
-				0.98,
-				1
 			]
 		},
-		"tooltipsInMenu": "long",
-		"levelSelectAcc": true,
-		"docInMenu": "none",
-		"customLevelVisuals": true,
-		"coordsDisplay": false,
-		"roundSelectedTimes": false,
-		"damoclismCataclism": false,
-		"bounceDoubleClick": true,
-		"alpha": 0.5,
-		"customEditorLayers": [],
-		"accBarWidth": 4,
-		"autoFixSides": false,
-		"displayEndAngle": true,
-		"easeListSerious": false,
-		"bounceDragging": true,
-		"accBarColors": "auto",
-		"colorPreview": true,
-		"showEventGroups": true,
 		"customWhiteColor": {
+			"b": 0,
 			"r": 0,
-			"g": 0,
-			"b": 0
+			"g": 0
 		},
 		"customBlackColor": {
+			"b": 0.74901962280273,
 			"r": 0.74901962280273,
-			"g": 0.74901962280273,
-			"b": 0.74901962280273
+			"g": 0.74901962280273
 		},
+		"spreadType": "absolute",
+		"editorSnapColor": {
+			"b": 0.12156862765551,
+			"r": 0.12156862765551,
+			"g": 0.12156862765551
+		},
+		"currentSprite": true,
+		"inputSize": 150,
+		"editorBgColor": {
+			"b": 0,
+			"r": 0,
+			"g": 0
+		},
+		"markRepeat": "on",
+		"whiteSelected": "cut corners",
+		"selectedBorderColor": {
+			"g": 1,
+			"b": 1,
+			"a": 1,
+			"r": 1
+		},
+		"displayEndAngle": true,
+		"currentPaddle": true,
+		"bounceDragging": true,
+		"easeList": true,
+		"hideHelpMarkers": false,
+		"easeListUse": false,
+		"easeListUsed": false,
+		"easeListSerious": false,
+		"easeListSelectChanged": true,
+		"angleSnapValues2": " 8, 16, 32",
 		"editorBeats": 24,
-		"levelSelectMultiplyBpm": true,
+		"beatSnapValues2": "1, 2, 4, 8,, 16",
 		"angleSnap": 1,
-		"speedScrolling": true,
-		"angleDefault": 3,
-		"customAngleSnap": 64,
-		"lagUseSeconds": true,
-		"colorEasePreview": true,
+		"saveAngleBeatSnap": true,
+		"stackingNotes": true,
+		"levelSelectShowIncompatible": true,
+		"levelSelectDynamicLoading": true,
 		"beatSnapValues": [
 			1,
 			2,
@@ -611,159 +548,223 @@
 			8,
 			16
 		],
-		"beatSnap": 2,
+		"lineColor": {
+			"g": 0.37299999594688,
+			"b": 0.37299999594688,
+			"a": 0.5,
+			"r": 0.37299999594688
+		},
 		"beatDefault": 2,
 		"customBeatSnap": 3,
-		"imguiGuide": true,
-		"lagBack": true,
-		"lagThreshhold": 0.25,
-		"zoomMin": 2,
-		"lagOffset": 2,
-		"showParam": "order",
-		"loopVisibleEventsAmount": 5000,
-		"loopSingleSelectionEventAmount": 2000,
-		"deleteNothing": true,
-		"markEndAnglePosition": "on",
-		"easeList": true,
-		"shadow": true,
-		"durationSelectedColor": {
-			"a": 0.5,
-			"r": 1,
-			"g": 0,
-			"b": 0
-		},
-		"scanMargin": 64,
-		"showDuration": "on",
-		"durationSameEasingColor": {
-			"a": 0.5,
+		"customBeatDefault": 16,
+		"shadow2": false,
+		"fgColor2": {
+			"b": 1,
 			"r": 0,
-			"g": 0,
-			"b": 1
+			"g": 0.25900000333786
 		},
 		"shortenParams": false,
-		"keysWhiteList": {
-			"ease": true,
-			"segments": "seg",
-			"holdEase": "ease",
-			"traceEase": "trEase",
-			"endAngle": "endAng",
-			"spinEase": "spEase",
-			"speedMult": "spdMlt",
-			"doDithering": "dither",
-			"order": "ord",
-			"tag": true,
-			"startTap": "stTap",
-			"endTap": true,
-			"paddles": "pdls",
-			"duration": "dur",
-			"tap": true,
-			"mineHold": "mineH",
-			"mine": true,
-			"side": true,
-			"g": true,
-			"y": true,
-			"paddle": "pdl",
-			"voidColor": "void",
-			"reps": true,
-			"tickRate": "tickR",
-			"repeats": "rep",
-			"repeatDelay": "delay",
-			"hide": true,
-			"angleOffset": "angOff",
-			"objectName": "obj",
-			"angle": "ang",
-			"var": true,
-			"color": "col",
-			"miss": true,
-			"effectCanvasRaw": "fxCanvR",
-			"outline": "outl",
-			"recolor": "col",
-			"sound": true,
-			"a": true,
-			"r": true,
-			"id": true,
-			"enable": "on",
-			"time": true,
-			"description": "desc",
-			"orbit": true,
-			"enabled": "on",
-			"value": "val",
-			"effectCanvas": "fxCanv",
-			"pitch": "ptch",
-			"drawOrder": "dOrd",
-			"angle2": "ang2",
-			"file": true,
-			"ox": true,
-			"oy": true,
-			"kx": true,
-			"ky": true,
-			"delay": true,
-			"type": true,
-			"sx": true,
-			"sy": true,
-			"volume": "vol",
-			"spriteName": "sprName",
-			"intensity": "inten",
-			"start": true,
-			"parentid": "par",
-			"block": "blk",
-			"x": true,
-			"sprite": "spr",
-			"rotationinfluence": "rotInf",
-			"drawLayer": "dLayer",
-			"newAngle": "nAngle",
-			"newWidth": "nWidth",
-			"offset": "off",
-			"name": true,
-			"variableName": "var",
-			"b": true,
-			"chance": true,
-			"bpm": true
-		},
-		"hideHelpMarkers": false,
-		"currentPaddle": true,
-		"untaggingHotkeys": true,
-		"editorBlackColor": {
-			"r": 0.24705882370472,
-			"g": 0.24705882370472,
-			"b": 0.24705882370472
-		},
-		"markRepeat": "on",
-		"editorBgColor": {
-			"r": 0,
-			"g": 0,
-			"b": 0
-		},
-		"inputSize": 150,
-		"currentSprite": true,
-		"preciseTimeInput": false,
-		"editorSnapColor": {
-			"r": 0.12156862765551,
-			"g": 0.12156862765551,
-			"b": 0.12156862765551
-		},
-		"spreadType": "absolute",
-		"editorMenu": true,
-		"livelyCranky": true,
-		"durationColor": {
-			"a": 0.5,
-			"r": 0,
-			"g": 1,
-			"b": 0
-		},
-		"easeListUse": false,
-		"whiteSelected": "cut corners",
-		"selectedBorderColor": {
-			"a": 1,
+		"betterBookmarks": true,
+		"easeCurrentValues": true,
+		"scanMargin": 64,
+		"shadow": true,
+		"easeListRound": true,
+		"browserCharter": true,
+		"deleteNothing": true,
+		"betterMoveSelection": true,
+		"loopVisibleEventsAmount": 5000,
+		"lagOffset": 2,
+		"fakeRepeat": true,
+		"keyHandling": "blacklist",
+		"spreadSnap": 32,
+		"lagThreshhold": 0.25,
+		"lagBack": true,
+		"beatSnap": 2,
+		"xOffset": 4,
+		"roundSelectedTimes": false,
+		"lagUseSeconds": true,
+		"customAngleSnap": 64,
+		"angleDefault": 3,
+		"speedScrolling": true,
+		"selectNoneInPalette": true,
+		"showEventGroups": true,
+		"colorPreview": true,
+		"accBarColors": "auto",
+		"bgColor2": {
+			"b": 1,
 			"r": 1,
-			"g": 1,
-			"b": 1
-		}
+			"g": 1
+		},
+		"scrollPast": 1,
+		"customEditorLayers": [],
+		"bounceDoubleClick": true,
+		"accBar": true,
+		"alpha": 0.5,
+		"damoclismCataclism": false,
+		"accBarSmooth": 0.34999999403954,
+		"groupTimeDifference": 0.5,
+		"bookmarkList": true,
+		"autoFixSides": false,
+		"zoomMax": 120,
+		"ignoreUntagPrompt": true,
+		"bgColor": {
+			"b": 0,
+			"r": 0,
+			"g": 0
+		},
+		"coordsDisplay": false,
+		"untaggingButtons": true,
+		"levelSelectMultiplyBpm": true,
+		"selectAll": true,
+		"customAngleDefault": 32,
+		"betterUntagging": true,
+		"accBarWidth": 4,
+		"accBarSide": "left",
+		"accBarReverse": true,
+		"angleSnapValues": [
+			8,
+			16,
+			32
+		],
+		"yOffset": 4,
+		"editorMenu": true,
+		"charter": "Pentatrate",
+		"loopSingleSelectionEventAmount": 2000,
+		"loopEventsDuringSelectionAmount": 2000,
+		"zoomMin": 2,
+		"foldAll": false,
+		"tooltipsInMenu": "long",
+		"levelSelectAcc": true,
+		"docInMenu": "none",
+		"sillyNisenenGimmick": true,
+		"markSameEasing": true,
+		"spreadButtons": true,
+		"colorEasePreview": true,
+		"fullSize": true,
+		"eventGroups": {
+			"song": {
+				"name": "song",
+				"visibility": " - ",
+				"events": {
+					"showResults": true,
+					"setBPM": true,
+					"play": true,
+					"playSound": true
+				},
+				"index": 1
+			},
+			"visuals": {
+				"name": "visuals",
+				"visibility": " - ",
+				"events": {
+					"toggleParticles": true,
+					"outline": true,
+					"noise": true,
+					"deco": true,
+					"ease": true,
+					"hom": true,
+					"setBgColor": true,
+					"forcePlayerSprite": true,
+					"setBoolean": true,
+					"setColor": true
+				},
+				"index": 1
+			},
+			"bookmarks": {
+				"name": "bookmarks",
+				"visibility": " - ",
+				"events": {
+					"bookmark": true
+				},
+				"index": 3
+			},
+			"gameplay": {
+				"name": "gameplay",
+				"visibility": " - ",
+				"events": {
+					"block": true,
+					"side": true,
+					"inverse": true,
+					"hold": true,
+					"mineHold": true,
+					"extraTap": true,
+					"paddles": true,
+					"mine": true
+				},
+				"index": 1
+			},
+			"deco": {
+				"name": "deco",
+				"visibility": " - ",
+				"events": {
+					"deco": true
+				},
+				"index": 3
+			},
+			"color": {
+				"name": "color",
+				"visibility": " - ",
+				"events": {
+					"noise": true,
+					"hom": true,
+					"setBgColor": true,
+					"outline": true,
+					"setColor": true
+				},
+				"index": 2
+			},
+			"eases": {
+				"name": "eases",
+				"visibility": " - ",
+				"events": {
+					"ease": true,
+					"setBoolean": true
+				},
+				"index": 3
+			},
+			"all": {
+				"name": "all",
+				"visibility": "show",
+				"events": {
+					"block": true,
+					"toggleParticles": true,
+					"extraTap": true,
+					"setColor": true,
+					"mineHold": true,
+					"deco": true,
+					"setBgColor": true,
+					"hold": true,
+					"mine": true,
+					"side": true,
+					"paddles": true,
+					"tag": true,
+					"outline": true,
+					"setBPM": true,
+					"setBoolean": true,
+					"bookmark": true,
+					"noise": true,
+					"inverse": true,
+					"ease": true,
+					"hom": true,
+					"play": true,
+					"forcePlayerSprite": true,
+					"playSound": true,
+					"showResults": true
+				},
+				"index": 0
+			},
+			"tags": {
+				"name": "tags",
+				"visibility": " - ",
+				"events": {
+					"tag": true
+				},
+				"index": 3
+			}
+		},
+		"scanInterval": 0.10000000149012
 	},
-	"id": "beattools",
-	"version": "2.2.0",
-	"author": "Pentatrate",
-	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
+	"enabled": true,
 	"name": "Beattools",
-	"enabled": true
+	"version": "2.2.1"
 }

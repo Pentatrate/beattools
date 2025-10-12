@@ -29,7 +29,7 @@ pattern = '''self.lastClickX, self.lastClickY = mouse.rx, mouse.ry'''
 position = "after"
 payload = '''
 self.lastSelected = self.selectedEvent
-self.ctrlSelectPending = maininput:down("ctrl")
+self.ctrlSelectPending = mods.beattools.config.ctrlSelect and maininput:down("ctrl")
 '''
 match_indent = true
 
@@ -41,7 +41,7 @@ pattern = '''function st:SelectEvent()
 position = "at"
 payload = '''
 function st:SelectEvent()
-	if not maininput:down("ctrl") then self:clearMultiselectVars() end
+	if not mods.beattools.config.ctrlSelect or not maininput:down("ctrl") then self:clearMultiselectVars() end
 '''
 match_indent = true
 
@@ -51,9 +51,22 @@ target = "states/Editor.lua"
 pattern = '''if maininput:down("ctrl") then'''
 position = "at"
 payload = '''
-if maininput:down("ctrl") then
+if mods.beattools.config.ctrlSelect and maininput:down("ctrl") then
 	beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
-elseif maininput:down("c") then
+elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if imgui.Selectable_Bool(Event.info[e.type].name .. ' (ID ' .. v .. ')') then'''
+position = "at"
+payload = '''
+if imgui.Selectable_Bool(
+	Event.info[e.type].name .. ' (ID ' .. v .. ')',
+	mods.beattools.config.ctrlSelect and self.ctrlSelectPending and self.multiselect and self.multiselect.events and tableContains(self.multiselect.events, self.level.events[v])
+) then
 '''
 match_indent = true
 
@@ -63,7 +76,7 @@ target = "states/Editor.lua"
 pattern = '''if self.deletePending then'''
 position = "at"
 payload = '''
-if self.ctrlSelectPending then
+if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	imgui.Text("Select which event to ctrl select:")
 elseif self.deletePending then
 '''
@@ -77,11 +90,12 @@ pattern = '''self.selectedEvent = self.level.events[v]
 self.cursorAngle = self.selectedEvent.angle'''
 position = "at"
 payload = '''
-if self.ctrlSelectPending then
+if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	beattoolsCtrlSelect(self.level.events[v])
 	self.ctrlSelectPending = false
 	self.cursorAngle = self.level.events[v].angle
 else
+	self.ctrlSelectPending = false
 	self.selectedEvent = self.level.events[v]
 	-- Changes cursor angle to match event angle
 	self.cursorAngle = self.selectedEvent.angle

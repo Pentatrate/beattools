@@ -1263,6 +1263,7 @@ local function beattoolsGetEventVisibility(event)
 end
 
 local function beattoolsCtrlSelect(event)
+	if not mods.beattools.config.ctrlSelect then return end
 	st.ctrlSelectPending = false
 	st.deletePending = false
 	local function addToMulti(event2)

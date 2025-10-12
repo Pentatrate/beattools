@@ -7,7 +7,6 @@ STUFF TO DO:
 
 
 Mod Config:
-- ctrl select
 - convert to single select
 
 

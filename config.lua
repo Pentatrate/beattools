@@ -45,6 +45,7 @@ Buttons:\
 Features:\
   Drag bounces around like holds (idea: crisp_chip)\
   Double click and drag to adjust bounce amount (idea: k4kadu)\
+  Ctrl select (original: k4kadu)\
   Fakes an option to repeat events. Compatible with unmodded\
   Mod specific confirmation, prompts and error popups (some text by: k4kadu, something4803, irember135)\
   Rounds time for all selected events to prevent float inaccuracy\
@@ -501,6 +502,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("bounceDragging")
 				beattoolsConfigHelpers.InputBool("bounceDoubleClick")
 				imgui.Separator()
+				beattoolsConfigHelpers.InputBool("ctrlSelect")
+				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("fakeRepeat")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("ignoreUntagPrompt")
@@ -540,47 +543,49 @@ if imgui.BeginTabBar("beattoolsConfig") then
 	if mod.config.foldAll then mod.config.foldAll = false end
 end
 
-if beattoolsConfirmationOpen and not imgui.IsPopupOpen("beattoolsConfirmation2") then
-	imgui.OpenPopup_Str("beattoolsConfirmation2")
-end
-beattoolsConfirmationOpen = false
-if imgui.BeginPopup("beattoolsConfirmation2") then
-    imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-    imgui.TextUnformatted("Are you sure?")
-    imgui.TextUnformatted(tostring(beattoolsConfirmationText2))
-    imgui.PopTextWrapPos()
-    local confirmationTexts = mods.beattools.config.confirmationTexts
-    if imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized2 * #confirmationTexts) + 1]) .. "##beattools") then
-        local tempFunc = beattoolsConfirmationFunc2
-        beattoolsConfirmationText2 = ""
-        beattoolsConfirmationFunc2 = function () end
-        beattoolsConfirmationRandomized2 = 0
-        if tempFunc then tempFunc() end
-        imgui.CloseCurrentPopup()
-    end
-    imgui.EndPopup("beattoolsConfirmation2")
-elseif beattoolsConfirmationText2 ~= "" then
-    beattoolsConfirmationText2 = ""
-    beattoolsConfirmationFunc2 = function() end
-    beattoolsConfirmationRandomized2 = 0
-end
+if true then -- Prompts
+	if beattoolsConfirmationOpen and not imgui.IsPopupOpen("beattoolsConfirmation2") then
+		imgui.OpenPopup_Str("beattoolsConfirmation2")
+	end
+	beattoolsConfirmationOpen = false
+	if imgui.BeginPopup("beattoolsConfirmation2") then
+		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+		imgui.TextUnformatted("Are you sure?")
+		imgui.TextUnformatted(tostring(beattoolsConfirmationText2))
+		imgui.PopTextWrapPos()
+		local confirmationTexts = mods.beattools.config.confirmationTexts
+		if imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized2 * #confirmationTexts) + 1]) .. "##beattools") then
+			local tempFunc = beattoolsConfirmationFunc2
+			beattoolsConfirmationText2 = ""
+			beattoolsConfirmationFunc2 = function () end
+			beattoolsConfirmationRandomized2 = 0
+			if tempFunc then tempFunc() end
+			imgui.CloseCurrentPopup()
+		end
+		imgui.EndPopup("beattoolsConfirmation2")
+	elseif beattoolsConfirmationText2 ~= "" then
+		beattoolsConfirmationText2 = ""
+		beattoolsConfirmationFunc2 = function() end
+		beattoolsConfirmationRandomized2 = 0
+	end
 
-if beattoolsErrorOpen2 and not imgui.IsPopupOpen("beattoolsError2") then
-	imgui.OpenPopup_Str("beattoolsError2")
-end
-beattoolsErrorOpen2 = false
-if imgui.BeginPopup("beattoolsError2") then
-	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-	-- Penta: I can imagine ppl screenshotting their error code to report it just to realize its just a random number :skull:
-	-- Penta: Don't think it's gonna happen though :/
-	local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.", ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]] "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you" }
-	table--[[stop wrong injection]].insert(errorTexts, 1, "Error Code " .. tostring(math.floor(beattoolsErrorRandomized2 * (#errorTexts + 1) * 999)))
-	imgui.TextUnformatted(tostring(errorTexts[math.floor(beattoolsErrorRandomized2 * #errorTexts) + 1]))
-	imgui.Separator()
-	imgui.TextUnformatted(tostring(beattoolsErrorText2))
-	imgui.PopTextWrapPos()
-	imgui.EndPopup("beattoolsError2")
-elseif beattoolsErrorText2 ~= "" then
-	beattoolsErrorText2 = ""
-	beattoolsErrorRandomized2 = 0
+	if beattoolsErrorOpen2 and not imgui.IsPopupOpen("beattoolsError2") then
+		imgui.OpenPopup_Str("beattoolsError2")
+	end
+	beattoolsErrorOpen2 = false
+	if imgui.BeginPopup("beattoolsError2") then
+		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+		-- Penta: I can imagine ppl screenshotting their error code to report it just to realize its just a random number :skull:
+		-- Penta: Don't think it's gonna happen though :/
+		local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.", ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]] "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you" }
+		table--[[stop wrong injection]].insert(errorTexts, 1, "Error Code " .. tostring(math.floor(beattoolsErrorRandomized2 * (#errorTexts + 1) * 999)))
+		imgui.TextUnformatted(tostring(errorTexts[math.floor(beattoolsErrorRandomized2 * #errorTexts) + 1]))
+		imgui.Separator()
+		imgui.TextUnformatted(tostring(beattoolsErrorText2))
+		imgui.PopTextWrapPos()
+		imgui.EndPopup("beattoolsError2")
+	elseif beattoolsErrorText2 ~= "" then
+		beattoolsErrorText2 = ""
+		beattoolsErrorRandomized2 = 0
+	end
 end
