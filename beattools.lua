@@ -1262,6 +1262,70 @@ local function beattoolsGetEventVisibility(event)
 	return visibility
 end
 
+local function beattoolsCtrlSelect(event)
+	st.ctrlSelectPending = false
+	st.deletePending = false
+	local function addToMulti(event2)
+		table--[[stop wrong injection]].insert(st.multiselect.events, event2)
+		st.multiselect.eventTypes[event2.type] = true
+		if st.multiselectStartBeat > event2.time then
+			st.multiselectStartBeat = event2.time
+		end
+		if st.multiselectEndBeat < event2.time then
+			st.multiselectEndBeat = event2.time
+		end
+	end
+	if st.multiselect then
+		local remove
+		for i, v in ipairs(st.multiselect.events) do
+			if v == event then
+				remove = i
+				break
+			end
+		end
+		if remove then
+			table--[[stop wrong injection]].remove(st.multiselect.events, remove)
+
+			local typeExists
+			local checkStart = event.time == st.multiselectStartBeat and st.multiselectEndBeat
+			local checkEnd = event.time == st.multiselectEndBeat and st.multiselectStartBeat
+
+			for i, v in ipairs(st.multiselect.events) do
+				if not typeExists and v.type == event.type then typeExists = true end
+				if checkStart or checkEnd then
+					if v.time == event.time then
+						checkStart = false
+						checkEnd = false
+					end
+					if checkStart and v.time < checkStart then checkStart = v.time end
+					if checkEnd and v.time > checkEnd then checkEnd  = v.time end
+				end
+				if typeExists and not checkStart and not checkEnd then
+					break
+				end
+			end
+			if not typeExists then st.multiselect.eventTypes[event.type] = nil end
+			if checkStart then st.multiselectStartBeat = checkStart end
+			if checkEnd then st.multiselectEndBeat = checkEnd end
+		else
+			addToMulti(event)
+		end
+	else
+		beattoolsNewMultiSelection()
+		st.multiselectStartBeat = event.time
+		st.multiselectEndBeat = event.time
+		addToMulti(event)
+		if st.lastSelected then
+			for i, v in ipairs(st.level.events) do
+				if v == st.lastSelected then
+					addToMulti(st.lastSelected)
+					break
+				end
+			end
+		end
+	end
+end
+
 if mods.beattools.config.imguiColors then
 	for k, v in pairs(mods.beattools.config.imguiColors) do
 		imgui.PushStyleColor_Vec4(imgui[k], imgui.ImVec4_Float(v[1], v[2], v[3], v[4]))

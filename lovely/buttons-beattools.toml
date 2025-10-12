@@ -364,7 +364,7 @@ if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.c
 	end
 	imgui.Separator()
 end
-if self.selectedEvent and mods.beattools.config.fakeRepeat and self.selectedEvent.type ~= "ease" then
+if self.selectedEvent and mods.beattools.config.fakeRepeat and self.selectedEvent.type ~= "ease" and self.selectedEvent.type ~= "tag" then
 	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
 		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
@@ -535,33 +535,4 @@ else
 	self.multiselectStartBeat = self.selectedEvent.time
 	self:deleteSelectedEvent()
 end'''
-match_indent = true
-
-
-# Delete multiselectiion ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-target = "states/Editor.lua"
-pattern = '''end, 'delete selected event', 'delete')'''
-position = "before"
-payload = '''
-	if mods.beattools.config.deleteSelectionHotkey and self.multiselect then
-		local i = 0
-		while i < #self.level.events do
-			i = i + 1
-			local v = self.level.events[i]
-			for ii, event in ipairs(self.multiselect.events) do
-				if v == event then
-					table.remove(self.level.events, i)
-					self.unsavedChanges = true
-					i = i - 1
-					break
-				end
-			end
-		end
-		self.multiselect, self.multiselectStartBeat, self.multiselectEndBeat = nil, nil, nil
-		self:updateBiggestBeat()
-		self.p:hurtPulse()
-	end
-'''
 match_indent = true

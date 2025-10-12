@@ -7,6 +7,92 @@ priority = 0
 # Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent = self.level.events[self.overlappingEvents[1]]
+end'''
+position = "after"
+payload = '''		if self.selectedEvent then'''
+match_indent = false
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time)'''
+position = "after"
+payload = '''		end'''
+match_indent = false
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.lastClickX, self.lastClickY = mouse.rx, mouse.ry'''
+position = "after"
+payload = '''
+self.lastSelected = self.selectedEvent
+self.ctrlSelectPending = maininput:down("ctrl")
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''function st:SelectEvent()
+	self:clearMultiselectVars()'''
+position = "at"
+payload = '''
+function st:SelectEvent()
+	if not maininput:down("ctrl") then self:clearMultiselectVars() end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if maininput:down("ctrl") then'''
+position = "at"
+payload = '''
+if maininput:down("ctrl") then
+	beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
+elseif maininput:down("c") then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if self.deletePending then'''
+position = "at"
+payload = '''
+if self.ctrlSelectPending then
+	imgui.Text("Select which event to ctrl select:")
+elseif self.deletePending then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.selectedEvent = self.level.events[v]
+-- Changes cursor angle to match event angle
+self.cursorAngle = self.selectedEvent.angle'''
+position = "at"
+payload = '''
+if self.ctrlSelectPending then
+	beattoolsCtrlSelect(self.level.events[v])
+	self.ctrlSelectPending = false
+	self.cursorAngle = self.level.events[v].angle
+else
+	self.selectedEvent = self.level.events[v]
+	-- Changes cursor angle to match event angle
+	self.cursorAngle = self.selectedEvent.angle
+end
+'''
+match_indent = true
+
+
+# Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
 target = "obj/OptionsList.lua"
 pattern = '''self.cooldownMax = 10'''
 position = "at"

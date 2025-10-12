@@ -7,6 +7,8 @@ STUFF TO DO:
 
 
 Mod Config:
+- ctrl select
+- convert to single select
 
 
 Party Tricks:
@@ -23,8 +25,6 @@ EA FIX:
 
 Low Priority:   -- Penta: very low priority, like in will get implemented next year, if at all
 - hold dragging customization
-- replay system (worked on by someone else?)
-- ctrl select (worked on by someone else?)
 - sfx for selecting events (more info required)
 - default positions for imgui windows (too lazy)
 
