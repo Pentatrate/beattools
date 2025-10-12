@@ -4,7 +4,7 @@ dump_lua = true
 priority = 0
 
 
-# Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
@@ -57,6 +57,8 @@ elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.b
 '''
 match_indent = true
 
+
+# Overlapping ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"

@@ -489,7 +489,13 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''if #self.multiselect.events == 0 and #self.markers == 0 then'''
 position = "at"
-payload = '''if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then'''
+payload = '''
+if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
+	self.selectedEvent = self.multiselect.events[1]
+	self:clearMultiselectVars()
+end
+if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then
+'''
 match_indent = true
 
 

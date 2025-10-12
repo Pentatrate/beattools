@@ -502,6 +502,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				beattoolsConfigHelpers.InputBool("bounceDragging")
 				beattoolsConfigHelpers.InputBool("bounceDoubleClick")
 				imgui.Separator()
+				beattoolsConfigHelpers.InputBool("convertSingle")
 				beattoolsConfigHelpers.InputBool("ctrlSelect")
 				imgui.Separator()
 				beattoolsConfigHelpers.InputBool("fakeRepeat")
