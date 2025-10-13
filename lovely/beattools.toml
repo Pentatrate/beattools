@@ -4,6 +4,48 @@ dump_lua = true
 priority = 0
 
 
+# Copy single event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''
+	end
+end,
+'copy',
+'''
+position = "at"
+payload = '''
+		self.copySingle = false
+	elseif mods.beattools.config.copySingle and self.selectedEvent then
+		self.copy = helpers.copy({ self.selectedEvent })
+		self.copy[1].time = 0
+		self.copySize = 0
+
+		self.multiselectCopyStartAngle = 0
+		self.multiselectCopyEndAngle = 360
+
+		self.p:hurtPulse()
+		self.copySingle = true
+	end
+end,
+'copy',
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.multiselectEndAngle = self.multiselectCopyEndAngle'''
+position = "after"
+payload = '''
+if mods.beattools.config.copySingle and self.copySingle then
+	self:clearMultiselectVars()
+	self.selectedEvent = newEvents[1]
+end
+'''
+match_indent = true
+
+
 # Ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

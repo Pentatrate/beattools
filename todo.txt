@@ -4,10 +4,10 @@ STUFF TO DO:
 - angles dial (spin over the limit)
 - - buttons for multiplying?
 - maybe see original channel colors in channel preview
+- auto update event groups?
 
 
 Mod Config:
-- convert to single select
 
 
 Party Tricks:

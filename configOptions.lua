@@ -633,7 +633,12 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 	}, convertSingle = {
 		name = "Convert Selection",
 		tooltips = { short = "Converts single multiselected event to selected event" },
-		default = false,
+		default = true,
+		off = false
+	}, copySingle = {
+		name = "Copy Single",
+		tooltips = { short = "Allows copying a single selected event" },
+		default = true,
 		off = false
 	},
 

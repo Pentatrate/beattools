@@ -31,7 +31,7 @@ self:addKeybind(function()
 		if beattoolsRecordPosition and beattoolsRecordFunc then
 			if beattoolsRecordFunc then beattoolsRecordFunc(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision) end
 			beattoolsRecordPosition = false
-			beattoolsRecordFunc = function () end
+			beattoolsRecordFunc = nil
 			beattoolsRecordPrecision = 1
 		elseif mods.beattools.config.editorMenu then
 			beattoolsConfigHelpers = nil
@@ -162,7 +162,7 @@ end, "undo", "z")
 self:addKeybind(function()
 	if mods.beattools.config.hideMenus and not beattoolsRecordFunc then
 		beattoolsRecordPosition = not beattoolsRecordPosition
-		beattoolsRecordFunc = function () end
+		beattoolsRecordFunc = nil
 	end
 end, "hide menus", "h")
 '''
@@ -178,7 +178,7 @@ position = "at"
 payload = '''
 if beattoolsRecordPosition then
 	beattoolsRecordPosition = false
-	beattoolsRecordFunc = function () end
+	beattoolsRecordFunc = nil
 	beattoolsRecordPrecision = 1
 elseif self.unsavedChanges then
 '''
