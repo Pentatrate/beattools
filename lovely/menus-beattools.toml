@@ -95,10 +95,11 @@ payload = '''
 end]]
 if true then
 	self.beattoolsCurrentIncompatibilities = {}
-	local incompatibleMods = { ["event-stacking"] = true, ["editor-shortcuts"] = true, undo = true, ["editor-alt-bookmark-fix"] = true, ["editor-overhaul"] = true }
+	local incompatibleMods = { ["event-stacking"] = true, ["editor-shortcuts"] = true, undo = true, ["editor-alt-bookmark-fix"] = true, ["editor-overhaul"] = true, ["audible-ratemod"] = true }
 	for k, v in pairs(incompatibleMods) do
 		if mods[k] then
 			table--[[stop wrong injection]].insert(self.beattoolsCurrentIncompatibilities, k)
+			print("[BT] Found incompatible mod: " .. tostring(k))
 		end
 	end
 	if #self.beattoolsCurrentIncompatibilities > 0 then print("[BT] Incompatibities detected. Showing menu.") end
@@ -124,10 +125,9 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Menu.lua"
-pattern = '''st:setBgDraw(function(self)'''
-position = "before"
+pattern = '''st:setFgDraw(function(self)'''
+position = "after"
 payload = '''
-st:setFgDraw(function(self)
 	if #self.beattoolsCurrentIncompatibilities > 0 then
 		if project.useImgui then
 			imgui.SetNextWindowPos(imgui.ImVec2_Float(0, 0), imgui["ImGuiCond_Always"])
@@ -143,7 +143,6 @@ st:setFgDraw(function(self)
 			imgui.End()
 		end
 	end
-end)
 '''
 match_indent = true
 

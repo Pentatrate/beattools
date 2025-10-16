@@ -4,6 +4,7 @@ STUFF TO DO:
 - auto update event groups?
 - ignore loop points
 - config search function (include help markers)
+- incompatibility with song pitch mod v4.2
 
 
 Mod Config:
