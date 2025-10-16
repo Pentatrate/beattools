@@ -3,6 +3,9 @@ local doc = {
 		long = "Editor quality-of-life mod\
 Should be compatible with all other editor qol mods\
 For now largest mod with the for now largest configs menu\
+Level Select:\
+  Changes song pitch and speed based off of rateMod (code: k4kadu)\
+  Optionally previews the full song to act as an ingame mp3 player (who uses Spitofy anyways? BB is the best mp3 player)\
 Gameplay:\
   Accessibility option to revert time back to before you lagged (will show in results screen)\
   Accuracy bar from the previous subgrade to the next subgrade\
@@ -72,8 +75,9 @@ Hotkeys:\
   - \"ctrl + t\" to untag same tag name (all tags with the same tag name)\
 \
 Contributions:\
-  - Pentatrate: (Almost) All code\
-  - K4kadu: Reworking most editor marker images"
+  - Pentatrate: Almost all code\
+  - K4kadu: Reworking most editor marker images\
+        Audible Ratemod"
 -- Penta: der Rest vom Schützenfest (saying) (jk this is just a comment to prevent folding weirdness)
 	}, general_menuOptions = {
 		long = "The mod config is designed to be very flexible, accessible in the editor in real time and adjustable for when you need more information or know what you're doing and want to keep it simple",
@@ -297,7 +301,10 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			imgui.TreePop()
 		end
 		if beattoolsConfigHelpers.TreeNode("Features") then
-			Doc("levelSelect_features")
+            Doc("levelSelect_features")
+			beattoolsConfigHelpers.InputBool("songSelectPitch")
+			beattoolsConfigHelpers.InputBool("ignoreLoopPoints")
+			imgui.Separator()
 			imgui.BeginDisabled()
 			beattoolsConfigHelpers.InputBool("levelSelectDynamicLoading")
 			imgui.EndDisabled()

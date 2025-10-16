@@ -4,6 +4,76 @@ dump_lua = true
 priority = 0
 
 
+# Ignore loop points ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''if self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData.metadata.loopPointsEnable then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/Map/LevelQuark.lua"
+pattern = '''if self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData.metadata.loopPointsEnable then'''
+match_indent = true
+
+
+# Kakadus code (song pitch in level select) ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''self.bgNoiseTime = self.bgNoiseTime + love.timer.getDelta()'''
+position = "after"
+payload = '''
+if mods.beattools.config.songSelectPitch then
+	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
+	if cs.source and self.rateMod then
+		if self.rateMod ~= prevRateModValue then
+			cs.source:setPitch(self.rateMod)
+			prevRateModValue = self.rateMod
+		end
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/AtomMap.lua"
+pattern = '''if not self.inOptionsMenu then'''
+position = "before"
+payload = '''
+if mods.beattools.config.songSelectPitch then
+	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
+	if cs.source and self.rateMod then
+		if self.rateMod ~= prevRateModValue then
+			cs.source:setPitch(self.rateMod)
+			prevRateModValue = self.rateMod
+		end
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/Map/LevelQuark.lua"
+pattern = ''':play()'''
+position = "after"
+payload = '''
+if mods.beattools.config.songSelectPitch then
+	if cs.source and cs.rateMod then
+		if cs.rateMod ~= 1 then cs.source:setPitch(cs.rateMod) end
+	end
+end
+'''
+match_indent = true
+
+
 # Copy single event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

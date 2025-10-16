@@ -640,6 +640,16 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Allows copying a single selected event" },
 		default = true,
 		off = false
+    }, songSelectPitch = {
+		name = "Audible Ratemod",
+		tooltips = { short = "Songs play at rateMod speed in level select menus" },
+		default = true,
+		off = false
+	}, ignoreLoopPoints = {
+		name = "Ignore Loop Points",
+		tooltips = { short = "Previews the full song" },
+		default = false,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
