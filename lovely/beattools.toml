@@ -4,6 +4,49 @@ dump_lua = true
 priority = 0
 
 
+# Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/LevelManager.lua"
+pattern = '''print("Using cached metadata for " .. filename)'''
+position = "at"
+payload = '''-- print("Using cached metadata for " .. filename)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "obj/LevelManager.lua"
+pattern = '''print("filename: " .. filename)'''
+position = "at"
+payload = '''-- print("filename: " .. filename)'''
+match_indent = true
+
+
+# Multiselect delta ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.multieditdeltamode = false'''
+position = "at"
+payload = '''self.multieditdeltamode = (function () if mods.beattools.config.rememberMultiselectDelta then return mods.beattools.config.multiselectDelta end return false end)()'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)'''
+position = "at"
+payload = '''
+if mods.beattools.config.rememberMultiselectDelta then
+	mods.beattools.config.multiselectDelta = helpers.InputBool('Delta Mode', mods.beattools.config.multiselectDelta)
+	self.multieditdeltamode = mods.beattools.config.multiselectDelta
+else
+	self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)
+end
+'''
+match_indent = true
+
+
 # Ignore loop points ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -292,7 +335,7 @@ for _, v in ipairs(bounceSelection) do
 	if v[1] == self.overlappingEvents[1] then
 		self.bounceSelected = v[2]
 		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and (beattoolsTime - prevBounceSelectTime) / 60 <= 0.5 then
-			print("[BT] Double clicked bounce")
+			log("[BT] Double clicked bounce")
 			self.bounceSelectTime = -1
 		else
 			self.bounceSelectTime = beattoolsTime
@@ -580,7 +623,7 @@ if self.placeEvent ~= '' and string.match(self.placeEvent, "beattoolsEvent;") th
 		self.unsavedChanges = true
 		self:updateBiggestBeat()
 	else
-		print("[BT] Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
+		log("[BT] Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
 	end
 elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
 '''
@@ -1061,7 +1104,7 @@ local tempTime = cs.source:getBeat()
 -- cs.cBeat is the old one
 -- tempTime is the new one
 if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBeat + self:CHEATconvertToBeat(mods.beattools.config.lagThreshhold) <= tempTime then
-	print("LAG DETECTED!!!")
+	log("LAG DETECTED!!!")
 	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
 	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
 	if cs.cBeat - tempTime >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click', soundObject = sounds['click']}) end
@@ -1113,32 +1156,77 @@ if tostring(first[k]) ~= tostring(v) then
 match_indent = true
 
 
-# Restart in playtest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Menumusicmanager in Song Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''self.menuMusicManager:stop()
+cLevel = filename'''
+position = "at"
+payload = '''
+if self.menuMusicManager and not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
+	self.menuMusicManager:stop()
+end
+cLevel = filename
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/SongSelect.lua"
+pattern = '''cs = bs.load('Editor')'''
+position = "after"
+payload = '''
+if self.menuMusicManager then
+	self.menuMusicManager:clearOnBeatHooks()
+	self.menuMusicManager:forceUnmute()
+	cs.menuMusicManager = self.menuMusicManager
+end
+'''
+match_indent = true
+
+
+# Restart in playtest and menumusicmanager in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''
-function st:playLevel()
-'''
+pattern = '''cs = bs.load(returnData.state)'''
 position = "after"
 payload = '''
-	beattoolsStartBeat = self.startBeat
-	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
-	beattoolsPlayerSprite = ""
-	self.p.forceSprite = ""
+if self.menuMusicManager then
+	self.menuMusicManager:clearOnBeatHooks()
+	self.menuMusicManager:forceUnmute()
+	cs.menuMusicManager = self.menuMusicManager
+	if not mods.beattools.config.menuMusicInEditor then self.menuMusicManager.music:play() end
+end
 '''
 match_indent = true
 
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''
-function st:stopLevel()
+pattern = '''function st:playLevel()'''
+position = "after"
+payload = '''
+	beattoolsStartBeat = self.startBeat
+	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
+	beattoolsPlayerSprite = ""
+	self.p.forceSprite = ""
+	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then self.menuMusicManager:forceMute() end
 '''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''function st:stopLevel()'''
 position = "after"
 payload = '''
 	beattoolsPlayerSprite = "><"
 	beattoolsLastSpriteChange = beattoolsTime
+	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then
+		self.menuMusicManager:forceUnmute()
+	end
 '''
 match_indent = true
 
@@ -1164,7 +1252,7 @@ if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
 	self.gm:resetLevel()
 end
 if maininput:pressed("back") then
-	print(self.pauseBeat)
+	log(self.pauseBeat)
 	self.pauseBeat = nil
 	self:stopLevel()
 '''
@@ -1209,7 +1297,6 @@ mods.beattools.config.customAngleSnap = self.customAngleSnap
 '''
 match_indent = true
 
-
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
@@ -1221,9 +1308,17 @@ payload = '''
 self.angleSnapValues = mods.beattools.config.angleSnapValues
 self.angleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.angleSnap or mods.beattools.config.angleDefault
 self.customAngleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customAngleSnap or mods.beattools.config.customAngleDefault
+
+self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
+if not self.menuMusicManager then
+	self.menuMusicManager = em.init("MenuMusicManager")
+	self.menuMusicManager:play()
+	if not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
+		self.menuMusicManager:stop()
+	end
+end
 '''
 match_indent = true
-
 
 [[patches]]
 [patches.pattern]
@@ -1236,7 +1331,6 @@ mods.beattools.config.beatSnap = self.beatSnap
 mods.beattools.config.customBeatSnap = self.customBeatSnap
 '''
 match_indent = true
-
 
 [[patches]]
 [patches.pattern]
@@ -1251,7 +1345,6 @@ self.beatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.confi
 self.customBeatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customBeatSnap or mods.beattools.config.customBeatDefault
 '''
 match_indent = true
-
 
 [[patches]]
 [patches.pattern]

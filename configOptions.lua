@@ -650,6 +650,26 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Previews the full song" },
 		default = false,
 		off = false
+	}, rememberMultiselectDelta = {
+		name = "Remember Delta",
+		tooltips = { short = "Remembers enabling delta mode in multiselect between sessions" },
+		default = false,
+		off = false
+	}, menuMusicInEditor = {
+		name = "Editor Music",
+		tooltips = { short = "Plays menu music in the editor" },
+		default = true,
+		off = false
+	}, editorCalculator = {
+		name = "Calculator",
+		tooltips = { short = "Calculator window in editor" },
+		default = true,
+		off = false
+	}, isolateLogs = {
+		name = "Isolate Logs",
+		tooltips = { short = "Hides logs from other mods" },
+		default = false,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
@@ -791,5 +811,14 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 				visibility = " - ", index = 3
 			}
 		}
-	}
+	}, calculator = {
+		name = "[internal] calculator",
+        default = {
+			input = "", output = "-", history = {}, notCalculation = false
+		}
+	}, multiselectDelta = {
+		name = "[internal] multiselectDelta",
+		default = false,
+		off = false
+	},
 }

@@ -38,7 +38,7 @@ self:addKeybind(function()
 			local chunk, errormsg = love.filesystem.load("Mods/beattools/config.lua")
 			if errormsg then
 				beattoolsError("Error while reloading the config renderer of Beattools")
-				print("[BT] Error while reloading the config renderer of Beattools. " .. errormsg)
+				log("[BT] Error while reloading the config renderer of Beattools. " .. errormsg)
 			else
 				local env = setmetatable({ mod = mods.beattools }, { __index = _G })
 				beattoolsMenuCode = setfenv(chunk, env)
@@ -57,7 +57,6 @@ self:addKeybind(function()
 	if mods.beattools.config.selectNoneInPalette and self.placeEvent ~= "" then
 		self.placeEvent = ""
 	end
-	dofile("Mods/beattools/test.lua")
 end, "select none", "n")
 -- tag/untag selection
 self:addKeybind(function()
@@ -222,7 +221,7 @@ if mods.beattools.config.spreadButtons then
 			if snappedAngle == nil then
 				if event == nil then
 					beattoolsError("Spread incorrect: snappedAngle is nil")
-					print("[BT] Spread incorrect: snappedAngle is nil")
+					log("[BT] Spread incorrect: snappedAngle is nil")
 					snappedAngle = 0
 				else
 					snappedAngle = beattoolsSnapAngle(event.angle, snap)
@@ -499,7 +498,16 @@ if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 the
 match_indent = true
 
 
-# Untagging but idk whats going on ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Tagging but idk whats going on ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
+position = "at"
+payload = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })
+self:deleteSelectedEvent()'''
+match_indent = true
+
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
@@ -528,17 +536,5 @@ pattern = '''for i, v in ipairs(self.multiselect.events) do
 end
 self.multiselect.events = {}'''
 position = "at"
-payload = '''if self.multiselect then
-	for i, v in ipairs(self.multiselect.events) do
-		for _i, _v in ipairs(self.level.events) do
-			if _v == v then
-				table.remove(self.level.events, _i)
-			end
-		end
-	end
-	self.multiselect.events = {}
-else
-	self.multiselectStartBeat = self.selectedEvent.time
-	self:deleteSelectedEvent()
-end'''
+payload = ''''''
 match_indent = true

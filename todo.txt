@@ -1,10 +1,9 @@
 STUFF TO DO:
 - better backup   -- Penta: +1 (multiple different types of backups to ensure nothing gets lost when the base game backup happens at a bad timing)
 
-- auto update event groups?
-- ignore loop points
-- config search function (include help markers)
-- incompatibility with song pitch mod v4.2
+- config search function (include help markers) (kak)
+- lively cranky (not even possible anymore?) (kak)
+- in-editor code evaluator +1 by others who want calculator
 
 
 Mod Config:
@@ -12,12 +11,10 @@ Mod Config:
 
 Party Tricks:
 - swap color channels? (tags!!!)
-- in-editor code evaluator +1 by others who want calculator
 - gif in imgui (Are you sure? :skull:)
 
 
 EA FIX:
-- lively cranky (not even possible anymore?)
 - level select non levels/folders
 - expand whitelist with new params   -- Penta: don wanna
 
@@ -28,6 +25,7 @@ Low Priority:   -- Penta: very low priority, like in will get implemented next y
 - hold dragging customization
 - sfx for selecting events (more info required)
 - default positions for imgui windows (too lazy)
+- auto update event groups?
 
 
 Potential:   -- Penta: i have no idea if i will even implement these features

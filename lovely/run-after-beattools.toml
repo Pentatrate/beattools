@@ -11,6 +11,12 @@ target = "states/Editor.lua"
 position = "prepend"
 sources = ["beattools.lua"]
 
+[[patches]]
+[patches.copy]
+target = "main.lua"
+position = "prepend"
+sources = ["pre-init.lua"]
+
 
 # Self fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -66,6 +72,17 @@ target = "states/Editor.lua"
 pattern = '''st:setUpdate(function(self, dt)'''
 position = "after"
 payload = '''
+	if self.menuMusicManager then
+		self.menuMusicManager:update(dt)
+		if self.beattoolsMenuMusicInEditorOn ~= mods.beattools.config.menuMusicInEditor then
+			if mods.beattools.config.menuMusicInEditor then
+				self.menuMusicManager.music:play()
+			else
+				self.menuMusicManager:stop()
+			end
+		end
+		self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
+	end
 	beattoolsTime = beattoolsTime + dt
 	if self.editMode then
 		--[[if beattoolsPlayerSprite == "idle" then
@@ -139,20 +156,28 @@ pattern = '''for i, v in ipairs(tagEvents) do
 end'''
 position = "at"
 payload = '''
-for i = #tagEvents, 1, -1 do
-	local v = tagEvents[i]
-	if mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil then
-		table.remove(tagEvents, i)
+if mods.beattools.config.fakeRepeat then
+	for i = #tagEvents, 1, -1 do
+		local v = tagEvents[i]
+		if v.beattoolsRepeats ~= nil then
+			table.remove(tagEvents, i)
+		end
 	end
 end
-for i, v in ipairs(tagEvents) do
+for i = 1, #tagEvents do
+	local v = tagEvents[i]
 	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)
 	if mods.beattools.config.fakeRepeat then
-		if v.repeats ~= nil and v.repeats > 0 then
+		if v.repeats ~= nil and v.repeats > 0 and v.type ~= "ease" and v.type ~= "tag" then
 			for i = 1, v.repeats do
 				local newEvent = helpers.copy(v)
-				newEvent.beattoolsRepeatIndex, newEvent.repeats, newEvent.repeatDelay, newEvent.beattoolsRepeats, newEvent.time = nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
-				table.insert(tagEvents, newEvent)
+				newEvent.beattoolsRepeats = newEvent.beattoolsRepeatIndex
+				newEvent.time = newEvent.time + i * (newEvent.repeatDelay or 1)
+				newEvent.beattoolsRepeatIndex = nil
+				newEvent.repeats = nil
+				newEvent.repeatDelay = nil
+				table.insert(tagEvents, 1, newEvent)
+				i = i + 1
 			end
 		else
 			v.beattoolsRepeatIndex = nil
@@ -485,7 +510,7 @@ position = "at"
 payload = '''
 local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 	if beattoolsLayer == nil then
-		print("[BT] Invalid call: beattoolsLayer is nil")
+		log("[BT] Invalid call: beattoolsLayer is nil")
 		return
 	else
 		local gameplay = Event.info[v.type].gameplayLayer
@@ -903,6 +928,7 @@ if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not
 '''
 match_indent = true
 # currently expect 1 default match and 1 match for "Hold Dragging" v1.0.0 by Kakadu and "Ctrl Select" v1.2.0 by Kakadu each
+# Penta: hmmm with EA, not anymore, uhhh
 
 
 [[patches]]

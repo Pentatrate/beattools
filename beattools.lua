@@ -270,7 +270,7 @@ if true then -- add easing
 				end
 				if temp then
 					beattoolsEasings.color[v.color + 1].eventAmount = (beattoolsEasings.color[v.color + 1].eventAmount or 0) +
-					1
+						1
 				end
 			end
 		end,
@@ -378,7 +378,7 @@ if beattoolsMenuCode == nil then -- mod config
 	local chunk, e = love.filesystem.load("Mods/beattools/config.lua")
 	if e then
 		beattoolsError("Error while loading the config renderer of Beattools")
-		print("[BT] Error while loading the config renderer of Beattools. " .. e)
+		log("[BT] Error while loading the config renderer of Beattools. " .. e)
 	else
 		beattoolsMenuCode = setfenv(chunk, setmetatable({ mod = mods.beattools }, { __index = _G }))
 	end
@@ -388,7 +388,7 @@ if beattoolsConfigHelpers == nil then -- config helpers
 	local chunk, e = love.filesystem.load("Mods/beattools/configHelpers.lua")
 	if e then
 		beattoolsError("Error while loading the config helper functions of Beattools")
-		print("[BT] Error while loading the config helper functions of Beattools. " .. e)
+		log("[BT] Error while loading the config helper functions of Beattools. " .. e)
 	else
 		beattoolsConfigHelpers = setfenv(chunk, setmetatable({ mod = mods.beattools }, { __index = _G }))()
 	end
@@ -491,8 +491,8 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 
 	if beattoolsCurrentEased == nil then
 		beattoolsCurrentEased = {}
-		print("[BT] There's no default value for " ..
-		type2 .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. vars)
+		log("[BT] There's no default value for " ..
+			type2 .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. vars)
 	end
 
 	local i = 1
@@ -511,12 +511,12 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 
 		for k, v in pairs(easingVars) do
 			if beattoolsCurrentEased[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				print("[BT] There's no ease value for " ..
-				type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
+				log("[BT] There's no ease value for " ..
+					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
 			end
 			if beattoolsPrev and beattoolsPrev[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				print("[BT] There's no previous ease value for " ..
-				type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
+				log("[BT] There's no previous ease value for " ..
+					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
 			end
 		end
 
@@ -534,21 +534,21 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 			end)()
 			if beattoolsCurrentEased.duration ~= nil and beattoolsCurrentEased.duration > 0 and time < beattoolsEventTime + beattoolsCurrentEased.duration and beattoolsPrev then
 				local beattoolsEase = (flux.easing[beattoolsCurrentEased.ease] or flux.easing["linear"])((time - beattoolsEventTime) /
-				beattoolsCurrentEased.duration)
+					beattoolsCurrentEased.duration)
 				if vars == "var" and beattoolsCurrentEased.start ~= nil then
 					beattoolsPrev.value = beattoolsCurrentEased.start
 				end
 
 				for k, v in pairs(easingVars) do
 					beattoolsCurrentEased[k] = beattoolsPrev[k] +
-					beattoolsEase * (beattoolsCurrentEased[k] - beattoolsPrev[k])
+						beattoolsEase * (beattoolsCurrentEased[k] - beattoolsPrev[k])
 				end
 			end
 		end
 	end
 
 	if type(beattoolsCurrentEased) ~= "table" then
-		print("[BT] Not a table: " .. type2 .. "." .. sub .. "." .. subsub .. " => " .. tostring(beattoolsCurrentEased))
+		log("[BT] Not a table: " .. type2 .. "." .. sub .. "." .. subsub .. " => " .. tostring(beattoolsCurrentEased))
 	end
 	beattoolsCurrentEased.lastCheckTime = time
 	beattoolsCurrentEased.runEvents = i
@@ -639,8 +639,8 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 							local tempChanges = beattoolsHasChanges(table1[i], v, "object", true)
 							table --[[stop wrong injection]].insert(valueChanges, { index = i, changes = tempChanges })
 							for ii, vv in ipairs(tempChanges) do
-								-- print(table1[i].type .. " in comparison to " .. v.type)
-								-- print("Set " .. vv.key .. " from " .. (vv.valueBefore == nil and "nil" or vv.valueBefore .. " originally " .. beattoolsPrevEvents[i][vv.key]) .. " to " .. (vv.valueAfter == nil and "nil" or vv.valueAfter))
+								-- log(table1[i].type .. " in comparison to " .. v.type)
+								-- log("Set " .. vv.key .. " from " .. (vv.valueBefore == nil and "nil" or vv.valueBefore .. " originally " .. beattoolsPrevEvents[i][vv.key]) .. " to " .. (vv.valueAfter == nil and "nil" or vv.valueAfter))
 								beattoolsPrevEvents[i][vv.key] = vv.valueAfter
 							end
 						end
@@ -673,8 +673,8 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 			if hasChanges and lastResort and beattoolsPrevEvents == nil then return false end
 			if hasChanges then beattoolsOverrideChanges() end
 			if #eventsAdded > 0 then
-				print("[BT] EVENTS .ADDED. NOT TAKEN INTO ACCOUNT Amount " ..
-				#eventsAdded .. " Type first " .. eventsAdded[1].event.type .. " Time " .. beattoolsTime)
+				log("[BT] EVENTS .ADDED. NOT TAKEN INTO ACCOUNT Amount " ..
+					#eventsAdded .. " Type first " .. eventsAdded[1].event.type .. " Time " .. beattoolsTime)
 				table --[[stop wrong injection]].insert(beattoolsChangeList, {
 					action = "place",
 					time = beattoolsTime,
@@ -691,8 +691,8 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 				-- end
 			end
 			if #eventsRemoved > 0 then
-				print("[BT] EVENTS REMOVED NOT TAKEN INTO ACCOUNT Amount " ..
-				#eventsRemoved .. " Type first " .. eventsRemoved[1].event.type .. " Time " .. beattoolsTime)
+				log("[BT] EVENTS REMOVED NOT TAKEN INTO ACCOUNT Amount " ..
+					#eventsRemoved .. " Type first " .. eventsRemoved[1].event.type .. " Time " .. beattoolsTime)
 				table --[[stop wrong injection]].insert(beattoolsChangeList, {
 					action = "delete",
 					time = beattoolsTime,
@@ -731,10 +731,10 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 					end
 				end
 				st:updateBiggestBeat()
-				-- print("[BT] CHANGES!!!")
+				-- log("[BT] CHANGES!!!")
 				-- for i, changes in ipairs(valueChanges) do
 				-- 	for ii, change in ipairs(changes.changes) do
-				-- 		print("at " .. tostring(st.level.events[changes.index].type) .. " time " .. tostring(st.level.events[changes.index].time) .. " angle " .. tostring(st.level.events[changes.index].angle) .. " set " .. tostring(change.key) .. " from " .. tostring(change.valueBefore) .. " (type " .. type(change.valueBefore) .. ") to " .. tostring(change.valueAfter) .. " (type " .. type(change.valueAfter) .. ") same? " .. tostring(change.valueBefore == change.valueAfter))
+				-- 		log("at " .. tostring(st.level.events[changes.index].type) .. " time " .. tostring(st.level.events[changes.index].time) .. " angle " .. tostring(st.level.events[changes.index].angle) .. " set " .. tostring(change.key) .. " from " .. tostring(change.valueBefore) .. " (type " .. type(change.valueBefore) .. ") to " .. tostring(change.valueAfter) .. " (type " .. type(change.valueAfter) .. ") same? " .. tostring(change.valueBefore == change.valueAfter))
 				-- 	end
 				-- end
 			end
@@ -754,7 +754,7 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 			elseif keyHandling == "whitelist" then
 				if beattoolsKeysWhiteList[k] then keepChecking() end
 			else
-				print("[BT] WARNING: INVALID KEYHANDLING " .. keyHandling)
+				log("[BT] WARNING: INVALID KEYHANDLING " .. keyHandling)
 			end
 		end
 
@@ -781,7 +781,7 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 			elseif keyHandling == "whitelist" then
 				if beattoolsKeysWhiteList[k] and keepChecking() then return true end
 			else
-				print("[BT] WARNING: INVALID KEYHANDLING " .. keyHandling)
+				log("[BT] WARNING: INVALID KEYHANDLING " .. keyHandling)
 			end
 		end
 
@@ -883,10 +883,12 @@ end
 local function beattoolsDeleteEvent(...)
 	local events, i = ...
 	if st ~= nil and events == st.level.events then
-		for ii, v in ipairs(beattoolsPrevEvents) do if not beattoolsHasChanges(v, events[i], "object") then
+		for ii, v in ipairs(beattoolsPrevEvents) do
+			if not beattoolsHasChanges(v, events[i], "object") then
 				table --[[stop wrong injection]].remove(beattoolsPrevEvents, ii)
 				break
-			end end
+			end
+		end
 		beattoolsOverrideChanges()
 		table --[[stop wrong injection]].insert(beattoolsChangeList, {
 			action = "delete",
@@ -912,7 +914,7 @@ local function beattoolsCheckEvents(self)
 		if beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events") and beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events", true, false, true) then
 			local temp = helpers.copy(self.level.events)
 			if beattoolsPrevEvents ~= nil then
-				print("[BT] Bad sign: Undo was forced to save all events to history, not just changes, causing much lag")
+				log("[BT] Bad sign: Undo was forced to save all events to history, not just changes, causing much lag")
 				beattoolsOverrideChanges()
 				table --[[stop wrong injection]].insert(beattoolsChangeList, {
 					action = "all",
@@ -930,7 +932,7 @@ end
 local function beattoolsUndo(self, type, group)
 	if (type == "undo" and beattoolsChangeIndex == 0) or (type == "redo" and beattoolsChangeIndex == #beattoolsChangeList) then
 		beattoolsError("Undo failed. End of history")
-		print("[BT] Undo failed. End of history")
+		log("[BT] Undo failed. End of history")
 		return nil
 	end
 	local lastChangeTime = nil
@@ -967,9 +969,9 @@ local function beattoolsUndo(self, type, group)
 			for i, changes in ipairs(beattoolsChangeList[beattoolsChangeIndex].changes) do
 				for ii, change in ipairs(changes.changes) do
 					self.level.events[changes.index][change.key] = type == "undo" and change.valueBefore or
-					change.valueAfter
+						change.valueAfter
 					beattoolsPrevEvents[changes.index][change.key] = type == "undo" and change.valueBefore or
-					change.valueAfter
+						change.valueAfter
 					table.insert(self.multiselect.events, self.level.events[changes.index])
 					self.multiselect.eventTypes[self.level.events[changes.index].type] = true
 					if self.multiselectStartBeat == nil then
@@ -984,13 +986,13 @@ local function beattoolsUndo(self, type, group)
 			end
 		elseif beattoolsChangeList[beattoolsChangeIndex].action == "all" then
 			self.level.events, beattoolsPrevEvents =
-			helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or
-			beattoolsChangeList[beattoolsChangeIndex].eventsAfter),
 				helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or
-				beattoolsChangeList[beattoolsChangeIndex].eventsAfter)
+					beattoolsChangeList[beattoolsChangeIndex].eventsAfter),
+				helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or
+					beattoolsChangeList[beattoolsChangeIndex].eventsAfter)
 		else
 			beattoolsError("Undo failed. Unrecognized change type")
-			print("[BT] Undo failed. Unrecognized change type")
+			log("[BT] Undo failed. Unrecognized change type")
 			return
 		end
 		if type == "undo" then beattoolsChangeIndex = beattoolsChangeIndex - 1 end
@@ -1013,7 +1015,7 @@ beattoolsUpdateRepeat = function(self, event, irreversible)
 	for i, v in ipairs(self.level.events) do
 		if v.beattoolsRepeatIndex ~= nil then
 			if beattoolsRepeatIndices[v.beattoolsRepeatIndex] then
-				print("[BT] Double repeat index " .. v.beattoolsRepeatIndex)
+				log("[BT] Double repeat index " .. v.beattoolsRepeatIndex)
 				v.beattoolsRepeatIndex = beattoolsFreeIndex(-1)
 			end
 			beattoolsRepeatIndices[v.beattoolsRepeatIndex] = v
@@ -1042,7 +1044,7 @@ beattoolsUpdateRepeat = function(self, event, irreversible)
 					newEvent.time + i * (newEvent.repeatDelay or 1)
 			else
 				newEvent.beattoolsRepeatIndex, newEvent.repeats, newEvent.repeatDelay, newEvent.beattoolsRepeats, newEvent.time =
-				nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
+					nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
 			end
 			table --[[stop wrong injection]].insert(beattoolsPrevEvents, helpers.copy(newEvent))
 			table --[[stop wrong injection]].insert(self.level.events, newEvent)
@@ -1081,7 +1083,7 @@ local function beattoolsUntag(self, tags2)
 			tagName = tagName2
 			return true
 		else
-			print("[BT] Untagging failed: Tag doesnt exist")
+			log("[BT] Untagging failed: Tag doesnt exist")
 			beattoolsError("Untagging failed: \"" .. tagName2 .. ".json\" doesnt exist")
 			return false
 		end
@@ -1102,7 +1104,7 @@ local function beattoolsUntag(self, tags2)
 				end
 				table.insert(self.level.events, event)
 				if self.multiselect == nil then
-					print("[BT] Multiselect nil - What? " .. i .. " " .. currentTag.tag)
+					log("[BT] Multiselect nil - What? " .. i .. " " .. currentTag.tag)
 				end
 				table.insert(self.multiselect.events, event)
 				self.multiselect.eventTypes[event.type] = true
@@ -1377,7 +1379,7 @@ end
 --[[
 if beattoolsTest == nil then
 	local chunk, e = love.filesystem.load("Mods/beattools/test.lua")
-	if e then beattoolsError("Error while loading the test of Beattools") print("[BT] Error while loading the test of Beattools. " .. e) else
+	if e then beattoolsError("Error while loading the test of Beattools") log("[BT] Error while loading the test of Beattools. " .. e) else
 		beattoolsTest = setfenv(chunk, setmetatable({ mod = mods.beattools, self = self }, { __index = _G }))
 	end
 end

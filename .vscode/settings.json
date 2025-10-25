@@ -6,6 +6,7 @@
 	],
 	"Lua.diagnostics.disable": [
 		"undefined-global",
-		"lowercase-global"
+		"lowercase-global",
+		"unused-function"
 	]
 }

@@ -86,7 +86,7 @@ pattern = '''self.menuMusicManager:addOnBeatHook(function(b)'''
 position = "before"
 payload = '''
 --[[if mods["high-score-restart"] then -- Penta: High Score Restart not ported to EA yet, it's their problem now >:)
-	print("[BT] Unstable compatibility with \"high-score-restart\" established")
+	log("[BT] Unstable compatibility with \"high-score-restart\" established")
 	loc.json.optionsMenuDescription8 = {}
 	loc.json.optionsMenuDescription8.en = loc.json.optionsMenuDescription7.en
 	loc.json.optionsMenuDescription8.owo = loc.json.optionsMenuDescription7.owo
@@ -99,10 +99,10 @@ if true then
 	for k, v in pairs(incompatibleMods) do
 		if mods[k] then
 			table--[[stop wrong injection]].insert(self.beattoolsCurrentIncompatibilities, k)
-			print("[BT] Found incompatible mod: " .. tostring(k))
+			log("[BT] Found incompatible mod: " .. tostring(k))
 		end
 	end
-	if #self.beattoolsCurrentIncompatibilities > 0 then print("[BT] Incompatibities detected. Showing menu.") end
+	if #self.beattoolsCurrentIncompatibilities > 0 then log("[BT] Incompatibities detected. Showing menu.") end
 
 	-- Penta: config defaults
 	if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
@@ -114,7 +114,7 @@ if true then
 		end
 	end
 	if modifiedConfig ~= "" then
-		print("[BT] Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
+		log("[BT] Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
 		mods.beattools.configRenderer = nil
 		dpf.saveJson("Mods/beattools/mod.json", mods.beattools)
 	end
@@ -651,7 +651,7 @@ position = "before"
 payload = '''
 if beattoolsConfigHelpers == nil then -- config helpers
 	local chunk, e = love.filesystem.load("Mods/beattools/configHelpers.lua")
-	if e then beattoolsError("Error while loading the config helper functions of Beattools") print("[BT] Error while loading the config helper functions of Beattools. " .. e) else
+	if e then beattoolsError("Error while loading the config helper functions of Beattools") log("[BT] Error while loading the config helper functions of Beattools. " .. e) else
 		beattoolsConfigHelpers = setfenv(chunk, setmetatable({ mod = mods.beattools }, { __index = _G }))()
 	end
 end
@@ -961,7 +961,7 @@ if mods.beattools.config.easeList then
 						end
 					end
 					if imgui.IsItemClicked(1) then
-						print("[BT] Copied to clipboard: " .. text)
+						log("[BT] Copied to clipboard: " .. text)
 						love.system.setClipboardText(text)
 						self.p:hurtPulse()
 					end
@@ -1067,7 +1067,7 @@ if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mod
 					2^1,
 					imgui.ImVec2_Float(20, 20)
 				) then
-					print("pressed")
+					log("pressed")
 					local function shouldSelect(v2)
 						return v2.type == "setColor" and v2.color == i - 1
 					end
@@ -1130,7 +1130,7 @@ if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mod
 				end
 				if imgui.IsItemClicked(1) then
 					local hex = beattoolsRGB2Hex(beattoolsCurrentEasings.editorBeat.color[i].r.r, beattoolsCurrentEasings.editorBeat.color[i].g.g, beattoolsCurrentEasings.editorBeat.color[i].b.b)
-					print("[BT] Copied to clipboard: " .. hex)
+					log("[BT] Copied to clipboard: " .. hex)
 					love.system.setClipboardText(hex)
 					self.p:hurtPulse()
 				end
@@ -1200,5 +1200,6 @@ if mods.beattools.config.imguiGuide then
 	helpers.SetNextWindowSize(200, 300, window_flag)
 	imgui.ShowDemoWindow()
 end
+if mods.beattools.config.editorCalculator then dofile("Mods/beattools/test.lua") end
 '''
 match_indent = true
