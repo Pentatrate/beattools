@@ -1,12 +1,22 @@
 STUFF TO DO:
 - better backup   -- Penta: +1 (multiple different types of backups to ensure nothing gets lost when the base game backup happens at a bad timing)
 
-- config search function (include help markers) (kak)
-- lively cranky (not even possible anymore?) (kak)
-- in-editor code evaluator +1 by others who want calculator
+- ease search bar
+- calculator
+- bundle multiple eases together
+- demo notif (rand working on it)
+- restart on acc?
+- different saves for different accessibility settings
+- level select non levels/folders
+- ease tooltips/descriptions (too much work)
+- imgui size problem
+- tooltipmarker replacing
 
 
-Mod Config:
+Utilitools:
+- imguihelpers: ease tooltips
+- keybinds
+- time
 
 
 Party Tricks:
@@ -15,7 +25,6 @@ Party Tricks:
 
 
 EA FIX:
-- level select non levels/folders
 - expand whitelist with new params   -- Penta: don wanna
 
 
@@ -26,6 +35,8 @@ Low Priority:   -- Penta: very low priority, like in will get implemented next y
 - sfx for selecting events (more info required)
 - default positions for imgui windows (too lazy)
 - auto update event groups?
+- lively cranky (not even possible anymore?) (kak)
+- fake repeat copy paste bug???????????????????????????????????????? cannot recreate
 
 
 Potential:   -- Penta: i have no idea if i will even implement these features
@@ -33,7 +44,6 @@ Potential:   -- Penta: i have no idea if i will even implement these features
 - better level duplicate scan + auto .redirect conversion + updates redirects with folder rename/move
 - move player in editor (i see no use)
 - overlap warning with ease durations (blue durations for eases with same var kinda cover this)
-- ease tooltips/descriptions (too much work)
 - auto convert when fakeRepeat is off and event is selected (annoying to make)
 
 

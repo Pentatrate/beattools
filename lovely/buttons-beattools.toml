@@ -26,7 +26,7 @@ pattern = '''end, 'delete selected event', 'delete')'''
 position = "after"
 payload = '''
 -- reload config/record position
-self:addKeybind(function()
+self:addKeybind(function ()
 	if self.editMode then
 		if beattoolsRecordPosition and beattoolsRecordFunc then
 			if beattoolsRecordFunc then beattoolsRecordFunc(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision) end
@@ -34,32 +34,22 @@ self:addKeybind(function()
 			beattoolsRecordFunc = nil
 			beattoolsRecordPrecision = 1
 		elseif mods.beattools.config.editorMenu then
-			beattoolsConfigHelpers = nil
-			local chunk, errormsg = love.filesystem.load("Mods/beattools/config.lua")
-			if errormsg then
-				beattoolsError("Error while reloading the config renderer of Beattools")
-				log("[BT] Error while reloading the config renderer of Beattools. " .. errormsg)
-			else
-				local env = setmetatable({ mod = mods.beattools }, { __index = _G })
-				beattoolsMenuCode = setfenv(chunk, env)
-				beattoolsOptions = nil
-				-- beattoolsTest = nil
-			end
+			utilitools.fileManager.loadAll(true)
 		end
 	end
 end, "reload config/record position", "r")
 -- fold all config
-self:addKeybind(function()
+self:addKeybind(function ()
 	if self.editMode and mods.beattools.config.editorMenu then mods.beattools.config.foldAll = true end
 end, "fold all config", "f")
 -- select none
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.selectNoneInPalette and self.placeEvent ~= "" then
 		self.placeEvent = ""
 	end
 end, "select none", "n")
 -- tag/untag selection
-self:addKeybind(function()
+self:addKeybind(function ()
 	-- tag selection
 	if mods.beattools.config.untaggingHotkeys and (self.multiselect or self.selectedEvent) and (not maininput:down("shift")) and (not maininput:down("ctrl")) then
 		self.changeToTagDialogue = true
@@ -77,7 +67,7 @@ self:addKeybind(function()
 	if mods.beattools.config.untaggingHotkeys and maininput:down("ctrl") and (not maininput:down("shift")) then
 		if self.selectedEvent then
 			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, { self.selectedEvent.tag }) return end
-			beattoolsConfirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+			utilitools.prompts.confirm.open("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
 				beattoolsUntag(self, { self.selectedEvent.tag })
 			end)
 		elseif self.multiselect then
@@ -86,14 +76,14 @@ self:addKeybind(function()
 				if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
 			end
 			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, tempEvents) return end
-			beattoolsConfirm("Continuing will untag all tags with the same name as those in the selection!", function ()
+			utilitools.prompts.confirm.open("Continuing will untag all tags with the same name as those in the selection!", function ()
 				beattoolsUntag(self, tempEvents)
 			end)
 		end
 	end
 end, "tag selection", "t")
 -- select all
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.selectAll then
 		beattoolsNewMultiSelection()
 		self.multiselectStartBeat = nil
@@ -114,7 +104,7 @@ self:addKeybind(function()
 	end
 end, "select all", "ctrl", "a")
 -- move to next
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.jumpEvents then
 		if self.multiselect then
 			local closest = nil
@@ -134,7 +124,7 @@ self:addKeybind(function()
 	end
 end, "move to next", "ctrl", "move_up")
 -- move to previous
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.jumpEvents then
 		if self.multiselect then
 			local closest = nil
@@ -154,11 +144,11 @@ self:addKeybind(function()
 	end
 end, "move to previous", "ctrl", "move_down")
 -- undo
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.undoHotkeys then beattoolsUndo(self, maininput:down("shift") and "redo" or "undo", maininput:down("ctrl")) end
 end, "undo", "z")
 -- hide menus
-self:addKeybind(function()
+self:addKeybind(function ()
 	if mods.beattools.config.hideMenus and not beattoolsRecordFunc then
 		beattoolsRecordPosition = not beattoolsRecordPosition
 		beattoolsRecordFunc = nil
@@ -220,8 +210,8 @@ if mods.beattools.config.spreadButtons then
 		local function beattoolsSpread(snap, sameTime, snappedAngle, event)
 			if snappedAngle == nil then
 				if event == nil then
-					beattoolsError("Spread incorrect: snappedAngle is nil")
-					log("[BT] Spread incorrect: snappedAngle is nil")
+					utilitools.prompts.error.open(mods.beattools, "Spread incorrect: snappedAngle is nil")
+					log(mods.beattools, "Spread incorrect: snappedAngle is nil")
 					snappedAngle = 0
 				else
 					snappedAngle = beattoolsSnapAngle(event.angle, snap)
@@ -369,7 +359,7 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and self.selectedEven
 		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
 	else self.selectedEvent.repeatDelay = nil end
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
-		beattoolsConfirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
+		utilitools.prompts.confirm.open("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
 			beattoolsUpdateRepeat(self, self.selectedEvent, true)
 		end)
 	end
@@ -390,8 +380,8 @@ if self.selectedEvent and mods.beattools.config.showEventGroups then
 				if isOpen then
 					for k, v in pairs(self.level.properties.beattools.customEventGroups) do
 						if not (self.selectedEvent.beattoolsCustomEventGroups and self.selectedEvent.beattoolsCustomEventGroups[k]) then
-							local isSelected = imgui.Selectable_Bool(k .. "##beattoolsAddSelectedEventGroup")
-							if isSelected then
+							local selected = imgui.Selectable_Bool(k .. "##beattoolsAddSelectedEventGroup")
+							if selected then
 								if self.selectedEvent.beattoolsCustomEventGroups == nil then self.selectedEvent.beattoolsCustomEventGroups = {} end
 								self.selectedEvent.beattoolsCustomEventGroups[k] = true
 							end
@@ -437,7 +427,7 @@ if self.selectedEvent and mods.beattools.config.untaggingButtons and self.select
 	end
 	imgui.SameLine()
 	if imgui.Button("Untag same tag name") then
-		beattoolsConfirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+		utilitools.prompts.confirm.open("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
 			beattoolsUntag(self, { self.selectedEvent.tag })
 		end)
 	end
@@ -474,7 +464,7 @@ if mods.beattools.config.untaggingButtons then
 		for i, v in ipairs(self.multiselect.events) do
 			if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
 		end
-		beattoolsConfirm("Continuing will untag all tags with the same name as those in the selection!", function ()
+		utilitools.prompts.confirm.open("Continuing will untag all tags with the same name as those in the selection!", function ()
 			beattoolsUntag(self, tempEvents)
 		end)
 	end

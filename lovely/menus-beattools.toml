@@ -81,149 +81,26 @@ match_indent = true
 # Incompatibilities and config defaults ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Menu.lua"
-pattern = '''self.menuMusicManager:addOnBeatHook(function(b)'''
-position = "before"
-payload = '''
---[[if mods["high-score-restart"] then -- Penta: High Score Restart not ported to EA yet, it's their problem now >:)
-	log("[BT] Unstable compatibility with \"high-score-restart\" established")
-	loc.json.optionsMenuDescription8 = {}
-	loc.json.optionsMenuDescription8.en = loc.json.optionsMenuDescription7.en
-	loc.json.optionsMenuDescription8.owo = loc.json.optionsMenuDescription7.owo
-	loc.json.optionsMenuDescription7.en = "Sets you back some time before you started lagging\nYou will not miss any notes because of lag anymore this way\nHold ctrl to ignore the lagback"
-	loc.json.optionsMenuDescription7.owo = "Sets youwu bwack some time befowo youwu stawted wagging\nYouwu wiww nowot mish any nowotes because of wag anymowo this way\nHowod ctrl to ignowo the wagback"
-end]]
-if true then
-	self.beattoolsCurrentIncompatibilities = {}
-	local incompatibleMods = { ["event-stacking"] = true, ["editor-shortcuts"] = true, undo = true, ["editor-alt-bookmark-fix"] = true, ["editor-overhaul"] = true, ["audible-ratemod"] = true }
-	for k, v in pairs(incompatibleMods) do
-		if mods[k] then
-			table--[[stop wrong injection]].insert(self.beattoolsCurrentIncompatibilities, k)
-			log("[BT] Found incompatible mod: " .. tostring(k))
-		end
-	end
-	if #self.beattoolsCurrentIncompatibilities > 0 then log("[BT] Incompatibities detected. Showing menu.") end
-
-	-- Penta: config defaults
-	if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-	local modifiedConfig = ""
-	for k, v in pairs(beattoolsOptions) do
-		if mods.beattools.config[k] == nil then
-			mods.beattools.config[k] = v.default
-			modifiedConfig = modifiedConfig .. (modifiedConfig == "" and "" or ",") .. " \"" .. v.name .. "\""
-		end
-	end
-	if modifiedConfig ~= "" then
-		log("[BT] Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
-		mods.beattools.configRenderer = nil
-		dpf.saveJson("Mods/beattools/mod.json", mods.beattools)
-	end
-end
-'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "states/Menu.lua"
-pattern = '''st:setFgDraw(function(self)'''
+target = "main.lua"
+pattern = '''cs = bs.load(project.initState)'''
 position = "after"
 payload = '''
-	if #self.beattoolsCurrentIncompatibilities > 0 then
-		if project.useImgui then
-			imgui.SetNextWindowPos(imgui.ImVec2_Float(0, 0), imgui["ImGuiCond_Always"])
-			imgui.SetNextWindowSize(imgui.ImVec2_Float(1200, 720), imgui["ImGuiCond_Always"])
-			imgui.SetNextWindowCollapsed(false, imgui["ImGuiCond_Always"])
-			imgui.Begin("MOD INCOMPATIBILITIES")
-
-			imgui.TextWrapped("CRASHES POSSIBLE:\nThese current mods are absolutely incompatible with \"beattools\" because they are already included in this mod.\nPlease remove them as they are outdated.\nMake sure to check the \"disabled\" folder in your \"Mods\" folder for those mods as well.\nFor badly written mods the folder name may not be accurate.")
-			for i, v in ipairs(self.beattoolsCurrentIncompatibilities) do
-				imgui.Text("(folder name?) " .. v .. " (display name) " .. mods[v].name)
-			end
-
-			imgui.End()
-		end
-	end
-'''
-match_indent = true
-
-
-# Prompts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-target = "states/Editor.lua"
-pattern = '''if self.quitDialogue then'''
-position = "before"
-payload = '''
-if beattoolsConfirmationOpen and not imgui.IsPopupOpen("beattoolsConfirmation") then
-	imgui.OpenPopup_Str("beattoolsConfirmation")
-end
-beattoolsConfirmationOpen = false
-if imgui.BeginPopup("beattoolsConfirmation") then
-	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-	imgui.TextUnformatted("Are you sure?")
-	imgui.Separator()
-	imgui.TextUnformatted(tostring(beattoolsConfirmationText))
-	imgui.PopTextWrapPos()
-	local confirmationTexts = mods.beattools.config.confirmationTexts
-	-- { "Confirm", "Accept", "Yes", "Yeah", "Ye", "Sure", "True", "Positive", "Okay", "Ok", "Do it", "Ready", --[[ something4803: ]] "Yippee!" }
-	if beattoolsConfirmationFunc and imgui.Button(tostring(confirmationTexts[math.floor(beattoolsConfirmationRandomized * #confirmationTexts) + 1]) .. "##beatools") then
-		local tempFunc = beattoolsConfirmationFunc
-		beattoolsConfirmationText = ""
-		beattoolsConfirmationFunc = function () end
-		beattoolsConfirmationRandomized = 0
-		if tempFunc then tempFunc() end
-		imgui.CloseCurrentPopup()
-	end
-	imgui.EndPopup("beattoolsConfirmation")
-elseif beattoolsConfirmationText ~= "" then
-	beattoolsConfirmationText = ""
-	beattoolsConfirmationFunc = function () end
-	beattoolsConfirmationRandomized = 0
-end
-if beattoolsPromptOpen and not imgui.IsPopupOpen("beattoolsPrompt") then
-	imgui.OpenPopup_Str("beattoolsPrompt")
-end
-beattoolsPromptOpen = false
-if imgui.BeginPopup("beattoolsPrompt") then
-	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-	imgui.TextUnformatted(tostring(beattoolsPromptText))
-	imgui.PopTextWrapPos()
-	if beattoolsPromptButtons then
-		for i, v in ipairs(beattoolsPromptButtons) do
-			if i ~= 1 then imgui.SameLine() end
-			if imgui.Button(tostring(v[1])) then
-				beattoolsPromptOpen = false
-				beattoolsPromptText = ""
-				beattoolsPromptButtons = nil
-				if v[2] then v[2]() end
-				imgui.CloseCurrentPopup()
-			end
-		end
-	end
-	imgui.EndPopup("beattoolsPrompt")
-elseif beattoolsPromptText ~= "" then
-	beattoolsPromptText = ""
-	beattoolsPromptRandomized = 0
-end
-if beattoolsErrorOpen and not imgui.IsPopupOpen("beattoolsError") then
-	imgui.OpenPopup_Str("beattoolsError")
-end
-beattoolsErrorOpen = false
-if imgui.BeginPopup("beattoolsError") then
-	imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-	-- Penta: I can imagine ppl screenshotting their error code to report it just to realize its just a random number :skull:
-	-- Penta: Don't think it's gonna happen though :/
-	local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.", ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]] "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you" }
-	table--[[stop wrong injection]].insert(errorTexts, 1, "Error Code " .. tostring(math.floor(beattoolsErrorRandomized * (#errorTexts + 1) * 999)))
-	imgui.TextUnformatted(tostring(errorTexts[math.floor(beattoolsErrorRandomized * #errorTexts) + 1]))
-	imgui.Separator()
-	imgui.TextUnformatted(tostring(beattoolsErrorText))
-	imgui.PopTextWrapPos()
-	imgui.EndPopup("beattoolsError")
-elseif beattoolsErrorText ~= "" then
-	beattoolsErrorText = ""
-	beattoolsErrorRandomized = 0
-end
+--if true then -- Beattools incompatibilities
+--	-- Penta: config defaults
+--	if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+--	local modifiedConfig = ""
+--	for k, v in pairs(beattoolsOptions) do
+--		if mods.beattools.config[k] == nil then
+--			mods.beattools.config[k] = v.default
+--			modifiedConfig = modifiedConfig .. (modifiedConfig == "" and "" or ",") .. " \"" .. v.name .. "\""
+--		end
+--	end
+--	if modifiedConfig ~= "" then
+--		log(mods.beattools, "Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
+--		mods.beattools.configRenderer = nil
+--		dpf.saveJson("Mods/beattools/mod.json", mods.beattools)
+--	end
+--end
 '''
 match_indent = true
 
@@ -263,18 +140,10 @@ position = "after"
 payload = '''
 if mods.beattools.config.mouseCoordsButton then
 	local pressed = imgui.Button("Use Mouse")
-	if imgui.IsItemHovered() then
-		imgui.BeginTooltip()
-		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-		imgui.TextUnformatted("Copy mouse coordinates")
-		imgui.PopTextWrapPos()
-		imgui.EndTooltip()
-	end
+	utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
 	if pressed then
 		local tempFunc = function ()
-			beattoolsPromptOpen = true
-			beattoolsPromptText = "Choose axis"
-			beattoolsPromptButtons = {
+			utilitools.prompts.prompt.open("Choose axis", {
 				{ "Both", function ()
 					beattoolsRecordPosition = true
 					beattoolsRecordFunc = function (x, y) event.x = x event.y = y end
@@ -287,11 +156,9 @@ if mods.beattools.config.mouseCoordsButton then
 					beattoolsRecordPosition = true
 					beattoolsRecordFunc = function (x, y) event.y = y end
 				end }
-			}
+			})
 		end
-		beattoolsPromptOpen = true
-		beattoolsPromptText = "Choose precision"
-		beattoolsPromptButtons = {
+		utilitools.prompts.prompt.open("Choose precision", {
 			{ "1px", function ()
 				beattoolsRecordPrecision = 1
 				tempFunc()
@@ -320,7 +187,7 @@ if mods.beattools.config.mouseCoordsButton then
 				beattoolsRecordPrecision = 100
 				tempFunc()
 			end }
-		}
+		})
 	end
 end
 '''
@@ -334,21 +201,13 @@ position = "after"
 payload = '''
 if mods.beattools.config.mouseCoordsButton and event.var ~= nil and (string.sub(event.var, -2, -1) == ".x" or string.sub(event.var, -2, -1) == ".y") then
 	local pressed = imgui.Button("Use Mouse")
-	if imgui.IsItemHovered() then
-		imgui.BeginTooltip()
-		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-		imgui.TextUnformatted("Copy mouse coordinates")
-		imgui.PopTextWrapPos()
-		imgui.EndTooltip()
-	end
+	utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
 	if pressed then
 		local tempFunc = function ()
 			beattoolsRecordPosition = true
 			beattoolsRecordFunc = function (x, y) event.value = string.sub(event.var, -2, -1) == ".x" and x or y end
 		end
-		beattoolsPromptOpen = true
-		beattoolsPromptText = "Choose precision"
-		beattoolsPromptButtons = {
+		utilitools.prompts.prompt.open("Choose precision", {
 			{ "1px", function ()
 				beattoolsRecordPrecision = 1
 				tempFunc()
@@ -377,7 +236,7 @@ if mods.beattools.config.mouseCoordsButton and event.var ~= nil and (string.sub(
 				beattoolsRecordPrecision = 100
 				tempFunc()
 			end }
-		}
+		})
 	end
 end
 '''
@@ -415,11 +274,11 @@ position = "at"
 payload = '''
 function helpers.InputTextMultiline(label, text, size, size2)
 	if size2 ~= nil and string.sub(size2, 1, 3) == "max" then
-		local temp = 1
-		for w in string.gmatch(text, "\n") do
-			temp = temp + 1
+		local lines = 1
+		for _ in string.gmatch(current, "\n") do
+			lines = lines + 1
 		end
-		size2 = imgui.ImVec2_Float(-imgui.GetFontSize() * 7 / 13 * string.len(string.sub(label, 1, -(string.find(string.reverse(label), "##") or -1) - 2)) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 25 or 0), imgui.GetFontSize() * temp + 6)
+		size2 = imgui.ImVec2_Float(-imgui.GetFontSize() * 7 / 13 * imguiHelpers.visibleLabel(label) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 25 or 6), imgui.GetFontSize() * lines + 6)
 	end
 '''
 match_indent = true
@@ -485,13 +344,7 @@ if properties.default then
 	tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
 end
 if mods.beattools.config.hideHelpMarkers then
-	if imgui.IsItemHovered() then
-		imgui.BeginTooltip()
-		imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-		imgui.TextUnformatted(tooltip)
-		imgui.PopTextWrapPos()
-		imgui.EndTooltip()
-	end
+	utilitools.imguiHelpers.tooltip(tooltip)
 else helpers--[[stop wrong injection]].imguiHelpMarker(tooltip) end
 '''
 match_indent = true
@@ -642,6 +495,24 @@ if mods.beattools.config.betterBookmarks then love.graphics.printf(bookmarkBeatT
 match_indent = true
 
 
+# Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/ease.lua"
+pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
+position = "after"
+payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyEases)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/setBoolean.lua"
+pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
+position = "after"
+payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyEases)'''
+match_indent = true
+
+
 # Menu in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -649,252 +520,425 @@ target = "states/Editor.lua"
 pattern = '''if self.goToBeatDialogue then'''
 position = "before"
 payload = '''
-if beattoolsConfigHelpers == nil then -- config helpers
-	local chunk, e = love.filesystem.load("Mods/beattools/configHelpers.lua")
-	if e then beattoolsError("Error while loading the config helper functions of Beattools") log("[BT] Error while loading the config helper functions of Beattools. " .. e) else
-		beattoolsConfigHelpers = setfenv(chunk, setmetatable({ mod = mods.beattools }, { __index = _G }))()
-	end
-end
-if mods.beattools.config.showEventGroups then
-	if self.level then
-		if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
-		if beattoolsHighestEventGroupIndex == -1 then
-			if self.level.properties.beattools.eventGroups == nil then
-				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-				self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
-			end
-			beattoolsUpdateEventGroups()
-		end
-	end
-	helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
-	helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-	if imgui.Begin("Event Groups") then
-		if self.level then
-			local function checkOverlapping(group, index)
-				local overlapping = false
-				if beattoolsEventIndices[index] then
-					if beattoolsEventIndices[index].events.custom or group.events.custom then
-						overlapping = true
-					else
-						for k, v in pairs(group.events) do
-							if beattoolsEventIndices[index].events[k] then
-								overlapping = true
-								break
-							end
-						end
-					end
-				end
-				return overlapping
-			end
-			if imgui.Button("Reset##EditorLayers") then
-				if self.level.properties.beattools.customEventGroups then
-					beattoolsMakeSpace(1, 3)
-				end
-				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-				self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
-				beattoolsUpdateEventGroups()
-				if self.level.properties.beattools.customEventGroups then
-					for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-						v.visibility = " - "
-					end
-					local i = 1
-					while i <= beattoolsHighestEventGroupIndex do
-						local v = beattoolsEventIndices[i]
-						if v then
-							while beattoolsEventIndices[i - 1] == nil and i > 1 do
-								beattoolsMakeSpace(i, true)
-								beattoolsUpdateEventGroups()
-								i = i - 1
-							end
-						end
-						i = i + 1
-					end
-				end
-				changing = true
-			end
+if true then
+	local configHelpers = utilitools.configHelpers
+	local imguiHelpers = utilitools.imguiHelpers
 
-			local changing = false
-			if true then
-				local buffer = ffi.new("char[?]", 256)
-				ffi.copy(buffer, "Add Custom Group", #("Add Custom Group"))
-				imgui.SetNextItemWidth(-1e-9)
-				imgui.InputText("##addCustomEditorLayers", buffer, 256, 2^12)
-				local value = ffi.string(buffer)
-				if imgui.IsItemDeactivatedAfterEdit() and value and value ~= "" and value ~= "Add Custom Group" then
-					if self.level.properties.beattools.customEventGroups == nil then self.level.properties.beattools.customEventGroups = {} end
-					if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then beattoolsError("Group name already exists") else
-						self.level.properties.beattools.customEventGroups[value] = {
-							events = { custom = true },
-							visibility = " - ",
-							index = #beattoolsEventIndices + 1
-						}
-						beattoolsUpdateEventGroups()
-						changing = true
+	if mods.beattools.config.showEventGroups then
+		if self.level then
+			if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
+			if beattoolsHighestEventGroupIndex == -1 then
+				if self.level.properties.beattools.eventGroups == nil then
+					if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+					self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+				end
+				beattoolsUpdateEventGroups()
+			end
+		end
+		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
+		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
+		if imgui.Begin("Event Groups") then
+			if self.level then
+				local function checkOverlapping(group, index)
+					local overlapping = false
+					if beattoolsEventIndices[index] then
+						if beattoolsEventIndices[index].events.custom or group.events.custom then
+							overlapping = true
+						else
+							for k, v in pairs(group.events) do
+								if beattoolsEventIndices[index].events[k] then
+									overlapping = true
+									break
+								end
+							end
+						end
+					end
+					return overlapping
+				end
+				if imgui.Button("Reset##EditorLayers") then
+					if self.level.properties.beattools.customEventGroups then
+						beattoolsMakeSpace(1, 3)
+					end
+					if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+					self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+					beattoolsUpdateEventGroups()
+					if self.level.properties.beattools.customEventGroups then
+						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+							v.visibility = " - "
+						end
+						local i = 1
+						while i <= beattoolsHighestEventGroupIndex do
+							local v = beattoolsEventIndices[i]
+							if v then
+								while beattoolsEventIndices[i - 1] == nil and i > 1 do
+									beattoolsMakeSpace(i, true)
+									beattoolsUpdateEventGroups()
+									i = i - 1
+								end
+							end
+							i = i + 1
+						end
+					end
+					changing = true
+				end
+
+				local changing = false
+				if true then
+					local buffer = ffi.new("char[?]", 256)
+					ffi.copy(buffer, "Add Custom Group", #("Add Custom Group"))
+					imgui.SetNextItemWidth(-1e-9)
+					imgui.InputText("##addCustomEditorLayers", buffer, 256, 2^12)
+					local value = ffi.string(buffer)
+					if imgui.IsItemDeactivatedAfterEdit() and value and value ~= "" and value ~= "Add Custom Group" then
+						if self.level.properties.beattools.customEventGroups == nil then self.level.properties.beattools.customEventGroups = {} end
+						if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then utilitools.prompts.error.open(mods.beattools, "Group name already exists") else
+							self.level.properties.beattools.customEventGroups[value] = {
+								events = { custom = true },
+								visibility = " - ",
+								index = #beattoolsEventIndices + 1
+							}
+							beattoolsUpdateEventGroups()
+							changing = true
+						end
 					end
 				end
-			end
-			local indexGroup = 0
-			for i, v in ipairs(beattoolsEventGroups) do
-				if v.index ~= indexGroup then
-					imgui.Separator()
-					indexGroup = v.index
-				end
-				imgui.AlignTextToFramePadding()
-				local currentPosition = imgui.GetCursorScreenPos()
-				imgui.PushClipRect(imgui.ImVec2_Float(currentPosition.x, currentPosition.y), imgui.ImVec2_Float(currentPosition.x + beattoolsEventGroupLongest, currentPosition.y + 20), true)
-				imgui.Text(v.name)
-				imgui.PopClipRect()
-				if v.name ~= "all" then
-					if not changing and (v.index > 1 or beattoolsEventIndices[v.index].groups > 1) then
-						imgui.SameLine(beattoolsEventGroupLongest + 10)
-						if imgui.Button("^##" .. v.name .. "_editorLayers") then
-							if beattoolsEventIndices[v.index].groups > 1 then
-								beattoolsMakeSpace(v.index)
-								v.index = v.index - 1
-							else
-								beattoolsMakeSpace(v.index, true)
-								if checkOverlapping(v, v.index) then
+				local indexGroup = 0
+				for i, v in ipairs(beattoolsEventGroups) do
+					if v.index ~= indexGroup then
+						imgui.Separator()
+						indexGroup = v.index
+					end
+					imgui.AlignTextToFramePadding()
+					local currentPosition = imgui.GetCursorScreenPos()
+					imgui.PushClipRect(imgui.ImVec2_Float(currentPosition.x, currentPosition.y), imgui.ImVec2_Float(currentPosition.x + beattoolsEventGroupLongest, currentPosition.y + 20), true)
+					imgui.Text(v.name)
+					imgui.PopClipRect()
+					if v.name ~= "all" then
+						if not changing and (v.index > 1 or beattoolsEventIndices[v.index].groups > 1) then
+							imgui.SameLine(beattoolsEventGroupLongest + 10)
+							if imgui.Button("^##" .. v.name .. "_editorLayers") then
+								if beattoolsEventIndices[v.index].groups > 1 then
 									beattoolsMakeSpace(v.index)
 									v.index = v.index - 1
+								else
+									beattoolsMakeSpace(v.index, true)
+									if checkOverlapping(v, v.index) then
+										beattoolsMakeSpace(v.index)
+										v.index = v.index - 1
+									end
 								end
+								beattoolsUpdateEventGroups()
+								changing = true
 							end
-							beattoolsUpdateEventGroups()
-							changing = true
 						end
-					end
-					if not changing and (beattoolsEventIndices[v.index + 1] or beattoolsEventIndices[v.index].groups > 1) then
-						imgui.SameLine(beattoolsEventGroupLongest + 28)
-						if imgui.Button("v##" .. v.name .. "_editorLayers") then
-							if beattoolsEventIndices[v.index].groups > 1 then
-								beattoolsMakeSpace(v.index + 1)
-								v.index = v.index + 1
-							else
-								beattoolsMakeSpace(v.index + 1, true)
-								if checkOverlapping(v, v.index + 1) then
+						if not changing and (beattoolsEventIndices[v.index + 1] or beattoolsEventIndices[v.index].groups > 1) then
+							imgui.SameLine(beattoolsEventGroupLongest + 28)
+							if imgui.Button("v##" .. v.name .. "_editorLayers") then
+								if beattoolsEventIndices[v.index].groups > 1 then
 									beattoolsMakeSpace(v.index + 1)
 									v.index = v.index + 1
+								else
+									beattoolsMakeSpace(v.index + 1, true)
+									if checkOverlapping(v, v.index + 1) then
+										beattoolsMakeSpace(v.index + 1)
+										v.index = v.index + 1
+									end
 								end
+								beattoolsUpdateEventGroups()
+								changing = true
 							end
-							beattoolsUpdateEventGroups()
-							changing = true
+						end
+						if not changing then
+							imgui.SameLine(beattoolsEventGroupLongest + 46)
+							local valptr = ffi.new("int[1]", { v.index })
+							imgui.SetNextItemWidth(15)
+							imgui.InputInt("##" .. v.name .. "_insertEditorLayers", valptr, 0, nil, 2^12)
+							local value = valptr[0]
+							if imgui.IsItemDeactivatedAfterEdit() and value and value ~= v.index then
+								local origIndex = v.index
+								if value < 1 then
+									value = 1
+								elseif value > #beattoolsEventIndices + 1 then
+									value = #beattoolsEventIndices + 1
+								end
+								if checkOverlapping(v, value) then
+									beattoolsMakeSpace(value)
+								end
+								v.index = value
+								if beattoolsEventIndices[origIndex].groups <= 1 then
+									beattoolsMakeSpace(origIndex + 1, true)
+								end
+								beattoolsUpdateEventGroups()
+								changing = true
+							end
 						end
 					end
-					if not changing then
-						imgui.SameLine(beattoolsEventGroupLongest + 46)
-						local valptr = ffi.new("int[1]", { v.index })
-						imgui.SetNextItemWidth(15)
-						imgui.InputInt("##" .. v.name .. "_insertEditorLayers", valptr, 0, nil, 2^12)
-						local value = valptr[0]
-						if imgui.IsItemDeactivatedAfterEdit() and value and value ~= v.index then
-							local origIndex = v.index
-							if value < 1 then
-								value = 1
-							elseif value > #beattoolsEventIndices + 1 then
-								value = #beattoolsEventIndices + 1
-							end
-							if checkOverlapping(v, value) then
-								beattoolsMakeSpace(value)
-							end
-							v.index = value
-							if beattoolsEventIndices[origIndex].groups <= 1 then
-								beattoolsMakeSpace(origIndex + 1, true)
-							end
-							beattoolsUpdateEventGroups()
-							changing = true
-						end
-					end
-				end
-				imgui.SameLine(beattoolsEventGroupLongest + 64)
-				local isOpen = imgui.BeginCombo("##" .. v.name .. "_visibilityEditorLayers", v.visibility, 2^4 + 2^5 + 2^7)
-				if isOpen then
-					for i, vv in ipairs(v.name ~= "all" and { " - ", "show", "transparent", "ghost", "hide" } or { "show", "transparent", "ghost", "hide" }) do
-						local isSelected = imgui.Selectable_Bool(vv, vv == v.visibility)
-						if isSelected and vv ~= v.visibility then
-							v.visibility = vv
-							beattoolsEventVisibilities = {}
-							self.selectedEvent = nil
-							self.multiselect = nil
+					imgui.SameLine(beattoolsEventGroupLongest + 64)
+					local isOpen = imgui.BeginCombo("##" .. v.name .. "_visibilityEditorLayers", v.visibility, 2^4 + 2^5 + 2^7)
+					if isOpen then
+						for i, vv in ipairs(v.name ~= "all" and { " - ", "show", "transparent", "ghost", "hide" } or { "show", "transparent", "ghost", "hide" }) do
+							local selected = imgui.Selectable_Bool(vv, vv == v.visibility)
+							if selected and vv ~= v.visibility then
+								v.visibility = vv
+								beattoolsEventVisibilities = {}
+								self.selectedEvent = nil
+								self.multiselect = nil
 
-							self.multiselectStartBeat = nil
-							self.multiselectEndBeat = nil
-							self.multiselectStartAngle = nil
-							self.multiselectEndAngle = nil
+								self.multiselectStartBeat = nil
+								self.multiselectEndBeat = nil
+								self.multiselectStartAngle = nil
+								self.multiselectEndAngle = nil
+							end
 						end
+						imgui.EndCombo()
 					end
-					imgui.EndCombo()
-				end
-				if v.events.custom then
-					imgui.SameLine()
-					if imgui.Button("Delete##" .. v.name .. "_deleteEditorLayers") then
-						self.level.properties.beattools.customEventGroups[v.name] = nil
-						local customEventsAmount = 0
-						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-							customEventsAmount = customEventsAmount + 1
+					if v.events.custom then
+						imgui.SameLine()
+						if imgui.Button("Delete##" .. v.name .. "_deleteEditorLayers") then
+							self.level.properties.beattools.customEventGroups[v.name] = nil
+							local customEventsAmount = 0
+							for k, v in pairs(self.level.properties.beattools.customEventGroups) do
+								customEventsAmount = customEventsAmount + 1
+							end
+							if customEventsAmount == 0 then
+								self.level.properties.beattools.customEventGroups = nil
+							end
+							beattoolsMakeSpace(v.index + 1, true)
+							beattoolsUpdateEventGroups()
+							changing = true
 						end
-						if customEventsAmount == 0 then
-							self.level.properties.beattools.customEventGroups = nil
-						end
-						beattoolsMakeSpace(v.index + 1, true)
-						beattoolsUpdateEventGroups()
-						changing = true
 					end
 				end
 			end
+			imgui.End()
 		end
-		imgui.End()
 	end
-end
-if mods.beattools.config.easeList then
-	helpers.SetNextWindowPos(750, 420, window_flag)
-	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Ease List") then
-		if imgui.TreeNode_Str("Filters") then
-			if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-			beattoolsConfigHelpers.InputBool("easeListUse")
-			beattoolsConfigHelpers.InputBool("easeListUsed")
-			beattoolsConfigHelpers.InputBool("easeListSerious")
-			beattoolsConfigHelpers.InputBool("easeListSelectChanged")
-			beattoolsConfigHelpers.InputBool("easeListSelected")
-			beattoolsConfigHelpers.InputBool("easeListRound")
-			imgui.TreePop()
-		end
+	if mods.beattools.config.easeList then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		if imgui.Begin("Ease List") then
+			if imgui.TreeNode_Str("Filters") then
+				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
+				configHelpers.input("easeListUse")
+				configHelpers.input("easeListUsed")
+				configHelpers.input("easeListSerious")
+				configHelpers.input("easeListSelectChanged")
+				configHelpers.input("easeListSelected")
+				configHelpers.input("easeListRound")
+				imgui.TreePop()
+			end
 
-		imgui.BeginTable("easeList", 2, 2^6 + 2^7 + 2^9 + 1 * 2^13)
-		for i, v in ipairs(beattoolsAllEasesSorted) do
-			if ((not mods.beattools.config.easeListUse) or beattoolsUselessEases[v] == nil)
-			and ((not mods.beattools.config.easeListSerious) or beattoolsTrollEases[v] == nil)
-			and ((not mods.beattools.config.easeListSelected) or beattoolsEasesSelected[v]) then
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", v)
-				if (not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0 then
-					imgui.TableNextRow()
-					imgui.TableNextColumn()
+			imgui.BeginTable("easeList", 2, 2^6 + 2^7 + 2^9 + 1 * 2^13)
+			for i, v in ipairs(beattoolsAllEasesSorted) do
+				if ((not mods.beattools.config.easeListUse) or beattoolsUselessEases[v] == nil)
+				and ((not mods.beattools.config.easeListSerious) or beattoolsTrollEases[v] == nil)
+				and ((not mods.beattools.config.easeListSelected) or beattoolsEasesSelected[v]) then
+					beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", v)
+					if (not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0 then
+						imgui.TableNextRow()
+						imgui.TableNextColumn()
 
-					local text
-					if type(beattoolsAllEases[v]) == "boolean" then
-						text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].enable)
-					elseif type(beattoolsAllEases[v]) == "number" or v == "outline" then
-						if beattoolsCurrentEasings.editorBeat.ease[v].value == nil or not mods.beattools.config.easeListRound then
-							text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].value)
+						local text
+						if type(beattoolsAllEases[v]) == "boolean" then
+							text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].enable)
+						elseif type(beattoolsAllEases[v]) == "number" or v == "outline" then
+							if beattoolsCurrentEasings.editorBeat.ease[v].value == nil or not mods.beattools.config.easeListRound then
+								text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].value)
+							else
+								text = tostring(helpers.round(beattoolsCurrentEasings.editorBeat.ease[v].value * 1e3) / 1e3)
+							end
+						end
+						if mods.beattools.config.easeListSelectChanged then
+							beattoolsEasesSelected[v] = beattoolsCurrentEasings.editorBeat.ease[v][type(beattoolsAllEases[v]) == "boolean" and "enable" or "value"] ~= beattoolsAllEases[v] or nil
+						end
+
+						local pressed = imgui.Selectable_Bool(v, beattoolsEasesSelected[v], 2^1)
+						imguiHelpers.tooltip((beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(beattoolsEasings.ease[v] or {}) .. " events")
+
+						if pressed then
+							local function shouldSelect(v2)
+								if v == "bgColor" and v2.type == "setBgColor" and v2.color ~= nil then return true end
+								if v == "voidColor" and v2.type == "setBgColor" and v2.voidColor ~= nil then return true end
+								if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
+								if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
+								if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
+								if string.sub(v, 1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[string.sub(v, 19)] ~= nil then return true end
+								return v2.type == (type(beattoolsAllEases[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
+							end
+							local eventsDeleted = 0
+							if self.multiselect ~= nil then
+								for i2 = #self.multiselect.events, 1, -1 do
+									local v2 = self.multiselect.events[i2]
+									if shouldSelect(v2) then
+										table.remove(self.multiselect.events, i2)
+										eventsDeleted = eventsDeleted + 1 + (v2.type == "ease" and v2.repeats and v2.repeats > 0 and (v2.repeatDelay or 1) ~= 0 and v2.repeats or 0)
+									end
+								end
+							end
+							local function addEases()
+								if self.multiselect == nil then
+									beattoolsNewMultiSelection()
+									self.multiselectStartBeat = nil
+									self.multiselectEndBeat = nil
+								end
+								local function addToMultiSelect(v2)
+									table.insert(self.multiselect.events, v2)
+									self.multiselect.eventTypes[v2.type] = true
+									if self.multiselectStartBeat == nil then
+										self.multiselectStartBeat = v2.time
+										self.multiselectEndBeat = v2.time
+									else
+										if self.multiselectStartBeat > v2.time then
+											self.multiselectStartBeat = v2.time
+										end
+										if self.multiselectEndBeat < v2.time then
+											self.multiselectEndBeat = v2.time
+										end
+									end
+								end
+								if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.ease[v].runEvents == 1 then
+									for i2, v2 in ipairs(self.level.events) do
+										if shouldSelect(v2) then addToMultiSelect(v2) end
+									end
+								elseif eventsDeleted == 0 then
+									local v3
+									for i2, v2 in ipairs(self.level.events) do
+										if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
+											v3 = v2
+										end
+									end
+									if v3 ~= nil then
+										addToMultiSelect(v3)
+									end
+								end
+								if self.multiselectStartBeat == nil then
+									self.multiselectStartBeat = 0
+									self.multiselectEndBeat = 360
+								end
+
+								self.p:hurtPulse()
+							end
+							if not mods.beattools.config.easeListSelectChanged then
+								if beattoolsEasesSelected[v] and (#(beattoolsEasings.ease[v] or {}) == 0 or eventsDeleted == #(beattoolsEasings.ease[v] or {})) then
+									beattoolsEasesSelected[v] = nil
+								else
+									beattoolsEasesSelected[v] = true
+									if #(beattoolsEasings.ease[v] or {}) > 0 then addEases() end
+								end
+							elseif #(beattoolsEasings.ease[v] or {}) > 0 and (eventsDeleted == 0 or eventsDeleted ~= #(beattoolsEasings.ease[v] or {})) then
+								addEases()
+							end
+						end
+						if imgui.IsItemClicked(1) then
+							log(mods.beattools, "Copied to clipboard: " .. text)
+							love.system.setClipboardText(text)
+							self.p:hurtPulse()
+						end
+						if imgui.IsItemClicked(2) then
+							if type(beattoolsAllEases[v]) == "boolean" then
+								self.placeEvent = "beattoolsEvent;setBoolean;var," .. v .. ",string;enable," .. text .. ",boolean"
+							else
+								self.placeEvent = "beattoolsEvent;ease;var," .. v .. ",string;value," .. text .. "," .. (type(beattoolsAllEases[v]) == "number" and "number" or "nil")
+							end
+						end
+
+						imgui.TableNextColumn()
+						if #(beattoolsEasings.ease[v] or {}) == 0 then
+							imgui.TextDisabled(text)
 						else
-							text = tostring(helpers.round(beattoolsCurrentEasings.editorBeat.ease[v].value * 1e3) / 1e3)
+							imgui.Text(text)
 						end
 					end
-					if mods.beattools.config.easeListSelectChanged then
-						beattoolsEasesSelected[v] = beattoolsCurrentEasings.editorBeat.ease[v][type(beattoolsAllEases[v]) == "boolean" and "enable" or "value"] ~= beattoolsAllEases[v] or nil
+				end
+			end
+			imgui.EndTable()
+
+			imgui.End()
+		end
+	end
+	if mods.beattools.config.bookmarkList then
+		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
+		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
+		if imgui.Begin("Bookmarks") then
+			beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
+			for i, v in ipairs(beattoolsEasings.bookmarks) do
+				if i ~= 1 then imgui.Separator() end
+				imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
+				imgui.SameLine()
+				local name = "Unnamed Bookmark"
+				if v.name and v.name ~= "" then name = v.name end
+				if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
+					self.editorBeat = v.time
+					self.selectedEvent = self.level.events[v.indexInLevel]
+				end
+				if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
+			end
+			imgui.End()
+		end
+	end
+	if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		if imgui.Begin("Beattools") then
+
+			if mods.beattools.config.colorPreview then
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "bgColor")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "voidColor")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "outline")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoise")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoiseColor")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.hom")
+
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.faceColor")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.fillColor")
+				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.outlineColor")
+				beattoolsGetCurrentEasing(self, "songNameOverride", "newname", "editorBeat")
+				for i = 1, 8 do
+					beattoolsGetCurrentEasing(self, "color", "r", "editorBeat", i, "r")
+					beattoolsGetCurrentEasing(self, "color", "g", "editorBeat", i, "g")
+					beattoolsGetCurrentEasing(self, "color", "b", "editorBeat", i, "b")
+
+					local ColorButtonPos = imgui.GetCursorScreenPos()
+					local additionalInfo = ""
+
+					if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+						if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nBackground Color"
+						end
+						if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nVoid Color"
+						end
+					end
+					if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+						additionalInfo = additionalInfo .. "\nOutline"
+					end
+					if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+						additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
+					end
+					if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
+						additionalInfo = additionalInfo .. "\nPlayer Face Color"
+					end
+					if beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
+						additionalInfo = additionalInfo .. "\nPlayer Fill Color"
+					end
+					if beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
+						additionalInfo = additionalInfo .. "\nPlayer Outline Color"
 					end
 
-					local pressed = imgui.Selectable_Bool(v, beattoolsEasesSelected[v], 2^1)
-					beattoolsConfigHelpers.Tooltip(nil, (beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(beattoolsEasings.ease[v] or {}) .. " events")
-
-					if pressed then
+					if imgui.ColorButton(
+						"Color channel " .. i - 1 .. " (" .. (beattoolsCurrentEasings.editorBeat.color[i].r.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].r or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].g.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].g or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].b.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].b or {}) .. " - " .. (beattoolsEasings.color[i].eventAmount or 0) .. " events)" .. additionalInfo,
+						imgui.ImVec4_Float(
+							(beattoolsCurrentEasings.editorBeat.color[i].r.r or 0) / 255,
+							(beattoolsCurrentEasings.editorBeat.color[i].g.g or 0) / 255,
+							(beattoolsCurrentEasings.editorBeat.color[i].b.b or 0) / 255,
+							1
+						),
+						2^1,
+						imgui.ImVec2_Float(20, 20)
+					) then
+						forceprint("pressed")
 						local function shouldSelect(v2)
-							if v == "bgColor" and v2.type == "setBgColor" and v2.color ~= nil then return true end
-							if v == "voidColor" and v2.type == "setBgColor" and v2.voidColor ~= nil then return true end
-							if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
-							if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
-							if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
-							if string.sub(v, 1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[string.sub(v, 19)] ~= nil then return true end
-							return v2.type == (type(beattoolsAllEases[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
+							return v2.type == "setColor" and v2.color == i - 1
 						end
 						local eventsDeleted = 0
 						if self.multiselect ~= nil then
@@ -902,7 +946,7 @@ if mods.beattools.config.easeList then
 								local v2 = self.multiselect.events[i2]
 								if shouldSelect(v2) then
 									table.remove(self.multiselect.events, i2)
-									eventsDeleted = eventsDeleted + 1 + (v2.type == "ease" and v2.repeats and v2.repeats > 0 and (v2.repeatDelay or 1) ~= 0 and v2.repeats or 0)
+									eventsDeleted = eventsDeleted + 1
 								end
 							end
 						end
@@ -927,7 +971,7 @@ if mods.beattools.config.easeList then
 									end
 								end
 							end
-							if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.ease[v].runEvents == 1 then
+							if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.color[i].runEvents == 1 then
 								for i2, v2 in ipairs(self.level.events) do
 									if shouldSelect(v2) then addToMultiSelect(v2) end
 								end
@@ -949,257 +993,85 @@ if mods.beattools.config.easeList then
 
 							self.p:hurtPulse()
 						end
-						if not mods.beattools.config.easeListSelectChanged then
-							if beattoolsEasesSelected[v] and (#(beattoolsEasings.ease[v] or {}) == 0 or eventsDeleted == #(beattoolsEasings.ease[v] or {})) then
-								beattoolsEasesSelected[v] = nil
-							else
-								beattoolsEasesSelected[v] = true
-								if #(beattoolsEasings.ease[v] or {}) > 0 then addEases() end
-							end
-						elseif #(beattoolsEasings.ease[v] or {}) > 0 and (eventsDeleted == 0 or eventsDeleted ~= #(beattoolsEasings.ease[v] or {})) then
+						if (beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (beattoolsEasings.color[i].eventAmount or 0)) then
 							addEases()
 						end
 					end
 					if imgui.IsItemClicked(1) then
-						log("[BT] Copied to clipboard: " .. text)
-						love.system.setClipboardText(text)
+						local hex = beattoolsRGB2Hex(beattoolsCurrentEasings.editorBeat.color[i].r.r, beattoolsCurrentEasings.editorBeat.color[i].g.g, beattoolsCurrentEasings.editorBeat.color[i].b.b)
+						log(mods.beattools, "Copied to clipboard: " .. hex)
+						love.system.setClipboardText(hex)
 						self.p:hurtPulse()
 					end
 					if imgui.IsItemClicked(2) then
-						if type(beattoolsAllEases[v]) == "boolean" then
-							self.placeEvent = "beattoolsEvent;setBoolean;var," .. v .. ",string;enable," .. text .. ",boolean"
-						else
-							self.placeEvent = "beattoolsEvent;ease;var," .. v .. ",string;value," .. text .. "," .. (type(beattoolsAllEases[v]) == "number" and "number" or "nil")
+						self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
+					end
+
+					if mods.beattools.config.colorEasePreview then
+						if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+							if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
+								imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
+							end
+							if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
+								imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
+							end
+						end
+						if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
+							imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
+						end
+						if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
+							imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
 						end
 					end
 
-					imgui.TableNextColumn()
-					if #(beattoolsEasings.ease[v] or {}) == 0 then
-						imgui.TextDisabled(text)
-					else
-						imgui.Text(text)
-					end
+					imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 25, ColorButtonPos.y))
 				end
-			end
-		end
-		imgui.EndTable()
-
-		imgui.End()
-	end
-end
-if mods.beattools.config.bookmarkList then
-	helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
-	helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-	if imgui.Begin("Bookmarks") then
-		beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
-		for i, v in ipairs(beattoolsEasings.bookmarks) do
-			if i ~= 1 then imgui.Separator() end
-			imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
-			imgui.SameLine()
-			local name = "Unnamed Bookmark"
-			if v.name and v.name ~= "" then name = v.name end
-			if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
-				self.editorBeat = v.time
-				self.selectedEvent = self.level.events[v.indexInLevel]
-			end
-			if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
-		end
-		imgui.End()
-	end
-end
-if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
-	helpers.SetNextWindowPos(750, 420, window_flag)
-	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Beattools") then
-
-		if mods.beattools.config.colorPreview then
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "bgColor")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "voidColor")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "outline")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoise")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoiseColor")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.hom")
-
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.faceColor")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.fillColor")
-			beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.outlineColor")
-			beattoolsGetCurrentEasing(self, "songNameOverride", "newname", "editorBeat")
-			for i = 1, 8 do
-				beattoolsGetCurrentEasing(self, "color", "r", "editorBeat", i, "r")
-				beattoolsGetCurrentEasing(self, "color", "g", "editorBeat", i, "g")
-				beattoolsGetCurrentEasing(self, "color", "b", "editorBeat", i, "b")
-
-				local ColorButtonPos = imgui.GetCursorScreenPos()
+				imgui.SameLine()
 				local additionalInfo = ""
-
-				if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-					if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
-						additionalInfo = additionalInfo .. "\nBackground Color"
-					end
-					if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
-						additionalInfo = additionalInfo .. "\nVoid Color"
-					end
+				if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
+					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+					additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
 				end
-				if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
-					additionalInfo = additionalInfo .. "\nOutline"
+				if beattoolsCurrentEasings.editorBeat.songNameOverride.newname then
+					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+					additionalInfo = additionalInfo ..  "Song Name (" .. beattoolsCurrentEasings.editorBeat.songNameOverride.newname .. ")"
 				end
-				if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
-					additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
+				if additionalInfo ~= "" then
+					imgui.Text("[+]")
+					imguiHelpers.tooltip(additionalInfo)
+				else
+					imgui.NewLine()
 				end
-				if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
-					additionalInfo = additionalInfo .. "\nPlayer Face Color"
-				end
-				if beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
-					additionalInfo = additionalInfo .. "\nPlayer Fill Color"
-				end
-				if beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
-					additionalInfo = additionalInfo .. "\nPlayer Outline Color"
-				end
-
-				if imgui.ColorButton(
-					"Color channel " .. i - 1 .. " (" .. (beattoolsCurrentEasings.editorBeat.color[i].r.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].r or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].g.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].g or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].b.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].b or {}) .. " - " .. (beattoolsEasings.color[i].eventAmount or 0) .. " events)" .. additionalInfo,
-					imgui.ImVec4_Float(
-						(beattoolsCurrentEasings.editorBeat.color[i].r.r or 0) / 255,
-						(beattoolsCurrentEasings.editorBeat.color[i].g.g or 0) / 255,
-						(beattoolsCurrentEasings.editorBeat.color[i].b.b or 0) / 255,
-						1
-					),
-					2^1,
-					imgui.ImVec2_Float(20, 20)
-				) then
-					log("pressed")
-					local function shouldSelect(v2)
-						return v2.type == "setColor" and v2.color == i - 1
-					end
-					local eventsDeleted = 0
-					if self.multiselect ~= nil then
-						for i2 = #self.multiselect.events, 1, -1 do
-							local v2 = self.multiselect.events[i2]
-							if shouldSelect(v2) then
-								table.remove(self.multiselect.events, i2)
-								eventsDeleted = eventsDeleted + 1
-							end
-						end
-					end
-					local function addEases()
-						if self.multiselect == nil then
-							beattoolsNewMultiSelection()
-							self.multiselectStartBeat = nil
-							self.multiselectEndBeat = nil
-						end
-						local function addToMultiSelect(v2)
-							table.insert(self.multiselect.events, v2)
-							self.multiselect.eventTypes[v2.type] = true
-							if self.multiselectStartBeat == nil then
-								self.multiselectStartBeat = v2.time
-								self.multiselectEndBeat = v2.time
-							else
-								if self.multiselectStartBeat > v2.time then
-									self.multiselectStartBeat = v2.time
-								end
-								if self.multiselectEndBeat < v2.time then
-									self.multiselectEndBeat = v2.time
-								end
-							end
-						end
-						if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.color[i].runEvents == 1 then
-							for i2, v2 in ipairs(self.level.events) do
-								if shouldSelect(v2) then addToMultiSelect(v2) end
-							end
-						elseif eventsDeleted == 0 then
-							local v3
-							for i2, v2 in ipairs(self.level.events) do
-								if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
-									v3 = v2
-								end
-							end
-							if v3 ~= nil then
-								addToMultiSelect(v3)
-							end
-						end
-						if self.multiselectStartBeat == nil then
-							self.multiselectStartBeat = 0
-							self.multiselectEndBeat = 360
-						end
-
-						self.p:hurtPulse()
-					end
-					if (beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (beattoolsEasings.color[i].eventAmount or 0)) then
-						addEases()
-					end
-				end
-				if imgui.IsItemClicked(1) then
-					local hex = beattoolsRGB2Hex(beattoolsCurrentEasings.editorBeat.color[i].r.r, beattoolsCurrentEasings.editorBeat.color[i].g.g, beattoolsCurrentEasings.editorBeat.color[i].b.b)
-					log("[BT] Copied to clipboard: " .. hex)
-					love.system.setClipboardText(hex)
-					self.p:hurtPulse()
-				end
-				if imgui.IsItemClicked(2) then
-					self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
-				end
-
-				if mods.beattools.config.colorEasePreview then
-					if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-						if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
-							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
-							imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
-						end
-						if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
-							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
-							imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
-						end
-					end
-					if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
-						imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
-						imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
-					end
-					if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
-						imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
-						imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
-					end
-				end
-
-				imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 25, ColorButtonPos.y))
 			end
-			imgui.SameLine()
-			local additionalInfo = ""
-			if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
-				if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
-				additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
+			if mods.beattools.config.coordsDisplay then
+				imgui.TextUnformatted("X/Y: " .. helpers.round(mouse.rx) .. "/" ..  helpers.round(mouse.ry))
 			end
-			if beattoolsCurrentEasings.editorBeat.songNameOverride.newname then
-				if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
-				additionalInfo = additionalInfo ..  "Song Name (" .. beattoolsCurrentEasings.editorBeat.songNameOverride.newname .. ")"
+			if mods.beattools.config.editorMenu then
+				if utilitools.files.beattools.config then utilitools.files.beattools.config() end
+				if self.zoom then
+					if self.zoom < mods.beattools.config.zoomMin then self.zoom = mods.beattools.config.zoomMin end
+					if self.zoom > mods.beattools.config.zoomMax then self.zoom = mods.beattools.config.zoomMax end
+					self.drawDistance = mods.beattools.config.editorBeats
+					self.angleSnapValues = mods.beattools.config.angleSnapValues
+					self.beatSnapValues = mods.beattools.config.beatSnapValues
+				end
 			end
-			if additionalInfo ~= "" then
-				imgui.Text("[+]")
-				beattoolsConfigHelpers.Tooltip(nil, additionalInfo)
-			else
-				imgui.NewLine()
-			end
+
+			imgui.End()
 		end
-		if mods.beattools.config.coordsDisplay then
-			imgui.TextUnformatted("X/Y: " .. helpers.round(mouse.rx) .. "/" ..  helpers.round(mouse.ry))
-		end
-		if mods.beattools.config.editorMenu then
-			if beattoolsMenuCode then beattoolsMenuCode() end
-			if self.zoom then
-				if self.zoom < mods.beattools.config.zoomMin then self.zoom = mods.beattools.config.zoomMin end
-				if self.zoom > mods.beattools.config.zoomMax then self.zoom = mods.beattools.config.zoomMax end
-				self.drawDistance = mods.beattools.config.editorBeats
-				self.angleSnapValues = mods.beattools.config.angleSnapValues
-				self.beatSnapValues = mods.beattools.config.beatSnapValues
-			end
-		end
-
-		imgui.End()
+	end
+	if mods.beattools.config.imguiGuide then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		imgui.ShowDemoWindow()
+	end
+	if mods.beattools.config.editorCalculator then
+		if utilitools.files.beattools.test then utilitools.files.beattools.test() end
 	end
 end
-if mods.beattools.config.imguiGuide then
-	helpers.SetNextWindowPos(750, 420, window_flag)
-	helpers.SetNextWindowSize(200, 300, window_flag)
-	imgui.ShowDemoWindow()
-end
-if mods.beattools.config.editorCalculator then dofile("Mods/beattools/test.lua") end
 '''
 match_indent = true

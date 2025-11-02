@@ -1,0 +1,52 @@
+{
+	"short": "BT",
+	"dependencies": {
+		"utilitools": {
+			"reason": "Required API"
+		}
+	},
+	"incompatibilities": {
+		"event-stacking": {
+			"reason": "Part of this mod already"
+		},
+		"editor-shortcuts": {
+			"reason": "Part of this mod already"
+		},
+		"undo": {
+			"reason": "Part of this mod already"
+		},
+		"editor-alt-bookmark-fix": {
+			"reason": "Part of this mod already"
+		},
+		"editor-overhaul": {
+			"reason": "Old version before this mod got renamed"
+		},
+		"audible-ratemod": {
+			"reason": "Part of this mod already"
+		}
+	},
+	"files": {
+		"config": {
+			"extension": "lua",
+			"load": true,
+			"call": false
+		},
+		"test": {
+			"extension": "lua",
+			"load": true,
+			"call": false
+		},
+		"configOptions": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"documentation": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		}
+	},
+	"config": true,
+	"cullConfig": true
+}

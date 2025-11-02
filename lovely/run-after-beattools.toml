@@ -11,12 +11,6 @@ target = "states/Editor.lua"
 position = "prepend"
 sources = ["beattools.lua"]
 
-[[patches]]
-[patches.copy]
-target = "main.lua"
-position = "prepend"
-sources = ["pre-init.lua"]
-
 
 # Self fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -34,7 +28,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''(imgui.SameLine\(\)[\n\s]+)?helpers\.imguiHelpMarker'''
 position = "at"
-payload = '''tooltip'''
+payload = '''utilitools.imguiHelpers.tooltip'''
 
 [[patches]]
 [patches.regex]
@@ -510,7 +504,7 @@ position = "at"
 payload = '''
 local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 	if beattoolsLayer == nil then
-		log("[BT] Invalid call: beattoolsLayer is nil")
+		log(mods.beattools, "Invalid call: beattoolsLayer is nil")
 		return
 	else
 		local gameplay = Event.info[v.type].gameplayLayer
@@ -854,7 +848,7 @@ if mods.beattools.config.autoFixSides and v.type == "side" then
 	if after ~= prev then
 		v[v.endAngle and "endAngle" or "angle"] = after
 		if v.endAngle then
-			v.angle = v.angle + (after - before)
+			v.angle = v.angle + (after - prev)
 		end
 	end
 end

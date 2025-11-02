@@ -335,7 +335,7 @@ for _, v in ipairs(bounceSelection) do
 	if v[1] == self.overlappingEvents[1] then
 		self.bounceSelected = v[2]
 		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and (beattoolsTime - prevBounceSelectTime) / 60 <= 0.5 then
-			log("[BT] Double clicked bounce")
+			log(mods.beattools, "Double clicked bounce")
 			self.bounceSelectTime = -1
 		else
 			self.bounceSelectTime = beattoolsTime
@@ -623,7 +623,7 @@ if self.placeEvent ~= '' and string.match(self.placeEvent, "beattoolsEvent;") th
 		self.unsavedChanges = true
 		self:updateBiggestBeat()
 	else
-		log("[BT] Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
+		log(mods.beattools, "Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
 	end
 elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
 '''
@@ -1104,7 +1104,7 @@ local tempTime = cs.source:getBeat()
 -- cs.cBeat is the old one
 -- tempTime is the new one
 if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBeat + self:CHEATconvertToBeat(mods.beattools.config.lagThreshhold) <= tempTime then
-	log("LAG DETECTED!!!")
+	forceprint("LAG DETECTED!!!")
 	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
 	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
 	if cs.cBeat - tempTime >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click', soundObject = sounds['click']}) end
@@ -1252,7 +1252,7 @@ if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
 	self.gm:resetLevel()
 end
 if maininput:pressed("back") then
-	log(self.pauseBeat)
+	forceprint(self.pauseBeat)
 	self.pauseBeat = nil
 	self:stopLevel()
 '''
@@ -1351,7 +1351,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''self:leave()'''
 position = "before"
-payload = '''beattoolsSaveConfig()'''
+payload = '''utilitools.config.save(mods.beattools)'''
 match_indent = true
 
 

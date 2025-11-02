@@ -14,17 +14,8 @@ local success, result = pcall(function()
 		local saveToHistory = false
 		imgui.TextWrapped(mods.beattools.config.calculator.output)
 
-		local newInput = mods.beattools.config.calculator.input
-		local temp = 1
-		for w in string.gmatch(mods.beattools.config.calculator.input, "\n") do
-			temp = temp + 1
-		end
-		local size = imgui.ImVec2_Float(-1 ^ -9, imgui.GetFontSize() * temp + 6)
-
-		local buffer = ffi.new("char[?]", 9999)
-		ffi.copy(buffer, mods.beattools.config.calculator.input, #mods.beattools.config.calculator.input)
-		imgui.InputTextMultiline("##beattoolsCalculator", buffer, 9999, size)
-		newInput = ffi.string(buffer)
+		local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator",
+			mods.beattools.config.calculator.input, "", nil, nil, nil)
 
 		if imgui.BeginTabBar("beattoolsCalculator") then
 			if imgui.BeginTabItem("Number Pad##beattoolsCalculator") then
@@ -89,7 +80,7 @@ local success, result = pcall(function()
 			end
 			if imgui.BeginTabItem("Lua Syntax##beattoolsCalculator") then
 				imgui.TextWrapped(
-				"Newlines possible\n+ - * / ^ symbols\nmath.sin( / .cos( etc.\nmath.floor( / .ceil( etc.\nhelpers.round(")
+					"Newlines possible\n+ - * / ^ symbols\nmath.sin( / .cos( etc.\nmath.floor( / .ceil( etc.\nhelpers.round(")
 				imgui.EndTabItem("Lua Syntax##beattoolsCalculator")
 			end
 		end
@@ -121,5 +112,5 @@ local success, result = pcall(function()
 	end
 end)
 if not success then
-	log(result)
+	forceprint(result)
 end
