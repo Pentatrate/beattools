@@ -55,7 +55,6 @@ Features:
   Rounds time for all selected events to prevent float inaccuracy
 Hotkeys:
   Config Hotkeys
-  - "r" to reload the config in the editor
   - "f" to fold all tree nodes but the by default open ones
   During Playtest
   - "restart hotkey" to restart in editor playtest (to the position you started playtesting)

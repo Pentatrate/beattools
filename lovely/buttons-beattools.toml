@@ -25,7 +25,7 @@ target = "states/Editor.lua"
 pattern = '''end, 'delete selected event', 'delete')'''
 position = "after"
 payload = '''
--- reload config/record position
+-- record position
 self:addKeybind(function ()
 	if self.editMode then
 		if beattoolsRecordPosition and beattoolsRecordFunc then
@@ -33,11 +33,9 @@ self:addKeybind(function ()
 			beattoolsRecordPosition = false
 			beattoolsRecordFunc = nil
 			beattoolsRecordPrecision = 1
-		elseif mods.beattools.config.editorMenu then
-			utilitools.fileManager.loadAll(true)
 		end
 	end
-end, "reload config/record position", "r")
+end, "record position", "r")
 -- fold all config
 self:addKeybind(function ()
 	if self.editMode and mods.beattools.config.editorMenu then mods.beattools.config.foldAll = true end
@@ -67,7 +65,7 @@ self:addKeybind(function ()
 	if mods.beattools.config.untaggingHotkeys and maininput:down("ctrl") and (not maininput:down("shift")) then
 		if self.selectedEvent then
 			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, { self.selectedEvent.tag }) return end
-			utilitools.prompts.confirm.open("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+			utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
 				beattoolsUntag(self, { self.selectedEvent.tag })
 			end)
 		elseif self.multiselect then
@@ -76,7 +74,7 @@ self:addKeybind(function ()
 				if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
 			end
 			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, tempEvents) return end
-			utilitools.prompts.confirm.open("Continuing will untag all tags with the same name as those in the selection!", function ()
+			utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
 				beattoolsUntag(self, tempEvents)
 			end)
 		end
@@ -210,7 +208,7 @@ if mods.beattools.config.spreadButtons then
 		local function beattoolsSpread(snap, sameTime, snappedAngle, event)
 			if snappedAngle == nil then
 				if event == nil then
-					utilitools.prompts.error.open(mods.beattools, "Spread incorrect: snappedAngle is nil")
+					utilitools.prompts.error(mods.beattools, "Spread incorrect: snappedAngle is nil")
 					log(mods.beattools, "Spread incorrect: snappedAngle is nil")
 					snappedAngle = 0
 				else
@@ -359,7 +357,7 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and self.selectedEven
 		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
 	else self.selectedEvent.repeatDelay = nil end
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
-		utilitools.prompts.confirm.open("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
+		utilitools.prompts.confirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
 			beattoolsUpdateRepeat(self, self.selectedEvent, true)
 		end)
 	end
@@ -427,7 +425,7 @@ if self.selectedEvent and mods.beattools.config.untaggingButtons and self.select
 	end
 	imgui.SameLine()
 	if imgui.Button("Untag same tag name") then
-		utilitools.prompts.confirm.open("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+		utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
 			beattoolsUntag(self, { self.selectedEvent.tag })
 		end)
 	end
@@ -464,7 +462,7 @@ if mods.beattools.config.untaggingButtons then
 		for i, v in ipairs(self.multiselect.events) do
 			if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
 		end
-		utilitools.prompts.confirm.open("Continuing will untag all tags with the same name as those in the selection!", function ()
+		utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
 			beattoolsUntag(self, tempEvents)
 		end)
 	end

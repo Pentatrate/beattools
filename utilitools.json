@@ -2,6 +2,7 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
+			"versions": [[">=", "1.1.0"]],
 			"reason": "Required API"
 		}
 	},

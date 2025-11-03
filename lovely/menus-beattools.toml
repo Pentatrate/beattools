@@ -143,7 +143,7 @@ if mods.beattools.config.mouseCoordsButton then
 	utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
 	if pressed then
 		local tempFunc = function ()
-			utilitools.prompts.prompt.open("Choose axis", {
+			utilitools.prompts.buttons("Choose axis", {
 				{ "Both", function ()
 					beattoolsRecordPosition = true
 					beattoolsRecordFunc = function (x, y) event.x = x event.y = y end
@@ -158,7 +158,7 @@ if mods.beattools.config.mouseCoordsButton then
 				end }
 			})
 		end
-		utilitools.prompts.prompt.open("Choose precision", {
+		utilitools.prompts.buttons("Choose precision", {
 			{ "1px", function ()
 				beattoolsRecordPrecision = 1
 				tempFunc()
@@ -207,7 +207,7 @@ if mods.beattools.config.mouseCoordsButton and event.var ~= nil and (string.sub(
 			beattoolsRecordPosition = true
 			beattoolsRecordFunc = function (x, y) event.value = string.sub(event.var, -2, -1) == ".x" and x or y end
 		end
-		utilitools.prompts.prompt.open("Choose precision", {
+		utilitools.prompts.buttons("Choose precision", {
 			{ "1px", function ()
 				beattoolsRecordPrecision = 1
 				tempFunc()
@@ -591,7 +591,7 @@ if true then
 					local value = ffi.string(buffer)
 					if imgui.IsItemDeactivatedAfterEdit() and value and value ~= "" and value ~= "Add Custom Group" then
 						if self.level.properties.beattools.customEventGroups == nil then self.level.properties.beattools.customEventGroups = {} end
-						if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then utilitools.prompts.error.open(mods.beattools, "Group name already exists") else
+						if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then utilitools.prompts.error(mods.beattools, "Group name already exists") else
 							self.level.properties.beattools.customEventGroups[value] = {
 								events = { custom = true },
 								visibility = " - ",

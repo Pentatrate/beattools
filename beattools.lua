@@ -158,7 +158,7 @@ local beattoolsDefaultEasings = {
 for k, v in pairs(beattoolsAllEases) do
 	table --[[stop wrong injection]].insert(beattoolsAllEasesSorted, k)
 	if type(v) == "boolean" then
-        table --[[stop wrong injection]].insert(beattoolsOnlyBooleans, k)
+		table --[[stop wrong injection]].insert(beattoolsOnlyBooleans, k)
 	else
 		table --[[stop wrong injection]].insert(beattoolsOnlyEases, k)
 	end
@@ -875,7 +875,7 @@ end
 
 local function beattoolsUndo(self, type, group)
 	if (type == "undo" and beattoolsChangeIndex == 0) or (type == "redo" and beattoolsChangeIndex == #beattoolsChangeList) then
-		utilitools.prompts.error.open(mods.beattools, "Undo failed. End of history")
+		utilitools.prompts.error(mods.beattools, "Undo failed. End of history")
 		log(mods.beattools, "Undo failed. End of history")
 		return nil
 	end
@@ -935,7 +935,7 @@ local function beattoolsUndo(self, type, group)
 				helpers.copy(type == "undo" and beattoolsChangeList[beattoolsChangeIndex].eventsBefore or
 					beattoolsChangeList[beattoolsChangeIndex].eventsAfter)
 		else
-			utilitools.prompts.error.open(mods.beattools, "Undo failed. Unrecognized change type")
+			utilitools.prompts.error(mods.beattools, "Undo failed. Unrecognized change type")
 			log(mods.beattools, "Undo failed. Unrecognized change type")
 			return
 		end
@@ -1028,7 +1028,7 @@ local function beattoolsUntag(self, tags2)
 			return true
 		else
 			log(mods.beattools, "Untagging failed: Tag doesnt exist")
-			utilitools.prompts.error.open(mods.beattools, "Untagging failed: \"" .. tagName2 .. ".json\" doesnt exist")
+			utilitools.prompts.error(mods.beattools, "Untagging failed: \"" .. tagName2 .. ".json\" doesnt exist")
 			return false
 		end
 	end

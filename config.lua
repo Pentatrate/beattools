@@ -25,7 +25,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("imguiGuide")
 			if imgui.Button("Save Colors Permanently") then
 				local function fail()
-					utilitools.prompts.error.open(mod, "ImGui data detected, but it's invalid :skull:")
+					utilitools.prompts.error(mod, "ImGui data detected, but it's invalid :skull:")
 				end
 				local text = love.system.getClipboardText()
 				for w in string.gmatch(string.gsub(text, "colors%[", "?"), "[^?]+") do
@@ -58,13 +58,13 @@ if imgui.BeginTabBar("beattoolsConfig") then
 							log(mod, "Failed.")
 						end
 					elseif string.find(w, "ImVec4* colors = ImGui::GetStyle().Colors;", 1, true) == nil then
-						utilitools.prompts.error.open(mod,
+						utilitools.prompts.error(mod,
 							"You have to export your ImGui colors to your clipboard\n(which you didnt do apparently)")
 					end
 				end
 			end
 			if imgui.Button("Reset Colors") then
-				utilitools.prompts.confirm.open("You will reset your custom ImGui colors to default", function()
+				utilitools.prompts.confirm("You will reset your custom ImGui colors to default", function()
 					mods.beattools.config.imguiColors = nil
 					imgui.PopStyleColor(100)
 				end)
@@ -127,7 +127,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			imgui.EndDisabled()
 			imgui.Separator()
 			if imgui.Button("Scan Duplicates") then
-				utilitools.prompts.confirm.open(
+				utilitools.prompts.confirm(
 					"You will scan all custom levels for duplicate level folder names\nThe results will be printed in the console",
 					function()
 						local levels = {}

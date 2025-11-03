@@ -1,65 +1,51 @@
-STUFF TO DO:
+TODO:
 - better backup   -- Penta: +1 (multiple different types of backups to ensure nothing gets lost when the base game backup happens at a bad timing)
 
-- ease search bar
 - calculator
 - bundle multiple eases together
-- demo notif (rand working on it)
-- restart on acc?
 - different saves for different accessibility settings
-- level select non levels/folders
-- ease tooltips/descriptions (too much work)
+
 - imgui size problem
 - tooltipmarker replacing
+
+- default positions for imgui windows (too lazy)
 
 
 Utilitools:
 - imguihelpers: ease tooltips
-- keybinds
+- hold keybinds
 - time
+- suggest separate
+
+
+Later:
+- angles dial (spin over the limit)
+- - buttons for multiplying?
+- fake repeat copy paste bug???????????????????????????????????????? cannot recreate
+- ease tooltips/descriptions (too much work)
+
+
+Potential:
+- expand whitelist with new params   -- Penta: don wanna
+- lively cranky (not even possible anymore?) (kak)
+- auto update event groups?
+- demo notif (rand working on it)
+- restart on acc?
 
 
 Party Tricks:
-- swap color channels? (tags!!!)
-- gif in imgui (Are you sure? :skull:)
-
-
-EA FIX:
-- expand whitelist with new params   -- Penta: don wanna
-
-
-Low Priority:   -- Penta: very low priority, like in will get implemented next year, if at all
-- angles dial (spin over the limit)
-- - buttons for multiplying?
-- hold dragging customization
-- sfx for selecting events (more info required)
-- default positions for imgui windows (too lazy)
-- auto update event groups?
-- lively cranky (not even possible anymore?) (kak)
-- fake repeat copy paste bug???????????????????????????????????????? cannot recreate
-
-
-Potential:   -- Penta: i have no idea if i will even implement these features
-- maybe see original channel colors in channel preview
+- sfx (more info required)
 - better level duplicate scan + auto .redirect conversion + updates redirects with folder rename/move
-- move player in editor (i see no use)
-- overlap warning with ease durations (blue durations for eases with same var kinda cover this)
-- auto convert when fakeRepeat is off and event is selected (annoying to make)
-
-
 
 
 Penta:
 #d6b48a #071c72
-
 MOD THE RHYTHM AND NOTES
 A test of wit and know-how, & a series of challenging UI
 with the intent to enhance
-
 Kakadu:
 We won't let the devs take us for fools:
 this is clearly sponsored by Penta's Beattools.
-
 WhenPigFly:
 This collab is sponsored by Penta's Beattools. Have you ever been in need of things the editor just won't provide ? Well, with Penta's Beattools, many things, such as a particle generator, a bpm corrector, and many more become available to you !
 Click the download link in the description and use code "WHENP16FL7" to get 50% off on your first purchase !
