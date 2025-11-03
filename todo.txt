@@ -50,6 +50,8 @@ Potential:   -- Penta: i have no idea if i will even implement these features
 
 
 Penta:
+#d6b48a #071c72
+
 MOD THE RHYTHM AND NOTES
 A test of wit and know-how, & a series of challenging UI
 with the intent to enhance

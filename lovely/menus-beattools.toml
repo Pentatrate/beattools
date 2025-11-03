@@ -275,7 +275,7 @@ payload = '''
 function helpers.InputTextMultiline(label, text, size, size2)
 	if size2 ~= nil and string.sub(size2, 1, 3) == "max" then
 		local lines = 1
-		for _ in string.gmatch(current, "\n") do
+		for _ in string.gmatch(text, "\n") do
 			lines = lines + 1
 		end
 		size2 = imgui.ImVec2_Float(-imgui.GetFontSize() * 7 / 13 * imguiHelpers.visibleLabel(label) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 25 or 6), imgui.GetFontSize() * lines + 6)

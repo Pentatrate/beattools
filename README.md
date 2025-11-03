@@ -5,6 +5,8 @@ by Pentatrate (more contributors in full mod description)
 
 ## Info:
 
+Requires API Mod Utilitools by Pentatrate
+
 More up to date info about this mod can be found in the [beatblock modding discord server (click for invite)](https://discord.gg/VDvPUSCdGZ)
 It has a dedicated post named `Beattools` in the `ea-mods` forum
 
