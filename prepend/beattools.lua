@@ -87,10 +87,6 @@ local beattoolsKeysBlacklist = { -- Add your parameters here if you dont want ch
 	beattoolsRepeats = true
 }
 
-local function beattoolsRGB2Hex(r, g, b)
-	return string.format("%02X%02X%02X", r, g, b)
-end
-
 local beattoolsTime = 0
 local beattoolsEditorBeat = 0
 local beattoolsPrevEvents
@@ -121,12 +117,10 @@ local beattoolsLastSpriteChange = 0
 local beattoolsAllEases = dpf.loadJson("Mods/beattools/easeList/all.json")
 local beattoolsUselessEases = dpf.loadJson("Mods/beattools/easeList/apparentlyUseless.json")
 local beattoolsTrollEases = dpf.loadJson("Mods/beattools/easeList/trollEases.json")
-
 local beattoolsAllEasesSorted = {}
 local beattoolsEasesSelected = {}
 beattoolsOnlyEases = {}
 beattoolsOnlyBooleans = {}
-
 local beattoolsTrackEasables
 local beattoolsDefaultEasings = {
 	color = {
@@ -154,33 +148,7 @@ local beattoolsDefaultEasings = {
 	playerSprites = { spriteName = "" },
 	songNameOverride = { newname = nil }
 }
-
-for k, v in pairs(beattoolsAllEases) do
-	table --[[stop wrong injection]].insert(beattoolsAllEasesSorted, k)
-	if type(v) == "boolean" then
-		table --[[stop wrong injection]].insert(beattoolsOnlyBooleans, k)
-	else
-		table --[[stop wrong injection]].insert(beattoolsOnlyEases, k)
-	end
-	if v == "nil" then
-		v = nil
-	end
-	beattoolsDefaultEasings.ease[k] = { [type(v) == "boolean" and "enable" or "value"] = v }
-end
-
-table.sort(beattoolsAllEasesSorted, function(a, b)
-	if type(beattoolsAllEases[a]) ~= type(beattoolsAllEases[b]) then
-		if type(beattoolsAllEases[a]) == "number" then return true end
-		if type(beattoolsAllEases[b]) == "number" then return false end
-		return type(beattoolsAllEases[a]) == "boolean"
-	end
-	return a < b
-end)
-
 local beattoolsEasings = {}
-for k, v in pairs(beattoolsDefaultEasings) do
-	beattoolsEasings[k] = {}
-end
 local beattoolsCurrentEasings = {}
 local beattoolsEasingFor = {
 	color = ipairs,
@@ -191,6 +159,25 @@ local beattoolsEasingFor = {
 	songNameOverride = true
 }
 
+for k, v in pairs(beattoolsAllEases) do
+	table --[[stop wrong injection]].insert(beattoolsAllEasesSorted, k)
+	if type(v) == "boolean" then
+		table --[[stop wrong injection]].insert(beattoolsOnlyBooleans, k)
+	else
+		table --[[stop wrong injection]].insert(beattoolsOnlyEases, k)
+	end
+	if v == "nil" then v = nil end
+	beattoolsDefaultEasings.ease[k] = { [type(v) == "boolean" and "enable" or "value"] = v }
+end
+table.sort(beattoolsAllEasesSorted, function(a, b)
+	if type(beattoolsAllEases[a]) ~= type(beattoolsAllEases[b]) then
+		if type(beattoolsAllEases[a]) == "number" then return true end
+		if type(beattoolsAllEases[b]) == "number" then return false end
+		return type(beattoolsAllEases[a]) == "boolean"
+	end
+	return a < b
+end)
+for k, v in pairs(beattoolsDefaultEasings) do beattoolsEasings[k] = {} end
 if true then -- add easing
 	local function beattoolsAddEasing(type, v, i, params, sub, subsub, convert)
 		local value = { indexInLevel = i }
@@ -367,6 +354,8 @@ if true then -- add easing
 		end
 	}
 end
+
+local function beattoolsRGB2Hex(r, g, b) return string.format("%02X%02X%02X", r, g, b) end
 
 local function beattoolsRemoveParameters(self)
 	for k, v in pairs(self.level.events) do
@@ -738,67 +727,27 @@ local function beattoolsHasChanges(table1, table2, tableType, trackChanges, cont
 
 	return false
 end
-
-local function beattoolsFreeIndex(step)
-	step = step or 1
-	local i = 0
-	while beattoolsRepeatIndices[i] do
-		i = i + step
-	end
-	return i
-end
-
-local function beattoolsMoveIndex(self, event, newIndex, events)
-	if event.beattoolsRepeatIndex == nil then return end
-	events = events or self.level.events
-	newIndex = newIndex or beattoolsFreeIndex()
-	for i, v in ipairs(events) do
-		if v.beattoolsRepeats == event.beattoolsRepeatIndex then
-			v.beattoolsRepeats = newIndex
+local function beattoolsCheckEvents(self)
+	beattoolsLastCheck = beattoolsTime
+	if beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", false, "events") then
+		if beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events") and beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events", true, false, true) then
+			local temp = helpers.copy(self.level.events)
+			if beattoolsPrevEvents ~= nil then
+				log(mods.beattools,
+					"Bad sign: Undo was forced to save all events to history, not just changes, causing much lag")
+				beattoolsOverrideChanges()
+				table --[[stop wrong injection]].insert(beattoolsChangeList, {
+					action = "all",
+					time = beattoolsTime,
+					eventsBefore = helpers.copy(beattoolsPrevEvents),
+					eventsAfter = temp
+				})
+				beattoolsChangeIndex = #beattoolsChangeList
+			end
+			beattoolsPrevEvents = temp
 		end
 	end
-	beattoolsRepeatIndices[newIndex] = event
-	beattoolsRepeatIndices[event.beattoolsRepeatIndex] = nil
-	event.beattoolsRepeatIndex = newIndex
 end
-
-beattoolsRemoveRepeated = function(self, index, deleteIndex)
-	if not mods.beattools.config.fakeRepeat then return end
-	local i = 1
-	local tempEvents = {}
-	while i <= #self.level.events do
-		local v = self.level.events[i]
-		if v.beattoolsRepeats == index then
-			table --[[stop wrong injection]].insert(tempEvents,
-				{ event = helpers.copy(v), index = i - ((deleteIndex ~= nil and deleteIndex < i and 1) or 0) })
-			table --[[stop wrong injection]].remove(self.level.events, i)
-			table --[[stop wrong injection]].remove(beattoolsPrevEvents,
-				i - ((deleteIndex ~= nil and deleteIndex < i and 1) or 0))
-			if deleteIndex ~= nil and deleteIndex >= i then deleteIndex = deleteIndex - 1 end
-			i = i - 1
-		end
-		i = i + 1
-	end
-	if #tempEvents > 0 then
-		beattoolsOverrideChanges()
-		table --[[stop wrong injection]].insert(beattoolsChangeList, {
-			action = "delete",
-			time = beattoolsTime,
-			events = tempEvents
-		})
-		beattoolsChangeIndex = #beattoolsChangeList
-	end
-end
-
-beattoolsRepeatExists = function(self, index)
-	for i, v in ipairs(self.level.events) do
-		if v.beattoolsRepeatIndex == index then
-			return true
-		end
-	end
-	return false
-end
-
 local function beattoolsPlaceEvent(...)
 	local events, event = ...
 	if st ~= nil and events == st.level.events then
@@ -822,7 +771,6 @@ local function beattoolsPlaceEvent(...)
 	end
 	return true
 end
-
 local function beattoolsDeleteEvent(...)
 	local events, i = ...
 	if st ~= nil and events == st.level.events then
@@ -850,29 +798,6 @@ local function beattoolsDeleteEvent(...)
 		end
 	end
 end
-
-local function beattoolsCheckEvents(self)
-	beattoolsLastCheck = beattoolsTime
-	if beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", false, "events") then
-		if beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events") and beattoolsHasChanges(beattoolsPrevEvents, self.level.events, "array", true, "events", true, false, true) then
-			local temp = helpers.copy(self.level.events)
-			if beattoolsPrevEvents ~= nil then
-				log(mods.beattools,
-					"Bad sign: Undo was forced to save all events to history, not just changes, causing much lag")
-				beattoolsOverrideChanges()
-				table --[[stop wrong injection]].insert(beattoolsChangeList, {
-					action = "all",
-					time = beattoolsTime,
-					eventsBefore = helpers.copy(beattoolsPrevEvents),
-					eventsAfter = temp
-				})
-				beattoolsChangeIndex = #beattoolsChangeList
-			end
-			beattoolsPrevEvents = temp
-		end
-	end
-end
-
 local function beattoolsUndo(self, type, group)
 	if (type == "undo" and beattoolsChangeIndex == 0) or (type == "redo" and beattoolsChangeIndex == #beattoolsChangeList) then
 		utilitools.prompts.error(mods.beattools, "Undo failed. End of history")
@@ -949,6 +874,62 @@ local function beattoolsUndo(self, type, group)
 	self:updateBiggestBeat()
 end
 
+local function beattoolsFreeIndex(step)
+	step = step or 1
+	local i = 0
+	while beattoolsRepeatIndices[i] do
+		i = i + step
+	end
+	return i
+end
+local function beattoolsMoveIndex(self, event, newIndex, events)
+	if event.beattoolsRepeatIndex == nil then return end
+	events = events or self.level.events
+	newIndex = newIndex or beattoolsFreeIndex()
+	for i, v in ipairs(events) do
+		if v.beattoolsRepeats == event.beattoolsRepeatIndex then
+			v.beattoolsRepeats = newIndex
+		end
+	end
+	beattoolsRepeatIndices[newIndex] = event
+	beattoolsRepeatIndices[event.beattoolsRepeatIndex] = nil
+	event.beattoolsRepeatIndex = newIndex
+end
+beattoolsRemoveRepeated = function(self, index, deleteIndex)
+	if not mods.beattools.config.fakeRepeat then return end
+	local i = 1
+	local tempEvents = {}
+	while i <= #self.level.events do
+		local v = self.level.events[i]
+		if v.beattoolsRepeats == index then
+			table --[[stop wrong injection]].insert(tempEvents,
+				{ event = helpers.copy(v), index = i - ((deleteIndex ~= nil and deleteIndex < i and 1) or 0) })
+			table --[[stop wrong injection]].remove(self.level.events, i)
+			table --[[stop wrong injection]].remove(beattoolsPrevEvents,
+				i - ((deleteIndex ~= nil and deleteIndex < i and 1) or 0))
+			if deleteIndex ~= nil and deleteIndex >= i then deleteIndex = deleteIndex - 1 end
+			i = i - 1
+		end
+		i = i + 1
+	end
+	if #tempEvents > 0 then
+		beattoolsOverrideChanges()
+		table --[[stop wrong injection]].insert(beattoolsChangeList, {
+			action = "delete",
+			time = beattoolsTime,
+			events = tempEvents
+		})
+		beattoolsChangeIndex = #beattoolsChangeList
+	end
+end
+beattoolsRepeatExists = function(self, index)
+	for i, v in ipairs(self.level.events) do
+		if v.beattoolsRepeatIndex == index then
+			return true
+		end
+	end
+	return false
+end
 beattoolsUpdateRepeat = function(self, event, irreversible)
 	if (not mods.beattools.config.fakeRepeat) and (not irreversible) then return end
 	if event.beattoolsRepeatIndex == nil then
@@ -1007,6 +988,28 @@ beattoolsUpdateRepeat = function(self, event, irreversible)
 		end
 	else
 		event.beattoolsRepeatIndex = nil
+	end
+end
+local function beattoolsCheckForRepeatUpdate(self, event, key, value)
+	beattoolsOverrideChanges()
+	table --[[stop wrong injection]].insert(beattoolsChangeList, {
+		action = "change",
+		time = beattoolsTime,
+		changes = {
+			{
+				index = beattoolsGetEventIndex(self, event),
+				changes = {
+					{ key = key, valueBefore = event[key], valueAfter = value }
+				}
+			}
+		}
+	})
+	beattoolsChangeIndex = #beattoolsChangeList
+	beattoolsPrevEvents[beattoolsGetEventIndex(self, event)][key] = value
+	if mods.beattools.config.fakeRepeat and event.type ~= "ease" and event.beattoolsRepeatIndex ~= nil then
+		local temp = helpers.copy(event)
+		temp[key] = value
+		beattoolsUpdateRepeat(self, temp)
 	end
 end
 
@@ -1122,29 +1125,6 @@ local function moveMultiselection(self, time, angle)
 	self:updateBiggestBeat()
 end
 
-local function beattoolsCheckForRepeatUpdate(self, event, key, value)
-	beattoolsOverrideChanges()
-	table --[[stop wrong injection]].insert(beattoolsChangeList, {
-		action = "change",
-		time = beattoolsTime,
-		changes = {
-			{
-				index = beattoolsGetEventIndex(self, event),
-				changes = {
-					{ key = key, valueBefore = event[key], valueAfter = value }
-				}
-			}
-		}
-	})
-	beattoolsChangeIndex = #beattoolsChangeList
-	beattoolsPrevEvents[beattoolsGetEventIndex(self, event)][key] = value
-	if mods.beattools.config.fakeRepeat and event.type ~= "ease" and event.beattoolsRepeatIndex ~= nil then
-		local temp = helpers.copy(event)
-		temp[key] = value
-		beattoolsUpdateRepeat(self, temp)
-	end
-end
-
 local function beattoolsSameEasing(event, selected)
 	if not (mods.beattools.config.markSameEasing and selected and event ~= selected and event.type == selected.type) then return false end
 	local paramForType = { ease = "var", setColor = "color", deco = "id" }
@@ -1157,7 +1137,6 @@ local beattoolsEventIndices = {}
 local beattoolsHighestEventGroupIndex = -1
 local beattoolsEventGroupLongest = 0
 local beattoolsEventVisibilities = {}
-
 local function beattoolsUpdateEventGroups()
 	if st then
 		st.selectedEvent = nil
@@ -1214,7 +1193,6 @@ local function beattoolsUpdateEventGroups()
 		beattoolsEventGroups[i].subindex = i
 	end ]]
 end
-
 local function beattoolsMakeSpace(index, reverse)
 	if type(reverse) ~= "number" then reverse = reverse and -1 or 1 end
 	for k, v in pairs(st.level.properties.beattools.eventGroups) do
@@ -1230,7 +1208,6 @@ local function beattoolsMakeSpace(index, reverse)
 		end
 	end
 end
-
 local function beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
 	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
@@ -1313,7 +1290,6 @@ local function beattoolsCtrlSelect(event)
 		end
 	end
 end
-
 if mods.beattools.config.imguiColors then
 	for k, v in pairs(mods.beattools.config.imguiColors) do
 		imgui.PushStyleColor_Vec4(imgui[k], imgui.ImVec4_Float(v[1], v[2], v[3], v[4]))

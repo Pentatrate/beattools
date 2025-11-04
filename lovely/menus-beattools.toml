@@ -24,9 +24,7 @@ match_indent = true
 target = "obj/GameManager.lua"
 pattern = '''cs.songOffset = 0'''
 position = "before"
-payload = '''
-self.CHEATlagBack = 0
-'''
+payload = '''self.CHEATlagBack = 0'''
 match_indent = true
 
 [[patches]]
@@ -34,9 +32,7 @@ match_indent = true
 target = "states/Game.lua"
 pattern = '''cs.levelinfo = self.levelinfo'''
 position = "after"
-payload = '''
-cs.CHEATlagBack = self.gm.CHEATlagBack
-'''
+payload = '''cs.CHEATlagBack = self.gm.CHEATlagBack'''
 match_indent = true
 
 [[patches]]
@@ -49,9 +45,7 @@ pattern = '''if 	savedata.options.accessibility.taps ~= 'default' or
 	self.paused == true
 then'''
 position = "at"
-payload = '''
-if self.CHEATlagBack ~= 0 or savedata.options.accessibility.vfx ~= 'full' or savedata.options.accessibility.taps ~= 'default' or savedata.options.accessibility.sides ~= 'default' or self.paused then
-'''
+payload = '''if self.CHEATlagBack ~= 0 or savedata.options.accessibility.vfx ~= 'full' or savedata.options.accessibility.taps ~= 'default' or savedata.options.accessibility.sides ~= 'default' or self.paused then'''
 match_indent = true
 
 [[patches]]
@@ -59,9 +53,7 @@ match_indent = true
 target = "states/Results.lua"
 pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
 position = "before"
-payload = '''
-self.CHEATlagBack ~= 0 or
-'''
+payload = '''self.CHEATlagBack ~= 0 or'''
 match_indent = true
 
 [[patches]]
@@ -74,33 +66,6 @@ if self.CHEATlagBack ~= 0 then
 	if str ~= '' then str = str .. ', ' end
 	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
 end
-'''
-match_indent = true
-
-
-# Incompatibilities and config defaults ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-target = "main.lua"
-pattern = '''cs = bs.load(project.initState)'''
-position = "after"
-payload = '''
---if true then -- Beattools incompatibilities
---	-- Penta: config defaults
---	if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
---	local modifiedConfig = ""
---	for k, v in pairs(beattoolsOptions) do
---		if mods.beattools.config[k] == nil then
---			mods.beattools.config[k] = v.default
---			modifiedConfig = modifiedConfig .. (modifiedConfig == "" and "" or ",") .. " \"" .. v.name .. "\""
---		end
---	end
---	if modifiedConfig ~= "" then
---		log(mods.beattools, "Couldn't find configs for " .. modifiedConfig .. ". Resetting to default")
---		mods.beattools.configRenderer = nil
---		dpf.saveJson("Mods/beattools/mod.json", mods.beattools)
---	end
---end
 '''
 match_indent = true
 
@@ -249,9 +214,7 @@ match_indent = true
 target = "obj/GameManager.lua"
 pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
 position = "at"
-payload = '''
-if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then
-'''
+payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
 match_indent = true
 
 
@@ -261,9 +224,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''9999)'''
 position = "at"
-payload = '''
-9999, mods.beattools.config.fullSize and "max" or nil)
-'''
+payload = '''9999, mods.beattools.config.fullSize and "max" or nil)'''
 match_indent = true
 
 [[patches]]
@@ -278,7 +239,10 @@ function helpers.InputTextMultiline(label, text, size, size2)
 		for _ in string.gmatch(text, "\n") do
 			lines = lines + 1
 		end
-		size2 = imgui.ImVec2_Float(-imgui.GetFontSize() * 7 / 13 * imguiHelpers.visibleLabel(label) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 25 or 6), imgui.GetFontSize() * lines + 6)
+		size2 = imgui.ImVec2_Float(
+			utilitools.imguiHelpers.getWidth(label) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 29 or 0),
+			imgui.GetFontSize() * lines + 6
+		)
 	end
 '''
 match_indent = true
@@ -288,9 +252,7 @@ match_indent = true
 target = "lib/imguihelper.lua"
 pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
 position = "at"
-payload = '''
-imgui.InputTextMultiline(label, buffer, size, size2)
-'''
+payload = '''imgui.InputTextMultiline(label, buffer, size, size2)'''
 match_indent = true
 
 
@@ -302,7 +264,7 @@ pattern = '''local enabled = true'''
 position = "after"
 payload = '''
 local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or imguiUniqueName
-local length = -imgui.GetFontSize() * 7 / 13 * string.len(string.sub(imguiUniqueName, 1, -(string.find(string.reverse(imguiUniqueName), "##") or -1) - 2)) - ((not mods.beattools.config.hideHelpMarkers) and 25 or 0)
+local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
 '''
 match_indent = true
 
@@ -372,18 +334,14 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = \'\' ?\}'''
 position = "at"
-payload = '''
-self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }
-'''
+payload = '''self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }'''
 
 [[patches]]
 [patches.pattern]
 target = "obj/LevelManager.lua"
 pattern = '''charter = 'Charter','''
 position = "at"
-payload = '''
-charter = mods.beattools.config.charter,
-'''
+payload = '''charter = mods.beattools.config.charter,'''
 match_indent = true
 
 
@@ -509,7 +467,7 @@ match_indent = true
 target = "levelformat/events/Vfx/setBoolean.lua"
 pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
 position = "after"
-payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyEases)'''
+payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyBooleans)'''
 match_indent = true
 
 
@@ -529,8 +487,7 @@ if true then
 			if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
 			if beattoolsHighestEventGroupIndex == -1 then
 				if self.level.properties.beattools.eventGroups == nil then
-					if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-					self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.configOptions.eventGroups.default)
 				end
 				beattoolsUpdateEventGroups()
 			end
@@ -559,8 +516,7 @@ if true then
 					if self.level.properties.beattools.customEventGroups then
 						beattoolsMakeSpace(1, 3)
 					end
-					if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
-					self.level.properties.beattools.eventGroups = helpers.copy(beattoolsOptions.eventGroups.default)
+					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.configOptions.eventGroups.default)
 					beattoolsUpdateEventGroups()
 					if self.level.properties.beattools.customEventGroups then
 						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
@@ -718,7 +674,6 @@ if true then
 		helpers.SetNextWindowSize(200, 300, window_flag)
 		if imgui.Begin("Ease List") then
 			if imgui.TreeNode_Str("Filters") then
-				if beattoolsOptions == nil then beattoolsOptions = dofile("Mods/beattools/configOptions.lua") end
 				configHelpers.input("easeListUse")
 				configHelpers.input("easeListUsed")
 				configHelpers.input("easeListSerious")

@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = -1000000000
+priority = -2147483643 # -2147483647 + 4
 
 
 # Honestly dont know what this was for anymore, i think its for the faster event scrolling? ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -49,7 +49,5 @@ match_indent = true
 target = "states/SongSelect.lua"
 pattern = '''self.innerOptionsMenu:addOption('back', function() self.inOptionsMenu = false end, ySpacing * 7)'''
 position = "before"
-payload = '''
-self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)
-'''
+payload = '''self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)'''
 match_indent = true

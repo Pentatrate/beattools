@@ -425,9 +425,7 @@ match_indent = true
 target = "levelformat/events/Notes/block.lua"
 pattern = '''local function editorDraw(event)'''
 position = "at"
-payload = '''
-local function editorDraw(event, a, b, alpha)
-'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -435,9 +433,7 @@ match_indent = true
 target = "levelformat/events/Notes/block.lua"
 pattern = '''local note = Block:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 [[patches]]
@@ -445,9 +441,7 @@ match_indent = true
 target = "obj/notes/Block.lua"
 pattern = '''color()'''
 position = "after"
-payload = '''
-love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
-'''
+payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
 match_indent = true
 
 # Inverse
@@ -456,9 +450,7 @@ match_indent = true
 target = "levelformat/events/Notes/inverse.lua"
 pattern = '''local function editorDraw(event)'''
 position = "at"
-payload = '''
-local function editorDraw(event, a, b, alpha)
-'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -466,9 +458,7 @@ match_indent = true
 target = "levelformat/events/Notes/inverse.lua"
 pattern = '''local note = Block:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 # Side
@@ -477,9 +467,7 @@ match_indent = true
 target = "levelformat/events/Notes/side.lua"
 pattern = '''local function editorDraw(event)'''
 position = "at"
-payload = '''
-local function editorDraw(event, a, b, alpha)
-'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -487,9 +475,7 @@ match_indent = true
 target = "levelformat/events/Notes/side.lua"
 pattern = '''local note = Side:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 [[patches]]
@@ -497,9 +483,7 @@ match_indent = true
 target = "obj/notes/Side.lua"
 pattern = '''color()'''
 position = "after"
-payload = '''
-love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
-'''
+payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
 match_indent = true
 
 # Mine
@@ -508,9 +492,7 @@ match_indent = true
 target = "levelformat/events/Notes/mine.lua"
 pattern = '''local function editorDraw(event)'''
 position = "at"
-payload = '''
-local function editorDraw(event, a, b, alpha)
-'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -518,9 +500,7 @@ match_indent = true
 target = "levelformat/events/Notes/mine.lua"
 pattern = '''local note = Mine:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 # Hold
@@ -529,9 +509,7 @@ match_indent = true
 target = "levelformat/events/Notes/hold.lua"
 pattern = '''local function editorDraw(event, beat, endBeat)'''
 position = "at"
-payload = '''
-local function editorDraw(event, beat, endBeat, alpha)
-'''
+payload = '''local function editorDraw(event, beat, endBeat, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -539,9 +517,7 @@ match_indent = true
 target = "levelformat/events/Notes/hold.lua"
 pattern = '''local hold = Hold:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 [[patches]]
@@ -549,9 +525,7 @@ match_indent = true
 target = "obj/notes/Hold.lua"
 pattern = '''color()'''
 position = "after"
-payload = '''
-love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)
-'''
+payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
 match_indent = true
 
 [[patches]]
@@ -559,9 +533,7 @@ match_indent = true
 target = "obj/notes/Hold.lua"
 pattern = '''color('black')'''
 position = "after"
-payload = '''
-love.graphics.setColor(0, 0, 0, self.beattoolsAlpha or 1)
-'''
+payload = '''love.graphics.setColor(0, 0, 0, self.beattoolsAlpha or 1)'''
 match_indent = true
 
 # Minehold
@@ -570,9 +542,7 @@ match_indent = true
 target = "levelformat/events/Notes/mineHold.lua"
 pattern = '''local function editorDraw(event, beat, endBeat)'''
 position = "at"
-payload = '''
-local function editorDraw(event, beat, endBeat, alpha)
-'''
+payload = '''local function editorDraw(event, beat, endBeat, alpha)'''
 match_indent = true
 
 [[patches]]
@@ -580,9 +550,7 @@ match_indent = true
 target = "levelformat/events/Notes/mineHold.lua"
 pattern = '''local hold = MineHold:new({'''
 position = "after"
-payload = '''
-	beattoolsAlpha = alpha,
-'''
+payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
 
 
@@ -590,9 +558,7 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''
-if self.placeEvent ~= '' and Event.info[self.placeEvent] then
-'''
+pattern = '''if self.placeEvent ~= '' and Event.info[self.placeEvent] then'''
 position = "at"
 payload = '''
 if self.placeEvent ~= '' and string.match(self.placeEvent, "beattoolsEvent;") then
@@ -1001,9 +967,7 @@ match_indent = true
 target = "obj/LevelManager.lua"
 pattern = '''level.metadata.bpm = loc.get('bpm',{level.metadata.bpm})'''
 position = "before"
-payload = '''
-level.metadata.rawBpm = level.metadata.bpm
-'''
+payload = '''level.metadata.rawBpm = level.metadata.bpm'''
 match_indent = true
 
 [[patches]]
@@ -1072,9 +1036,7 @@ match_indent = true
 target = "obj/GameManager.lua"
 pattern = '''function GameManager:resetLevel()'''
 position = "after"
-payload = '''
-	self.CHEATmaxBeat = nil
-'''
+payload = '''	self.CHEATmaxBeat = nil'''
 match_indent = true
 
 [[patches]]
@@ -1140,9 +1102,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''if changed then'''
 position = "at"
-payload = '''
-if (function () for k, v in pairs(changed) do return true end return false end)() then
-'''
+payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
 match_indent = true
 
 [[patches]]
@@ -1150,9 +1110,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''if first[k] ~= v then'''
 position = "at"
-payload = '''
-if tostring(first[k]) ~= tostring(v) then
-'''
+payload = '''if tostring(first[k]) ~= tostring(v) then'''
 match_indent = true
 
 
@@ -1265,9 +1223,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to activate on', { step = beatStep })'''
 position = "before"
-payload = '''
-local beattoolsTemp1 = self.selectedEvent.endAngle
-'''
+payload = '''local beattoolsTemp1 = self.selectedEvent.endAngle'''
 match_indent = true
 
 

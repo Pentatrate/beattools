@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = 1000000000
+priority = 2147483643 # 2147483647 - 4
 
 
 # Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -9,7 +9,7 @@ priority = 1000000000
 [patches.copy]
 target = "states/Editor.lua"
 position = "prepend"
-sources = ["beattools.lua"]
+sources = ["prepend/beattools.lua"]
 
 
 # Self fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -35,28 +35,28 @@ payload = '''utilitools.imguiHelpers.tooltip'''
 target = "states/Editor.lua"
 pattern = '''(?:bgData|(?:self\.(?:level\.(?:metadata|properties)|variant?)))\.\w+ = helpers\.Input(?:Text|Int|Float)\((?<label>['"][\w\s#]+['"])'''
 position = "before"
-payload = '''if mods.beattools.config.fullSize then imgui.SetNextItemWidth(-imgui.GetFontSize() * 7 / 13 * string.len( $label ) --[[Penta's RegEx Marker]]) end '''
+payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
 
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
 pattern = '''bgData\.\w+Channel\.r, bgData\.\w+Channel\.g, bgData\.\w+Channel\.b = helpers\.imguiColor\((?:[\n\s\t]*)?(?<label>['"]\w+ channel['"])'''
 position = "before"
-payload = '''if mods.beattools.config.fullSize then imgui.SetNextItemWidth(-imgui.GetFontSize() * 7 / 13 * string.len( $label ) --[[Penta's RegEx Marker]]) end '''
+payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
 
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
-pattern = '''##float(?<keep>\w+['"] \) --\[\[Penta's RegEx Marker\]\])'''
+pattern = '''##float(?<keep>\w+['"] --\[\[Penta's RegEx Marker\]\])'''
 position = "at"
-payload = ''' $keep'''
+payload = '''$keep'''
 
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
-pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) \) --\[\[Penta's RegEx Marker\]\]'''
+pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) --\[\[Penta's RegEx Marker\]\]'''
 position = "at"
-payload = '''$keep ) - ((not mods.beattools.config.hideHelpMarkers) and 25 or 0)'''
+payload = '''$keep , not mods.beattools.config.hideHelpMarkers'''
 
 
 # Update self ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -756,9 +756,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''self:drawEvent({type = eventType, angle = angle, time = time, isCursor = true},alpha)'''
 position = "at"
-payload = '''
-self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected")
-'''
+payload = '''self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected")'''
 match_indent = true
 
 
@@ -939,9 +937,7 @@ if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) th
 target = "states/Editor.lua"
 pattern = '''if maininput:pressed("move_up") then'''
 position = "before"
-payload = '''
-self:updateBiggestBeat()
-'''
+payload = '''self:updateBiggestBeat()'''
 match_indent = true
 
 [[patches]]
@@ -949,9 +945,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''if maininput:pressed("move_down") then'''
 position = "before"
-payload = '''
-self:updateBiggestBeat()
-'''
+payload = '''self:updateBiggestBeat()'''
 match_indent = true
 
 [[patches]]
@@ -970,9 +964,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''self.selectedEvent.time = self.cursorBeat'''
 position = "after"
-payload = '''
-if beattoolsTemp then self:updateBiggestBeat() end
-'''
+payload = '''if beattoolsTemp then self:updateBiggestBeat() end'''
 match_indent = true
 
 
@@ -1078,9 +1070,7 @@ end
 target = "states/Editor.lua"
 pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
 position = "at"
-payload = '''
-love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)
-'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)'''
 match_indent = true
 
 [[patches]]
@@ -1088,9 +1078,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''color('black')'''
 position = "at"
-payload = '''
-love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)
-'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)'''
 match_indent = true
 
 [[patches]]
@@ -1098,9 +1086,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''color()'''
 position = "at"
-payload = '''
-love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
-'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 match_indent = true
 
 [[patches]]
@@ -1108,7 +1094,5 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''color('white')'''
 position = "at"
-payload = '''
-love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
-'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 match_indent = true
