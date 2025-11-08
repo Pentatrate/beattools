@@ -10,12 +10,15 @@ TODO:
 
 - default positions for imgui windows (too lazy)
 
+- angle dial configs
+
 
 Utilitools:
 - imguihelpers: ease tooltips
 - hold keybinds
 - time
 - suggest separate
+- fold all
 
 
 Later:

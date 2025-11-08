@@ -459,7 +459,7 @@ match_indent = true
 target = "levelformat/events/Vfx/ease.lua"
 pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
 position = "after"
-payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyEases)'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyEases)'''
 match_indent = true
 
 [[patches]]
@@ -467,7 +467,7 @@ match_indent = true
 target = "levelformat/events/Vfx/setBoolean.lua"
 pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
 position = "after"
-payload = '''event.var = utilitools.suggest.run(event.var, beattoolsOnlyBooleans)'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyBooleans)'''
 match_indent = true
 
 
@@ -487,7 +487,7 @@ if true then
 			if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
 			if beattoolsHighestEventGroupIndex == -1 then
 				if self.level.properties.beattools.eventGroups == nil then
-					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.configOptions.eventGroups.default)
+					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
 				end
 				beattoolsUpdateEventGroups()
 			end
@@ -516,7 +516,7 @@ if true then
 					if self.level.properties.beattools.customEventGroups then
 						beattoolsMakeSpace(1, 3)
 					end
-					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.configOptions.eventGroups.default)
+					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
 					beattoolsUpdateEventGroups()
 					if self.level.properties.beattools.customEventGroups then
 						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
@@ -1025,7 +1025,7 @@ if true then
 		imgui.ShowDemoWindow()
 	end
 	if mods.beattools.config.editorCalculator then
-		if utilitools.files.beattools.test then utilitools.files.beattools.test() end
+		if utilitools.files.beattools.calculator then utilitools.files.beattools.calculator() end
 	end
 end
 '''

@@ -2,7 +2,7 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.1.1"]],
+			"versions": [[">=", "1.1.3"]],
 			"reason": "Required API"
 		}
 	},
@@ -29,13 +29,11 @@
 	"files": {
 		"config": {
 			"extension": "lua",
-			"load": true,
-			"call": false
+			"load": true
 		},
-		"test": {
+		"calculator": {
 			"extension": "lua",
-			"load": true,
-			"call": false
+			"load": true
 		},
 		"configOptions": {
 			"extension": "lua",

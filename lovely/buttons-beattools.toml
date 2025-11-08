@@ -526,3 +526,109 @@ self.multiselect.events = {}'''
 position = "at"
 payload = ''''''
 match_indent = true
+
+
+# Angle dials ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''imgui.Begin("Event Editor")'''
+position = "after"
+payload = '''beattoolsAngleSnap = self.angleSnap ~= 0 and self:getAngleSnapValue() or 360'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''Event.property(self.selectedEvent, 'decimal', 'angle', 'Angle to activate at', { step = angleStep })'''
+position = "after"
+payload = '''self.selectedEvent.angle = utilitools.suggest.dial(self.selectedEvent.angle, "selectedEventAngle", beattoolsAngleSnap)'''
+match_indent = true
+
+# End angle
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/block.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/inverse.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mine.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/mineHold.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/side.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/bounce.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at for initial approach', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+match_indent = true
+
+# Bounce
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/bounce.lua"
+pattern = '''Event.property(event,'decimal', 'rotation', 'Rotation between bounces', {step = cs:getAngleStep(), default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.rotation = utilitools.suggest.dial(self.selectedEvent.rotation, "selectedEventRotation", beattoolsAngleSnap)'''
+match_indent = true
+
+# Hold
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the hold', {step = cs:getAngleStep(), default = event.angle})'''
+position = "after"
+payload = '''self.selectedEvent.angle2 = utilitools.suggest.dial(self.selectedEvent.angle2, "selectedEventAngle2", beattoolsAngleSnap)'''
+match_indent = true
+
+# Minehold
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the hold', {step = cs:getAngleStep(), default = event.angle})'''
+position = "after"
+payload = '''self.selectedEvent.angle2 = utilitools.suggest.dial(self.selectedEvent.angle2, "selectedEventAngle2", beattoolsAngleSnap)'''
+match_indent = true
+
+# Deco
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Notes/hold.lua"
+pattern = '''Event.property(event,'decimal','r', 'Rotation', {step = angleStep, optional = true, default = 0})'''
+position = "after"
+payload = '''self.selectedEvent.r = utilitools.suggest.dial(self.selectedEvent.r, "selectedEventR", beattoolsAngleSnap)'''
+match_indent = true

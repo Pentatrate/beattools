@@ -92,6 +92,7 @@ local beattoolsEditorBeat = 0
 local beattoolsPrevEvents
 local beattoolsSelect
 local beattoolsPrevSelect
+beattoolsAngleSnap = 4
 
 local beattoolsOverlap = {}       -- event stacking
 
@@ -146,7 +147,45 @@ local beattoolsDefaultEasings = {
 	},
 	bookmarks = { name = "Start", description = "", r = 0, g = 0, b = 0, time = -1e9, order = 1e9, start = true },
 	playerSprites = { spriteName = "" },
-	songNameOverride = { newname = nil }
+	songNameOverride = { newname = nil },
+	decos = { }
+}
+local decoDefault = {
+	["sprite"] = "",
+	["parentid"] = "",
+	["rotationinfluence"] = 1,
+	["orbit"] = false,
+	["x"] = 300,
+	["y"] = 180,
+	["r"] = 0,
+	["sx"] = 1,
+	["sy"] = 1,
+	["ox"] = 0,
+	["oy"] = 0,
+	["kx"] = 0,
+	["ky"] = 0,
+	["mirror"] = "none",
+	["exclusiveMirror"] = false,
+	["drawLayer"] = "fg",
+	["drawOrder"] = 0,
+	["recolor"] = -1,
+	["outline"] = false,
+	["hide"] = false,
+	["tiling"] = false,
+	["uvx"] = 0,
+	["uvy"] = 0,
+	["uvdx"] = 0,
+	["uvdy"] = 0,
+	["alphadither"] = false,
+	["ditherpercent"] = 1,
+	["effectCanvas"] = false,
+	["effectCanvasType"] = "recolor",
+	["effectCanvasRaw"] = false,
+	["ecRecolorR"] = 255,
+	["ecRecolorG"] = 255,
+	["ecRecolorB"] = 255,
+	["ecRecolorA"] = 255
+
 }
 local beattoolsEasings = {}
 local beattoolsCurrentEasings = {}
@@ -156,7 +195,8 @@ local beattoolsEasingFor = {
 	paddles = { ipairs, pairs },
 	bookmarks = true,
 	playerSprites = true,
-	songNameOverride = true
+	songNameOverride = true,
+	decos = { pairs, pairs }
 }
 
 for k, v in pairs(beattoolsAllEases) do
@@ -351,7 +391,57 @@ if true then -- add easing
 			if v.newname ~= nil then
 				beattoolsAddEasing("songNameOverride", v, i, { "newname" })
 			end
-		end
+		end,
+		deco = function(v, i)
+			if v.id ~= nil then
+				for k, _ in pairs(v) do
+					local easable = {
+						["rotationinfluence"] = true,
+						["x"] = true,
+						["y"] = true,
+						["r"] = true,
+						["sx"] = true,
+						["sy"] = true,
+						["ox"] = true,
+						["oy"] = true,
+						["kx"] = true,
+						["ky"] = true,
+						["uvx"] = true,
+						["uvy"] = true,
+						["uvdx"] = true,
+						["uvdy"] = true,
+						["ditherpercent"] = true,
+						["ecRecolorR"] = true,
+						["ecRecolorG"] = true,
+						["ecRecolorB"] = true,
+						["ecRecolorA"] = true
+					}
+					local nonEasable = {
+						["sprite"] = true,
+						["parentid"] = true,
+						["orbit"] = true,
+						["mirror"] = true,
+						["exclusiveMirror"] = true,
+						["drawLayer"] = true,
+						["drawOrder"] = true,
+						["recolor"] = true,
+						["outline"] = true,
+						["hide"] = true,
+						["tiling"] = true,
+						["alphadither"] = true,
+						["effectCanvas"] = true,
+						["effectCanvasType"] = true,
+						["effectCanvasRaw"] = true
+					}
+					if easable[k] then
+						beattoolsAddEasing("decos", v, i, { k, "duration", "ease" }, v.id, k)
+					end
+					if nonEasable[k] then
+						beattoolsAddEasing("decos", v, i, { k }, v.id, k)
+					end
+				end
+			end
+		end,
 	}
 end
 
@@ -374,7 +464,26 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 	if beattoolsCurrentEasings[time2] == nil then
 		beattoolsCurrentEasings[time2] = {}
 	end
+	if type2 == "decos" then
+		beattoolsCurrentEased = { [subsub] = decoDefault[subsub]}
+	else
+		if sub then
+			if subsub then
+				if beattoolsDefaultEasings[type2][sub] == nil then
+					beattoolsDefaultEasings[type2][sub] = {}
+				end
+				beattoolsCurrentEased = beattoolsDefaultEasings[type2][sub][subsub]
+			else
+				beattoolsCurrentEased = beattoolsDefaultEasings[type2][sub]
+			end
+		else
+			beattoolsCurrentEased = beattoolsDefaultEasings[type2]
+		end
+	end
 	if sub then
+		if beattoolsEasings[type2] == nil then
+			beattoolsEasings[type2] = {}
+		end
 		if beattoolsCurrentEasings[time2][type2] == nil then
 			beattoolsCurrentEasings[time2][type2] = {}
 		end
@@ -382,23 +491,17 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 			if beattoolsEasings[type2][sub] == nil then
 				beattoolsEasings[type2][sub] = {}
 			end
-			if beattoolsDefaultEasings[type2][sub] == nil then
-				beattoolsDefaultEasings[type2][sub] = {}
-			end
 			if beattoolsCurrentEasings[time2][type2][sub] == nil then
 				beattoolsCurrentEasings[time2][type2][sub] = {}
 			end
 			easingArray = beattoolsEasings[type2][sub][subsub]
-			beattoolsCurrentEased = beattoolsDefaultEasings[type2][sub][subsub]
 			beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2][sub][subsub])
 		else
 			easingArray = beattoolsEasings[type2][sub]
-			beattoolsCurrentEased = beattoolsDefaultEasings[type2][sub]
 			beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2][sub])
 		end
 	else
 		easingArray = beattoolsEasings[type2]
-		beattoolsCurrentEased = beattoolsDefaultEasings[type2]
 		beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2])
 	end
 
