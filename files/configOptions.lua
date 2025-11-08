@@ -897,6 +897,13 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		default = "",
 		off = ""
 	},
+	angleDials = {
+		type = "bool",
+		name = "Angle dials",
+		tooltips = { short = "Dial buttons to edit angles easier" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

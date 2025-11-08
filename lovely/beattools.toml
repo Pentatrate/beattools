@@ -4,6 +4,20 @@ dump_lua = true
 priority = 0
 
 
+# Utilitools requirement ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''cs = bs.load(project.initState)'''
+position = "after"
+payload = '''
+if mods.utilitools == nil then
+	error("Beattools requires utilitools. Please install that mod.")
+end
+'''
+match_indent = true
+
+
 # Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

@@ -345,6 +345,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.input("untaggingButtons")
 				configHelpers.input("spreadButtons")
 				configHelpers.input("mouseCoordsButton")
+				configHelpers.input("angleDials")
 			end)
 			configHelpers.treeNode("Hotkeys", function()
 				configHelpers.doc("editor_features_hotkeys")

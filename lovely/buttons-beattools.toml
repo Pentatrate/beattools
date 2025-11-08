@@ -528,6 +528,123 @@ payload = ''''''
 match_indent = true
 
 
+# Coordinate copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/deco.lua"
+pattern = '''Event.property(event,'decimal','y', 'Y position', {step = 1, optional = true, default = project.res.cy})'''
+position = "after"
+payload = '''
+if mods.beattools.config.mouseCoordsButton then
+	local pressed = imgui.Button("Use Mouse")
+	utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
+	if pressed then
+		local tempFunc = function ()
+			utilitools.prompts.buttons("Choose axis", {
+				{ "Both", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.x = x event.y = y end
+				end },
+				{ "X", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.x = x end
+				end },
+				{ "Y", function ()
+					beattoolsRecordPosition = true
+					beattoolsRecordFunc = function (x, y) event.y = y end
+				end }
+			})
+		end
+		utilitools.prompts.buttons("Choose precision", {
+			{ "1px", function ()
+				beattoolsRecordPrecision = 1
+				tempFunc()
+			end },
+			{ "5px", function ()
+				beattoolsRecordPrecision = 5
+				tempFunc()
+			end },
+			{ "10px", function ()
+				beattoolsRecordPrecision = 10
+				tempFunc()
+			end },
+			{ "30px", function ()
+				beattoolsRecordPrecision = 30
+				tempFunc()
+			end },
+			{ "60px", function ()
+				beattoolsRecordPrecision = 60
+				tempFunc()
+			end },
+			{ "90px", function ()
+				beattoolsRecordPrecision = 90
+				tempFunc()
+			end },
+			{ "100px", function ()
+				beattoolsRecordPrecision = 100
+				tempFunc()
+			end }
+		})
+	end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/ease.lua"
+pattern = '''Event.property(event,'decimal', 'value', 'Ending value', {step = 0.01, default = 0})'''
+position = "after"
+payload = '''
+if event.var ~= nil then
+	local split = utilitools.string.split(event.var, "%.")
+	if mods.beattools.config.angleDials and string.sub(event.var, -2, -1) == ".r" or ({ ["vfx.angleTwist.offset"] = true })[event.var] or (#split > 0 and (string.find(split[#split]:lower(), "angle", nil, true) or string.find(split[#split]:lower(), "rotate", nil, true))) then
+		event.value = utilitools.suggest.dial(event.value, "selectedEventValue", beattoolsAngleSnap)
+	elseif mods.beattools.config.mouseCoordsButton and (string.sub(event.var, -2, -1) == ".x" or string.sub(event.var, -2, -1) == ".y") then
+		local pressed = imgui.Button("Use Mouse")
+		utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
+		if pressed then
+			local tempFunc = function ()
+				beattoolsRecordPosition = true
+				beattoolsRecordFunc = function (x, y) event.value = string.sub(event.var, -2, -1) == ".x" and x or y end
+			end
+			utilitools.prompts.buttons("Choose precision", {
+				{ "1px", function ()
+					beattoolsRecordPrecision = 1
+					tempFunc()
+				end },
+				{ "5px", function ()
+					beattoolsRecordPrecision = 5
+					tempFunc()
+				end },
+				{ "10px", function ()
+					beattoolsRecordPrecision = 10
+					tempFunc()
+				end },
+				{ "30px", function ()
+					beattoolsRecordPrecision = 30
+					tempFunc()
+				end },
+				{ "60px", function ()
+					beattoolsRecordPrecision = 60
+					tempFunc()
+				end },
+				{ "90px", function ()
+					beattoolsRecordPrecision = 90
+					tempFunc()
+				end },
+				{ "100px", function ()
+					beattoolsRecordPrecision = 100
+					tempFunc()
+				end }
+			})
+		end
+	end
+end
+'''
+match_indent = true
+
+
 # Angle dials ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -542,7 +659,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''Event.property(self.selectedEvent, 'decimal', 'angle', 'Angle to activate at', { step = angleStep })'''
 position = "after"
-payload = '''self.selectedEvent.angle = utilitools.suggest.dial(self.selectedEvent.angle, "selectedEventAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials then self.selectedEvent.angle = utilitools.suggest.dial(self.selectedEvent.angle, "selectedEventAngle", beattoolsAngleSnap) end'''
 match_indent = true
 
 # End angle
@@ -551,50 +668,49 @@ match_indent = true
 target = "levelformat/events/Notes/block.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/hold.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/inverse.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/mine.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/mineHold.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/side.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
-
 [[patches]]
 [patches.pattern]
 target = "levelformat/events/Notes/bounce.lua"
 pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at for initial approach', {step = cs:getAngleStep(), optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.endAngle = utilitools.suggest.dial(self.selectedEvent.endAngle, "selectedEventEndAngle", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
 
 # Bounce
@@ -603,7 +719,7 @@ match_indent = true
 target = "levelformat/events/Notes/bounce.lua"
 pattern = '''Event.property(event,'decimal', 'rotation', 'Rotation between bounces', {step = cs:getAngleStep(), default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.rotation = utilitools.suggest.dial(self.selectedEvent.rotation, "selectedEventRotation", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials then event.rotation = utilitools.suggest.dial(event.rotation, "selectedEventRotation", beattoolsAngleSnap) end'''
 match_indent = true
 
 # Hold
@@ -612,7 +728,7 @@ match_indent = true
 target = "levelformat/events/Notes/hold.lua"
 pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the hold', {step = cs:getAngleStep(), default = event.angle})'''
 position = "after"
-payload = '''self.selectedEvent.angle2 = utilitools.suggest.dial(self.selectedEvent.angle2, "selectedEventAngle2", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials then event.angle2 = utilitools.suggest.dial(event.angle2, "selectedEventAngle2", beattoolsAngleSnap) end'''
 match_indent = true
 
 # Minehold
@@ -621,14 +737,55 @@ match_indent = true
 target = "levelformat/events/Notes/hold.lua"
 pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the hold', {step = cs:getAngleStep(), default = event.angle})'''
 position = "after"
-payload = '''self.selectedEvent.angle2 = utilitools.suggest.dial(self.selectedEvent.angle2, "selectedEventAngle2", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials then event.angle2 = utilitools.suggest.dial(event.angle2, "selectedEventAngle2", beattoolsAngleSnap) end'''
 match_indent = true
 
 # Deco
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/hold.lua"
+target = "levelformat/events/Vfx/deco.lua"
 pattern = '''Event.property(event,'decimal','r', 'Rotation', {step = angleStep, optional = true, default = 0})'''
 position = "after"
-payload = '''self.selectedEvent.r = utilitools.suggest.dial(self.selectedEvent.r, "selectedEventR", beattoolsAngleSnap)'''
+payload = '''if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattoolsAngleSnap) end'''
+match_indent = true
+
+# Paddles
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Gameplay/paddles.lua"
+pattern = '''Event.property(event,'int', 'newWidth', 'New width to ease to', {default = 70, optional=true})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and event.newWidth then event.newWidth = utilitools.suggest.dial(event.newWidth, "selectedEventNewWidth", beattoolsAngleSnap) end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Gameplay/paddles.lua"
+pattern = '''Event.property(event,'int', 'newAngle', 'New angle to ease to', {default = 0, optional=true})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and event.newAngle then event.newAngle = utilitools.suggest.dial(event.newAngle, "selectedEventNewAngle", beattoolsAngleSnap) end'''
+match_indent = true
+
+# Ease sequence
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/easeSequence.lua"
+pattern = '''Event.property(v,'decimal', 'startValue', 'Starting value', {step = 0.01, optional = true, default = 0, uniqueName = 'startValue'..i})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and v.startValue and v.variable == "angle" then v.startValue = utilitools.suggest.dial(v.startValue, "selectedEventStartValue", beattoolsAngleSnap) end'''
+match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/easeSequence.lua"
+pattern = '''Event.property(v,'decimal', 'endValue', 'Ending value', {step = 0.01, default = 0, uniqueName = 'endValue'..i})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and v.variable == "angle" then v.endValue = utilitools.suggest.dial(v.endValue, "selectedEventEndValue", beattoolsAngleSnap) end'''
+match_indent = true
+
+# Text deco
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Vfx/textdeco.lua"
+pattern = '''Event.property(event,'decimal', 'r', 'Text rotation', {step = 1, optional = true, default = 0})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattoolsAngleSnap) end'''
 match_indent = true
