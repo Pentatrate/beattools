@@ -1,51 +1,1368 @@
-{"author":"Pentatrate","description":"Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.","version":"3.1.0","enabled":true,"config":{"customWhiteColor":{"b":1,"r":1,"g":1}
-,"customBlackColor":{"b":0,"r":0,"g":0}
-,"spreadSnap":32,"displayEndAngle":true,"bounceDragging":true,"levelSelectMultiplyBpm":true,"charter":"Me","bounceDoubleClick":true,"easeList":true,"easeListUse":false,"easeListUsed":true,"scanMargin":64,"easeListSelectChanged":true,"autoFixSides":false,"currentSprite":true,"livelyCranky":true,"bookmarkList":true,"colorPreview":true,"coordsDisplay":false,"zoomMin":2,"zoomMax":120,"scrollPast":1,"menuMusicInEditor":true,"angleDials":true,"dragThreshhold":5,"xOffset":4,"yOffset":4,"colorEasePreview":true,"imguiGuide":false,"editorCalculator":true,"scanInterval":0.1,"restartInPlaytest":true,"markSameEasing":true,"shortenParams":false,"keysWhiteList":{"angle":"ang","tag":true,"pitch":"ptch","variableName":"var","effectCanvas":"fxCanv","recolor":"col","x":true,"y":true,"duration":"dur","sx":true,"ease":true,"offset":"off","tickRate":"tickR","chance":true,"outline":"outl","intensity":"inten","segments":"seg","sound":true,"traceEase":"trEase","endAngle":"endAng","spinEase":"spEase","speedMult":"spdMlt","delay":true,"angleOffset":"angOff","a":true,"start":true,"r":true,"value":"val","name":true,"block":"blk","paddles":"pdls","ox":true,"oy":true,"kx":true,"ky":true,"mine":true,"newWidth":"nWidth","newAngle":"nAngle","sprite":"spr","description":"desc","side":true,"enabled":"on","order":"ord","id":true,"time":true,"miss":true,"mineHold":"mineH","volume":"vol","startTap":"stTap","parentid":"par","drawLayer":"dLayer","var":true,"enable":"on","rotationinfluence":"rotInf","b":true,"paddle":"pdl","sy":true,"doDithering":"dither","reps":true,"g":true,"file":true,"angle2":"ang2","repeats":"rep","bpm":true,"drawOrder":"dOrd","effectCanvasRaw":"fxCanvR","orbit":true,"hide":true,"repeatDelay":"delay","type":true,"objectName":"obj","color":"col","voidColor":"void","tap":true,"spriteName":"sprName","endTap":true,"holdEase":"ease"}
-,"hideHelpMarkers":true,"eventGroups":{"all":{"events":{"setBoolean":true,"outline":true,"deco":true,"playSound":true,"hom":true,"toggleParticles":true,"showResults":true,"block":true,"setColor":true,"paddles":true,"bookmark":true,"ease":true,"extraTap":true,"setBgColor":true,"noise":true,"play":true,"mineHold":true,"mine":true,"forcePlayerSprite":true,"side":true,"setBPM":true,"hold":true,"tag":true,"inverse":true}
-,"index":0,"name":"all","visibility":"show"}
-,"color":{"events":{"hom":true,"outline":true,"setBgColor":true,"noise":true,"setColor":true}
-,"index":2,"name":"color","visibility":" - "}
-,"deco":{"events":{"deco":true}
-,"index":3,"name":"deco","visibility":" - "}
-,"tags":{"events":{"tag":true}
-,"index":3,"name":"tags","visibility":" - "}
-,"eases":{"events":{"setBoolean":true,"ease":true}
-,"index":3,"name":"eases","visibility":" - "}
-,"bookmarks":{"events":{"bookmark":true}
-,"index":3,"name":"bookmarks","visibility":" - "}
-,"visuals":{"events":{"setBoolean":true,"outline":true,"deco":true,"setBgColor":true,"noise":true,"hom":true,"toggleParticles":true,"forcePlayerSprite":true,"ease":true,"setColor":true}
-,"index":1,"name":"visuals","visibility":" - "}
-,"gameplay":{"events":{"mineHold":true,"hold":true,"paddles":true,"side":true,"extraTap":true,"block":true,"mine":true,"inverse":true}
-,"index":1,"name":"gameplay","visibility":" - "}
-,"song":{"events":{"setBPM":true,"play":true,"playSound":true,"showResults":true}
-,"index":1,"name":"song","visibility":" - "}
+{
+	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
+	"enabled": true,
+	"config": {
+		"livelyCranky": true,
+		"showParam": "order",
+		"shadow": true,
+		"speedScrolling": true,
+		"randomizeWindows": "off",
+		"markEndAnglePosition": "on",
+		"scrollPast": 1,
+		"durationSelectedColor": {
+			"r": 1,
+			"g": 0,
+			"b": 0,
+			"a": 0.5
+		},
+		"showDuration": "on",
+		"durationSameEasingColor": {
+			"r": 0,
+			"g": 0,
+			"b": 1,
+			"a": 0.5
+		},
+		"durationColor": {
+			"r": 0,
+			"g": 1,
+			"b": 0,
+			"a": 0.5
+		},
+		"dragThreshhold": 5,
+		"sillyNisenenGimmick": true,
+		"markRepeat": "on",
+		"editorBgColor": {
+			"r": 0,
+			"g": 0,
+			"b": 0
+		},
+		"menuMusicInEditor": true,
+		"groupTimeDifference": 0.5,
+		"editorBlackColor": {
+			"r": 0.24705882370472,
+			"g": 0.24705882370472,
+			"b": 0.24705882370472
+		},
+		"accBar": true,
+		"customWhiteColor": {
+			"r": 0,
+			"g": 0,
+			"b": 0
+		},
+		"customBlackColor": {
+			"r": 0.74901962280273,
+			"g": 0.74901962280273,
+			"b": 0.74901962280273
+		},
+		"whiteSelected": "cut corners",
+		"selectNoneInPalette": true,
+		"scanInterval": 0.10000000149012,
+		"documentation": "none",
+		"ignoreUntagPrompt": true,
+		"beatSnapValues_temp": "1, 2, 4, 8, 16",
+		"keysWhiteList": {
+			"description": "desc",
+			"enabled": "on",
+			"outline": "outl",
+			"sprite": "spr",
+			"tag": true,
+			"chance": true,
+			"a": true,
+			"drawLayer": "dLayer",
+			"parentid": "par",
+			"rotationinfluence": "rotInf",
+			"repeats": "rep",
+			"repeatDelay": "delay",
+			"block": "blk",
+			"angleOffset": "angOff",
+			"var": true,
+			"paddle": "pdl",
+			"drawOrder": "dOrd",
+			"effectCanvasRaw": "fxCanvR",
+			"orbit": true,
+			"variableName": "var",
+			"pitch": "ptch",
+			"side": true,
+			"tap": true,
+			"miss": true,
+			"y": true,
+			"bpm": true,
+			"hide": true,
+			"paddles": "pdls",
+			"objectName": "obj",
+			"g": true,
+			"order": "ord",
+			"newWidth": "nWidth",
+			"newAngle": "nAngle",
+			"spriteName": "sprName",
+			"sound": true,
+			"ox": true,
+			"oy": true,
+			"kx": true,
+			"file": true,
+			"segments": "seg",
+			"holdEase": "ease",
+			"traceEase": "trEase",
+			"endAngle": "endAng",
+			"spinEase": "spEase",
+			"speedMult": "spdMlt",
+			"doDithering": "dither",
+			"recolor": "col",
+			"effectCanvas": "fxCanv",
+			"time": true,
+			"r": true,
+			"mineHold": "mineH",
+			"reps": true,
+			"endTap": true,
+			"startTap": "stTap",
+			"type": true,
+			"sx": true,
+			"delay": true,
+			"x": true,
+			"name": true,
+			"angle": "ang",
+			"enable": "on",
+			"b": true,
+			"mine": true,
+			"offset": "off",
+			"intensity": "inten",
+			"value": "val",
+			"volume": "vol",
+			"duration": "dur",
+			"tickRate": "tickR",
+			"ease": true,
+			"angle2": "ang2",
+			"voidColor": "void",
+			"sy": true,
+			"start": true,
+			"id": true,
+			"color": "col",
+			"ky": true
+		},
+		"tooltips": "long",
+		"accBarColors": "auto",
+		"selectAll": true,
+		"levelSelectMultiplyBpm": true,
+		"jumpEvents": true,
+		"customLevelVisuals": true,
+		"inputSize": 150,
+		"accBarWidth": 4,
+		"undoHotkeys": true,
+		"accBarSide": "left",
+		"accBarReverse": true,
+		"betterUntagging": true,
+		"alpha": 0.5,
+		"markSameEasing": true,
+		"calculator": {
+			"notCalculation": false,
+			"output": "258280326",
+			"input": "6*9^8 1111",
+			"history": [
+				{
+					"output": "1111",
+					"input": "1111"
+				},
+				{
+					"output": "11111",
+					"input": "11111"
+				},
+				{
+					"output": "0.33333333333333",
+					"input": "1/3"
+				},
+				{
+					"output": "12.414764591323",
+					"input": "8*9^0.2"
+				},
+				{
+					"output": "72",
+					"input": "8*9"
+				}
+			]
+		},
+		"imguiStyles": {
+			"default": {
+				"vars": {
+					"FrameBorderSize": 0,
+					"ItemSpacing": [
+						8,
+						4
+					],
+					"ItemInnerSpacing": [
+						4,
+						4
+					],
+					"CellPadding": [
+						4,
+						2
+					],
+					"IndentSpacing": 21,
+					"ScrollbarSize": 14,
+					"ScrollbarRounding": 9,
+					"GrabMinSize": 12,
+					"GrabRounding": 0,
+					"TabRounding": 4,
+					"TabBorderSize": 0,
+					"TabBarBorderSize": 1,
+					"TabBarOverlineSize": 2,
+					"TableAngledHeadersAngle": 0.61086523532867,
+					"TableAngledHeadersTextAlign": [
+						0.5,
+						0
+					],
+					"ButtonTextAlign": [
+						0.5,
+						0.5
+					],
+					"SelectableTextAlign": [
+						0,
+						0
+					],
+					"SeparatorTextBorderSize": 3,
+					"SeparatorTextAlign": [
+						0,
+						0.5
+					],
+					"SeparatorTextPadding": [
+						20,
+						3
+					],
+					"DockingSeparatorSize": 2,
+					"Alpha": 1,
+					"DisabledAlpha": 0.60000002384186,
+					"WindowPadding": [
+						8,
+						8
+					],
+					"WindowRounding": 0,
+					"WindowBorderSize": 1,
+					"WindowMinSize": [
+						32,
+						32
+					],
+					"WindowTitleAlign": [
+						0,
+						0.5
+					],
+					"ChildRounding": 0,
+					"ChildBorderSize": 1,
+					"PopupRounding": 0,
+					"PopupBorderSize": 1,
+					"FramePadding": [
+						4,
+						3
+					],
+					"FrameRounding": 0
+				},
+				"name": "default"
+			},
+			"glass": {
+				"name": "glass",
+				"colors": {
+					"28": [
+						0.10000000149012,
+						0.40000000596046,
+						0.75,
+						0.77999997138977
+					],
+					"56": [
+						0.80000001192093,
+						0.80000001192093,
+						0.80000001192093,
+						0.20000000298023
+					],
+					"44": [
+						0.89999997615814,
+						0.69999998807907,
+						0,
+						1
+					],
+					"41": [
+						0.20000000298023,
+						0.20000000298023,
+						0.20000000298023,
+						1
+					],
+					"37": [
+						0.068000003695488,
+						0.10199998319149,
+						0.14800003170967,
+						0.97240000963211
+					],
+					"47": [
+						0.31000000238419,
+						0.31000000238419,
+						0.34999999403954,
+						1
+					],
+					"10": [
+						0.03999999910593,
+						0.03999999910593,
+						0.03999999910593,
+						1
+					],
+					"50": [
+						1,
+						1,
+						1,
+						0.059999998658895
+					],
+					"53": [
+						1,
+						1,
+						0,
+						0.89999997615814
+					],
+					"1": [
+						0.5,
+						0.5,
+						0.5,
+						1
+					],
+					"29": [
+						0.10000000149012,
+						0.40000000596046,
+						0.75,
+						1
+					],
+					"43": [
+						1,
+						0.43000000715256,
+						0.34999999403954,
+						1
+					],
+					"27": [
+						0.43000000715256,
+						0.43000000715256,
+						0.5,
+						0.5
+					],
+					"40": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.69999998807907
+					],
+					"18": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"48": [
+						0.23000000417233,
+						0.23000000417233,
+						0.25,
+						1
+					],
+					"54": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"23": [
+						0.059999998658895,
+						0.52999997138977,
+						0.98000001907349,
+						1
+					],
+					"2": [
+						0.059999998658895,
+						0.059999998658895,
+						0.059999998658895,
+						0.25
+					],
+					"3": [
+						0,
+						0,
+						0,
+						0
+					],
+					"45": [
+						1,
+						0.60000002384186,
+						0,
+						1
+					],
+					"51": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"17": [
+						0.50999999046326,
+						0.50999999046326,
+						0.50999999046326,
+						1
+					],
+					"7": [
+						0.15999999642372,
+						0.28999999165535,
+						0.47999998927116,
+						0.54000002145767
+					],
+					"19": [
+						0.23999999463558,
+						0.51999998092651,
+						0.87999999523163,
+						1
+					],
+					"9": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.6700000166893
+					],
+					"5": [
+						0.43000000715256,
+						0.43000000715256,
+						0.5,
+						0.5
+					],
+					"30": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.20000000298023
+					],
+					"0": [
+						1,
+						1,
+						1,
+						1
+					],
+					"42": [
+						0.61000001430511,
+						0.61000001430511,
+						0.61000001430511,
+						1
+					],
+					"26": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"4": [
+						0.079999998211861,
+						0.079999998211861,
+						0.079999998211861,
+						0.93999999761581
+					],
+					"36": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"13": [
+						0.14000000059605,
+						0.14000000059605,
+						0.14000000059605,
+						1
+					],
+					"16": [
+						0.40999999642372,
+						0.40999999642372,
+						0.40999999642372,
+						1
+					],
+					"49": [
+						0,
+						0,
+						0,
+						0
+					],
+					"52": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.34999999403954
+					],
+					"22": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"33": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.80000001192093
+					],
+					"24": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.31000000238419
+					],
+					"31": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.6700000166893
+					],
+					"20": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"34": [
+						0.1799999922514,
+						0.34999996423721,
+						0.58000004291534,
+						0.86199998855591
+					],
+					"21": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.40000000596046
+					],
+					"14": [
+						0.019999999552965,
+						0.019999999552965,
+						0.019999999552965,
+						0.52999997138977
+					],
+					"12": [
+						0,
+						0,
+						0,
+						0.50999999046326
+					],
+					"6": [
+						0,
+						0,
+						0,
+						0
+					],
+					"46": [
+						0.18999999761581,
+						0.18999999761581,
+						0.20000000298023,
+						1
+					],
+					"35": [
+						0.19999998807907,
+						0.4099999666214,
+						0.68000000715256,
+						1
+					],
+					"11": [
+						0.15999999642372,
+						0.28999999165535,
+						0.47999998927116,
+						1
+					],
+					"39": [
+						0.5,
+						0.5,
+						0.5,
+						1
+					],
+					"38": [
+						0.13599997758865,
+						0.26199996471405,
+						0.42399999499321,
+						1
+					],
+					"8": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.40000000596046
+					],
+					"25": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.80000001192093
+					],
+					"15": [
+						0.31000000238419,
+						0.31000000238419,
+						0.31000000238419,
+						1
+					],
+					"32": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.94999998807907
+					],
+					"57": [
+						0.80000001192093,
+						0.80000001192093,
+						0.80000001192093,
+						0.34999999403954
+					],
+					"55": [
+						1,
+						1,
+						1,
+						0.69999998807907
+					]
+				},
+				"vars": {
+					"FrameBorderSize": 0,
+					"ItemSpacing": [
+						8,
+						4
+					],
+					"ItemInnerSpacing": [
+						4,
+						4
+					],
+					"CellPadding": [
+						4,
+						2
+					],
+					"IndentSpacing": 21,
+					"ScrollbarSize": 14,
+					"ScrollbarRounding": 9,
+					"GrabMinSize": 12,
+					"GrabRounding": 0,
+					"TabRounding": 4,
+					"TabBorderSize": 0,
+					"TabBarBorderSize": 1,
+					"TabBarOverlineSize": 2,
+					"TableAngledHeadersAngle": 0.61086529493332,
+					"TableAngledHeadersTextAlign": [
+						0.5,
+						0
+					],
+					"ButtonTextAlign": [
+						0.5,
+						0.5
+					],
+					"SelectableTextAlign": [
+						0,
+						0
+					],
+					"SeparatorTextBorderSize": 3,
+					"SeparatorTextAlign": [
+						0,
+						0.5
+					],
+					"SeparatorTextPadding": [
+						20,
+						3
+					],
+					"DockingSeparatorSize": 2,
+					"Alpha": 1,
+					"DisabledAlpha": 0.60000002384186,
+					"WindowPadding": [
+						8,
+						8
+					],
+					"WindowRounding": 0,
+					"WindowBorderSize": 1,
+					"WindowMinSize": [
+						32,
+						32
+					],
+					"WindowTitleAlign": [
+						0,
+						0.5
+					],
+					"ChildRounding": 0,
+					"ChildBorderSize": 1,
+					"PopupRounding": 0,
+					"PopupBorderSize": 1,
+					"FramePadding": [
+						4,
+						3
+					],
+					"FrameRounding": 0
+				}
+			},
+			"round glass": {
+				"name": "round glass",
+				"colors": {
+					"28": [
+						0.10000000149012,
+						0.40000000596046,
+						0.75,
+						0.77999997138977
+					],
+					"56": [
+						0.80000001192093,
+						0.80000001192093,
+						0.80000001192093,
+						0.20000000298023
+					],
+					"44": [
+						0.89999997615814,
+						0.69999998807907,
+						0,
+						1
+					],
+					"41": [
+						0.20000000298023,
+						0.20000000298023,
+						0.20000000298023,
+						1
+					],
+					"37": [
+						0.068000003695488,
+						0.10199998319149,
+						0.14800003170967,
+						0.97240000963211
+					],
+					"47": [
+						0.31000000238419,
+						0.31000000238419,
+						0.34999999403954,
+						1
+					],
+					"10": [
+						0.03999999910593,
+						0.03999999910593,
+						0.03999999910593,
+						1
+					],
+					"50": [
+						1,
+						1,
+						1,
+						0.059999998658895
+					],
+					"53": [
+						1,
+						1,
+						0,
+						0.89999997615814
+					],
+					"1": [
+						0.5,
+						0.5,
+						0.5,
+						1
+					],
+					"29": [
+						0.10000000149012,
+						0.40000000596046,
+						0.75,
+						1
+					],
+					"43": [
+						1,
+						0.43000000715256,
+						0.34999999403954,
+						1
+					],
+					"27": [
+						0.43000000715256,
+						0.43000000715256,
+						0.5,
+						0.5
+					],
+					"40": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.69999998807907
+					],
+					"18": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"48": [
+						0.23000000417233,
+						0.23000000417233,
+						0.25,
+						1
+					],
+					"54": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"23": [
+						0.059999998658895,
+						0.52999997138977,
+						0.98000001907349,
+						1
+					],
+					"2": [
+						0.058823529630899,
+						0.058823529630899,
+						0.058823529630899,
+						0.50196081399918
+					],
+					"3": [
+						0,
+						0,
+						0,
+						0
+					],
+					"45": [
+						1,
+						0.60000002384186,
+						0,
+						1
+					],
+					"51": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"17": [
+						0.50999999046326,
+						0.50999999046326,
+						0.50999999046326,
+						1
+					],
+					"7": [
+						0.15999999642372,
+						0.28999999165535,
+						0.47999998927116,
+						0.54000002145767
+					],
+					"19": [
+						0.23899999260902,
+						0.52200001478195,
+						0.87800002098083,
+						1
+					],
+					"9": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.6700000166893
+					],
+					"5": [
+						0.43000000715256,
+						0.43000000715256,
+						0.5,
+						0.5
+					],
+					"30": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.20000000298023
+					],
+					"0": [
+						1,
+						1,
+						1,
+						1
+					],
+					"42": [
+						0.61000001430511,
+						0.61000001430511,
+						0.61000001430511,
+						1
+					],
+					"26": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"4": [
+						0.079999998211861,
+						0.079999998211861,
+						0.079999998211861,
+						0.93999999761581
+					],
+					"36": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"13": [
+						0.14000000059605,
+						0.14000000059605,
+						0.14000000059605,
+						1
+					],
+					"16": [
+						0.40999999642372,
+						0.40999999642372,
+						0.40999999642372,
+						1
+					],
+					"49": [
+						0,
+						0,
+						0,
+						0
+					],
+					"52": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.34999999403954
+					],
+					"22": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						1
+					],
+					"33": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.80000001192093
+					],
+					"24": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.31000000238419
+					],
+					"31": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.6700000166893
+					],
+					"20": [
+						0.25900000333786,
+						0.58799999952316,
+						0.98000001907349,
+						1
+					],
+					"34": [
+						0.1799999922514,
+						0.34999996423721,
+						0.58000004291534,
+						0.86199998855591
+					],
+					"21": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.40000000596046
+					],
+					"14": [
+						0.019999999552965,
+						0.019999999552965,
+						0.019999999552965,
+						0.52999997138977
+					],
+					"12": [
+						0,
+						0,
+						0,
+						0.50999999046326
+					],
+					"6": [
+						0,
+						0,
+						0,
+						0
+					],
+					"46": [
+						0.18999999761581,
+						0.18999999761581,
+						0.20000000298023,
+						1
+					],
+					"35": [
+						0.19999998807907,
+						0.4099999666214,
+						0.68000000715256,
+						1
+					],
+					"8": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.40000000596046
+					],
+					"32": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.94999998807907
+					],
+					"38": [
+						0.13599997758865,
+						0.26199996471405,
+						0.42399999499321,
+						1
+					],
+					"39": [
+						0.5,
+						0.5,
+						0.5,
+						1
+					],
+					"25": [
+						0.25999999046326,
+						0.58999997377396,
+						0.98000001907349,
+						0.80000001192093
+					],
+					"15": [
+						0.31000000238419,
+						0.31000000238419,
+						0.31000000238419,
+						1
+					],
+					"11": [
+						0.15999999642372,
+						0.28999999165535,
+						0.47999998927116,
+						1
+					],
+					"57": [
+						0.80000001192093,
+						0.80000001192093,
+						0.80000001192093,
+						0.34999999403954
+					],
+					"55": [
+						1,
+						1,
+						1,
+						0.69999998807907
+					]
+				},
+				"vars": {
+					"FrameBorderSize": 0,
+					"ItemSpacing": [
+						4,
+						4
+					],
+					"ItemInnerSpacing": [
+						4,
+						4
+					],
+					"CellPadding": [
+						4,
+						2
+					],
+					"IndentSpacing": 20,
+					"ScrollbarSize": 12,
+					"ScrollbarRounding": 4,
+					"GrabMinSize": 12,
+					"GrabRounding": 4,
+					"TabRounding": 8,
+					"TabBorderSize": 0,
+					"TabBarBorderSize": 1,
+					"TabBarOverlineSize": 0,
+					"TableAngledHeadersAngle": 0.61086529493332,
+					"TableAngledHeadersTextAlign": [
+						0.5,
+						0
+					],
+					"ButtonTextAlign": [
+						0.5,
+						0.5
+					],
+					"SelectableTextAlign": [
+						0.5,
+						0.5
+					],
+					"SeparatorTextBorderSize": 4,
+					"SeparatorTextAlign": [
+						0.5,
+						0.5
+					],
+					"SeparatorTextPadding": [
+						20,
+						2
+					],
+					"DockingSeparatorSize": 0,
+					"Alpha": 1,
+					"DisabledAlpha": 0.60000002384186,
+					"WindowPadding": [
+						4,
+						4
+					],
+					"WindowRounding": 8,
+					"WindowBorderSize": 0,
+					"WindowMinSize": [
+						32,
+						32
+					],
+					"WindowTitleAlign": [
+						0.5,
+						0.5
+					],
+					"ChildRounding": 8,
+					"ChildBorderSize": 0,
+					"PopupRounding": 8,
+					"PopupBorderSize": 1,
+					"FramePadding": [
+						2,
+						2
+					],
+					"FrameRounding": 4
+				}
+			}
+		},
+		"imguiColors": "deprecated",
+		"levelSelectDynamicLoading": true,
+		"eventGroups": {
+			"all": {
+				"visibility": "show",
+				"name": "all",
+				"events": {
+					"setBoolean": true,
+					"hold": true,
+					"play": true,
+					"toggleParticles": true,
+					"outline": true,
+					"mine": true,
+					"hom": true,
+					"tag": true,
+					"inverse": true,
+					"extraTap": true,
+					"setColor": true,
+					"side": true,
+					"playSound": true,
+					"ease": true,
+					"paddles": true,
+					"forcePlayerSprite": true,
+					"deco": true,
+					"mineHold": true,
+					"bookmark": true,
+					"setBgColor": true,
+					"noise": true,
+					"showResults": true,
+					"block": true,
+					"setBPM": true
+				},
+				"index": 0
+			},
+			"song": {
+				"visibility": " - ",
+				"name": "song",
+				"events": {
+					"setBPM": true,
+					"playSound": true,
+					"play": true,
+					"showResults": true
+				},
+				"index": 1
+			},
+			"visuals": {
+				"visibility": " - ",
+				"name": "visuals",
+				"events": {
+					"setBoolean": true,
+					"toggleParticles": true,
+					"forcePlayerSprite": true,
+					"ease": true,
+					"hom": true,
+					"noise": true,
+					"deco": true,
+					"setBgColor": true,
+					"setColor": true,
+					"outline": true
+				},
+				"index": 1
+			},
+			"color": {
+				"visibility": " - ",
+				"name": "color",
+				"events": {
+					"hom": true,
+					"noise": true,
+					"setBgColor": true,
+					"setColor": true,
+					"outline": true
+				},
+				"index": 2
+			},
+			"bookmarks": {
+				"visibility": " - ",
+				"name": "bookmarks",
+				"events": {
+					"bookmark": true
+				},
+				"index": 3
+			},
+			"deco": {
+				"visibility": " - ",
+				"name": "deco",
+				"events": {
+					"deco": true
+				},
+				"index": 3
+			},
+			"tags": {
+				"visibility": " - ",
+				"name": "tags",
+				"events": {
+					"tag": true
+				},
+				"index": 3
+			},
+			"eases": {
+				"visibility": " - ",
+				"name": "eases",
+				"events": {
+					"setBoolean": true,
+					"ease": true
+				},
+				"index": 3
+			},
+			"gameplay": {
+				"visibility": " - ",
+				"name": "gameplay",
+				"events": {
+					"paddles": true,
+					"hold": true,
+					"mineHold": true,
+					"side": true,
+					"extraTap": true,
+					"inverse": true,
+					"mine": true,
+					"block": true
+				},
+				"index": 1
+			}
+		},
+		"showEventGroups": true,
+		"displayEndAngle": true,
+		"bounceDragging": true,
+		"ctrlSelect": true,
+		"bookmarkList": true,
+		"untaggingButtons": true,
+		"colorPreview": true,
+		"coordsDisplay": false,
+		"loopVisibleEventsAmount": 5000,
+		"loopSingleSelectionEventAmount": 2000,
+		"loopEventsDuringSelectionAmount": 2000,
+		"bounceDoubleClick": true,
+		"currentImguiStyle": "round glass",
+		"easeListRound": true,
+		"angleSnapValues_temp": "8, 16, 32",
+		"scanMargin": 64,
+		"autoFixSides": true,
+		"angleDials": true,
+		"bgColor": {
+			"r": 0,
+			"g": 0,
+			"b": 0
+		},
+		"keyHandling": "blacklist",
+		"editorBeats": 24,
+		"angleSnapValues": [
+			8,
+			16,
+			32
+		],
+		"angleSnap": 2,
+		"saveAngleBeatSnap": true,
+		"angleDefault": 3,
+		"customAngleSnap": 32,
+		"editorCalculator": true,
+		"beatSnapValues": [
+			1,
+			2,
+			4,
+			8,
+			16
+		],
+		"beatSnap": 3,
+		"beatDefault": 2,
+		"customBeatSnap": 16,
+		"customBeatDefault": 16,
+		"deleteNothing": true,
+		"lagUseSeconds": true,
+		"rememberMultiselectDelta": true,
+		"multiselectDelta": true,
+		"stackingNotes": true,
+		"lagBack": true,
+		"lagThreshhold": 0.25,
+		"lineColor": {
+			"r": 0.37299999594688,
+			"g": 0.37299999594688,
+			"b": 0.37299999594688,
+			"a": 0.5
+		},
+		"bgColor2": {
+			"r": 1,
+			"g": 1,
+			"b": 1
+		},
+		"shadow2": false,
+		"fgColor2": {
+			"r": 0,
+			"g": 0.25900000333786,
+			"b": 1
+		},
+		"betterBookmarks": true,
+		"spreadButtons": true,
+		"easeList": true,
+		"browserCharter": true,
+		"easeListUse": true,
+		"easeListUsed": true,
+		"spreadType": "absolute",
+		"easeListSelectChanged": true,
+		"easeListSelected": false,
+		"search": "angle dial",
+		"spreadSnap": 32,
+		"songSelectPitch": true,
+		"ignoreLoopPoints": true,
+		"mouseCoordsButton": true,
+		"xOffset": 4,
+		"yOffset": 4,
+		"customAngleDefault": 32,
+		"convertSingle": false,
+		"editorMenu": true,
+		"easeCurrentValues": true,
+		"levelSelectShowIncompatible": true,
+		"currentSprite": true,
+		"roundSelectedTimes": false,
+		"colorEasePreview": true,
+		"fakeRepeat": true,
+		"copySingle": true,
+		"betterMoveSelection": true,
+		"zoomMax": 120,
+		"accBarSmooth": 0.34999999403954,
+		"imguiGuide": true,
+		"fgColor": {
+			"r": 1,
+			"g": 0.5,
+			"b": 0
+		},
+		"untaggingHotkeys": true,
+		"damoclismCataclism": false,
+		"hideHelpMarkers": true,
+		"easeListSerious": true,
+		"charter": "Pentatrate",
+		"fullSize": true,
+		"preciseTimeInput": false,
+		"restartInPlaytest": true,
+		"zoomMin": 2,
+		"selectedBorderColor": {
+			"r": 1,
+			"g": 1,
+			"b": 1,
+			"a": 1
+		},
+		"shortenParams": false,
+		"betterCombo": true,
+		"hideMenus": true,
+		"editorSnapColor": {
+			"r": 0.12156862765551,
+			"g": 0.12156862765551,
+			"b": 0.12156862765551
+		},
+		"currentPaddle": true,
+		"lagOffset": 2
+	},
+	"version": "3.1.1",
+	"name": "Beattools",
+	"id": "beattools",
+	"author": "Pentatrate"
 }
-,"fullSize":true,"inputSize":150,"showEventGroups":true,"preciseTimeInput":false,"mouseCoordsButton":true,"lagUseSeconds":true,"betterCombo":true,"ctrlSelect":true,"lagBack":false,"lagThreshhold":0.25,"lagOffset":2,"showParam":"order","shadow":true,"fgColor":{"b":0,"r":1,"g":0.5}
-,"markEndAnglePosition":"on","durationSelectedColor":{"b":0,"r":1,"a":0.5,"g":0}
-,"showDuration":"on","durationSameEasingColor":{"b":1,"r":0,"a":0.5,"g":0}
-,"durationColor":{"b":0,"r":0,"a":0.5,"g":1}
-,"editorBeats":24,"angleSnapValues":[8,12,16,24,32],"angleSnap":2,"saveAngleBeatSnap":true,"markRepeat":"on","customAngleSnap":32,"currentPaddle":true,"editorSnapColor":{"b":0.75,"r":0.75,"g":0.75}
-,"editorBlackColor":{"b":0,"r":0,"g":0}
-,"beatSnap":3,"beatDefault":2,"customBeatSnap":16,"customBeatDefault":16,"documentation":"none","whiteSelected":"off","selectedBorderColor":{"b":0,"r":0,"a":1,"g":0}
-,"tooltips":"long","loopVisibleEventsAmount":5000,"deleteNothing":true,"loopEventsDuringSelectionAmount":2000,"rememberMultiselectDelta":false,"multiselectDelta":true,"speedScrolling":true,"accBar":true,"untaggingButtons":true,"stackingNotes":true,"accBarSmooth":0.35,"convertSingle":true,"fakeRepeat":true,"lineColor":{"b":0.373,"r":0.373,"a":0.5,"g":0.373}
-,"bgColor2":{"b":1,"r":1,"g":1}
-,"shadow2":false,"fgColor2":{"b":1,"r":0,"g":0.259}
-,"easeCurrentValues":true,"betterBookmarks":true,"easeListRound":true,"search":"","accBarWidth":6,"accBarSide":"top","accBarReverse":false,"groupTimeDifference":0.5,"roundSelectedTimes":false,"copySingle":true,"ignoreLoopPoints":false,"beatSnapValues":[1,2,3,4,6,8,12,16],"imguiColors":"deprecated","customAngleDefault":32,"imguiStyles":{"glass":{"vars":{"SeparatorTextBorderSize":3,"SeparatorTextAlign":[0,0.5],"SeparatorTextPadding":[20,3],"DockingSeparatorSize":2,"Alpha":1,"DisabledAlpha":0.60000002384186,"WindowPadding":[8,8],"WindowRounding":0,"WindowBorderSize":1,"WindowMinSize":[32,32],"WindowTitleAlign":[0,0.5],"ChildRounding":0,"ChildBorderSize":1,"PopupRounding":0,"PopupBorderSize":1,"FramePadding":[4,3],"FrameRounding":0,"FrameBorderSize":0,"ItemSpacing":[8,4],"ItemInnerSpacing":[4,4],"CellPadding":[4,2],"IndentSpacing":21,"ScrollbarSize":14,"ScrollbarRounding":9,"GrabMinSize":12,"GrabRounding":0,"TabRounding":4,"TabBorderSize":0,"TabBarBorderSize":1,"TabBarOverlineSize":2,"TableAngledHeadersAngle":0.61086529493332,"TableAngledHeadersTextAlign":[0.5,0],"ButtonTextAlign":[0.5,0.5],"SelectableTextAlign":[0,0]}
-,"name":"glass","colors":{"18":[0.25999999046326,0.58999997377396,0.98000001907349,1],"43":[1,0.43000000715256,0.34999999403954,1],"29":[0.10000000149012,0.40000000596046,0.75,1],"27":[0.43000000715256,0.43000000715256,0.5,0.5],"40":[0.25999999046326,0.58999997377396,0.98000001907349,0.69999998807907],"48":[0.23000000417233,0.23000000417233,0.25,1],"23":[0.059999998658895,0.52999997138977,0.98000001907349,1],"45":[1,0.60000002384186,0,1],"51":[0.25999999046326,0.58999997377396,0.98000001907349,1],"17":[0.50999999046326,0.50999999046326,0.50999999046326,1],"19":[0.23999999463558,0.51999998092651,0.87999999523163,1],"2":[0.059999998658895,0.059999998658895,0.059999998658895,0.25],"57":[0.80000001192093,0.80000001192093,0.80000001192093,0.34999999403954],"30":[0.25999999046326,0.58999997377396,0.98000001907349,0.20000000298023],"53":[1,1,0,0.89999997615814],"42":[0.61000001430511,0.61000001430511,0.61000001430511,1],"50":[1,1,1,0.059999998658895],"3":[0,0,0,0],"36":[0.25999999046326,0.58999997377396,0.98000001907349,1],"13":[0.14000000059605,0.14000000059605,0.14000000059605,1],"10":[0.03999999910593,0.03999999910593,0.03999999910593,1],"49":[0,0,0,0],"52":[0.25999999046326,0.58999997377396,0.98000001907349,0.34999999403954],"22":[0.25999999046326,0.58999997377396,0.98000001907349,1],"33":[0.25999999046326,0.58999997377396,0.98000001907349,0.80000001192093],"47":[0.31000000238419,0.31000000238419,0.34999999403954,1],"31":[0.25999999046326,0.58999997377396,0.98000001907349,0.6700000166893],"39":[0.5,0.5,0.5,1],"34":[0.1799999922514,0.34999996423721,0.58000004291534,0.86199998855591],"26":[0.25999999046326,0.58999997377396,0.98000001907349,1],"41":[0.20000000298023,0.20000000298023,0.20000000298023,1],"11":[0.15999999642372,0.28999999165535,0.47999998927116,1],"16":[0.40999999642372,0.40999999642372,0.40999999642372,1],"1":[0.5,0.5,0.5,1],"35":[0.19999998807907,0.4099999666214,0.68000000715256,1],"6":[0,0,0,0],"55":[1,1,1,0.69999998807907],"24":[0.25999999046326,0.58999997377396,0.98000001907349,0.31000000238419],"25":[0.25999999046326,0.58999997377396,0.98000001907349,0.80000001192093],"20":[0.25999999046326,0.58999997377396,0.98000001907349,1],"15":[0.31000000238419,0.31000000238419,0.31000000238419,1],"21":[0.25999999046326,0.58999997377396,0.98000001907349,0.40000000596046],"14":[0.019999999552965,0.019999999552965,0.019999999552965,0.52999997138977],"12":[0,0,0,0.50999999046326],"28":[0.10000000149012,0.40000000596046,0.75,0.77999997138977],"46":[0.18999999761581,0.18999999761581,0.20000000298023,1],"56":[0.80000001192093,0.80000001192093,0.80000001192093,0.20000000298023],"44":[0.89999997615814,0.69999998807907,0,1],"0":[1,1,1,1],"38":[0.13599997758865,0.26199996471405,0.42399999499321,1],"37":[0.068000003695488,0.10199998319149,0.14800003170967,0.97240000963211],"4":[0.079999998211861,0.079999998211861,0.079999998211861,0.93999999761581],"5":[0.43000000715256,0.43000000715256,0.5,0.5],"32":[0.25999999046326,0.58999997377396,0.98000001907349,0.94999998807907],"7":[0.15999999642372,0.28999999165535,0.47999998927116,0.54000002145767],"8":[0.25999999046326,0.58999997377396,0.98000001907349,0.40000000596046],"9":[0.25999999046326,0.58999997377396,0.98000001907349,0.6700000166893],"54":[0.25999999046326,0.58999997377396,0.98000001907349,1]}
-}
-,"default":{"vars":{"SeparatorTextBorderSize":3,"SeparatorTextAlign":[0,0.5],"SeparatorTextPadding":[20,3],"DockingSeparatorSize":2,"Alpha":1,"DisabledAlpha":0.60000002384186,"WindowPadding":[8,8],"WindowRounding":0,"WindowBorderSize":1,"WindowMinSize":[32,32],"WindowTitleAlign":[0,0.5],"ChildRounding":0,"ChildBorderSize":1,"PopupRounding":0,"PopupBorderSize":1,"FramePadding":[4,3],"FrameRounding":0,"FrameBorderSize":0,"ItemSpacing":[8,4],"ItemInnerSpacing":[4,4],"CellPadding":[4,2],"IndentSpacing":21,"ScrollbarSize":14,"ScrollbarRounding":9,"GrabMinSize":12,"GrabRounding":0,"TabRounding":4,"TabBorderSize":0,"TabBarBorderSize":1,"TabBarOverlineSize":2,"TableAngledHeadersAngle":0.61086523532867,"TableAngledHeadersTextAlign":[0.5,0],"ButtonTextAlign":[0.5,0.5],"SelectableTextAlign":[0,0]}
-,"name":"default"}
-,"round glass":{"vars":{"SeparatorTextBorderSize":4,"SeparatorTextAlign":[0.5,0.5],"SeparatorTextPadding":[20,2],"DockingSeparatorSize":0,"Alpha":1,"DisabledAlpha":0.60000002384186,"WindowPadding":[4,4],"WindowRounding":8,"WindowBorderSize":0,"WindowMinSize":[32,32],"WindowTitleAlign":[0.5,0.5],"ChildRounding":8,"ChildBorderSize":0,"PopupRounding":8,"PopupBorderSize":1,"FramePadding":[2,2],"FrameRounding":4,"FrameBorderSize":0,"ItemSpacing":[4,4],"ItemInnerSpacing":[4,4],"CellPadding":[4,2],"IndentSpacing":20,"ScrollbarSize":12,"ScrollbarRounding":4,"GrabMinSize":12,"GrabRounding":4,"TabRounding":8,"TabBorderSize":0,"TabBarBorderSize":1,"TabBarOverlineSize":0,"TableAngledHeadersAngle":0.61086529493332,"TableAngledHeadersTextAlign":[0.5,0],"ButtonTextAlign":[0.5,0.5],"SelectableTextAlign":[0.5,0.5]}
-,"name":"round glass","colors":{"18":[0.25999999046326,0.58999997377396,0.98000001907349,1],"43":[1,0.43000000715256,0.34999999403954,1],"29":[0.10000000149012,0.40000000596046,0.75,1],"27":[0.43000000715256,0.43000000715256,0.5,0.5],"40":[0.25999999046326,0.58999997377396,0.98000001907349,0.69999998807907],"48":[0.23000000417233,0.23000000417233,0.25,1],"23":[0.059999998658895,0.52999997138977,0.98000001907349,1],"45":[1,0.60000002384186,0,1],"51":[0.25999999046326,0.58999997377396,0.98000001907349,1],"17":[0.50999999046326,0.50999999046326,0.50999999046326,1],"19":[0.23899999260902,0.52200001478195,0.87800002098083,1],"2":[0.058823529630899,0.058823529630899,0.058823529630899,0.50196081399918],"57":[0.80000001192093,0.80000001192093,0.80000001192093,0.34999999403954],"30":[0.25999999046326,0.58999997377396,0.98000001907349,0.20000000298023],"53":[1,1,0,0.89999997615814],"42":[0.61000001430511,0.61000001430511,0.61000001430511,1],"50":[1,1,1,0.059999998658895],"11":[0.15999999642372,0.28999999165535,0.47999998927116,1],"36":[0.25999999046326,0.58999997377396,0.98000001907349,1],"13":[0.14000000059605,0.14000000059605,0.14000000059605,1],"10":[0.03999999910593,0.03999999910593,0.03999999910593,1],"49":[0,0,0,0],"52":[0.25999999046326,0.58999997377396,0.98000001907349,0.34999999403954],"22":[0.25999999046326,0.58999997377396,0.98000001907349,1],"33":[0.25999999046326,0.58999997377396,0.98000001907349,0.80000001192093],"47":[0.31000000238419,0.31000000238419,0.34999999403954,1],"31":[0.25999999046326,0.58999997377396,0.98000001907349,0.6700000166893],"39":[0.5,0.5,0.5,1],"34":[0.1799999922514,0.34999996423721,0.58000004291534,0.86199998855591],"26":[0.25999999046326,0.58999997377396,0.98000001907349,1],"41":[0.20000000298023,0.20000000298023,0.20000000298023,1],"1":[0.5,0.5,0.5,1],"16":[0.40999999642372,0.40999999642372,0.40999999642372,1],"3":[0,0,0,0],"35":[0.19999998807907,0.4099999666214,0.68000000715256,1],"32":[0.25999999046326,0.58999997377396,0.98000001907349,0.94999998807907],"55":[1,1,1,0.69999998807907],"24":[0.25999999046326,0.58999997377396,0.98000001907349,0.31000000238419],"25":[0.25999999046326,0.58999997377396,0.98000001907349,0.80000001192093],"20":[0.25900000333786,0.58799999952316,0.98000001907349,1],"15":[0.31000000238419,0.31000000238419,0.31000000238419,1],"21":[0.25999999046326,0.58999997377396,0.98000001907349,0.40000000596046],"14":[0.019999999552965,0.019999999552965,0.019999999552965,0.52999997138977],"12":[0,0,0,0.50999999046326],"28":[0.10000000149012,0.40000000596046,0.75,0.77999997138977],"46":[0.18999999761581,0.18999999761581,0.20000000298023,1],"56":[0.80000001192093,0.80000001192093,0.80000001192093,0.20000000298023],"44":[0.89999997615814,0.69999998807907,0,1],"0":[1,1,1,1],"38":[0.13599997758865,0.26199996471405,0.42399999499321,1],"37":[0.068000003695488,0.10199998319149,0.14800003170967,0.97240000963211],"4":[0.079999998211861,0.079999998211861,0.079999998211861,0.93999999761581],"5":[0.43000000715256,0.43000000715256,0.5,0.5],"6":[0,0,0,0],"7":[0.15999999642372,0.28999999165535,0.47999998927116,0.54000002145767],"8":[0.25999999046326,0.58999997377396,0.98000001907349,0.40000000596046],"9":[0.25999999046326,0.58999997377396,0.98000001907349,0.6700000166893],"54":[0.25999999046326,0.58999997377396,0.98000001907349,1]}
-}
-}
-,"angleDefault":3,"editorBgColor":{"b":1,"r":1,"g":1}
-,"keyHandling":"blacklist","sillyNisenenGimmick":true,"browserCharter":true,"editorMenu":true,"currentImguiStyle":"round glass","selectNoneInPalette":true,"beatSnapValues_temp":"1, 2, 4, 8, 16","angleSnapValues_temp":"8, 16, 32","ignoreUntagPrompt":false,"spreadType":"around","levelSelectDynamicLoading":true,"betterMoveSelection":true,"songSelectPitch":true,"accBarColors":"auto","selectAll":true,"untaggingHotkeys":true,"jumpEvents":true,"betterUntagging":true,"easeListSelected":false,"customLevelVisuals":true,"undoHotkeys":true,"hideMenus":true,"damoclismCataclism":false,"levelSelectShowIncompatible":true,"loopSingleSelectionEventAmount":2000,"calculator":{"input":"6*9^8 1111","history":[{"input":"1111","output":"1111"}
-,{"input":"11111","output":"11111"}
-,{"input":"1/3","output":"0.33333333333333"}
-,{"input":"8*9^0.2","output":"12.414764591323"}
-,{"input":"8*9","output":"72"}
-],"notCalculation":false,"output":"258280326"}
-,"spreadButtons":true,"bgColor":{"b":0,"r":0,"g":0}
-,"easeListSerious":false,"randomizeWindows":"off","alpha":0.5}
-,"name":"Beattools","id":"beattools"}

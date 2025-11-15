@@ -1,68 +1,64 @@
 [manifest]
-version = "1.0.0"
 dump_lua = true
 priority = 0
-
+version = "1.0.0"
 
 # Silly nisenen gimmick ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/bounce.lua"
+match_indent = true
 pattern = '''Event.property(event,'string', 'easeSequence', 'Ease sequence to use, if any', {optional = true, default = ''})'''
-position = "after"
 payload = '''
 if mods.beattools.config.sillyNisenenGimmick then
 	Event.property(event, "bool", "sillyNisenenGimmick", "Randomizes angles for bounces\nOverrides rotation with a high value", { optional = true, default = true })
 end
 '''
-match_indent = true
-
+position = "after"
+target = "levelformat/events/Notes/bounce.lua"
 
 # Cheat in results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''cs.songOffset = 0'''
-position = "before"
 payload = '''self.CHEATlagBack = 0'''
-match_indent = true
+position = "before"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Game.lua"
+match_indent = true
 pattern = '''cs.levelinfo = self.levelinfo'''
-position = "after"
 payload = '''cs.CHEATlagBack = self.gm.CHEATlagBack'''
-match_indent = true
+position = "after"
+target = "states/Game.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Results.lua"
+match_indent = true
 pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
-position = "before"
 payload = '''self.CHEATlagBack ~= 0 or'''
-match_indent = true
+position = "before"
+target = "states/Results.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Results.lua"
+match_indent = true
 pattern = '''local textWidth = fonts.digitalDisco:getWidth(str)'''
-position = "before"
 payload = '''
 if self.CHEATlagBack ~= 0 then
 	if str ~= '' then str = str .. ', ' end
 	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
 end
 '''
-match_indent = true
-
+position = "before"
+target = "states/Results.lua"
 
 # Hide menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self:imgui()'''
-position = "at"
 payload = '''
 if not beattoolsRecordPosition then self:imgui() beattoolsRandomizeWindows = false end
 for i = 1, 7 do
@@ -80,33 +76,31 @@ for i = 1, 7 do
 	end
 end
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
-pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
-position = "at"
-payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
 match_indent = true
-
+pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
+payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
+position = "at"
+target = "obj/GameManager.lua"
 
 # Ctrl + i menu resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''9999)'''
-position = "at"
-payload = '''9999, mods.beattools.config.fullSize and "max" or nil)'''
 match_indent = true
+pattern = '''9999)'''
+payload = '''9999, mods.beattools.config.fullSize and "max" or nil)'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "lib/imguihelper.lua"
+match_indent = true
 pattern = '''function helpers.InputTextMultiline(label, text, size)'''
-position = "at"
 payload = '''
 function helpers.InputTextMultiline(label, text, size, size2)
 	if size2 ~= nil and size2:sub(1, 3) == "max" then
@@ -120,62 +114,61 @@ function helpers.InputTextMultiline(label, text, size, size2)
 		)
 	end
 '''
-match_indent = true
+position = "at"
+target = "lib/imguihelper.lua"
 
 [[patches]]
 [patches.pattern]
-target = "lib/imguihelper.lua"
-pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
-position = "at"
-payload = '''imgui.InputTextMultiline(label, buffer, size, size2)'''
 match_indent = true
-
+pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
+payload = '''imgui.InputTextMultiline(label, buffer, size, size2)'''
+position = "at"
+target = "lib/imguihelper.lua"
 
 # Input resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''local enabled = true'''
-position = "after"
 payload = '''
 local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or imguiUniqueName
 local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
 '''
-match_indent = true
+position = "after"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''imgui.PushItemWidth(100)'''
-position = "at"
 payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length) end'''
-match_indent = true
+position = "at"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
-pattern = '''imgui.InputFloat(imguiUniqueName, numptr, properties.step or 0.01, 0.001)'''
-position = "at"
-payload = '''imgui.InputFloat(label, numptr, properties.step or 0.01, 0.001, mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or nil)'''
 match_indent = true
+pattern = '''imgui.InputFloat(imguiUniqueName, numptr, properties.step or 0.01, 0.001)'''
+payload = '''imgui.InputFloat(label, numptr, properties.step or 0.01, 0.001, mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or nil)'''
+position = "at"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.regex]
-target = "obj/GameManager.lua"
 pattern = '''imguiUniqueName, (?<param>numptr|event)'''
-position = "at"
 payload = '''label, $param'''
+position = "at"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''
 if properties.default then
 		tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
 end
 
 helpers.imguiHelpMarker(tooltip)'''
-position = "at"
 payload = '''
 if properties.default then
 	tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
@@ -184,17 +177,16 @@ if mods.beattools.config.hideHelpMarkers then
 	utilitools.imguiHelpers.tooltip(tooltip)
 else helpers--[[stop wrong injection]].imguiHelpMarker(tooltip) end
 '''
-match_indent = true
-
+position = "at"
+target = "obj/GameManager.lua"
 
 # Charter fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if not self.variant then
 	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
 else'''
-position = "at"
 payload = '''
 if mods.beattools.config.browserCharter or (not self.variant) then
 	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
@@ -202,77 +194,76 @@ if mods.beattools.config.browserCharter or (not self.variant) then
 end
 if self.variant then
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = '',slot ?=0 ?\}'''
-position = "at"
 payload = '''self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/LevelManager.lua"
-pattern = '''charter = 'Charter','''
-position = "at"
-payload = '''charter = mods.beattools.config.charter,'''
 match_indent = true
-
+pattern = '''charter = 'Charter','''
+payload = '''charter = mods.beattools.config.charter,'''
+position = "at"
+target = "obj/LevelManager.lua"
 
 # Bookmark ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''
 local prevBookmarkBeat = 0
 local currBookmarkBeat = 0
 '''
-position = "at"
 payload = '''
 local prevBookmarkBeat = self.smallestBeat - (mods.beattools.config.scrollPast == 0 and 1 or mods.beattools.config.scrollPast)
 local currBookmarkBeat = prevBookmarkBeat
 local prevSectionName = "Start"
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''prevBookmarkBeat = v.time'''
-position = "after"
 payload = '''prevSectionName = v.name'''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName'''
-position = "at"
 payload = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName = self:findBookmarkBeats()'''
-position = "at"
 payload = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName = self:findBookmarkBeats()'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat)'''
-position = "at"
 payload = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat ~= 0 and nextBookmarkBeat - currBookmarkBeat or 1)'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''love.graphics.printf(sectionName, project.res.cx - 499, project.res.cy - 60, 1000, "center")'''
-position = "at"
 payload = '''
 beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
 love.graphics.printf((mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 ~= 0 and self.editorBeat == beattoolsCurrentEasings.editorBeat.bookmarks.time and prevSectionName .. " >> " or "") .. sectionName .. (mods.beattools.config.betterBookmarks and " (" .. (beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1) .. "/" .. #(beattoolsEasings.bookmarks or {}) .. ")" or ""), project.res.cx - 499, project.res.cy - 60, 1000, "center")
@@ -280,13 +271,13 @@ if mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.
 	love.graphics.printf(beattoolsCurrentEasings.editorBeat.bookmarks.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))'''
-position = "at"
 payload = '''
 love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))
 if mods.beattools.config.betterBookmarks then
@@ -294,14 +285,14 @@ if mods.beattools.config.betterBookmarks then
 	love.graphics.arc("line", "open", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat), 0, 2 * math.pi, 100)
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local textWidth = love.graphics.getFont():getWidth(tostring(math.floor(self.editorBeat)))
 love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)'''
-position = "at"
 payload = '''
 local beatText = tostring(math.floor(self.editorBeat))
 local easingPrevBookmarkTime = beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 == 0 and 0 or beattoolsCurrentEasings.editorBeat.bookmarks.time
@@ -314,44 +305,42 @@ if mods.beattools.config.betterBookmarks then
 	love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''love.graphics.printf(math.floor(self.editorBeat), project.res.cx - 18.5, project.res.cy - 7, 50, "center")'''
-position = "at"
 payload = '''
 love.graphics.printf(beatText, project.res.cx - 18.5, project.res.cy - 7, 50, "center")
 if mods.beattools.config.betterBookmarks then love.graphics.printf(bookmarkBeatText, project.res.cx - 18.5, project.res.cy - 7 + 11, 50, "center") end
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Vfx/ease.lua"
-pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
-position = "after"
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyEases)'''
 match_indent = true
+pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyEases)'''
+position = "after"
+target = "levelformat/events/Vfx/ease.lua"
 
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Vfx/setBoolean.lua"
-pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
-position = "after"
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyBooleans)'''
 match_indent = true
-
+pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyBooleans)'''
+position = "after"
+target = "levelformat/events/Vfx/setBoolean.lua"
 
 # Menu in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if self.goToBeatDialogue then'''
-position = "before"
 payload = '''
 if true then
 	local configHelpers = utilitools.configHelpers
@@ -904,4 +893,5 @@ if true then
 	end
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"

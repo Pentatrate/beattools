@@ -1,70 +1,65 @@
 [manifest]
-version = "1.0.0"
 dump_lua = true
 priority = 2147483643 # 2147483647 - 4
-
+version = "1.0.0"
 
 # Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.copy]
-target = "states/Editor.lua"
 position = "prepend"
 sources = ["prepend/beattools.lua"]
-
+target = "states/Editor.lua"
 
 # Self fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''local st = Gamestate:new('Editor')'''
-position = "at"
-payload = ''''''
 match_indent = true
-
+pattern = '''local st = Gamestate:new('Editor')'''
+payload = ''''''
+position = "at"
+target = "states/Editor.lua"
 
 # Remove help marker ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''(imgui.SameLine\(\)[\n\s]+)?helpers\.imguiHelpMarker'''
-position = "at"
 payload = '''utilitools.imguiHelpers.tooltip'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''(?:bgData|(?:self\.(?:level\.(?:metadata|properties)|variant?)))\.\w+ = helpers\.Input(?:Text|Int|Float)\((?<label>['"][\w\s#]+['"])'''
-position = "before"
 payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''bgData\.\w+Channel\.r, bgData\.\w+Channel\.g, bgData\.\w+Channel\.b = helpers\.imguiColor\((?:[\n\s\t]*)?(?<label>['"]\w+ channel['"])'''
-position = "before"
 payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''##float(?<keep>\w+['"] --\[\[Penta's RegEx Marker\]\])'''
-position = "at"
 payload = '''$keep'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) --\[\[Penta's RegEx Marker\]\]'''
-position = "at"
 payload = '''$keep , not mods.beattools.config.hideHelpMarkers'''
-
+position = "at"
+target = "states/Editor.lua"
 
 # Update self ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''st:setUpdate(function(self, dt)'''
-position = "after"
 payload = '''
 	if self.menuMusicManager then
 		self.menuMusicManager:update(dt)
@@ -138,17 +133,16 @@ payload = '''
 		end
 	end
 '''
-match_indent = true
-
+position = "after"
+target = "states/Editor.lua"
 
 # Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''for i, v in ipairs(tagEvents) do
 	v.time = v.time - self.multiselectStartBeat
 end'''
-position = "at"
 payload = '''
 if mods.beattools.config.fakeRepeat then
 	for i = #tagEvents, 1, -1 do
@@ -179,7 +173,8 @@ for i = 1, #tagEvents do
 	end
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 # Blueprints probably dont work in EA
 # [[patches]]
@@ -213,28 +208,25 @@ match_indent = true
 # '''
 # match_indent = true
 
-
 # Add to changes ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents|holdEndSelection|bounceSelection|Event\.enum\.variants|self\.markers|newMarkers),'''
-position = "at"
 payload = '''table--[[stop wrong injection]].insert($table,'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''table\.remove\((?<table>self\.multiselect\.events|tagEvents),'''
-position = "at"
 payload = '''table--[[stop wrong injection]].remove($table,'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
-pattern = '''(?<indent>[ \t]*)table\.insert\((?<params>[\s\S]+?)(\)\s*\n)[\n\t ]*(?<end>(?:(?:[^\S\n]|(?:--\[\[[\s\S]*?\]\])|(?:--[^\n]*?\n))*(?:(?:[^bdefirtuw\W]\w*|b[^r\s]\w*|b\W|br[^e\s]\w*|br\W|bre[^a\s]\w*|bre\W|brea[^k\s]\w*|brea\W|break\w+|d[^o\s]\w*|d\W|do\w+|e[^ln\s]\w*|e\W|el[^s\s]\w*|el\W|els[^e\s]\w*|els\W|else\w+|en[^d\s]\w*|en\W|end\w+|f[^ou\s]\w*|f\W|fo[^r\s]\w*|fo\W|for\w+|fu[^n\s]\w*|fu\W|fun[^c\s]\w*|fun\W|func[^t\s]\w*|func\W|funct[^i\s]\w*|funct\W|functi[^o\s]\w*|functi\W|functio[^n\s]\w*|functio\W|function\w+|i[^fn\s]\w*|i\W|if\w+|in\w+|r[^e\s]\w*|r\W|re[^pt\s]\w*|re\W|rep[^e\s]\w*|rep\W|repe[^a\s]\w*|repe\W|repea[^t\s]\w*|repea\W|repeat\w+|ret[^u\s]\w*|ret\W|retu[^r\s]\w*|retu\W|retur[^n\s]\w*|retur\W|return\w+|t[^h\s]\w*|t\W|th[^e\s]\w*|th\W|the[^n\s]\w*|the\W|then\w+|u[^n\s]\w*|u\W|un[^t\s]\w*|un\W|unt[^i\s]\w*|unt\W|unti[^l\s]\w*|unti\W|until\w+|w[^h\s]\w*|w\W|wh[^i\s]\w*|wh\W|whi[^l\s]\w*|whi\W|whil[^e\s]\w*|whil\W|while\w+)?[^\n\w]?)*\n)*)''' # Penta: huge.
-position = "at"
 line_prepend = "$indent"
+pattern = '''(?<indent>[ \t]*)table\.insert\((?<params>[\s\S]+?)(\)\s*\n)[\n\t ]*(?<end>(?:(?:[^\S\n]|(?:--\[\[[\s\S]*?\]\])|(?:--[^\n]*?\n))*(?:(?:[^bdefirtuw\W]\w*|b[^r\s]\w*|b\W|br[^e\s]\w*|br\W|bre[^a\s]\w*|bre\W|brea[^k\s]\w*|brea\W|break\w+|d[^o\s]\w*|d\W|do\w+|e[^ln\s]\w*|e\W|el[^s\s]\w*|el\W|els[^e\s]\w*|els\W|else\w+|en[^d\s]\w*|en\W|end\w+|f[^ou\s]\w*|f\W|fo[^r\s]\w*|fo\W|for\w+|fu[^n\s]\w*|fu\W|fun[^c\s]\w*|fun\W|func[^t\s]\w*|func\W|funct[^i\s]\w*|funct\W|functi[^o\s]\w*|functi\W|functio[^n\s]\w*|functio\W|function\w+|i[^fn\s]\w*|i\W|if\w+|in\w+|r[^e\s]\w*|r\W|re[^pt\s]\w*|re\W|rep[^e\s]\w*|rep\W|repe[^a\s]\w*|repe\W|repea[^t\s]\w*|repea\W|repeat\w+|ret[^u\s]\w*|ret\W|retu[^r\s]\w*|retu\W|retur[^n\s]\w*|retur\W|return\w+|t[^h\s]\w*|t\W|th[^e\s]\w*|th\W|the[^n\s]\w*|the\W|then\w+|u[^n\s]\w*|u\W|un[^t\s]\w*|un\W|unt[^i\s]\w*|unt\W|unti[^l\s]\w*|unti\W|until\w+|w[^h\s]\w*|w\W|wh[^i\s]\w*|wh\W|whi[^l\s]\w*|whi\W|whil[^e\s]\w*|whil\W|while\w+)?[^\n\w]?)*\n)*)''' # Penta: huge.
 payload = '''if beattoolsPlaceEvent($params) then
 table.insert($params)
 -- Beattools Regex Start
@@ -242,67 +234,66 @@ table.insert($params)
 $end
 -- Beattools Regex End
 end '''
+position = "at"
+target = "states/Editor.lua"
 # Penta: original before i changed it (without negative lookahead)
 # table\.insert\((?<params>[\s\S]+?)\)(?<end>([^\S\n]*((?!break|do|else|end|for|function|if|in|repeat|return|then|until|while)(\w*?)[^\n]?)*\n)*)
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''table\.remove\((?<params>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?]]|--[\s\S]*?\n)*?\w+)'''
-position = "at"
 payload = '''beattoolsDeleteEvent($params) table.remove($params)$end'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''--\[\[stop wrong injection]]'''
-position = "at"
 payload = ''''''
-
+position = "at"
+target = "states/Editor.lua"
 
 # Add undo shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.selectedEvent.angle = angle'''
-position = "before"
 payload = '''if self.selectedEvent.angle ~= self.cursorAngle then
 	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "angle", self.cursorAngle)
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.selectedEvent.time = self.cursorBeat'''
-position = "before"
 payload = '''if self.selectedEvent.time ~= self.cursorBeat then
 	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "time", self.cursorBeat)
 end
 '''
-match_indent = true
-
+position = "before"
+target = "states/Editor.lua"
 
 # Edits the event position visually ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''function st:drawEvent(event,alpha)'''
-position = "at"
-payload = '''function st:drawEvent(event, alpha, beattoolsLayer)'''
 match_indent = true
+pattern = '''function st:drawEvent(event,alpha)'''
+payload = '''function st:drawEvent(event, alpha, beattoolsLayer)'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if type(eventDraw) == 'function' then
 	eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance)
 else
 	local pos = cs:getPosition(event.angle, event.time)
 	love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
 end'''
-position = "at"
 payload = '''
 if type(eventDraw) == "function" then
 	if event.isCursor then
@@ -477,11 +468,12 @@ else
 	end
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''for i, v in ipairs(self.level.events) do --draw events
 	if Event.info[v.type] and Event.shouldEditorDraw[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
 		local gameplay = Event.info[v.type].gameplayLayer
@@ -500,7 +492,6 @@ pattern = '''for i, v in ipairs(self.level.events) do --draw events
 				if v == vv then
 					local pos = self:getPosition(v.angle, v.time)
 					love.graphics.draw(sprites.editor.selected, pos[1], pos[2], 0, 1, 1, 11, 11)'''
-position = "at"
 payload = '''
 local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 	if beattoolsLayer == nil then
@@ -532,11 +523,12 @@ local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 					love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
 					love.graphics.setColor(1, 1, 1, 1)
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''love.graphics.setCanvas(self.canv)
 
 --draw layers
@@ -567,7 +559,6 @@ if self.selectedEvent and self.editorBeat <= self.selectedEvent.time then
 	self:drawEvent(self.selectedEvent)
 	love.graphics.draw(sprites.editor.selected, pos[1], pos[2], 0, 1, 1, 11, 11)
 end'''
-position = "at"
 payload = '''
 if true then -- Penta: beattools layer code
 	local layerNote, layerEndAngleMarker, layerDuration, layerEvent, layerRepeatMarker = {}, {}, {}, {}, {}
@@ -749,23 +740,22 @@ if beattoolsRecordPosition and beattoolsRecordFunc then
 	love.graphics.printf(beattoolsParam, pos[1], pos[2], 200, (leftside and "left" or "right"))
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self:drawEvent({type = eventType, angle = angle, time = time, isCursor = true},alpha)'''
-position = "at"
-payload = '''self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected")'''
 match_indent = true
-
+pattern = '''self:drawEvent({type = eventType, angle = angle, time = time, isCursor = true},alpha)'''
+payload = '''self:drawEvent({ type = eventType, angle = angle, time = time, isCursor = true }, alpha, "selected")'''
+position = "at"
+target = "states/Editor.lua"
 
 # Determines event beattoolsOverlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''  color(cs.voidColor)'''
-position = "at"
 payload = '''
 	beattoolsSelect = nil
 	love.graphics.setFont(fonts.main)
@@ -775,25 +765,25 @@ payload = '''
 		color(cs.voidColor)
 	end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''--trigger auto-backup every five minutes'''
-position = "before"
 payload = '''if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect ~= nil and (beattoolsSelect[1] ~= beattoolsPrevSelect[1] or beattoolsSelect[2] ~= beattoolsPrevSelect[2])) then
 	beattoolsPrevSelect = beattoolsSelect
 	self:updateBiggestBeat()
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''function st:updateBiggestBeat()'''
-position = "after"
 payload = '''
 	beattoolsOverlap = {}
 	for k, v in pairs(beattoolsDefaultEasings) do
@@ -801,25 +791,25 @@ payload = '''
 	end
 	beattoolsCurrentEasings = {}
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''--trigger auto-backup every five minutes'''
-position = "before"
 payload = '''if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
 	beattoolsEditorBeat = helpers.round(self.editorBeat)
 	self:updateBiggestBeat()
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
-position = "after"
 payload = '''
 if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
 
@@ -854,14 +844,14 @@ if mods.beattools.config.autoFixSides and v.type == "side" then
 end
 -- Penta's Beattools code marker
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = false
 pattern = '''	-- Penta's Beattools code marker
 end'''
-position = "after"
 payload = '''
 	for kk, vv in pairs(beattoolsEasings) do
 		if beattoolsEasingFor[kk] == true then
@@ -904,155 +894,149 @@ payload = '''
 		end
 	end
 '''
-match_indent = false
-
+position = "after"
+target = "states/Editor.lua"
 
 # Making the seletion hitbox offset as well ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''
 if helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
-position = "at"
 payload = '''
 if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8 + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, y = pos[2] - 8 - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, width = 16, height = 16 }
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 # currently expect 1 default match and 1 match for "Hold Dragging" v1.0.0 by Kakadu and "Ctrl Select" v1.2.0 by Kakadu each
 # Penta: hmmm with EA, not anymore, uhhh
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
-position = "at"
-payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then'''
 match_indent = true
-
+pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
+payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
-position = "at"
 payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
+position = "at"
+target = "states/Editor.lua"
 
 # Updating stack detection more often ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if maininput:pressed("move_up") then'''
-position = "before"
 payload = '''self:updateBiggestBeat()'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if maininput:pressed("move_down") then'''
-position = "before"
 payload = '''self:updateBiggestBeat()'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.selectedEvent.angle = angle'''
-position = "before"
 payload = '''
 local beattoolsTemp = false
 if self.selectedEvent.angle ~= self.cursorAngle or self.selectedEvent.time ~= self.cursorBeat then beattoolsTemp = true end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self.selectedEvent.time = self.cursorBeat'''
-position = "after"
-payload = '''if beattoolsTemp then self:updateBiggestBeat() end'''
 match_indent = true
-
+pattern = '''self.selectedEvent.time = self.cursorBeat'''
+payload = '''if beattoolsTemp then self:updateBiggestBeat() end'''
+position = "after"
+target = "states/Editor.lua"
 
 # Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
-position = "before"
 payload = '''beattoolsRemoveParameters(self)'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
-position = "before"
 payload = '''beattoolsRemoveParameters(self)'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
-position = "before"
 payload = '''beattoolsRemoveParameters(self)'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if imgui.Button('Make tag') then'''
-position = "after"
 payload = '''beattoolsRemoveParameters(self)'''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
-position = "after"
 payload = '''self:updateBiggestBeat()'''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
-position = "after"
 payload = '''self:updateBiggestBeat()'''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
-position = "after"
-payload = '''self:updateBiggestBeat()'''
 match_indent = true
-
+pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
+payload = '''self:updateBiggestBeat()'''
+position = "after"
+target = "states/Editor.lua"
 
 # End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''(?<func>self:getPosition)\((?<param>[^\n]+?)\.angle,'''
-position = "at"
 payload = '''
 self:getPosition((function () if mods.beattools.config.displayEndAngle and $param.endAngle ~= nil then return $param.endAngle else return $param.angle end end)(),'''
-
+position = "at"
+target = "states/Editor.lua"
 
 # Random Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
-pattern = '''[^\S\n]*helpers\.SetNextWindowPos\([^\S\n]*?(?<param1>\d+)[^\S\n]*?,[^\S\n]*?(?<param2>\d+)[^\S\n]*?,[^\S\n]*?(?<param3>[\w"'_ ]+?)[^\S\n]*?\)[^\S\n]*?\n(?<indent>\s+)helpers\.SetNextWindowSize\([^\S\n]*?(?<param5>\d+)[^\S\n]*?,[^\S\n]*?(?<param6>\d+)[^\S\n]*?,[^\S\n]*?(?<param7>[\w"'_ ]+?)[^\S\n]*?\)'''
-position = "at"
 line_prepend = "$indent"
+pattern = '''[^\S\n]*helpers\.SetNextWindowPos\([^\S\n]*?(?<param1>\d+)[^\S\n]*?,[^\S\n]*?(?<param2>\d+)[^\S\n]*?,[^\S\n]*?(?<param3>[\w"'_ ]+?)[^\S\n]*?\)[^\S\n]*?\n(?<indent>\s+)helpers\.SetNextWindowSize\([^\S\n]*?(?<param5>\d+)[^\S\n]*?,[^\S\n]*?(?<param6>\d+)[^\S\n]*?,[^\S\n]*?(?<param7>[\w"'_ ]+?)[^\S\n]*?\)'''
 payload = '''
 if mods.beattools.config.randomizeWindows ~= "off" and beattoolsRandomizeWindows then
 	local sx, sy = math.random(100, 400), math.random(100, 400)
@@ -1063,37 +1047,38 @@ else
 	helpers.SetNextWindowSize( $param5 , $param6 , $param7 )
 end
 '''
-
+position = "at"
+target = "states/Editor.lua"
 
 # Editor Colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
-position = "at"
 payload = '''love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''color('black')'''
-position = "at"
 payload = '''love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''color()'''
-position = "at"
 payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''color('white')'''
-position = "at"
-payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 match_indent = true
+pattern = '''color('white')'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
+position = "at"
+target = "states/Editor.lua"

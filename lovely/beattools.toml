@@ -1,15 +1,13 @@
 [manifest]
-version = "1.0.0"
 dump_lua = true
 priority = 0
-
+version = "1.0.0"
 
 # Utilitools requirement ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "main.lua"
+match_indent = true
 pattern = '''cs = bs.load(project.initState)'''
-position = "after"
 payload = '''
 if mods.utilitools == nil then
 	local buttonPressed = love.window.showMessageBox("Beattools", "Beattools requires Utilitools. Please install that mod.", { "Ok", "No" })
@@ -19,15 +17,14 @@ if mods.utilitools == nil then
 end
 beattools = {}
 '''
-match_indent = true
-
+position = "after"
+target = "main.lua"
 
 # Imgui colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "main.lua"
+match_indent = true
 pattern = '''imgui.love.Init()'''
-position = "after"
 payload = '''
 mods.beattools.config.imguiStyles.default = nil
 utilitools.fileManager.beattools.imguiStyle.load()
@@ -40,23 +37,22 @@ if type(mods.beattools.config.imguiColors) == "table" then
 	mods.beattools.config.imguiColors = "deprecated"
 end
 '''
-match_indent = true
-
+position = "after"
+target = "main.lua"
 
 # Multiselect delta ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self.multieditdeltamode = false'''
-position = "at"
-payload = '''self.multieditdeltamode = (function () if mods.beattools.config.rememberMultiselectDelta then return mods.beattools.config.multiselectDelta end return false end)()'''
 match_indent = true
+pattern = '''self.multieditdeltamode = false'''
+payload = '''self.multieditdeltamode = (function () if mods.beattools.config.rememberMultiselectDelta then return mods.beattools.config.multiselectDelta end return false end)()'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)'''
-position = "at"
 payload = '''
 if mods.beattools.config.rememberMultiselectDelta then
 	mods.beattools.config.multiselectDelta = helpers.InputBool('Delta Mode', mods.beattools.config.multiselectDelta)
@@ -65,33 +61,31 @@ else
 	self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)
 end
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Ignore loop points ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/SongSelect.lua"
-pattern = '''if self.levelData and self.levelData.metadata.loopPointsEnable then'''
-position = "at"
-payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
 match_indent = true
+pattern = '''if self.levelData and self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+target = "states/SongSelect.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/Map/LevelQuark.lua"
-pattern = '''if self.levelData.metadata.loopPointsEnable then'''
-position = "at"
-payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
 match_indent = true
-
+pattern = '''if self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+target = "obj/Map/LevelQuark.lua"
 
 # Kakadus code (song pitch in level select) ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/SongSelect.lua"
+match_indent = true
 pattern = '''self.bgNoiseTime = self.bgNoiseTime + love.timer.getDelta()'''
-position = "after"
 payload = '''
 if mods.beattools.config.songSelectPitch then
 	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
@@ -103,13 +97,13 @@ if mods.beattools.config.songSelectPitch then
 	end
 end
 '''
-match_indent = true
+position = "after"
+target = "states/SongSelect.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/AtomMap.lua"
+match_indent = true
 pattern = '''if not self.inOptionsMenu then'''
-position = "before"
 payload = '''
 if mods.beattools.config.songSelectPitch then
 	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
@@ -121,13 +115,13 @@ if mods.beattools.config.songSelectPitch then
 	end
 end
 '''
-match_indent = true
+position = "before"
+target = "states/AtomMap.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/Map/LevelQuark.lua"
+match_indent = true
 pattern = ''':play()'''
-position = "after"
 payload = '''
 if mods.beattools.config.songSelectPitch then
 	if cs.source and cs.rateMod then
@@ -135,19 +129,18 @@ if mods.beattools.config.songSelectPitch then
 	end
 end
 '''
-match_indent = true
-
+position = "after"
+target = "obj/Map/LevelQuark.lua"
 
 # Copy single event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''
 	end
 end,
 'copy',
 '''
-position = "at"
 payload = '''
 		self.copySingle = false
 	elseif mods.beattools.config.copySingle and self.selectedEvent then
@@ -164,109 +157,107 @@ payload = '''
 end,
 'copy',
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.multiselectEndAngle = self.multiselectCopyEndAngle'''
-position = "after"
 payload = '''
 if mods.beattools.config.copySingle and self.copySingle then
 	self:clearMultiselectVars()
 	self.selectedEvent = newEvents[1]
 end
 '''
-match_indent = true
-
+position = "after"
+target = "states/Editor.lua"
 
 # Ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = false
 pattern = '''self.selectedEvent = self.level.events[self.overlappingEvents[1]]
 end'''
-position = "after"
 payload = '''		if self.selectedEvent then'''
-match_indent = false
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = false
 pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time)'''
-position = "after"
 payload = '''		end'''
-match_indent = false
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.lastClickX, self.lastClickY = mouse.rx, mouse.ry'''
-position = "after"
 payload = '''
 self.lastSelected = self.selectedEvent
 self.ctrlSelectPending = mods.beattools.config.ctrlSelect and maininput:down("ctrl")
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''function st:SelectEvent()
 	self:clearMultiselectVars()'''
-position = "at"
 payload = '''
 function st:SelectEvent()
 	if not mods.beattools.config.ctrlSelect or not maininput:down("ctrl") then self:clearMultiselectVars() end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if maininput:down("ctrl") then'''
-position = "at"
 payload = '''
 if mods.beattools.config.ctrlSelect and maininput:down("ctrl") then
 	beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
 elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Overlapping ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if imgui.Selectable_Bool(Event.info[e.type].name .. ' (ID ' .. v .. ')') then'''
-position = "at"
 payload = '''
 if imgui.Selectable_Bool(
 	Event.info[e.type].name .. ' (ID ' .. v .. ')',
 	mods.beattools.config.ctrlSelect and self.ctrlSelectPending and self.multiselect and self.multiselect.events and tableContains(self.multiselect.events, self.level.events[v])
 ) then
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if self.deletePending then'''
-position = "at"
 payload = '''
 if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	imgui.Text("Select which event to ctrl select:")
 elseif self.deletePending then
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.selectedEvent = self.level.events[v]
 -- Changes cursor angle to match event angle
 self.cursorAngle = self.selectedEvent.angle'''
-position = "at"
 payload = '''
 if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	beattoolsCtrlSelect(self.level.events[v])
@@ -279,26 +270,24 @@ else
 	self.cursorAngle = self.selectedEvent.angle
 end
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/OptionsList.lua"
-pattern = '''self.cooldownMax = 10'''
-position = "at"
-payload = '''self.cooldownMax = mods.beattools.config.speedScrolling and 0 or 10'''
 match_indent = true
-
+pattern = '''self.cooldownMax = 10'''
+payload = '''self.cooldownMax = mods.beattools.config.speedScrolling and 0 or 10'''
+position = "at"
+target = "obj/OptionsList.lua"
 
 # Multiselect movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''function st:moveSelectedEvents(angle,beat)
 	if self.multiselect then'''
-position = "after"
 payload = '''
 	self.multiselectStartBeat = self.multiselectStartBeat + beat
 	self.multiselectEndBeat = self.multiselectEndBeat + beat
@@ -307,15 +296,14 @@ payload = '''
 		self.multiselectEndAngle = self.multiselectEndAngle + angle
 	end
 '''
-match_indent = true
-
+position = "after"
+target = "states/Editor.lua"
 
 # Bounce dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.overlappingEvents = {}'''
-position = "before"
 payload = '''local prevOverlapping = self.overlappingEvents
 local prevBounceSelect = self.bounceSelected
 local prevBounceSelectTime = self.bounceSelectTime
@@ -323,13 +311,13 @@ self.bounceSelected = false
 self.bounceSelectTime = 0
 self.bounceSelectAccumulation = 0
 local bounceSelection = {}'''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''-- check end of holds as well'''
-position = "before"
 payload = '''
 -- check bounces of bounces as well
 if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
@@ -344,13 +332,13 @@ if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or
 	end
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''for _, v in ipairs(holdEndSelection) do'''
-position = "before"
 payload = '''
 for _, v in ipairs(bounceSelection) do
 	if v[1] == self.overlappingEvents[1] then
@@ -365,14 +353,14 @@ for _, v in ipairs(bounceSelection) do
 	end
 end
 '''
-match_indent = true
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if not self.holdEndSelected then
 	self.selectedEvent.time = self.selectedEvent.time + beat'''
-position = "at"
 payload = '''
 if mods.beattools.config.bounceDragging and self.bounceSelected then
 	if mods.beattools.config.bounceDoubleClick and self.bounceSelectTime == -1 then
@@ -391,15 +379,15 @@ if mods.beattools.config.bounceDragging and self.bounceSelected then
 elseif not self.holdEndSelected then
 	self.selectedEvent.time = self.selectedEvent.time + beat
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''local angle = self.cursorAngle
 
 					if not self.holdEndSelected then'''
-position = "at"
 payload = '''
 local angle = self.cursorAngle
 if mods.beattools.config.bounceDragging and self.bounceSelected then
@@ -420,15 +408,14 @@ if mods.beattools.config.bounceDragging and self.bounceSelected then
 	end
 elseif not self.holdEndSelected then
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Fix for penta's dream skin ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/Player.lua"
+match_indent = true
 pattern = '''if bodyShape == "2p5d" then'''
-position = "at"
 payload = '''
 if costume.body and (bodyShape ~= "2p5d" or costume.body.bodyInvisible) and costume.body.body2p5d then
 	if costume.body.bodyInvisible then bodyShape = "invisible" end
@@ -436,151 +423,149 @@ if costume.body and (bodyShape ~= "2p5d" or costume.body.bodyInvisible) and cost
 	self:drawToCanvas(costume, bodyShape, 0)
 elseif bodyShape == "2p5d" then
 '''
-match_indent = true
-
+position = "at"
+target = "obj/Player.lua"
 
 # Event transparency drawing ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # Block
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/block.lua"
+match_indent = true
 pattern = '''local function editorDraw(event)'''
-position = "at"
 payload = '''local function editorDraw(event, a, b, alpha)'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
+position = "at"
 target = "levelformat/events/Notes/block.lua"
-pattern = '''local note = Block:new({'''
-position = "after"
-payload = '''	beattoolsAlpha = alpha,'''
-match_indent = true
 
 [[patches]]
 [patches.pattern]
-target = "obj/notes/Block.lua"
-pattern = '''color()'''
-position = "after"
-payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
 match_indent = true
+pattern = '''local note = Block:new({'''
+payload = '''	beattoolsAlpha = alpha,'''
+position = "after"
+target = "levelformat/events/Notes/block.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''color()'''
+payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
+position = "after"
+target = "obj/notes/Block.lua"
 
 # Inverse
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/inverse.lua"
-pattern = '''local function editorDraw(event)'''
-position = "at"
-payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
+pattern = '''local function editorDraw(event)'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
+position = "at"
+target = "levelformat/events/Notes/inverse.lua"
 
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/inverse.lua"
-pattern = '''local note = Block:new({'''
-position = "after"
-payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
+pattern = '''local note = Block:new({'''
+payload = '''	beattoolsAlpha = alpha,'''
+position = "after"
+target = "levelformat/events/Notes/inverse.lua"
 
 # Side
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/side.lua"
+match_indent = true
 pattern = '''local function editorDraw(event)'''
-position = "at"
 payload = '''local function editorDraw(event, a, b, alpha)'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
+position = "at"
 target = "levelformat/events/Notes/side.lua"
-pattern = '''local note = Side:new({'''
-position = "after"
-payload = '''	beattoolsAlpha = alpha,'''
-match_indent = true
 
 [[patches]]
 [patches.pattern]
-target = "obj/notes/Side.lua"
-pattern = '''color()'''
-position = "after"
-payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
 match_indent = true
+pattern = '''local note = Side:new({'''
+payload = '''	beattoolsAlpha = alpha,'''
+position = "after"
+target = "levelformat/events/Notes/side.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''color()'''
+payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
+position = "after"
+target = "obj/notes/Side.lua"
 
 # Mine
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/mine.lua"
-pattern = '''local function editorDraw(event)'''
-position = "at"
-payload = '''local function editorDraw(event, a, b, alpha)'''
 match_indent = true
+pattern = '''local function editorDraw(event)'''
+payload = '''local function editorDraw(event, a, b, alpha)'''
+position = "at"
+target = "levelformat/events/Notes/mine.lua"
 
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/mine.lua"
-pattern = '''local note = Mine:new({'''
-position = "after"
-payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
+pattern = '''local note = Mine:new({'''
+payload = '''	beattoolsAlpha = alpha,'''
+position = "after"
+target = "levelformat/events/Notes/mine.lua"
 
 # Hold
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/hold.lua"
+match_indent = true
 pattern = '''local function editorDraw(event, beat, endBeat)'''
-position = "at"
 payload = '''local function editorDraw(event, beat, endBeat, alpha)'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
+position = "at"
 target = "levelformat/events/Notes/hold.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''local hold = Hold:new({'''
-position = "after"
 payload = '''	beattoolsAlpha = alpha,'''
-match_indent = true
+position = "after"
+target = "levelformat/events/Notes/hold.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/notes/Hold.lua"
+match_indent = true
 pattern = '''color()'''
-position = "after"
 payload = '''love.graphics.setColor(1, 1, 1, self.beattoolsAlpha or 1)'''
-match_indent = true
+position = "after"
+target = "obj/notes/Hold.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/notes/Hold.lua"
-pattern = '''color('black')'''
-position = "after"
-payload = '''love.graphics.setColor(0, 0, 0, self.beattoolsAlpha or 1)'''
 match_indent = true
+pattern = '''color('black')'''
+payload = '''love.graphics.setColor(0, 0, 0, self.beattoolsAlpha or 1)'''
+position = "after"
+target = "obj/notes/Hold.lua"
 
 # Minehold
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/mineHold.lua"
-pattern = '''local function editorDraw(event, beat, endBeat)'''
-position = "at"
-payload = '''local function editorDraw(event, beat, endBeat, alpha)'''
 match_indent = true
+pattern = '''local function editorDraw(event, beat, endBeat)'''
+payload = '''local function editorDraw(event, beat, endBeat, alpha)'''
+position = "at"
+target = "levelformat/events/Notes/mineHold.lua"
 
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/mineHold.lua"
-pattern = '''local hold = MineHold:new({'''
-position = "after"
-payload = '''	beattoolsAlpha = alpha,'''
 match_indent = true
-
+pattern = '''local hold = MineHold:new({'''
+payload = '''	beattoolsAlpha = alpha,'''
+position = "after"
+target = "levelformat/events/Notes/mineHold.lua"
 
 # Place custom event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if self.placeEvent ~= '' and Event.info[self.placeEvent] then'''
-position = "at"
 payload = '''
 if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 	local placingEvent = { time = self.cursorBeat, angle = self.cursorAngle }
@@ -614,15 +599,14 @@ if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 	end
 elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # Acc bar ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''if cs.vfx.drawCombo and cs.vfx.drawUI then'''
-position = "before"
 payload = '''
 if mods.beattools.config.accBar then
 	local realAcc = (((cs.currentMaxHits or 1) - (cs.misses or 0) - ((cs.barelies or 0) / 4)) / (cs.currentMaxHits or 1))
@@ -715,26 +699,25 @@ if mods.beattools.config.accBar then
 	end
 end
 '''
-match_indent = true
-
+position = "before"
+target = "obj/GameManager.lua"
 
 # Custom level visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''local loadBeatQueue = {}'''
-position = "after"
 payload = '''
 local beattoolsNoColors = true
 local alreadyHasDamoclism = false
 '''
-match_indent = true
+position = "after"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''if cs.level.properties.loadBeat and cs.cBeat < 0 and v.time <= cs.level.properties.loadBeat then'''
-position = "before"
 payload = '''
 if mods.beattools.config.customLevelVisuals then
 	if v.type == "setColor" then
@@ -761,12 +744,12 @@ if mods.beattools.config.damoclismCataclism then
 	if v.type == "initObject" and v.objectName == "Damoclism" then alreadyHasDamoclism = true end
 end
 '''
-match_indent = true
+position = "before"
+target = "obj/GameManager.lua"
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''table.sort(loadBeatQueue,function(k1, k2)'''
-position = "before"
 payload = '''
 if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
 	shuv.pal[0].r, shuv.pal[0].g, shuv.pal[0].b = mods.beattools.config.customWhiteColor.r * 255, mods.beattools.config.customWhiteColor.g * 255, mods.beattools.config.customWhiteColor.b * 255
@@ -776,8 +759,8 @@ if mods.beattools.config.damoclismCataclism and not alreadyHasDamoclism then
 	table--[[stop wrong injection]].insert(cs.playEvents, { time = -999, angle = 0, type = "initObject", objectName = "Damoclism", variableName = "damoclism_beattools" })
 end
 '''
-match_indent = true
-
+position = "before"
+target = "obj/GameManager.lua"
 
 # Better Level Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
@@ -981,32 +964,30 @@ match_indent = true
 # '''
 # match_indent = true
 
-
 # Bpm with rateMod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/LevelManager.lua"
-pattern = '''level.metadata.bpm = loc.get('bpm',{level.metadata.bpm})'''
-position = "before"
-payload = '''level.metadata.rawBpm = level.metadata.bpm'''
 match_indent = true
+pattern = '''level.metadata.bpm = loc.get('bpm',{level.metadata.bpm})'''
+payload = '''level.metadata.rawBpm = level.metadata.bpm'''
+position = "before"
+target = "obj/LevelManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/LevelManager.lua"
+match_indent = true
 pattern = '''level.metadata.bpm = minBPM .. '-' .. maxBPM'''
-position = "before"
 payload = '''
 level.metadata.rawMinBpm = minBPM
 level.metadata.rawMaxBpm = maxBPM
 '''
-match_indent = true
+position = "before"
+target = "obj/LevelManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/SongSelect.lua"
+match_indent = true
 pattern = '''love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')'''
-position = "at"
 payload = '''
 if mods.beattools.config.levelSelectMultiplyBpm and self.rateMod and self.rateMod ~= 1 then
 	if type(level.rawMetadata.rawBpm) == "number" then
@@ -1018,53 +999,51 @@ else
 	love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')
 end
 '''
-match_indent = true
-
+position = "at"
+target = "states/SongSelect.lua"
 
 # Fix play sound annoyance ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''local oLTotal = 0'''
-position = "before"
 payload = '''cs.loadingBeats = true'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
+position = "before"
 target = "obj/GameManager.lua"
-pattern = '''prof.pop("GameManager update")'''
-position = "after"
-payload = '''cs.loadingBeats = false'''
-match_indent = true
 
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Vfx/playSound.lua"
+match_indent = true
+pattern = '''prof.pop("GameManager update")'''
+payload = '''cs.loadingBeats = false'''
+position = "after"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)'''
-position = "at"
 payload = '''
 if not cs.loadingBeats then
 	te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)
 end
 '''
-match_indent = true
-
+position = "at"
+target = "levelformat/events/Vfx/playSound.lua"
 
 # Cheat ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
-pattern = '''function GameManager:resetLevel()'''
-position = "after"
-payload = '''	self.CHEATmaxBeat = nil'''
 match_indent = true
+pattern = '''function GameManager:resetLevel()'''
+payload = '''	self.CHEATmaxBeat = nil'''
+position = "after"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''function GameManager:update(dt)'''
-position = "before"
 payload = '''
 function GameManager:CHEATconvertToBeat(number, forceSeconds)
 	if forceSeconds or mods.beattools.config.lagUseSeconds then
@@ -1074,13 +1053,13 @@ function GameManager:CHEATconvertToBeat(number, forceSeconds)
 end
 
 '''
-match_indent = true
+position = "before"
+target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-target = "obj/GameManager.lua"
+match_indent = true
 pattern = '''cs.cBeat = cs.source:getBeat()'''
-position = "at"
 payload = '''
 local tempTime = cs.source:getBeat()
 -- Penta:
@@ -1100,61 +1079,58 @@ if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBe
 end
 cs.cBeat = tempTime
 '''
-match_indent = true
-
+position = "at"
+target = "obj/GameManager.lua"
 
 # Better multiselect move ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''v.time = v.time + deltaBeat'''
-position = "before"
 payload = '''
 if mods.beattools.config.betterMoveSelection and v.endAngle then
 	v.endAngle = v.endAngle * deltaScale + deltaAngle
 end
 '''
-match_indent = true
-
+position = "before"
+target = "states/Editor.lua"
 
 # Fix multiselect bug with untagger ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''if changed then'''
-position = "at"
-payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
 match_indent = true
+pattern = '''if changed then'''
+payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''if first[k] ~= v then'''
-position = "at"
-payload = '''if tostring(first[k]) ~= tostring(v) then'''
 match_indent = true
-
+pattern = '''if first[k] ~= v then'''
+payload = '''if tostring(first[k]) ~= tostring(v) then'''
+position = "at"
+target = "states/Editor.lua"
 
 # Menumusicmanager in Song Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/SongSelect.lua"
+match_indent = true
 pattern = '''self.menuMusicManager:stop()
 cLevel = filename'''
-position = "at"
 payload = '''
 if self.menuMusicManager and not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
 	self.menuMusicManager:stop()
 end
 cLevel = filename
 '''
-match_indent = true
+position = "at"
+target = "states/SongSelect.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/SongSelect.lua"
+match_indent = true
 pattern = '''cs = bs.load('Editor')'''
-position = "after"
 payload = '''
 if self.menuMusicManager then
 	self.menuMusicManager:clearOnBeatHooks()
@@ -1162,15 +1138,14 @@ if self.menuMusicManager then
 	cs.menuMusicManager = self.menuMusicManager
 end
 '''
-match_indent = true
-
+position = "after"
+target = "states/SongSelect.lua"
 
 # Restart in playtest and menumusicmanager in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''cs = bs.load(returnData.state)'''
-position = "after"
 payload = '''
 if self.menuMusicManager then
 	self.menuMusicManager:clearOnBeatHooks()
@@ -1179,13 +1154,13 @@ if self.menuMusicManager then
 	if not mods.beattools.config.menuMusicInEditor then self.menuMusicManager.music:play() end
 end
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''function st:playLevel()'''
-position = "after"
 payload = '''
 	beattoolsStartBeat = self.startBeat
 	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
@@ -1193,13 +1168,13 @@ payload = '''
 	self.p.forceSprite = ""
 	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then self.menuMusicManager:forceMute() end
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''function st:stopLevel()'''
-position = "after"
 payload = '''
 	beattoolsPlayerSprite = "><"
 	beattoolsLastSpriteChange = beattoolsTime
@@ -1207,17 +1182,16 @@ payload = '''
 		self.menuMusicManager:forceUnmute()
 	end
 '''
-match_indent = true
-
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''
 if maininput:pressed("back") then
 	self:stopLevel()
 '''
-position = "at"
 payload = '''
 if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
 	self.pauseBeat = nil
@@ -1235,52 +1209,49 @@ if maininput:pressed("back") then
 	self.pauseBeat = nil
 	self:stopLevel()
 '''
-match_indent = true
-
+position = "at"
+target = "states/Editor.lua"
 
 # End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to activate on', { step = beatStep })'''
-position = "before"
-payload = '''local beattoolsTemp1 = self.selectedEvent.endAngle'''
 match_indent = true
-
+pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to activate on', { step = beatStep })'''
+payload = '''local beattoolsTemp1 = self.selectedEvent.endAngle'''
+position = "before"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''if imgui.Button('Delete event') then'''
-position = "before"
 payload = '''
 if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle == 0 then
 	self.selectedEvent.endAngle = self.selectedEvent.angle
 end
 '''
-match_indent = true
-
+position = "before"
+target = "states/Editor.lua"
 
 # Angle/Beat snap saving ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''imgui.Text("Angle: " .. angleSnapText)
 end'''
-position = "after"
 payload = '''
 mods.beattools.config.angleSnap = self.angleSnap
 mods.beattools.config.customAngleSnap = self.customAngleSnap
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.angleSnapValues = { 8, 12, 16, 24, 32 }
 self.angleSnap = 3
 self.customAngleSnap = 32'''
-position = "at"
 payload = '''
 self.angleSnapValues = mods.beattools.config.angleSnapValues
 self.angleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.angleSnap or mods.beattools.config.angleDefault
@@ -1295,73 +1266,72 @@ if not self.menuMusicManager then
 	end
 end
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''imgui.Text("Beat: " .. beatSnapText)
 end'''
-position = "after"
 payload = '''
 mods.beattools.config.beatSnap = self.beatSnap
 mods.beattools.config.customBeatSnap = self.customBeatSnap
 '''
-match_indent = true
+position = "after"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
+match_indent = true
 pattern = '''self.beatSnapValues = { 1, 2, 3, 4, 5, 6, 8, 12, 16 }
 self.beatSnap = 2
 self.customBeatSnap = 16'''
-position = "at"
 payload = '''
 self.beatSnapValues = mods.beattools.config.beatSnapValues
 self.beatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.beatSnap or mods.beattools.config.beatDefault
 self.customBeatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customBeatSnap or mods.beattools.config.customBeatDefault
 '''
-match_indent = true
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self:leave()'''
-position = "before"
-payload = '''utilitools.config.save(mods.beattools)'''
 match_indent = true
-
+pattern = '''self:leave()'''
+payload = '''utilitools.config.save(mods.beattools)'''
+position = "before"
+target = "states/Editor.lua"
 
 # Adjusting zoom limits ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, 20), 300)'''
-position = "at"
-payload = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, mods.beattools.config.zoomMin), mods.beattools.config.zoomMax)'''
 match_indent = true
+pattern = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, 20), 300)'''
+payload = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, mods.beattools.config.zoomMin), mods.beattools.config.zoomMax)'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''self.drawDistance = 10'''
-position = "at"
-payload = '''self.drawDistance = mods.beattools.config.editorBeats'''
 match_indent = true
+pattern = '''self.drawDistance = 10'''
+payload = '''self.drawDistance = mods.beattools.config.editorBeats'''
+position = "at"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
-target = "states/Editor.lua"
 pattern = '''self\.zoom, self\.smallestBeat\)'''
-position = "at"
 payload = '''self.zoom, self.smallestBeat - mods.beattools.config.scrollPast)'''
-
+position = "at"
+target = "states/Editor.lua"
 
 # Drag threshhold ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "states/Editor.lua"
-pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= 10 then'''
-position = "at"
-payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
 match_indent = true
+pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= 10 then'''
+payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
+position = "at"
+target = "states/Editor.lua"
