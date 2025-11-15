@@ -38,19 +38,6 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Results.lua"
-pattern = '''if 	savedata.options.accessibility.taps ~= 'default' or
-	savedata.options.accessibility.vfx ~= 'full' or
-	savedata.options.accessibility.sides ~= 'default' or
-	savedata.costumes.currentCostume == "invisible" or
-	self.paused == true
-then'''
-position = "at"
-payload = '''if self.CHEATlagBack ~= 0 or savedata.options.accessibility.vfx ~= 'full' or savedata.options.accessibility.taps ~= 'default' or savedata.options.accessibility.sides ~= 'default' or self.paused then'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "states/Results.lua"
 pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
 position = "before"
 payload = '''self.CHEATlagBack ~= 0 or'''
@@ -122,9 +109,9 @@ pattern = '''function helpers.InputTextMultiline(label, text, size)'''
 position = "at"
 payload = '''
 function helpers.InputTextMultiline(label, text, size, size2)
-	if size2 ~= nil and string.sub(size2, 1, 3) == "max" then
+	if size2 ~= nil and size2:sub(1, 3) == "max" then
 		local lines = 1
-		for _ in string.gmatch(text, "\n") do
+		for _ in text:gmatch("\n") do
 			lines = lines + 1
 		end
 		size2 = imgui.ImVec2_Float(
@@ -220,7 +207,7 @@ match_indent = true
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
-pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = \'\' ?\}'''
+pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = '',slot ?=0 ?\}'''
 position = "at"
 payload = '''self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }'''
 
@@ -382,7 +369,7 @@ if true then
 		end
 		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
 		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-		if imgui.Begin("Event Groups") then
+		if imgui.Begin("Event Groups", nil, inputFlag) then
 			if self.level then
 				local function checkOverlapping(group, index)
 					local overlapping = false
@@ -560,7 +547,7 @@ if true then
 	if mods.beattools.config.easeList then
 		helpers.SetNextWindowPos(750, 420, window_flag)
 		helpers.SetNextWindowSize(200, 300, window_flag)
-		if imgui.Begin("Ease List") then
+		if imgui.Begin("Ease List", nil, inputFlag) then
 			if imgui.TreeNode_Str("Filters") then
 				configHelpers.input("easeListUse")
 				configHelpers.input("easeListUsed")
@@ -605,7 +592,7 @@ if true then
 								if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
 								if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
 								if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
-								if string.sub(v, 1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[string.sub(v, 19)] ~= nil then return true end
+								if v:sub(1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[v:sub(19)] ~= nil then return true end
 								return v2.type == (type(beattoolsAllEases[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
 							end
 							local eventsDeleted = 0
@@ -702,7 +689,7 @@ if true then
 	if mods.beattools.config.bookmarkList then
 		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
 		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-		if imgui.Begin("Bookmarks") then
+		if imgui.Begin("Bookmarks", nil, inputFlag) then
 			beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
 			for i, v in ipairs(beattoolsEasings.bookmarks) do
 				if i ~= 1 then imgui.Separator() end
@@ -722,7 +709,7 @@ if true then
 	if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
 		helpers.SetNextWindowPos(750, 420, window_flag)
 		helpers.SetNextWindowSize(200, 300, window_flag)
-		if imgui.Begin("Beattools") then
+		if imgui.Begin("Beattools", nil, inputFlag) then
 
 			if mods.beattools.config.colorPreview then
 				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "bgColor")

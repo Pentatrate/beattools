@@ -42,7 +42,7 @@ if imgui.Begin("Calculate", true) then
 			sl()
 			if imgui.Button("CLR") then newInput = "" end
 			sl()
-			if imgui.Button("DEL") then newInput = string.sub(newInput, 1, -2) end
+			if imgui.Button("DEL") then newInput = newInput:sub(1, -2) end
 			numPad("(")
 			sl()
 			numPad(")")

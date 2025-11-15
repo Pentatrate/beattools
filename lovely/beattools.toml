@@ -12,27 +12,34 @@ pattern = '''cs = bs.load(project.initState)'''
 position = "after"
 payload = '''
 if mods.utilitools == nil then
-	error("Beattools requires utilitools. Please install that mod.")
+	local buttonPressed = love.window.showMessageBox("Beattools", "Beattools requires Utilitools. Please install that mod.", { "Ok", "No" })
+	if buttonPressed == 2 then error("Beattools: This is what you get for not installing Utilitools even though this mod needs it") end
+	love.quit()
+	error("Beattools: Failed to quit game.")
 end
+beattools = {}
 '''
 match_indent = true
 
 
-# Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Imgui colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "obj/LevelManager.lua"
-pattern = '''print("Using cached metadata for " .. filename)'''
-position = "at"
-payload = '''-- print("Using cached metadata for " .. filename)'''
-match_indent = true
+target = "main.lua"
+pattern = '''imgui.love.Init()'''
+position = "after"
+payload = '''
+mods.beattools.config.imguiStyles.default = nil
+utilitools.fileManager.beattools.imguiStyle.load()
 
-[[patches]]
-[patches.pattern]
-target = "obj/LevelManager.lua"
-pattern = '''print("filename: " .. filename)'''
-position = "at"
-payload = '''-- print("filename: " .. filename)'''
+if type(mods.beattools.config.imguiColors) == "table" then
+	mods.beattools.config.imguiStyles["from old format"] = { colors = {}, vars = mods.beattools.config.imguiStyles.default.vars }
+	for k, v in pairs(mods.beattools.config.imguiColors) do
+		mods.beattools.config.imguiStyles["from old format"].colors[tostring(imgui[k])] = v
+	end
+	mods.beattools.config.imguiColors = "deprecated"
+end
+'''
 match_indent = true
 
 
@@ -65,9 +72,9 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/SongSelect.lua"
-pattern = '''if self.levelData.metadata.loopPointsEnable then'''
+pattern = '''if self.levelData and self.levelData.metadata.loopPointsEnable then'''
 position = "at"
-payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
 match_indent = true
 
 [[patches]]
@@ -75,7 +82,7 @@ match_indent = true
 target = "obj/Map/LevelQuark.lua"
 pattern = '''if self.levelData.metadata.loopPointsEnable then'''
 position = "at"
-payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
 match_indent = true
 
 
@@ -325,7 +332,7 @@ pattern = '''-- check end of holds as well'''
 position = "before"
 payload = '''
 -- check bounces of bounces as well
-if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 then
+if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
 	for ii = 1, (v.bounces or 1) do
 		local pos2 = self:getPosition(v.angle + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
 		if helpers.collide(
@@ -575,15 +582,15 @@ target = "states/Editor.lua"
 pattern = '''if self.placeEvent ~= '' and Event.info[self.placeEvent] then'''
 position = "at"
 payload = '''
-if self.placeEvent ~= '' and string.match(self.placeEvent, "beattoolsEvent;") then
+if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 	local placingEvent = { time = self.cursorBeat, angle = self.cursorAngle }
-	for w in string.gmatch(self.placeEvent, "[^;]+") do
+	for w in self.placeEvent:gmatch("[^;]+") do
 		if w ~= "beattoolsEvent" then
-			if string.match(w, ",") == nil then
+			if w:match(",") == nil then
 				placingEvent.type = w
 			else
 				local temp = {}
-				for ww in string.gmatch(w, "[^,]+") do
+				for ww in w:gmatch("[^,]+") do
 					table--[[stop wrong injection]].insert(temp, ww)
 				end
 				if false then end
@@ -1305,7 +1312,7 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''self.beatSnapValues = { 1, 2, 3, 4, 6, 8, 12, 16 }
+pattern = '''self.beatSnapValues = { 1, 2, 3, 4, 5, 6, 8, 12, 16 }
 self.beatSnap = 2
 self.customBeatSnap = 16'''
 position = "at"

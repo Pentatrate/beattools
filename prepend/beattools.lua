@@ -445,7 +445,7 @@ if true then -- add easing
 	}
 end
 
-local function beattoolsRGB2Hex(r, g, b) return string.format("%02X%02X%02X", r, g, b) end
+local function beattoolsRGB2Hex(r, g, b) return ("%02X%02X%02X"):format(r, g, b) end
 
 local function beattoolsRemoveParameters(self)
 	for k, v in pairs(self.level.events) do
@@ -1259,7 +1259,7 @@ local function beattoolsUpdateEventGroups()
 		local temp = v
 		temp.name = k
 
-		local textLength = imgui.GetFontSize() * 7 / 13 * string.len(temp.name)
+		local textLength = imgui.GetFontSize() * 7 / 13 * temp.name:len()
 		if beattoolsEventGroupLongest < textLength then beattoolsEventGroupLongest = textLength end
 
 		if beattoolsHighestEventGroupIndex < temp.index then beattoolsHighestEventGroupIndex = temp.index end
@@ -1313,6 +1313,12 @@ local function beattoolsMakeSpace(index, reverse)
 end
 local function beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
+	if type(event) ~= "table" then
+		utilitools.try(mods.beattools, function() error(tostring(event)) end)
+		log(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
+		return "transparent"
+	end
+	if event.type == nil then log(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
 	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
 	if beattoolsEventVisibilities[event.type][""] then return beattoolsEventVisibilities[event.type][""] end
 	local visibility = "hide"
@@ -1391,10 +1397,5 @@ local function beattoolsCtrlSelect(event)
 				end
 			end
 		end
-	end
-end
-if mods.beattools.config.imguiColors then
-	for k, v in pairs(mods.beattools.config.imguiColors) do
-		imgui.PushStyleColor_Vec4(imgui[k], imgui.ImVec4_Float(v[1], v[2], v[3], v[4]))
 	end
 end

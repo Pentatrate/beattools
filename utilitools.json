@@ -44,6 +44,10 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"imguiStyle": {
+			"extension": "lua",
+			"call": true
 		}
 	},
 	"config": true,

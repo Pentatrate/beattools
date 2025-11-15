@@ -106,7 +106,7 @@ payload = '''
 			local forcedSprite = false
 			if mods.beattools.config.currentSprite and beattoolsCurrentEasings.editorBeat.playerSprites.spriteName ~= "" then
 				local spriteName = beattoolsCurrentEasings.editorBeat.playerSprites.spriteName
-				if string.lower(string.sub(spriteName, -4)) == ".png" then
+				if spriteName:sub(-4):lower() == ".png" then
 					local filename = cLevel .. spriteName
 					if love.filesystem.exists(filename) then
 						local modTime = love.filesystem.getInfo(cLevel .. spriteName, "file").modtime
@@ -822,7 +822,8 @@ pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 position = "after"
 payload = '''
 if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
-if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin then
+
+if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin and beattoolsGetEventVisibility(v) ~= "hide" then
 	local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
 	if v.time == -0 then v.time = 0 end
 	if beattoolsOverlap["" .. v.time] == nil then
@@ -840,6 +841,7 @@ if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= se
 		beattoolsOverlap["" .. v.time][beattoolsAngle][1] = beattoolsOverlap["" .. v.time][beattoolsAngle][1] + 1
 	end
 end
+
 if mods.beattools.config.autoFixSides and v.type == "side" then
 	local prev = v.endAngle or v.angle
 	local after = prev % 360
@@ -878,8 +880,9 @@ payload = '''
 			end
 		end
 	end
+
 	for i, v in ipairs(self.level.events) do
-		if (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" then
+		if (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" and beattoolsGetEventVisibility(v) ~= "hide" then
 			local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
 			if v.time == -0 then v.time = 0 end
 			v.beattoolsIndex, v.beattoolsInStack = 0, nil
@@ -922,14 +925,21 @@ match_indent = true
 # currently expect 1 default match and 1 match for "Hold Dragging" v1.0.0 by Kakadu and "Ctrl Select" v1.2.0 by Kakadu each
 # Penta: hmmm with EA, not anymore, uhhh
 
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
+position = "at"
+payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then'''
+match_indent = true
+
 
 [[patches]]
 [patches.regex]
 target = "states/Editor.lua"
 pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
 position = "at"
-payload = '''
-if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) then $func .multiselect.events, $event ) end $end'''
+payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
 
 # Updating stack detection more often ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -974,8 +984,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
 position = "before"
-payload = '''beattoolsRemoveParameters(self)
-'''
+payload = '''beattoolsRemoveParameters(self)'''
 match_indent = true
 
 [[patches]]
@@ -983,18 +992,15 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
 position = "before"
-payload = '''beattoolsRemoveParameters(self)
-'''
+payload = '''beattoolsRemoveParameters(self)'''
 match_indent = true
-times = 3
 
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
 pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
 position = "before"
-payload = '''beattoolsRemoveParameters(self)
-'''
+payload = '''beattoolsRemoveParameters(self)'''
 match_indent = true
 
 [[patches]]
@@ -1002,8 +1008,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''if imgui.Button('Make tag') then'''
 position = "after"
-payload = '''
-beattoolsRemoveParameters(self)'''
+payload = '''beattoolsRemoveParameters(self)'''
 match_indent = true
 
 [[patches]]
@@ -1011,8 +1016,7 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
 position = "after"
-payload = '''
-self:updateBiggestBeat()'''
+payload = '''self:updateBiggestBeat()'''
 match_indent = true
 
 [[patches]]
@@ -1020,18 +1024,15 @@ match_indent = true
 target = "states/Editor.lua"
 pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
 position = "after"
-payload = '''
-self:updateBiggestBeat()'''
+payload = '''self:updateBiggestBeat()'''
 match_indent = true
-times = 3
 
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
 pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
 position = "after"
-payload = '''
-self:updateBiggestBeat()'''
+payload = '''self:updateBiggestBeat()'''
 match_indent = true
 
 

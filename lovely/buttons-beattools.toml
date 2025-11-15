@@ -115,7 +115,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -135,7 +135,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -153,6 +153,16 @@ self:addKeybind(function ()
 	end
 end, "hide menus", "h")
 '''
+match_indent = true
+
+
+# Prevent ctrl hotkey overlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Editor.lua"
+pattern = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) then'''
+position = "at"
+payload = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) and ((not mods.beattools.config.jumpEvents) or (not maininput:down("ctrl"))) then'''
 match_indent = true
 
 
@@ -598,15 +608,15 @@ position = "after"
 payload = '''
 if event.var ~= nil then
 	local split = utilitools.string.split(event.var, "%.")
-	if mods.beattools.config.angleDials and string.sub(event.var, -2, -1) == ".r" or ({ ["vfx.angleTwist.offset"] = true })[event.var] or (#split > 0 and (string.find(split[#split]:lower(), "angle", nil, true) or string.find(split[#split]:lower(), "rotate", nil, true))) then
+	if mods.beattools.config.angleDials and event.var:sub(-2, -1) == ".r" or ({ ["vfx.angleTwist.offset"] = true })[event.var] or (#split > 0 and (split[#split]:lower():find("angle", nil, true) or split[#split]:lower():find("rotate", nil, true))) then
 		event.value = utilitools.suggest.dial(event.value, "selectedEventValue", beattoolsAngleSnap)
-	elseif mods.beattools.config.mouseCoordsButton and (string.sub(event.var, -2, -1) == ".x" or string.sub(event.var, -2, -1) == ".y") then
+	elseif mods.beattools.config.mouseCoordsButton and (event.var:sub(-2, -1) == ".x" or event.var:sub(-2, -1) == ".y") then
 		local pressed = imgui.Button("Use Mouse")
 		utilitools.imguiHelpers.tooltip("Copy mouse coordinates")
 		if pressed then
 			local tempFunc = function ()
 				beattoolsRecordPosition = true
-				beattoolsRecordFunc = function (x, y) event.value = string.sub(event.var, -2, -1) == ".x" and x or y end
+				beattoolsRecordFunc = function (x, y) event.value = event.var:sub(-2, -1) == ".x" and x or y end
 			end
 			utilitools.prompts.buttons("Choose precision", {
 				{ "1px", function ()
@@ -649,7 +659,7 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "states/Editor.lua"
-pattern = '''imgui.Begin("Event Editor")'''
+pattern = '''imgui.Begin("Event Editor",nil,inputFlag)'''
 position = "after"
 payload = '''beattoolsAngleSnap = self.angleSnap ~= 0 and self:getAngleSnapValue() or 360'''
 match_indent = true
@@ -712,6 +722,13 @@ pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at for
 position = "after"
 payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
 match_indent = true
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Advanced/trace.lua"
+pattern = '''Event.property(event,'decimal', 'endAngle', 'Angle to end up at', {step = cs:getAngleStep(), optional = true, default = 0})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials and event.endAngle then event.endAngle = utilitools.suggest.dial(event.endAngle, "selectedEventEndAngle", beattoolsAngleSnap) end'''
+match_indent = true
 
 # Bounce
 [[patches]]
@@ -734,8 +751,17 @@ match_indent = true
 # Minehold
 [[patches]]
 [patches.pattern]
-target = "levelformat/events/Notes/hold.lua"
+target = "levelformat/events/Notes/mineHold.lua"
 pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the hold', {step = cs:getAngleStep(), default = event.angle})'''
+position = "after"
+payload = '''if mods.beattools.config.angleDials then event.angle2 = utilitools.suggest.dial(event.angle2, "selectedEventAngle2", beattoolsAngleSnap) end'''
+match_indent = true
+
+# Trace
+[[patches]]
+[patches.pattern]
+target = "levelformat/events/Advanced/trace.lua"
+pattern = '''Event.property(event,'decimal', 'angle2', 'Angle for end of the trace', {step = cs:getAngleStep(), default = event.angle})'''
 position = "after"
 payload = '''if mods.beattools.config.angleDials then event.angle2 = utilitools.suggest.dial(event.angle2, "selectedEventAngle2", beattoolsAngleSnap) end'''
 match_indent = true

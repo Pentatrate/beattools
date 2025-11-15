@@ -1053,11 +1053,23 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		default = false,
 		off = false
 	},
-	imguiColors = {
+	imguiStyles = {
 		type = "hidden",
-		name = "[internal] imguiColors",
+		name = "[internal] imguiStyles",
 		default = {},
 		off = {}
+	},
+	currentImguiStyle = {
+		type = "hidden",
+		name = "[internal] currentImguiStyle",
+		default = "default",
+		off = "default"
+	},
+	imguiColors = {
+		type = "hidden",
+		name = "[internal] imguiColors (deprecated)",
+		default = "deprecated",
+		off = "deprecated"
 	},
 	angleSnap = {
 		type = "hidden",

@@ -5,6 +5,7 @@ configHelpers.setMod(mod)
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
 		configHelpers.treeNode("Menu Options", function()
+			configHelpers.doc("general_menuOptions")
 			configHelpers.presets.menuOptions()
 			imgui.Separator()
 			configHelpers.presets.menuButtons()
@@ -23,51 +24,95 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			imgui.Separator()
 			configHelpers.input("randomizeWindows")
 			configHelpers.input("imguiGuide")
-			if imgui.Button("Save Colors Permanently") then
-				local function fail()
-					utilitools.prompts.error(mod, "ImGui data detected, but it's invalid :skull:")
-				end
-				local text = love.system.getClipboardText()
-				for w in string.gmatch(string.gsub(text, "colors%[", "?"), "[^?]+") do
-					local i1 = string.find(w, "]", 1, true)
-					if i1 then
-						local _, i2 = string.find(w, "= ImVec4(", i1 + 1, true)
-						if i2 then
-							local i3 = string.find(w, "f);", i2 + 1, true)
-							if i3 then
-								local values = {}
-								for ww in string.gmatch(string.gsub(string.sub(w, i2 + 1, i3 - 1), "f, ", "?"), "[^?]+") do
-									table --[[stop wrong injection]].insert(values, tonumber(ww))
+			if imgui.Button("Style Manager##beattools") then
+				local imguiStyleManager = utilitools.files.beattools.imguiStyle
+				utilitools.prompts.custom({
+					title = "Style Manager", message = "Choose an action.",
+					buttonsTable = {
+						{ "Apply style", function() utilitools.prompts.custom({
+							title = "Style Manager > Apply", message = "Choose style",
+							func = function()
+								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+									if imgui.Button(v .. "##beattoolsChooseStyle") then
+										imguiStyleManager.applyStyle(v)
+									end
 								end
-								if #values == 4 then
-									-- forceprint(string.sub(w, 1, i1 - 1) .. " " .. values[1] .. " " .. values[2] .. " " .. values[3] .. " " .. tostring(values[4]))
-									imgui.PushStyleColor_Vec4(imgui[string.sub(w, 1, i1 - 1)],
-										imgui.ImVec4_Float(values[1], values[2], values[3], values[4]))
-									if mods.beattools.config.imguiColors == nil then mods.beattools.config.imguiColors = {} end
-									mods.beattools.config.imguiColors[string.sub(w, 1, i1 - 1)] = values
-								else
-									fail()
-									log(mod, "Failed.")
-								end
-							else
-								fail()
-								log(mod, "Failed.")
 							end
-						else
-							fail()
-							log(mod, "Failed.")
-						end
-					elseif string.find(w, "ImVec4* colors = ImGui::GetStyle().Colors;", 1, true) == nil then
-						utilitools.prompts.error(mod,
-							"You have to export your ImGui colors to your clipboard\n(which you didnt do apparently)")
-					end
-				end
-			end
-			if imgui.Button("Reset Colors") then
-				utilitools.prompts.confirm("You will reset your custom ImGui colors to default", function()
-					mods.beattools.config.imguiColors = nil
-					imgui.PopStyleColor(100)
-				end)
+						}) end },
+						{ "New Style", function() utilitools.prompts.custom({
+							title = "Style Manager > New", message = "Choose creation method",
+							buttonsTable = {
+								{ "Save current style", function()
+									imguiStyleManager.promptStyleName(imguiStyleManager.saveStyle)
+								end },
+								{ "Import from clipboard", function()
+									utilitools.prompts.custom({
+										title = "Style Manager > Import",
+										message = "Choose import format",
+										buttonsTable = {
+											{ "Beattools Format", function() utilitools.try(mod, function()
+												local jsonData = json.decode(love.system.getClipboardText())
+												if ({ [""] = true, default = true, ["from old format"] = true })[jsonData.name] then
+													jsonData = "default"
+												end
+												if mods.beattools.config.imguiStyles[jsonData.name] ~= nil then
+													imguiStyleManager.promptStyleName(function(styleName)
+														jsonData.name = styleName
+														mods.beattools.config.imguiStyles[jsonData.name] = jsonData
+														log(mod, "Imported beattools format " .. tostring(jsonData.name))
+													end)
+												else
+													mods.beattools.config.imguiStyles[jsonData.name] = jsonData
+													log(mod, "Imported beattools format " .. tostring(jsonData.name))
+												end
+											end) end },
+											{ "ImGui Colors Format", imguiStyleManager.promptStyleName(imguiStyleManager.imguiColorsFormat) }
+										}
+									})
+								end }
+							}
+						}) end },
+						{ "Remove style", function() utilitools.prompts.custom({
+							title = "Style Manager > Remove", message = "Choose style",
+							func = function()
+								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+										imguiStyleManager.removeStyle(v)
+									end
+								end
+							end
+						}) end },
+						{ "Rename style", function() utilitools.prompts.custom({
+							title = "Style Manager > Rename", message = "Choose style",
+							func = function()
+								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+										imguiStyleManager.promptStyleName(function(styleName)
+											mod.config.imguiStyles[styleName] = mod.config.imguiStyles[v]
+											mod.config.imguiStyles[v] = nil
+											mod.config.imguiStyles[styleName].name = styleName
+
+											if v == mod.config.currentImguiStyle then mod.config.currentImguiStyle = styleName end
+											imguiStyleManager.updateAllSavedStyles()
+										end)
+									end
+								end
+							end
+						}) end },
+						{ "Export style", function() utilitools.prompts.custom({
+							title = "Style Manager > Export", message = "Choose style",
+							func = function()
+								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+										local text = json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end)
+										log(mods.beattools, "Copied to clipboard: " .. text)
+										love.system.setClipboardText(text)
+									end
+								end
+							end
+						}) end }
+					}
+				})
 			end
 		end)
 		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()

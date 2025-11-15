@@ -3,38 +3,32 @@ TODO:
 
 - calculator
 - bundle multiple eases together
-- different saves for different accessibility settings
 
-- imgui size problem
 - tooltipmarker replacing
-
 - default positions for imgui windows (too lazy)
 
-- angle dial configs
+- "r" non snap adjusting
 
-- utilitools requiring msg
+- Use better time detection for undo
 
 
 Utilitools:
-- imguihelpers: ease tooltips
 - hold keybinds
-- time
-- suggest separate
+- suggest words separated by space
 - fold all
+- optionslist
 
 
 Later:
-- angles dial (spin over the limit)
-- - buttons for multiplying?
-- fake repeat copy paste bug???????????????????????????????????????? cannot recreate
+- fake repeat copy paste bug? cannot recreate
 - ease tooltips/descriptions (too much work)
+- different score saves for different accessibility settings
 
 
 Potential:
 - expand whitelist with new params   -- Penta: don wanna
 - lively cranky (not even possible anymore?) (kak)
 - auto update event groups?
-- demo notif (rand working on it)
 - restart on acc?
 
 
