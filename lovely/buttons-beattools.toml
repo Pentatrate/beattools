@@ -518,15 +518,19 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''for i, v in ipairs(self.multiselect.events) do
+pattern = '''
+love.filesystem.forceSaveInSource(false)
+
+for i, v in ipairs(self.multiselect.events) do
 	for _i, _v in ipairs(self.level.events) do
 		if _v == v then
 			table.remove(self.level.events, _i)
 		end
 	end
 end
-self.multiselect.events = {}'''
-payload = ''''''
+self.multiselect.events = {}
+'''
+payload = '''love.filesystem.forceSaveInSource(false)'''
 position = "at"
 target = "states/Editor.lua"
 
@@ -762,8 +766,11 @@ target = "levelformat/events/Advanced/trace.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''Event.property(event,'decimal','r', 'Rotation', {step = angleStep, optional = true, default = 0})'''
-payload = '''if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattoolsAngleSnap) end'''
-position = "after"
+payload = '''
+Event.property(event,'decimal','r', 'Rotation', {step = mods.beattools.config.decoRotation and 1 or angleStep, optional = true, default = 0})
+if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattoolsAngleSnap) end
+'''
+position = "at"
 target = "levelformat/events/Vfx/deco.lua"
 
 # Paddles

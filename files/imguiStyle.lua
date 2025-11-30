@@ -37,7 +37,7 @@ imguiStyle.promptStyleName = function(func)
 			if ({ [""] = true, default = true, ["from old format"] = true })[imguiStyle.tempStyleName] then
 				imguiStyle.promptStyleName(func)
 			else
-				if mods.beattools.config.imguiStyles[styleName] ~= nil then
+				if mods.beattools.config.imguiStyles[imguiStyle.tempStyleName] ~= nil then
 					utilitools.prompts.custom({
 						title = "Style Manager > Select style name > Confirm", message = "Do you want to overrite the current saved style?",
 						buttonsTable = {

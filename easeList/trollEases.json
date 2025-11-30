@@ -7,5 +7,14 @@
 	"level.properties.offset": 8,
 	"level.properties.speed": 70,
 	"p.delete": false,
-	"paused": true
+	"paused": true,
+
+	"level.bpm": 1.234,
+	"level.metadata.loopPointsEnable": false,
+	"level.properties.loadBeat": -1,
+	"level.properties.startingBeat": -8,
+
+	"timingInfo.initial.beatOffset": 0,
+	"timingInfo.initial.bpm": 1.234,
+	"timingInfo.initial.timeOffsetSeconds": 0
 }

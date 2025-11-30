@@ -226,6 +226,14 @@ elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.b
 position = "at"
 target = "states/Editor.lua"
 
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''Ctrl + LMB - Duplicate clicked event'''
+payload = '''Ctrl + LMB - Duplicate clicked event (C + LMB if ctrl select is on)'''
+position = "at"
+target = "states/Editor.lua"
+
 # Overlapping ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -234,7 +242,7 @@ pattern = '''if imgui.Selectable_Bool(Event.info[e.type].name .. ' (ID ' .. v ..
 payload = '''
 if imgui.Selectable_Bool(
 	Event.info[e.type].name .. ' (ID ' .. v .. ')',
-	mods.beattools.config.ctrlSelect and self.ctrlSelectPending and self.multiselect and self.multiselect.events and tableContains(self.multiselect.events, self.level.events[v])
+	mods.beattools.config.ctrlSelect and self.ctrlSelectPending and self.multiselect and self.multiselect.events and (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(self.multiselect.events, self.level.events[v])
 ) then
 '''
 position = "at"
@@ -1335,3 +1343,51 @@ pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.r
 payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
 position = "at"
 target = "states/Editor.lua"
+
+
+# Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''print(template)'''
+payload = '''-- print(template)'''
+position = "at"
+target = "levelformat/events/Vfx/deco.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''print("Using cached metadata for " .. filename)'''
+payload = '''-- print("Using cached metadata for " .. filename)'''
+position = "at"
+target = "obj/LevelManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''print("filename: " .. filename)'''
+payload = '''-- print("filename: " .. filename)'''
+position = "at"
+target = "obj/LevelManager.lua"
+
+# Draw less ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = false
+pattern = '''
+--folder
+love.graphics.print(v.name,x+10,y-15,0,2,2)
+'''
+payload = '''
+		end
+'''
+position = "after"
+target = "states/SongSelect.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''yTotal = yTotal + myHeight'''
+payload = '''if y - myHeight * 0.5 < 360 or y + myHeight * 0.5 > 0 then'''
+position = "after"
+target = "states/SongSelect.lua"

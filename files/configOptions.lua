@@ -99,7 +99,7 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		type = "bool",
 		name = "Accuracy Bar",
 		tooltips = { long = "Draws an accuracy bar from the previous grade to the next grade", short = "Accuracy bar within grade ingame" },
-		default = true,
+		default = false,
 		off = false
 	},
 	accBarWidth = {
@@ -783,6 +783,13 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		default = true,
 		off = false
 	},
+	decoRotation = {
+		type = "bool",
+		name = "Deco Rotation",
+		tooltips = { short = "Up/down keys rotate deco by 1 instead of angle snap" },
+		default = true,
+		off = false
+	},
 
 	-- newer options i couldnt be bothered to sort, especially after the config menu got reordered and i didnt reorder it in this file
 	damoclismCataclism = {
@@ -903,6 +910,20 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		tooltips = { short = "Dial buttons to edit angles easier" },
 		default = true,
 		off = false
+	},
+	testKey = {
+		type = "key",
+		name = "Test Hotkey",
+		tooltips = { short = "Generating events for Logic Gatekeeper" },
+		default = {},
+		off = {}
+	},
+	testKey2 = {
+		type = "key",
+		name = "Test Hotkey 2",
+		tooltips = { short = "Finding children of cs" },
+		default = {},
+		off = {}
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

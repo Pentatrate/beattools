@@ -131,7 +131,7 @@ target = "lib/imguihelper.lua"
 match_indent = true
 pattern = '''local enabled = true'''
 payload = '''
-local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or imguiUniqueName
+local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or (((propertyType == 'decimal') or (propertyType == 'int')) and propertyName or imguiUniqueName)
 local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
 '''
 position = "after"
@@ -145,11 +145,57 @@ payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods
 position = "at"
 target = "obj/GameManager.lua"
 
+# Original
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''imgui.InputFloat(imguiUniqueName, numptr, properties.step or 0.01, 0.001)'''
 payload = '''imgui.InputFloat(label, numptr, properties.step or 0.01, 0.001, mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or nil)'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Beta math parser
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''result = math.floor(1000*result)/1000 --thanks sam'''
+payload = '''
+local precision = mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and 1e12 or 1e3
+result = math.floor(precision * result) / precision -- thanks sam
+'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Beta math parser
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+imgui.SameLine()
+imgui.Text(propertyName)
+'''
+payload = '''
+imgui.SameLine()
+imgui.Text(label)
+'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Beta math parser
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%.3f", event[propertyName]))'''
+payload = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format(mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or "%.3f", event[propertyName]))'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Beta math parser
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.PushItemWidth(60)'''
+payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length * 1 - 4 * 2 - 19 * 2 + imgui.GetStyle().ItemInnerSpacing.x - imgui.GetStyle().ItemSpacing.x) end -- Penta: these values are hard coded in the parser lol'''
 position = "at"
 target = "obj/GameManager.lua"
 

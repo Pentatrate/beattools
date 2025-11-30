@@ -13,8 +13,7 @@ if imgui.Begin("Calculate", true) then
 	local saveToHistory = false
 	imgui.TextWrapped(mods.beattools.config.calculator.output)
 
-	local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator",
-		mods.beattools.config.calculator.input, "", nil, nil, nil)
+	local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator", mods.beattools.config.calculator.input, "", nil, nil, nil)
 
 	if imgui.BeginTabBar("beattoolsCalculator") then
 		if imgui.BeginTabItem("Number Pad##beattoolsCalculator") then

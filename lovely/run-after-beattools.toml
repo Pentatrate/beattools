@@ -474,8 +474,9 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''for i, v in ipairs(self.level.events) do --draw events
-	if Event.info[v.type] and Event.shouldEditorDraw[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
+pattern = '''
+for i, v in ipairs(self.level.events) do --draw events
+	if Event.info[v.type] and Event.checkActiveRange[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
 		local gameplay = Event.info[v.type].gameplayLayer
 		if gameplay == nil then
 			gameplay = Event.info[v.type].storeInChart
@@ -510,7 +511,7 @@ local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 
 		local alpha = 1
 		if v.beattoolsInStack ~= nil then alpha = alpha * mods.beattools.config.alpha end
-		if beattoolsGetEventVisibility(v) == "transparent" then alpha = alpha * 0.5 end
+		if beattoolsGetEventVisibility(v) == "transparent" then alpha = alpha * 0.75 end
 		if beattoolsGetEventVisibility(v) == "ghost" then alpha = alpha * 0.25 end
 		self:drawEvent(v, alpha, beattoolsLayer)
 		if (beattoolsLayer == "event" or beattoolsLayer == "note") and self.multiselect and v.time >= self.editorBeat then
@@ -564,8 +565,7 @@ if true then -- Penta: beattools layer code
 	local layerNote, layerEndAngleMarker, layerDuration, layerEvent, layerRepeatMarker = {}, {}, {}, {}, {}
 
 	for i, v in ipairs(self.level.events) do
-		local visiblility = beattoolsGetEventVisibility(v)
-		if Event.info[v.type] and v ~= self.selectedEvent and visiblility ~= "hide" then
+		if Event.info[v.type] and v ~= self.selectedEvent and beattoolsGetEventVisibility(v) ~= "hide" then
 			local function isBetween(x, low, high)
 				return x >= low and x <= high
 			end
@@ -604,7 +604,7 @@ if true then -- Penta: beattools layer code
 					end
 				end
 			end
-			if Event.shouldEditorDraw[v.type](v, self.editorBeat, maxBeat) then
+			if Event.checkActiveRange[v.type](v, self.editorBeat, maxBeat) then
 				if type(Event.editorDraw[v.type]) == "function" then
 					addTo(layerNote)
 					if (mods.beattools.config.markEndAnglePosition == "on" or (mods.beattools.config.markEndAnglePosition ~= "off" and selected)) and v.endAngle ~= nil then
@@ -813,7 +813,7 @@ pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 payload = '''
 if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
 
-if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin and beattoolsGetEventVisibility(v) ~= "hide" then
+if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
 	local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
 	if v.time == -0 then v.time = 0 end
 	if beattoolsOverlap["" .. v.time] == nil then
@@ -872,12 +872,12 @@ payload = '''
 	end
 
 	for i, v in ipairs(self.level.events) do
-		if (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" and beattoolsGetEventVisibility(v) ~= "hide" then
+		if not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" then
 			local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
 			if v.time == -0 then v.time = 0 end
 			v.beattoolsIndex, v.beattoolsInStack = 0, nil
 			local noGameplay = true
-			if (beattoolsOverlap["" .. v.time][beattoolsAngle][2] or beattoolsOverlap["" .. v.time][beattoolsAngle][1] > 1) then
+			if beattoolsOverlap["" .. v.time] and beattoolsOverlap["" .. v.time][beattoolsAngle] and (beattoolsOverlap["" .. v.time][beattoolsAngle][2] or beattoolsOverlap["" .. v.time][beattoolsAngle][1] > 1) then
 				v.beattoolsInStack = true
 				v.beattoolsIndex = beattoolsOverlap["" .. v.time][beattoolsAngle][3]
 				beattoolsOverlap["" .. v.time][beattoolsAngle][3] = beattoolsOverlap["" .. v.time][beattoolsAngle][3] + 1

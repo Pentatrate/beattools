@@ -1,0 +1,5 @@
+.vscode/
+.lovelyignore
+.nolovelyignore
+config.json
+unused/

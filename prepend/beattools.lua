@@ -215,6 +215,9 @@ table.sort(beattoolsAllEasesSorted, function(a, b)
 		if type(beattoolsAllEases[b]) == "number" then return false end
 		return type(beattoolsAllEases[a]) == "boolean"
 	end
+	if a:sub(1, #"vfx.vars") == "vfx.vars" and b:sub(1, #"vfx.vars") == "vfx.vars" then
+		return tonumber(a:sub(#"vfx.vars" + 1)) < tonumber(b:sub(#"vfx.vars" + 1))
+	end
 	return a < b
 end)
 for k, v in pairs(beattoolsDefaultEasings) do beattoolsEasings[k] = {} end
@@ -626,8 +629,7 @@ local function beattoolsNewMultiSelection()
 end
 
 local beattoolsRemoveRepeated, beattoolsRepeatExists, beattoolsUpdateRepeat
-local function beattoolsHasChanges(table1, table2, tableType, trackChanges, content, checkAll, overrideKeyHandling,
-								   lastResort)
+local function beattoolsHasChanges(table1, table2, tableType, trackChanges, content, checkAll, overrideKeyHandling, lastResort)
 	if table1 == nil or table2 == nil then return true end
 
 	if tableType == "array" then
@@ -1241,15 +1243,13 @@ local beattoolsHighestEventGroupIndex = -1
 local beattoolsEventGroupLongest = 0
 local beattoolsEventVisibilities = {}
 local function beattoolsUpdateEventGroups()
-	if st then
-		st.selectedEvent = nil
-		st.multiselect = nil
+	st.selectedEvent = nil
+	st.multiselect = nil
 
-		st.multiselectStartBeat = nil
-		st.multiselectEndBeat = nil
-		st.multiselectStartAngle = nil
-		st.multiselectEndAngle = nil
-	end
+	st.multiselectStartBeat = nil
+	st.multiselectEndBeat = nil
+	st.multiselectStartAngle = nil
+	st.multiselectEndAngle = nil
 
 	beattoolsEventGroups = {}
 	beattoolsEventIndices = {}
@@ -1292,9 +1292,8 @@ local function beattoolsUpdateEventGroups()
 			processEventGroup(k, v)
 		end
 	end
-	--[[ for i, v in ipairs(beattoolsEventGroups) do
-		beattoolsEventGroups[i].subindex = i
-	end ]]
+
+	st:updateBiggestBeat()
 end
 local function beattoolsMakeSpace(index, reverse)
 	if type(reverse) ~= "number" then reverse = reverse and -1 or 1 end

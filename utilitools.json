@@ -2,8 +2,8 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.1.3"]],
-			"reason": "Required API"
+			"versions": [[">=", "1.1.4"]],
+			"reason": "Required API. You may need to update this mod."
 		}
 	},
 	"incompatibilities": {
@@ -48,6 +48,19 @@
 		"imguiStyle": {
 			"extension": "lua",
 			"call": true
+		},
+		"keys": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"test": {
+			"extension": "lua",
+			"load": true
+		},
+		"test2": {
+			"extension": "lua",
+			"load": true
 		}
 	},
 	"config": true,

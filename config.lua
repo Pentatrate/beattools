@@ -114,6 +114,9 @@ if imgui.BeginTabBar("beattoolsConfig") then
 					}
 				})
 			end
+			imgui.Separator()
+			configHelpers.input("testKey")
+			configHelpers.input("testKey2")
 		end)
 		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()
 			configHelpers.doc("general_fullDescription")
@@ -347,6 +350,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("menuMusicInEditor")
 				configHelpers.input("sillyNisenenGimmick")
+				configHelpers.input("decoRotation")
 			end)
 			configHelpers.treeNode("Features", function()
 				configHelpers.doc("editor_features_features")
@@ -411,4 +415,5 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		configHelpers.presets.search()
 		imgui.EndTabItem("Search##beattoolsConfig")
 	end
+	imgui.EndTabBar()
 end
