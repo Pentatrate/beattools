@@ -2,7 +2,7 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.1.4"]],
+			"versions": [[">=", "1.1.6"]],
 			"reason": "Required API. You may need to update this mod."
 		}
 	},
@@ -59,6 +59,10 @@
 			"load": true
 		},
 		"test2": {
+			"extension": "lua",
+			"load": true
+		},
+		"test3": {
 			"extension": "lua",
 			"load": true
 		}

@@ -4,5 +4,8 @@ return {
 	end,
 	testKey2 = function()
 		utilitools.files.beattools.test2()
+	end,
+	testKey3 = function()
+		utilitools.files.beattools.test3()
 	end
 }

@@ -145,28 +145,21 @@ payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods
 position = "at"
 target = "obj/GameManager.lua"
 
-# Original
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''imgui.InputFloat(imguiUniqueName, numptr, properties.step or 0.01, 0.001)'''
-payload = '''imgui.InputFloat(label, numptr, properties.step or 0.01, 0.001, mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or nil)'''
-position = "at"
-target = "obj/GameManager.lua"
-
-# Beta math parser
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''result = math.floor(1000*result)/1000 --thanks sam'''
+pattern = '''
+local truncatedResult = math.floor(1000*result+0.5)/1000
+local truncatedProperty = math.floor(1000*propertyOld+0.5)/1000
+'''
 payload = '''
 local precision = mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and 1e12 or 1e3
-result = math.floor(precision * result) / precision -- thanks sam
+local truncatedResult = math.floor(precision * result + 0.5) / precision
+local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
 '''
 position = "at"
 target = "obj/GameManager.lua"
 
-# Beta math parser
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -181,7 +174,6 @@ imgui.Text(label)
 position = "at"
 target = "obj/GameManager.lua"
 
-# Beta math parser
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -190,7 +182,6 @@ payload = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format(mo
 position = "at"
 target = "obj/GameManager.lua"
 
-# Beta math parser
 [[patches]]
 [patches.pattern]
 match_indent = true

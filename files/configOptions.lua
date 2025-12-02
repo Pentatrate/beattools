@@ -1,4 +1,5 @@
-return { -- Penta: I'm sorry I really cannot be bothered to update the order of this table to match the new config order and grouping :(
+return {
+	-- Penta: I'm sorry I really cannot be bothered to update the order of this table to match the new config order and grouping :(
 	-- General
 	--   Menu Options
     editorMenu = {
@@ -925,6 +926,32 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		default = {},
 		off = {}
 	},
+	testKey3 = {
+		type = "key",
+		name = "Test Hotkey 3",
+		tooltips = { short = "Websocket stuff" },
+		default = {},
+		off = {}
+	},
+	autoUpdate = {
+		type = "bool",
+		name = "Auto Update",
+		tooltips = { short = "Allow beattools to use the internet to update the mod version" },
+		default = false,
+		off = false
+	},
+	askUpdate = {
+		type = "hidden",
+		name = "[internal] askUpdate",
+		default = true,
+		off = false
+	},
+	useRelease = {
+		type = "bool",
+		name = "Use Release",
+		tooltips = { short = "Use the latest release (more stable) instead of the main branch (faster updates)" },
+		default = true
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1111,5 +1138,5 @@ return { -- Penta: I'm sorry I really cannot be bothered to update the order of 
 		type = "hidden",
 		name = "[internal] beatSnap",
 		default = 16
-	},
+	}
 }
