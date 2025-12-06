@@ -199,6 +199,12 @@ local beattoolsEasingFor = {
 	decos = { pairs, pairs }
 }
 
+local beattoolsEventGroups = {}
+local beattoolsEventIndices = {}
+local beattoolsHighestEventGroupIndex = -1
+local beattoolsEventGroupLongest = 0
+local beattoolsEventVisibilities = {}
+
 for k, v in pairs(beattoolsAllEases) do
 	table --[[stop wrong injection]].insert(beattoolsAllEasesSorted, k)
 	if type(v) == "boolean" then
@@ -626,6 +632,29 @@ local function beattoolsNewMultiSelection()
 	st.multiselectEndBeat = 0
 	st.multiselectStartAngle = 0
 	st.multiselectEndAngle = 360
+end
+local function beattoolsGetEventVisibility(event)
+	if not mods.beattools.config.showEventGroups then return "show" end
+	if type(event) ~= "table" then
+		utilitools.try(mods.beattools, function() error(tostring(event)) end)
+		log(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
+		return "transparent"
+	end
+	if event.type == nil then log(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
+	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
+	if beattoolsEventVisibilities[event.type][""] then return beattoolsEventVisibilities[event.type][""] end
+	local visibility = "hide"
+	for i, v in ipairs(beattoolsEventGroups) do
+		if v.visibility ~= " - " then
+			if v.events[event.type] or v.name == "all" then
+				visibility = v.visibility
+			elseif v.events.custom and event.beattoolsCustomEventGroups and event.beattoolsCustomEventGroups[v.name] then
+				visibility = v.visibility
+			end
+		end
+	end
+	if not event.beattoolsCustomEventGroups then beattoolsEventVisibilities[event.type][""] = visibility end
+	return visibility
 end
 
 local beattoolsRemoveRepeated, beattoolsRepeatExists, beattoolsUpdateRepeat
@@ -1236,12 +1265,6 @@ local function beattoolsSameEasing(event, selected)
 	if paramForType[event.type] == nil then return false end
 	return event[paramForType[event.type]] == selected[paramForType[event.type]]
 end
-
-local beattoolsEventGroups = {}
-local beattoolsEventIndices = {}
-local beattoolsHighestEventGroupIndex = -1
-local beattoolsEventGroupLongest = 0
-local beattoolsEventVisibilities = {}
 local function beattoolsUpdateEventGroups()
 	st.selectedEvent = nil
 	st.multiselect = nil
@@ -1309,29 +1332,6 @@ local function beattoolsMakeSpace(index, reverse)
 			end
 		end
 	end
-end
-local function beattoolsGetEventVisibility(event)
-	if not mods.beattools.config.showEventGroups then return "show" end
-	if type(event) ~= "table" then
-		utilitools.try(mods.beattools, function() error(tostring(event)) end)
-		log(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
-		return "transparent"
-	end
-	if event.type == nil then log(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
-	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
-	if beattoolsEventVisibilities[event.type][""] then return beattoolsEventVisibilities[event.type][""] end
-	local visibility = "hide"
-	for i, v in ipairs(beattoolsEventGroups) do
-		if v.visibility ~= " - " then
-			if v.events[event.type] or v.name == "all" then
-				visibility = v.visibility
-			elseif v.events.custom and event.beattoolsCustomEventGroups and event.beattoolsCustomEventGroups[v.name] then
-				visibility = v.visibility
-			end
-		end
-	end
-	if not event.beattoolsCustomEventGroups then beattoolsEventVisibilities[event.type][""] = visibility end
-	return visibility
 end
 
 local function beattoolsCtrlSelect(event)

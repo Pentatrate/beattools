@@ -147,8 +147,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		end)
 		configHelpers.treeNode("Features", function()
 			configHelpers.doc("game_features")
-			configHelpers.input("damoclismCataclism")
-			imgui.Separator()
 			configHelpers.input("lagBack")
 			configHelpers.condTreeNode("Lag Back Options", "lagBack", true, true, function()
 				configHelpers.input("lagThreshhold")

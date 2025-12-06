@@ -717,7 +717,6 @@ match_indent = true
 pattern = '''local loadBeatQueue = {}'''
 payload = '''
 local beattoolsNoColors = true
-local alreadyHasDamoclism = false
 '''
 position = "after"
 target = "obj/GameManager.lua"
@@ -748,9 +747,6 @@ if mods.beattools.config.customLevelVisuals then
 		end
 	end
 end
-if mods.beattools.config.damoclismCataclism then
-	if v.type == "initObject" and v.objectName == "Damoclism" then alreadyHasDamoclism = true end
-end
 '''
 position = "before"
 target = "obj/GameManager.lua"
@@ -762,9 +758,6 @@ payload = '''
 if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
 	shuv.pal[0].r, shuv.pal[0].g, shuv.pal[0].b = mods.beattools.config.customWhiteColor.r * 255, mods.beattools.config.customWhiteColor.g * 255, mods.beattools.config.customWhiteColor.b * 255
 	shuv.pal[1].r, shuv.pal[1].g, shuv.pal[1].b = mods.beattools.config.customBlackColor.r * 255, mods.beattools.config.customBlackColor.g * 255, mods.beattools.config.customBlackColor.b * 255
-end
-if mods.beattools.config.damoclismCataclism and not alreadyHasDamoclism then
-	table--[[stop wrong injection]].insert(cs.playEvents, { time = -999, angle = 0, type = "initObject", objectName = "Damoclism", variableName = "damoclism_beattools" })
 end
 '''
 position = "before"

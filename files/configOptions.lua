@@ -793,13 +793,6 @@ return {
 	},
 
 	-- newer options i couldnt be bothered to sort, especially after the config menu got reordered and i didnt reorder it in this file
-	damoclismCataclism = {
-		type = "bool",
-		name = "Damoclism Cataclism",
-		tooltips = { short = "Forces the gimmick from Damoclism on all levels" },
-		default = false,
-		off = false
-	},
 	bookmarkList = {
 		type = "bool",
 		name = "Bookmark List",
@@ -933,24 +926,17 @@ return {
 		default = {},
 		off = {}
 	},
-	autoUpdate = {
+	update = {
 		type = "bool",
-		name = "Auto Update",
-		tooltips = { short = "Allow beattools to use the internet to update the mod version" },
-		default = false,
-		off = false
-	},
-	askUpdate = {
-		type = "hidden",
-		name = "[internal] askUpdate",
-		default = true,
-		off = false
-	},
-	useRelease = {
-		type = "bool",
-		name = "Use Release",
-		tooltips = { short = "Use the latest release (more stable) instead of the main branch (faster updates)" },
+		name = "Update",
+		tooltips = { short = "Allow the version for this mod to be autoupdated" },
 		default = true
+	},
+	branch = {
+		type = "branch",
+		name = "Branch",
+		tooltips = { short = "Different ways to get different versions" },
+		default = "main"
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
