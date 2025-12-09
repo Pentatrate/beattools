@@ -226,6 +226,7 @@ pattern = '''if not self.variant then
 else'''
 payload = '''
 if mods.beattools.config.browserCharter or (not self.variant) then
+	self.level.metadata.charter = self.level.metadata.charter or ""
 	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
 	helpers.imguiHelpMarker("This is the name that will be displayed on the Beatblock Browser.")
 end

@@ -2,7 +2,7 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.2.0"]],
+			"versions": [[">=", "1.2.1"]],
 			"reason": "Required API. You may need to update this mod."
 		}
 	},
