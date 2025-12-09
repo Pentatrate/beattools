@@ -6,6 +6,7 @@ utilitools.try(mod, function()
 
 	-- forceprint(utilitools.modUpdater.checkModVersion(mods.utilitools))
 
-	utilitools.modUpdater.checkModVersions()
+	-- utilitools.modUpdater.updateMods()
+	forceprint(love.filesystem.getRealDirectory("Workshop/"))
 
 end)

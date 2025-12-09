@@ -2,7 +2,7 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.1.6"]],
+			"versions": [[">=", "1.2.0"]],
 			"reason": "Required API. You may need to update this mod."
 		}
 	},
@@ -23,7 +23,7 @@
 			"reason": "Old version before this mod got renamed"
 		},
 		"audible-ratemod": {
-			"reason": "Part of this mod already"
+			"reason": "Already in the vanilla game"
 		}
 	},
 	"files": {

@@ -581,16 +581,17 @@ if true then
 				configHelpers.input("easeListSelectChanged")
 				configHelpers.input("easeListSelected")
 				configHelpers.input("easeListRound")
+				configHelpers.input("easeListUsedVars")
 				imgui.TreePop()
 			end
-
-			imgui.BeginTable("easeList", 2, 2^6 + 2^7 + 2^9 + 1 * 2^13)
+			imgui.BeginTable("easeList", 2, imgui.ImGuiTableFlags_RowBg + imgui.ImGuiTableFlags_BordersInnerH + imgui.ImGuiTableFlags_BordersInnerV + imgui.ImGuiTableFlags_SizingFixedFit)
 			for i, v in ipairs(beattoolsAllEasesSorted) do
 				if ((not mods.beattools.config.easeListUse) or beattoolsUselessEases[v] == nil)
 				and ((not mods.beattools.config.easeListSerious) or beattoolsTrollEases[v] == nil)
 				and ((not mods.beattools.config.easeListSelected) or beattoolsEasesSelected[v]) then
 					beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", v)
-					if (not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0 then
+					if ((not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0)
+					and ((not mods.beattools.config.easeListUsedVars) or v == "vfx.vars0" or v:sub(1, #"vfx.vars") ~= "vfx.vars" or #(beattoolsEasings.ease[v] or {}) > 0) then
 						imgui.TableNextRow()
 						imgui.TableNextColumn()
 
@@ -608,7 +609,7 @@ if true then
 							beattoolsEasesSelected[v] = beattoolsCurrentEasings.editorBeat.ease[v][type(beattoolsAllEases[v]) == "boolean" and "enable" or "value"] ~= beattoolsAllEases[v] or nil
 						end
 
-						local pressed = imgui.Selectable_Bool(v, beattoolsEasesSelected[v], 2^1)
+						local pressed = imgui.Selectable_Bool(text, beattoolsEasesSelected[v], imgui.ImGuiSelectableFlags_SpanAllColumns)
 						imguiHelpers.tooltip((beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(beattoolsEasings.ease[v] or {}) .. " events")
 
 						if pressed then
@@ -700,9 +701,9 @@ if true then
 
 						imgui.TableNextColumn()
 						if #(beattoolsEasings.ease[v] or {}) == 0 then
-							imgui.TextDisabled(text)
+							imgui.TextDisabled(v)
 						else
-							imgui.Text(text)
+							imgui.Text(v)
 						end
 					end
 				end

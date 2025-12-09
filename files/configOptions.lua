@@ -856,13 +856,6 @@ return {
 		default = true,
 		off = false
 	},
-	songSelectPitch = {
-		type = "bool",
-		name = "Audible Ratemod",
-		tooltips = { short = "Songs play at rateMod speed in level select menus" },
-		default = true,
-		off = false
-	},
 	ignoreLoopPoints = {
 		type = "bool",
 		name = "Ignore Loop Points",
@@ -926,17 +919,11 @@ return {
 		default = {},
 		off = {}
 	},
-	update = {
+	easeListUsedVars = {
 		type = "bool",
-		name = "Update",
-		tooltips = { short = "Allow the version for this mod to be autoupdated" },
+		name = "Hide Unused Vars Eases",
+		tooltips = { short = "Hides the 100 vars eases if unused" },
 		default = true
-	},
-	branch = {
-		type = "branch",
-		name = "Branch",
-		tooltips = { short = "Different ways to get different versions" },
-		default = "main"
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

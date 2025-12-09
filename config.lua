@@ -1,4 +1,3 @@
-utilitools.fileManager.utilitools.configHelpers.load()
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
@@ -9,6 +8,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.presets.menuOptions()
 			imgui.Separator()
 			configHelpers.presets.menuButtons()
+			imgui.Separator()
+			configHelpers.presets.updateOptions()
 		end, 2 ^ 5)
 		configHelpers.treeNode("Advanced", function()
 			configHelpers.doc("general_advanced")
@@ -166,7 +167,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		end)
 		configHelpers.treeNode("Features", function()
 			configHelpers.doc("levelSelect_features")
-			configHelpers.input("songSelectPitch")
 			configHelpers.input("ignoreLoopPoints")
 			imgui.Separator()
 			imgui.BeginDisabled()
@@ -264,6 +264,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 					configHelpers.input("easeListSelectChanged")
 					configHelpers.input("easeListSelected")
 					configHelpers.input("easeListRound")
+					configHelpers.input("easeListUsedVars")
 				end)
 				imgui.Separator()
 				configHelpers.input("currentPaddle")

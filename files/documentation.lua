@@ -5,7 +5,6 @@ Editor quality-of-life mod
 Should be compatible with all other editor qol mods
 For now largest mod with the for now largest configs menu
 Level Select:
-  Changes song pitch and speed based off of rateMod (code: k4kadu)
   Optionally previews the full song to act as an ingame mp3 player (who uses Spitofy anyways? BB is the best mp3 player)
 Gameplay:
   Accessibility option to revert time back to before you lagged (will show in results screen)
@@ -76,8 +75,7 @@ Hotkeys:
 
 Contributions:
   - Pentatrate: Almost all code
-  - K4kadu: Reworking most editor marker images
-        Audible Ratemod]],
+  - K4kadu: Reworking most editor marker images]],
 	},
 	general_menuOptions = {
 		long =

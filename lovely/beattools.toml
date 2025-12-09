@@ -3,6 +3,23 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
+# Ratemod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.innerOptionsMenu:addNumber('ratemod', self, 'rateMod', 0, 0.1, {0.5, 5}, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
+payload = '''self.innerOptionsMenu:addNumber('ratemod', self, 'rateMod', 0, 0.1, {0.01, 50}, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
+position = "at"
+target = "states/SongSelect.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.innerOptionsMenu:addNumber("ratemod", self, "rateMod", 0, 0.1, { 0.5, 5 }, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
+payload = '''self.innerOptionsMenu:addNumber("ratemod", self, "rateMod", 0, 0.1, { 0.01, 50 }, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
+position = "at"
+target = "states/AtomMap.lua"
+
 # Utilitools requirement ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -79,57 +96,6 @@ match_indent = true
 pattern = '''if self.levelData.metadata.loopPointsEnable then'''
 payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
 position = "at"
-target = "obj/Map/LevelQuark.lua"
-
-# Kakadus code (song pitch in level select) ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.bgNoiseTime = self.bgNoiseTime + love.timer.getDelta()'''
-payload = '''
-if mods.beattools.config.songSelectPitch then
-	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
-	if cs.source and self.rateMod then
-		if self.rateMod ~= prevRateModValue then
-			cs.source:setPitch(self.rateMod)
-			prevRateModValue = self.rateMod
-		end
-	end
-end
-'''
-position = "after"
-target = "states/SongSelect.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if not self.inOptionsMenu then'''
-payload = '''
-if mods.beattools.config.songSelectPitch then
-	if not prevRateModValue then prevRateModValue = self.rateMod or 1 end
-	if cs.source and self.rateMod then
-		if self.rateMod ~= prevRateModValue then
-			cs.source:setPitch(self.rateMod)
-			prevRateModValue = self.rateMod
-		end
-	end
-end
-'''
-position = "before"
-target = "states/AtomMap.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = ''':play()'''
-payload = '''
-if mods.beattools.config.songSelectPitch then
-	if cs.source and cs.rateMod then
-		if cs.rateMod ~= 1 then cs.source:setPitch(cs.rateMod) end
-	end
-end
-'''
-position = "after"
 target = "obj/Map/LevelQuark.lua"
 
 # Copy single event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -1336,7 +1302,6 @@ pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.r
 payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
 position = "at"
 target = "states/Editor.lua"
-
 
 # Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
