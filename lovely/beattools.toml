@@ -32,7 +32,17 @@ if mods.utilitools == nil then
 	love.quit()
 	error("Beattools: Failed to quit game.")
 end
-beattools = {}
+beattools = {
+	noFakeRepeat = {
+		ease = true,
+		tag = true,
+		setJoystickColor = true,
+		["c-me_b-me_iconsEase"] = true,
+		shinamon_offset = true,
+		shinamon_offsetAll = true,
+		shinamon_offsetEvenOdd = true
+	}
+}
 '''
 position = "after"
 target = "main.lua"
