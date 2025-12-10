@@ -1082,3 +1082,32 @@ pattern = '''color('white')'''
 payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 position = "at"
 target = "states/Editor.lua"
+
+# Text deco inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local function editorDraw(event)
+	local pos = cs:getPosition(event.angle,event.time)
+
+	love.graphics.draw(sprites.editor.events.textdeco,pos[1],pos[2],0,1,1,8,8)
+end
+'''
+payload = '''local editorDraw = sprites.editor.events.textdeco'''
+position = "at"
+target = "levelformat/events/Vfx/textdeco.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local function editorDraw(event)
+	local pos = cs:getPosition(event.angle,event.time)
+
+	love.graphics.draw(sprites.editor.events.advancetextdeco,pos[1],pos[2],0,1,1,8,8)
+end
+'''
+payload = '''local editorDraw = sprites.editor.events.advancetextdeco'''
+position = "at"
+target = "levelformat/events/Vfx/advancetextdeco.lua"
