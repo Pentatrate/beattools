@@ -925,6 +925,13 @@ return {
 		tooltips = { short = "Hides the 100 vars eases if unused" },
 		default = true
 	},
+	rateModLimits = {
+		type = "bool",
+		name = "Loosen Speed Range",
+		tooltips = { short = "Game speed selector ranges from 0.01-50x instead of 0.5-5x" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

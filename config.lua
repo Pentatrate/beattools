@@ -168,10 +168,9 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		configHelpers.treeNode("Features", function()
 			configHelpers.doc("levelSelect_features")
 			configHelpers.input("ignoreLoopPoints")
+			configHelpers.input("rateModLimits")
 			imgui.Separator()
-			imgui.BeginDisabled()
-			configHelpers.input("levelSelectDynamicLoading")
-			imgui.EndDisabled()
+			imgui.BeginDisabled() configHelpers.input("levelSelectDynamicLoading") imgui.EndDisabled()
 			imgui.Separator()
 			if imgui.Button("Scan Duplicates") then
 				utilitools.prompts.confirm(
