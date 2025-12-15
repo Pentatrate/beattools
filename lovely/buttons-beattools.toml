@@ -493,6 +493,27 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = '''self.changeToTagDialogue = true'''
+payload = '''self.firstTimeTagDialogue = true'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.newTagName = helpers.InputText("Tag name", self.newTagName, 9999)'''
+payload = '''
+if self.firstTimeTagDialogue then
+	self.firstTimeTagDialogue = false
+	imgui.SetKeyboardFocusHere()
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
 payload = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })
 self:deleteSelectedEvent()'''

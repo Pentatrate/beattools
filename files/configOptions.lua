@@ -759,7 +759,7 @@ return {
 	undoHotkeys = {
 		type = "bool",
 		name = "Undo Hotkeys",
-		tooltips = { long = "Hotkeys to undo (z) / redo (shift + z) single or multiple (ctrl) changes close in time to each other", short = "(ctrl) + (shift) + z" },
+		tooltips = { long = "Hotkeys to undo (z) / redo (shift + z) single or multiple (ctrl) changes close in time to each other", short = "(ctrl: multiple) + (shift: redo) + z" },
 		default = true,
 		off = false
 	},
@@ -908,7 +908,7 @@ return {
 	testKey2 = {
 		type = "key",
 		name = "Test Hotkey 2",
-		tooltips = { short = "Finding children of cs" },
+		tooltips = { short = "Finding ease list eases" },
 		default = {},
 		off = {}
 	},

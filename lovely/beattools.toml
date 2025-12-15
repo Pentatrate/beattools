@@ -32,16 +32,16 @@ if mods.utilitools == nil then
 	love.quit()
 	error("Beattools: Failed to quit game.")
 end
-beattools = {
-	noFakeRepeat = {
-		ease = true,
-		tag = true,
-		setJoystickColor = true,
-		["c-me_b-me_iconsEase"] = true,
-		shinamon_offset = true,
-		shinamon_offsetAll = true,
-		shinamon_offsetEvenOdd = true
-	}
+beattools = beattools or {}
+-- utilitools.files.beattools.undo.firstTime()
+beattools.noFakeRepeat = {
+	ease = true,
+	tag = true,
+	setJoystickColor = true,
+	["c-me_b-me_iconsEase"] = true,
+	shinamon_offset = true,
+	shinamon_offsetAll = true,
+	shinamon_offsetEvenOdd = true
 }
 '''
 position = "after"
@@ -270,15 +270,15 @@ target = "obj/OptionsList.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''function st:moveSelectedEvents(angle,beat)
-	if self.multiselect then'''
+pattern = '''
+self.multiselectStartAngle = self.multiselectStartAngle + angle
+self.multiselectEndAngle = self.multiselectEndAngle + anglefunction st:moveSelectedEvents(angle,beat)
+'''
 payload = '''
-	self.multiselectStartBeat = self.multiselectStartBeat + beat
-	self.multiselectEndBeat = self.multiselectEndBeat + beat
-	if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) then
-		self.multiselectStartAngle = self.multiselectStartAngle + angle
-		self.multiselectEndAngle = self.multiselectEndAngle + angle
-	end
+if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) then
+	self.multiselectStartAngle = self.multiselectStartAngle + angle
+	self.multiselectEndAngle = self.multiselectEndAngle + angle
+end
 '''
 position = "after"
 target = "states/Editor.lua"
