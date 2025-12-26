@@ -196,17 +196,9 @@ match_indent = true
 pattern = '''if maininput:down("ctrl") then'''
 payload = '''
 if mods.beattools.config.ctrlSelect and maininput:down("ctrl") then
-	beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
+	self.beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
 elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
 '''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''Ctrl + LMB - Duplicate clicked event'''
-payload = '''Ctrl + LMB - Duplicate clicked event (C + LMB if ctrl select is on)'''
 position = "at"
 target = "states/Editor.lua"
 
@@ -244,7 +236,7 @@ pattern = '''self.selectedEvent = self.level.events[v]
 self.cursorAngle = self.selectedEvent.angle'''
 payload = '''
 if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
-	beattoolsCtrlSelect(self.level.events[v])
+	self.beattoolsCtrlSelect(self.level.events[v])
 	self.ctrlSelectPending = false
 	self.cursorAngle = self.level.events[v].angle
 else
@@ -272,7 +264,7 @@ target = "obj/OptionsList.lua"
 match_indent = true
 pattern = '''
 self.multiselectStartAngle = self.multiselectStartAngle + angle
-self.multiselectEndAngle = self.multiselectEndAngle + anglefunction st:moveSelectedEvents(angle,beat)
+self.multiselectEndAngle = self.multiselectEndAngle + angle
 '''
 payload = '''
 if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) then
@@ -280,7 +272,7 @@ if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) the
 	self.multiselectEndAngle = self.multiselectEndAngle + angle
 end
 '''
-position = "after"
+position = "at"
 target = "states/Editor.lua"
 
 # Bounce dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====

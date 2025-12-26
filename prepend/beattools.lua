@@ -94,7 +94,7 @@ local beattoolsSelect
 local beattoolsPrevSelect
 beattoolsAngleSnap = 4
 
-local beattoolsOverlap = {}       -- event stacking
+local beattoolsOverlap = {}  -- event stacking
 
 local beattoolsStartBeat          -- restart in playtest
 
@@ -1246,19 +1246,6 @@ local function beattoolsUntag(self, tags2)
 	self.unsavedChanges = true
 end
 
-local function moveMultiselection(self, time, angle)
-	self.unsavedChanges = true
-	for i, event in ipairs(self.multiselect.events) do
-		event.time = event.time + time
-		event.angle = event.angle + angle
-		if event.angle2 then event.angle2 = event.angle2 + angle end
-		if mods.beattools.config.betterMoveSelection and event.endAngle then event.endAngle = event.endAngle + angle end
-	end
-	self.multiselectStartBeat, self.multiselectEndBeat = self.multiselectStartBeat + time,
-		self.multiselectEndBeat + time
-	self:updateBiggestBeat()
-end
-
 local function beattoolsSameEasing(event, selected)
 	if not (mods.beattools.config.markSameEasing and selected and event ~= selected and event.type == selected.type) then return false end
 	local paramForType = { ease = "var", setColor = "color", deco = "id" }
@@ -1334,8 +1321,8 @@ local function beattoolsMakeSpace(index, reverse)
 	end
 end
 
-local function beattoolsCtrlSelect(event)
-	if not mods.beattools.config.ctrlSelect then return end
+st.beattoolsCtrlSelect = function(event, force)
+	if not mods.beattools.config.ctrlSelect and not force then return end
 	st.ctrlSelectPending = false
 	st.deletePending = false
 	local function addToMulti(event2)

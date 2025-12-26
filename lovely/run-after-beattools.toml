@@ -776,6 +776,10 @@ payload = '''if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (bea
 	beattoolsPrevSelect = beattoolsSelect
 	self:updateBiggestBeat()
 end
+if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
+	beattoolsEditorBeat = helpers.round(self.editorBeat)
+	self:updateBiggestBeat()
+end
 '''
 position = "before"
 target = "states/Editor.lua"
@@ -797,25 +801,13 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''--trigger auto-backup every five minutes'''
-payload = '''if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
-	beattoolsEditorBeat = helpers.round(self.editorBeat)
-	self:updateBiggestBeat()
-end
-'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 payload = '''
 if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
 
 if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
 	local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
-	if v.time == -0 then v.time = 0 end
+	if tostring(v.time) == "-0" then v.time = 0 end
 	if beattoolsOverlap["" .. v.time] == nil then
 		beattoolsOverlap["" .. v.time] = {}
 	end
@@ -874,7 +866,7 @@ payload = '''
 	for i, v in ipairs(self.level.events) do
 		if not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" then
 			local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
-			if v.time == -0 then v.time = 0 end
+			if tostring(v.time) == "-0" then v.time = 0 end
 			v.beattoolsIndex, v.beattoolsInStack = 0, nil
 			local noGameplay = true
 			if beattoolsOverlap["" .. v.time] and beattoolsOverlap["" .. v.time][beattoolsAngle] and (beattoolsOverlap["" .. v.time][beattoolsAngle][2] or beattoolsOverlap["" .. v.time][beattoolsAngle][1] > 1) then
@@ -970,34 +962,13 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
-payload = '''beattoolsRemoveParameters(self)'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
-payload = '''beattoolsRemoveParameters(self)'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
-payload = '''beattoolsRemoveParameters(self)'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if imgui.Button('Make tag') then'''
-payload = '''beattoolsRemoveParameters(self)'''
+pattern = '''v.play_onBeat = nil'''
+payload = '''
+v.beattoolsIndex = nil
+v.beattoolsInStack = nil
+'''
 position = "after"
-target = "states/Editor.lua"
+target = "obj/LevelManager.lua"
 
 [[patches]]
 [patches.pattern]
