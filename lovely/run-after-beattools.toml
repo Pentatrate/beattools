@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0" 
+version = "1.0.0"
 
 # Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -314,7 +314,7 @@ else
 		if ((beattoolsLayer == "event" and event ~= self.selectedEvent) or beattoolsLayer == "selected") and event.time >= self.editorBeat then
 			if event.isCursor and beattoolsOverlap["" .. event.time] ~= nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
 				event.beattoolsIndex = beattoolsOverlap["" .. event.time]["" .. event.angle % 360][1]
-				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = event.beattoolsIndex + 1 end
+				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = (event.beattoolsIndex or 0) + 1 end
 			end
 			if event.beattoolsRepeatChild == nil or not mods.beattools.config.fakeRepeat then
 				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
@@ -812,12 +812,13 @@ payload = '''
 				v.beattoolsIndex = beattoolsOverlap["" .. v.time][beattoolsAngle][3]
 				beattoolsOverlap["" .. v.time][beattoolsAngle][3] = beattoolsOverlap["" .. v.time][beattoolsAngle][3] + 1
 				if beattoolsOverlap["" .. v.time][beattoolsAngle][2] then
-					v.beattoolsIndex = v.beattoolsIndex + 1 noGameplay = false
+					v.beattoolsIndex = (v.beattoolsIndex or 0) + 1
+					noGameplay = false
 				end
 			end
 			if beattoolsSelect ~= nil and noGameplay then
 				if true and beattoolsSelect[1] == v.time and beattoolsSelect[2] == v.angle % 360 then
-					v.beattoolsIndex = v.beattoolsIndex + 1
+					v.beattoolsIndex = (v.beattoolsIndex or 0) + 1
 					v.beattoolsInStack = true
 				end
 			end
