@@ -119,6 +119,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("testKey")
 			configHelpers.input("testKey2")
 			configHelpers.input("testKey3")
+			configHelpers.input("testKey4")
 		end)
 		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()
 			configHelpers.doc("general_fullDescription")

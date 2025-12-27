@@ -65,6 +65,16 @@
 		"test3": {
 			"extension": "lua",
 			"load": true
+		},
+		"undo": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"fakeRepeat": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

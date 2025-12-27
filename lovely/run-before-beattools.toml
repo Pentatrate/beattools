@@ -29,16 +29,6 @@ end
 position = "before"
 target = "states/Editor.lua"
 
-# Full update ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''--trigger auto-backup every five minutes'''
-payload = '''if beattoolsTime - beattoolsLastCheck > mods.beattools.config.scanInterval * 100 then beattoolsCheckEvents(self) end
-'''
-position = "before"
-target = "states/Editor.lua"
-
 # Lag back in option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

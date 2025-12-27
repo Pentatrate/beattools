@@ -97,7 +97,7 @@ imguiStyle.imguiColorsFormat = function(styleName)
 				if i3 then
 					local values = {}
 					for ww in string.gmatch(string.gsub(string.sub(w, i2 + 1, i3 - 1), "f, ", "?"), "[^?]+") do
-						table --[[stop wrong injection]].insert(values, tonumber(ww))
+						table.insert(values, tonumber(ww))
 					end
 					if #values == 4 then
 						-- forceprint(string.sub(w, 1, i1 - 1) .. " " .. values[1] .. " " .. values[2] .. " " .. values[3] .. " " .. tostring(values[4]))

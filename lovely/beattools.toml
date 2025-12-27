@@ -3,6 +3,19 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
+# Undo Copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''copies = copies or {}'''
+payload = '''
+if getmetatable(orig) and getmetatable(orig).beattoolsUndoInject then
+	orig = getmetatable(orig).hidden
+end
+'''
+position = "after"
+target = "lib/helpers.lua"
+
 # Ratemod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -33,7 +46,7 @@ if mods.utilitools == nil then
 	error("Beattools: Failed to quit game.")
 end
 beattools = beattools or {}
--- utilitools.files.beattools.undo.firstTime()
+utilitools.files.beattools.undo.firstTime()
 beattools.noFakeRepeat = {
 	ease = true,
 	tag = true,
@@ -296,7 +309,7 @@ match_indent = true
 pattern = '''-- check end of holds as well'''
 payload = '''
 -- check bounces of bounces as well
-if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
+if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
 	for ii = 1, (v.bounces or 1) do
 		local pos2 = self:getPosition(v.angle + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
 		if helpers.collide(
@@ -552,7 +565,7 @@ if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 			else
 				local temp = {}
 				for ww in w:gmatch("[^,]+") do
-					table--[[stop wrong injection]].insert(temp, ww)
+					table.insert(temp, ww)
 				end
 				if false then end
 				({
@@ -1196,7 +1209,11 @@ match_indent = true
 pattern = '''if imgui.Button('Delete event') then'''
 payload = '''
 if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle == 0 then
+	utilitools.files.beattools.undo.undoing = true
+	utilitools.files.beattools.undo.fakeRepeating = true
 	self.selectedEvent.endAngle = self.selectedEvent.angle
+	utilitools.files.beattools.undo.undoing = false
+	utilitools.files.beattools.undo.fakeRepeating = false
 end
 '''
 position = "before"
@@ -1351,3 +1368,16 @@ pattern = '''yTotal = yTotal + myHeight'''
 payload = '''if y - myHeight * 0.5 < 360 or y + myHeight * 0.5 > 0 then'''
 position = "after"
 target = "states/SongSelect.lua"
+
+# Undo save all ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if love.timer.getTime() - self.lastSaved > 300 then'''
+payload = '''
+	if #utilitools.files.beattools.undo.changes == utilitools.files.beattools.undo.index then
+		utilitools.files.beattools.undo.fullSave()
+	end
+'''
+position = "after"
+target = "states/Editor.lua"

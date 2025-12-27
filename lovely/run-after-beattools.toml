@@ -147,7 +147,7 @@ payload = '''
 if mods.beattools.config.fakeRepeat then
 	for i = #tagEvents, 1, -1 do
 		local v = tagEvents[i]
-		if v.beattoolsRepeats ~= nil then
+		if v.beattoolsRepeatChild ~= nil then
 			table.remove(tagEvents, i)
 		end
 	end
@@ -156,124 +156,24 @@ for i = 1, #tagEvents do
 	local v = tagEvents[i]
 	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)
 	if mods.beattools.config.fakeRepeat then
-		if v.repeats ~= nil and v.repeats > 0 and not beattools.noFakeRepeat[v.type] then
+		if v.beattoolsRepeatParent and v.repeats ~= nil and v.repeats > 0 and not beattools.noFakeRepeat[v.type] then
 			for i = 1, v.repeats do
 				local newEvent = helpers.copy(v)
-				newEvent.beattoolsRepeats = newEvent.beattoolsRepeatIndex
-				newEvent.time = newEvent.time + i * (newEvent.repeatDelay or 1)
-				newEvent.beattoolsRepeatIndex = nil
-				newEvent.repeats = nil
-				newEvent.repeatDelay = nil
+
+				newEvent.beattoolsRepeatParent, newEvent.repeats, newEvent.repeatDelay = nil, nil, nil
+				newEvent.time = v.time + i * (v.repeatDelay or 1)
+				newEvent.beattoolsRepeatChild = v.beattoolsRepeatParent
+
 				table.insert(tagEvents, 1, newEvent)
 				i = i + 1
 			end
 		else
-			v.beattoolsRepeatIndex = nil
+			v.beattoolsRepeatParent = nil
 		end
 	end
 end
 '''
 position = "at"
-target = "states/Editor.lua"
-
-# Blueprints probably dont work in EA
-# [[patches]]
-# [patches.pattern]
-# target = "states/Editor.lua"
-# pattern = '''for i, v in ipairs(blueprintEvents) do
-# 	v.time = v.time - self.multiselectStartBeat
-# end'''
-# position = "at"
-# payload = '''
-# for i = #blueprintEvents, 1, -1 do
-# 	local v = blueprintEvents[i]
-# 	if mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil then
-# 		table.remove(blueprintEvents, i)
-# 	end
-# end
-# for i, v in ipairs(blueprintEvents) do
-# 	v.time = v.time - self.multiselectStartBeat
-# 	if mods.beattools.config.fakeRepeat then
-# 		if v.repeats ~= nil and v.repeats > 0 then
-# 			for i = 1, v.repeats do
-# 				local newEvent = helpers.copy(v)
-# 				newEvent.beattoolsRepeatIndex, newEvent.repeats, newEvent.repeatDelay, newEvent.beattoolsRepeats, newEvent.time = nil, nil, nil, newEvent.beattoolsRepeatIndex, newEvent.time + i * (newEvent.repeatDelay or 1)
-# 				table.insert(blueprintEvents, newEvent)
-# 			end
-# 		else
-# 			v.beattoolsRepeatIndex = nil
-# 		end
-# 	end
-# end
-# '''
-# match_indent = true
-
-# Add to changes ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.regex]
-pattern = '''table\.insert\((?<table>self\.variants|self\.multiselect\.events|palette|self\.overlappingEvents|self\.keybinds|newEvents|overlappingDistances|hitMarkers|barelyMarkers|missMarkers|mineMarkers|tapMarkers|points|self\.currentTrails\[i\]|self\.trails|blueprintContent|sameTime|beattoolsEasings\.(color\[v\.color \+ 1\]|bgColor|outline|noise|ease\.w+)|tagEvents|holdEndSelection|bounceSelection|Event\.enum\.variants|self\.markers|newMarkers),'''
-payload = '''table--[[stop wrong injection]].insert($table,'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''table\.remove\((?<table>self\.multiselect\.events|tagEvents),'''
-payload = '''table--[[stop wrong injection]].remove($table,'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-line_prepend = "$indent" 
-pattern = '''(?<indent>[ \t]*)table\.insert\((?<params>[\s\S]+?)(\)\s*\n)[\n\t ]*(?<end>(?:(?:[^\S\n]|(?:--\[\[[\s\S]*?\]\])|(?:--[^\n]*?\n))*(?:(?:[^bdefirtuw\W]\w*|b[^r\s]\w*|b\W|br[^e\s]\w*|br\W|bre[^a\s]\w*|bre\W|brea[^k\s]\w*|brea\W|break\w+|d[^o\s]\w*|d\W|do\w+|e[^ln\s]\w*|e\W|el[^s\s]\w*|el\W|els[^e\s]\w*|els\W|else\w+|en[^d\s]\w*|en\W|end\w+|f[^ou\s]\w*|f\W|fo[^r\s]\w*|fo\W|for\w+|fu[^n\s]\w*|fu\W|fun[^c\s]\w*|fun\W|func[^t\s]\w*|func\W|funct[^i\s]\w*|funct\W|functi[^o\s]\w*|functi\W|functio[^n\s]\w*|functio\W|function\w+|i[^fn\s]\w*|i\W|if\w+|in\w+|r[^e\s]\w*|r\W|re[^pt\s]\w*|re\W|rep[^e\s]\w*|rep\W|repe[^a\s]\w*|repe\W|repea[^t\s]\w*|repea\W|repeat\w+|ret[^u\s]\w*|ret\W|retu[^r\s]\w*|retu\W|retur[^n\s]\w*|retur\W|return\w+|t[^h\s]\w*|t\W|th[^e\s]\w*|th\W|the[^n\s]\w*|the\W|then\w+|u[^n\s]\w*|u\W|un[^t\s]\w*|un\W|unt[^i\s]\w*|unt\W|unti[^l\s]\w*|unti\W|until\w+|w[^h\s]\w*|w\W|wh[^i\s]\w*|wh\W|whi[^l\s]\w*|whi\W|whil[^e\s]\w*|whil\W|while\w+)?[^\n\w]?)*\n)*)''' # Penta: huge.
-payload = '''if beattoolsPlaceEvent($params) then
-table.insert($params)
--- Beattools Regex Start
--- Remember that this code is supposed to be indented one further, but doing so with regexes is almost impossible
-$end
--- Beattools Regex End
-end ''' 
-position = "at" 
-target = "states/Editor.lua" 
-# Penta: original before i changed it (without negative lookahead)
-# table\.insert\((?<params>[\s\S]+?)\)(?<end>([^\S\n]*((?!break|do|else|end|for|function|if|in|repeat|return|then|until|while)(\w*?)[^\n]?)*\n)*)
-
-[[patches]]
-[patches.regex]
-pattern = '''table\.remove\((?<params>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?]]|--[\s\S]*?\n)*?\w+)'''
-payload = '''beattoolsDeleteEvent($params) table.remove($params)$end'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''--\[\[stop wrong injection]]'''
-payload = ''''''
-position = "at"
-target = "states/Editor.lua"
-
-# Add undo shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.selectedEvent.angle = angle'''
-payload = '''if self.selectedEvent.angle ~= self.cursorAngle then
-	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "angle", self.cursorAngle)
-end
-'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.selectedEvent.time = self.cursorBeat'''
-payload = '''if self.selectedEvent.time ~= self.cursorBeat then
-	beattoolsCheckForRepeatUpdate(self, self.selectedEvent, "time", self.cursorBeat)
-end
-'''
-position = "before"
 target = "states/Editor.lua"
 
 # Edits the event position visually ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -302,9 +202,15 @@ if type(eventDraw) == "function" then
 		end
 	end
 	local beattoolsTemp2 = event.angle
-	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = event.endAngle end
+	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
+		utilitools.files.beattools.undo.undoing = true
+		utilitools.files.beattools.undo.fakeRepeating = true
+		event.angle = event.endAngle
+		utilitools.files.beattools.undo.undoing = false
+		utilitools.files.beattools.undo.fakeRepeating = false
+	end
 	if (beattoolsLayer == "note" and event ~= self.selectedEvent) or beattoolsLayer == "selected" then
-		if event.beattoolsRepeats == nil or not mods.beattools.config.fakeRepeat then
+		if event.beattoolsRepeatChild == nil or not mods.beattools.config.fakeRepeat then
 			eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance, alpha)
 			if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil and event.time >= self.editorBeat then
 				local pos = cs:getPosition(event.angle, event.time)
@@ -336,17 +242,29 @@ if type(eventDraw) == "function" then
 	end
 	if ((beattoolsLayer == "endAngleMarker" and event ~= self.selectedEvent) or (beattoolsLayer == "selected" and mods.beattools.config.markEndAnglePosition ~= "off")) and event.endAngle ~= nil and event.time >= self.editorBeat then
 		if beattoolsLayer == "selected" then love.graphics.setColor(1, 1, 1, 1) end
-		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = beattoolsTemp2 end
+		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
+			utilitools.files.beattools.undo.undoing = true
+			utilitools.files.beattools.undo.fakeRepeating = true
+			event.angle = beattoolsTemp2
+			utilitools.files.beattools.undo.undoing = false
+			utilitools.files.beattools.undo.fakeRepeating = false
+		end
 		local pos = cs:getPosition((function () if mods.beattools.config.displayEndAngle then return event.angle else return event.endAngle end end)(), event.time)
-		love.graphics.draw((function () if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex) then return sprites.editor.endAngleMarkerSelected else return sprites.editor.endAngleMarker end end)(), pos[1], pos[2], 0, 1, 1, 11, 11)
-		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = event.endAngle end
+		love.graphics.draw((function () if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeatChild ~= nil and event.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent) then return sprites.editor.endAngleMarkerSelected else return sprites.editor.endAngleMarker end end)(), pos[1], pos[2], 0, 1, 1, 11, 11)
+		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
+			utilitools.files.beattools.undo.undoing = true
+			utilitools.files.beattools.undo.fakeRepeating = true
+			event.angle = event.endAngle
+			utilitools.files.beattools.undo.undoing = false
+			utilitools.files.beattools.undo.fakeRepeating = false
+		end
 	end
-	if beattoolsLayer == "repeatMarker" and event.beattoolsRepeats ~= nil then
+	if beattoolsLayer == "repeatMarker" and event.beattoolsRepeatChild ~= nil then
 		local pos = cs:getPosition(event.angle, event.time)
 		if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 and event.time >= self.editorBeat then
 			love.graphics.draw(
 				(function ()
-					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then
+					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeatChild ~= nil and event.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent then
 						love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, 1)
 						return sprites.editor.repeatMarkerSelected
 					else
@@ -358,10 +276,16 @@ if type(eventDraw) == "function" then
 			)
 		end
 	end
-	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then event.angle = beattoolsTemp2 end
+	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
+		utilitools.files.beattools.undo.undoing = true
+		utilitools.files.beattools.undo.fakeRepeating = true
+		event.angle = beattoolsTemp2
+		utilitools.files.beattools.undo.undoing = false
+		utilitools.files.beattools.undo.fakeRepeating = false
+	end
 else
 	if event.duration ~= nil and event.duration > 0 and (beattoolsLayer == "duration" or (mods.beattools.config.showDuration ~= "off" and beattoolsLayer == "selected")) then
-		if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex) then
+		if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeatChild ~= nil and event.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent) then
 			love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, mods.beattools.config.durationSelectedColor.a)
 		elseif beattoolsSameEasing(event, self.selectedEvent) then
 			love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, mods.beattools.config.durationSameEasingColor.a)
@@ -392,7 +316,7 @@ else
 				event.beattoolsIndex = beattoolsOverlap["" .. event.time]["" .. event.angle % 360][1]
 				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = event.beattoolsIndex + 1 end
 			end
-			if event.beattoolsRepeats == nil or not mods.beattools.config.fakeRepeat then
+			if event.beattoolsRepeatChild == nil or not mods.beattools.config.fakeRepeat then
 				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
 				if beattoolsSameEasing(event, self.selectedEvent) then
 					love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
@@ -423,10 +347,10 @@ else
 				end
 			end
 		end
-		if beattoolsLayer == "repeatMarker" and event.beattoolsRepeats ~= nil then
+		if beattoolsLayer == "repeatMarker" and event.beattoolsRepeatChild ~= nil then
 			love.graphics.draw(
 				(function ()
-					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeats ~= nil and event.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex then
+					if mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeatChild ~= nil and event.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent then
 						love.graphics.setColor(mods.beattools.config.durationSelectedColor.r, mods.beattools.config.durationSelectedColor.g, mods.beattools.config.durationSelectedColor.b, 1)
 						return sprites.editor.repeatMarkerSelected
 					elseif beattoolsSameEasing(event, self.selectedEvent) then
@@ -570,15 +494,15 @@ if true then -- Penta: beattools layer code
 				return x >= low and x <= high
 			end
 			local function addTo(list)
-				table--[[stop wrong injection]].insert(list, v)
+				table.insert(list, v)
 			end
 
-			local added, repeating, maxBeat, selected = false, v.type == "ease" and v.repeats ~= nil and v.repeats > 0 and v.repeatDelay ~= 0, self.editorBeat + self.drawDistance, self.selectedEvent ~= nil and self.selectedEvent.beattoolsRepeatIndex ~= nil and v.beattoolsRepeats == self.selectedEvent.beattoolsRepeatIndex
+			local added, repeating, maxBeat, selected = false, v.type == "ease" and v.repeats ~= nil and v.repeats > 0 and v.repeatDelay ~= 0, self.editorBeat + self.drawDistance, self.selectedEvent ~= nil and self.selectedEvent.beattoolsRepeatParent ~= nil and v.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent
 
 			if type(Event.editorDraw[v.type]) ~= "function" and (mods.beattools.config.showDuration == "on" or (mods.beattools.config.showDuration ~= "off" and selected)) and v.duration ~= nil and v.duration > 0 then
 				if isBetween(self.editorBeat, v.time, v.time + v.duration) or isBetween(maxBeat, v.time, v.time + v.duration) or isBetween(v.time, self.editorBeat, maxBeat) then
 					addTo(layerDuration)
-					if (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and ((repeating and v.time + v.repeats * (v.repeatDelay or 1) >= self.editorBeat) or (mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil and v.time >= self.editorBeat)) then
+					if (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and ((repeating and v.time + v.repeats * (v.repeatDelay or 1) >= self.editorBeat) or (mods.beattools.config.fakeRepeat and v.beattoolsRepeatChild ~= nil and v.time >= self.editorBeat)) then
 						addTo(layerRepeatMarker)
 					end
 				elseif repeating then
@@ -592,7 +516,7 @@ if true then -- Penta: beattools layer code
 						end
 					end
 				end
-			elseif (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and (repeating or (mods.beattools.config.fakeRepeat and v.beattoolsRepeats ~= nil)) then
+			elseif (mods.beattools.config.markRepeat == "on" or (mods.beattools.config.markRepeat ~= "off" and selected)) and (repeating or (mods.beattools.config.fakeRepeat and v.beattoolsRepeatChild ~= nil)) then
 				if isBetween(v.time, self.editorBeat, maxBeat) then
 					addTo(layerRepeatMarker)
 				elseif repeating then
@@ -772,7 +696,9 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''--trigger auto-backup every five minutes'''
-payload = '''if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect ~= nil and (beattoolsSelect[1] ~= beattoolsPrevSelect[1] or beattoolsSelect[2] ~= beattoolsPrevSelect[2])) then
+payload = '''
+utilitools.files.beattools.undo.update()
+if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect ~= nil and (beattoolsSelect[1] ~= beattoolsPrevSelect[1] or beattoolsSelect[2] ~= beattoolsPrevSelect[2])) then
 	beattoolsPrevSelect = beattoolsSelect
 	self:updateBiggestBeat()
 end
@@ -841,6 +767,18 @@ target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
+match_indent = true
+pattern = '''--trigger auto-backup every five minutes'''
+payload = '''if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
+	beattoolsEditorBeat = helpers.round(self.editorBeat)
+	self:updateBiggestBeat()
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
 match_indent = false
 pattern = '''	-- Penta's Beattools code marker
 end'''
@@ -898,7 +836,7 @@ if helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
 payload = '''
-if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and helpers.collide(
+if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8 + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, y = pos[2] - 8 - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, width = 16, height = 16 }
 '''
@@ -911,14 +849,14 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
-payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then'''
+payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then'''
 position = "at"
 target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
 pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
-payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
+payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
 position = "at"
 target = "states/Editor.lua"
 

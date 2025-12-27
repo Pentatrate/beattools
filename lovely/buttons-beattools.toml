@@ -69,7 +69,7 @@ self:addKeybind(function ()
 		elseif self.multiselect then
 			local tempEvents = {}
 			for i, v in ipairs(self.multiselect.events) do
-				if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
+				if v.type == "tag" then table.insert(tempEvents, v.tag) end
 			end
 			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, tempEvents) return end
 			utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
@@ -113,7 +113,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -133,7 +133,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeats == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -141,7 +141,7 @@ self:addKeybind(function ()
 end, "move to previous", "ctrl", "move_down")
 -- undo
 self:addKeybind(function ()
-	if mods.beattools.config.undoHotkeys then beattoolsUndo(self, maininput:down("shift") and "redo" or "undo", maininput:down("ctrl")) end
+	if mods.beattools.config.undoHotkeys then utilitools.files.beattools.undo.keybind() end
 end, "undo", "z")
 -- hide menus
 self:addKeybind(function ()
@@ -195,7 +195,7 @@ if mods.beattools.config.spreadButtons then
 		local function beattoolsGetSameTime(sameTime)
 			for i, v in ipairs(self.level.events) do
 				if v.time == self.level.events[self.overlappingEvents[1]].time then
-					beattoolsPlaceEvent(sameTime, v) table.insert(sameTime, v)
+					table.insert(sameTime, v)
 				end
 			end
 		end
@@ -361,7 +361,7 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and not beattools.noF
 	else self.selectedEvent.repeatDelay = nil end
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
 		utilitools.prompts.confirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
-			beattoolsUpdateRepeat(self, self.selectedEvent, true)
+			utilitools.files.beattools.fakeRepeat.update(self.selectedEvent, true)
 		end)
 	end
 	imgui.Separator()
@@ -463,7 +463,7 @@ if mods.beattools.config.untaggingButtons then
 	if imgui.Button("Untag same tag name") then
 		local tempEvents = {}
 		for i, v in ipairs(self.multiselect.events) do
-			if v.type == "tag" then table--[[stop wrong injection]].insert(tempEvents, v.tag) end
+			if v.type == "tag" then table.insert(tempEvents, v.tag) end
 		end
 		utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
 			beattoolsUntag(self, tempEvents)

@@ -155,12 +155,6 @@ return {
 		tooltips = { long = "How many beats outside of the visible area to scan for event stacks. Too small values result results in lag when scrolling. Too large values result results in one lag* spike when the margin is reached.\n(Generally, the scan for event stacks is not laggy enough to even require this measure, so you can input large values)", short = "Beat margin for calculating event stacks" },
 		default = 64
 	},
-	scanInterval = {
-		type = "float",
-		name = "Scan Interval",
-		tooltips = { long = "Scan for changes to undo/redo in this interval in seconds\nMaybe would be a smart idea to keep this lower than the Group Time Difference (Features/Features)", short = "Scan interval for undo/redo in seconds" },
-		default = 0.1
-	},
 	keyHandling = {
 		type = "combo",
 		name = "Property Filter",
@@ -171,24 +165,6 @@ return {
 			{ long = "Save changes of all unsupported event parameters added by other mods (especially when you want to be able to undo/redo them and they dont auto update, basically a gameplay altering mod or custom events)",                                                                                   short = "Takes unsupported parameters into account" }
 		},
 		default = "blacklist"
-	},
-	loopVisibleEventsAmount = {
-		type = "int",
-		name = "Visible Threshold",
-		tooltips = { long = "When checking for changes, only loop through events visible in the editor once the level has this many events. Will still loop through the selected/multiselected events regardless of them being visible", short = "After this threshhold for the level, only scan visible events for changes" },
-		default = 5000
-	},
-	loopEventsDuringSelectionAmount = {
-		type = "int",
-		name = "During Threshold",
-		tooltips = { long = "When checking for changes, only loop through events within the selection area (not the selection itself) once the multiselection has this many events (You will lag if you ctrl select events (Using \"Ctrl Select\" by Kakadu) at the start and end of the level, because almost the full level will be within the selection area)", short = "After this threshhold for the selection, scan events within selection area instead of within multiselection itself" },
-		default = 2000
-	},
-	loopSingleSelectionEventAmount = {
-		type = "int",
-		name = "Single Threshold",
-		tooltips = { long = "When checking for changes, only loop through one event in the selection once the multiselection has this many events (You could argue that when a single event in the selection changes, all events change, and therefore could make this value lower) (This is mainly designed for those who ctrl + a large levels and expect the game to run smoothly)", short = "After this threshhold for the selection, scan one event instead of full selection" },
-		default = 2000
 	},
 	randomizeWindows = {
 		type = "combo",
@@ -915,7 +891,14 @@ return {
 	testKey3 = {
 		type = "key",
 		name = "Test Hotkey 3",
-		tooltips = { short = "Websocket stuff" },
+		tooltips = { short = "Nothing" },
+		default = {},
+		off = {}
+	},
+	testKey4 = {
+		type = "key",
+		name = "Test Hotkey 4",
+		tooltips = { short = "Undo stuff" },
 		default = {},
 		off = {}
 	},

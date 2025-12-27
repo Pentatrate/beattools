@@ -212,7 +212,7 @@ if properties.default then
 end
 if mods.beattools.config.hideHelpMarkers then
 	utilitools.imguiHelpers.tooltip(tooltip)
-else helpers--[[stop wrong injection]].imguiHelpMarker(tooltip) end
+else helpers.imguiHelpMarker(tooltip) end
 '''
 position = "at"
 target = "obj/GameManager.lua"
@@ -929,6 +929,9 @@ if true then
 	end
 	if mods.beattools.config.editorCalculator then
 		if utilitools.files.beattools.calculator then utilitools.files.beattools.calculator() end
+	end
+	if mods.beattools.config.editorCalculator then
+		if utilitools.files.beattools.calculator then utilitools.files.beattools.test3() end
 	end
 end
 '''
