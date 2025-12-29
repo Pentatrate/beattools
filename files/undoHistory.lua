@@ -99,7 +99,7 @@ return function(inputFlag)
 
 	helpers.SetNextWindowPos(750, 400, window_flag or 'ImGuiCond_FirstUseEver')
 	helpers.SetNextWindowSize(200, 320, window_flag or 'ImGuiCond_FirstUseEver')
-	if imgui.Begin("Undo History", true, inputFlag) then
+	if imgui.Begin("Undo History", nil, inputFlag) then
 		if imgui.BeginTabBar("beattoolsUndo") then
 			local first
 			local changes = {}
