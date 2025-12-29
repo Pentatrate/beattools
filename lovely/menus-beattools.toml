@@ -63,12 +63,12 @@ payload = '''
 if not beattoolsRecordPosition then self:imgui() beattoolsRandomizeWindows = false end
 for i = 1, 7 do
 	if mods.beattools.config.currentPaddle then
-		beattoolsGetCurrentEasing(self, "paddles", "enabled", "editorBeat", i, "enabled")
-		beattoolsGetCurrentEasing(self, "paddles", "newWidth", "editorBeat", i, "newWidth")
-		beattoolsGetCurrentEasing(self, "paddles", "newAngle", "editorBeat", i, "newAngle")
-		self.p.paddles[i].enabled = beattoolsCurrentEasings.editorBeat.paddles[i].enabled.enabled
-		self.p.paddles[i].paddleSize = beattoolsCurrentEasings.editorBeat.paddles[i].newWidth.newWidth
-		self.p.paddles[i].baseAngle = beattoolsCurrentEasings.editorBeat.paddles[i].newAngle.newAngle
+		self:beattoolsCurrentEasing("paddles", "enabled", "editorBeat", i, "enabled")
+		self:beattoolsCurrentEasing("paddles", "newWidth", "editorBeat", i, "newWidth")
+		self:beattoolsCurrentEasing("paddles", "newAngle", "editorBeat", i, "newAngle")
+		self.p.paddles[i].enabled = self.beattoolsCurrentEasings.editorBeat.paddles[i].enabled.enabled
+		self.p.paddles[i].paddleSize = self.beattoolsCurrentEasings.editorBeat.paddles[i].newWidth.newWidth
+		self.p.paddles[i].baseAngle = self.beattoolsCurrentEasings.editorBeat.paddles[i].newAngle.newAngle
 	else
 		self.p.paddles[i].enabled = i == 1
 		self.p.paddles[i].paddleSize = 70
@@ -303,10 +303,10 @@ target = "states/Editor.lua"
 match_indent = true
 pattern = '''love.graphics.printf(sectionName, project.res.cx - 499, project.res.cy - 60, 1000, "center")'''
 payload = '''
-beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
-love.graphics.printf((mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 ~= 0 and self.editorBeat == beattoolsCurrentEasings.editorBeat.bookmarks.time and prevSectionName .. " >> " or "") .. sectionName .. (mods.beattools.config.betterBookmarks and " (" .. (beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1) .. "/" .. #(beattoolsEasings.bookmarks or {}) .. ")" or ""), project.res.cx - 499, project.res.cy - 60, 1000, "center")
-if mods.beattools.config.betterBookmarks and beattoolsCurrentEasings.editorBeat.bookmarks.description ~= nil and beattoolsCurrentEasings.editorBeat.bookmarks.description ~= "" then
-	love.graphics.printf(beattoolsCurrentEasings.editorBeat.bookmarks.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
+self:beattoolsCurrentEasing("bookmarks", "bookmark", "editorBeat")
+love.graphics.printf((mods.beattools.config.betterBookmarks and self.beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 ~= 0 and self.editorBeat == self.beattoolsCurrentEasings.editorBeat.bookmarks.time and prevSectionName .. " >> " or "") .. sectionName .. (mods.beattools.config.betterBookmarks and " (" .. (self.beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1) .. "/" .. #(self.beattoolsEasings.bookmarks or {}) .. ")" or ""), project.res.cx - 499, project.res.cy - 60, 1000, "center")
+if mods.beattools.config.betterBookmarks and self.beattoolsCurrentEasings.editorBeat.bookmarks.description ~= nil and self.beattoolsCurrentEasings.editorBeat.bookmarks.description ~= "" then
+	love.graphics.printf(self.beattoolsCurrentEasings.editorBeat.bookmarks.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
 end
 '''
 position = "at"
@@ -319,7 +319,7 @@ pattern = '''love.graphics.circle("fill", project.res.cx, project.res.cy, self:b
 payload = '''
 love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))
 if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
+	love.graphics.setColor(self.beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, self.beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, self.beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
 	love.graphics.arc("line", "open", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat), 0, 2 * math.pi, 100)
 end
 '''
@@ -333,13 +333,13 @@ pattern = '''local textWidth = love.graphics.getFont():getWidth(tostring(math.fl
 love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)'''
 payload = '''
 local beatText = tostring(math.floor(self.editorBeat))
-local easingPrevBookmarkTime = beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 == 0 and 0 or beattoolsCurrentEasings.editorBeat.bookmarks.time
+local easingPrevBookmarkTime = self.beattoolsCurrentEasings.editorBeat.bookmarks.runEvents - 1 == 0 and 0 or self.beattoolsCurrentEasings.editorBeat.bookmarks.time
 local bookmarkBeatText = math.floor(self.editorBeat - easingPrevBookmarkTime) .. "/" .. math.floor(nextBookmarkBeat - easingPrevBookmarkTime)
 local textWidth = love.graphics.getFont():getWidth(beatText)
 local bookmarkBeatTextWidth = love.graphics.getFont():getWidth(bookmarkBeatText)
 
 if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
+	love.graphics.setColor(self.beattoolsCurrentEasings.editorBeat.bookmarks.r / 255, self.beattoolsCurrentEasings.editorBeat.bookmarks.g / 255, self.beattoolsCurrentEasings.editorBeat.bookmarks.b / 255, 1)
 	love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
 end
 '''
@@ -362,7 +362,7 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyEases)'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattools.easeList.eases)'''
 position = "after"
 target = "levelformat/events/Vfx/ease.lua"
 
@@ -370,7 +370,7 @@ target = "levelformat/events/Vfx/ease.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattoolsOnlyBooleans)'''
+payload = '''event.var = utilitools.suggest.suggest(event.var, beattools.easeList.bools)'''
 position = "after"
 target = "levelformat/events/Vfx/setBoolean.lua"
 
@@ -381,9 +381,6 @@ match_indent = true
 pattern = '''if self.goToBeatDialogue then'''
 payload = '''
 if true then
-	local configHelpers = utilitools.configHelpers
-	local imguiHelpers = utilitools.imguiHelpers
-
 	if mods.beattools.config.showEventGroups then
 		if self.level then
 			if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
@@ -571,161 +568,21 @@ if true then
 			imgui.End()
 		end
 	end
-	if mods.beattools.config.easeList then
-		helpers.SetNextWindowPos(750, 420, window_flag)
-		helpers.SetNextWindowSize(200, 300, window_flag)
-		if imgui.Begin("Ease List", nil, inputFlag) then
-			if imgui.TreeNode_Str("Filters") then
-				configHelpers.input("easeListUse")
-				configHelpers.input("easeListUsed")
-				configHelpers.input("easeListSerious")
-				configHelpers.input("easeListSelectChanged")
-				configHelpers.input("easeListSelected")
-				configHelpers.input("easeListRound")
-				configHelpers.input("easeListUsedVars")
-				imgui.TreePop()
-			end
-			imgui.BeginTable("easeList", 2, imgui.ImGuiTableFlags_RowBg + imgui.ImGuiTableFlags_BordersInnerH + imgui.ImGuiTableFlags_BordersInnerV + imgui.ImGuiTableFlags_SizingFixedFit)
-			for i, v in ipairs(beattoolsAllEasesSorted) do
-				if ((not mods.beattools.config.easeListUse) or beattoolsUselessEases[v] == nil)
-				and ((not mods.beattools.config.easeListSerious) or beattoolsTrollEases[v] == nil)
-				and ((not mods.beattools.config.easeListSelected) or beattoolsEasesSelected[v]) then
-					beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", v)
-					if ((not mods.beattools.config.easeListUsed) or #(beattoolsEasings.ease[v] or {}) > 0)
-					and ((not mods.beattools.config.easeListUsedVars) or v == "vfx.vars0" or v:sub(1, #"vfx.vars") ~= "vfx.vars" or #(beattoolsEasings.ease[v] or {}) > 0) then
-						imgui.TableNextRow()
-						imgui.TableNextColumn()
-
-						local text
-						if type(beattoolsAllEases[v]) == "boolean" then
-							text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].enable)
-						elseif type(beattoolsAllEases[v]) == "number" or v == "outline" then
-							if beattoolsCurrentEasings.editorBeat.ease[v].value == nil or not mods.beattools.config.easeListRound then
-								text = tostring(beattoolsCurrentEasings.editorBeat.ease[v].value)
-							else
-								text = tostring(helpers.round(beattoolsCurrentEasings.editorBeat.ease[v].value * 1e3) / 1e3)
-							end
-						end
-						if mods.beattools.config.easeListSelectChanged then
-							beattoolsEasesSelected[v] = beattoolsCurrentEasings.editorBeat.ease[v][type(beattoolsAllEases[v]) == "boolean" and "enable" or "value"] ~= beattoolsAllEases[v] or nil
-						end
-
-						local pressed = imgui.Selectable_Bool(text, beattoolsEasesSelected[v], imgui.ImGuiSelectableFlags_SpanAllColumns)
-						imguiHelpers.tooltip((beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(beattoolsEasings.ease[v] or {}) .. " events")
-
-						if pressed then
-							local function shouldSelect(v2)
-								if v == "bgColor" and v2.type == "setBgColor" and v2.color ~= nil then return true end
-								if v == "voidColor" and v2.type == "setBgColor" and v2.voidColor ~= nil then return true end
-								if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
-								if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
-								if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
-								if v:sub(1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[v:sub(19)] ~= nil then return true end
-								return v2.type == (type(beattoolsAllEases[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
-							end
-							local eventsDeleted = 0
-							if self.multiselect ~= nil then
-								for i2 = #self.multiselect.events, 1, -1 do
-									local v2 = self.multiselect.events[i2]
-									if shouldSelect(v2) then
-										table.remove(self.multiselect.events, i2)
-										eventsDeleted = eventsDeleted + 1 + (v2.type == "ease" and v2.repeats and v2.repeats > 0 and (v2.repeatDelay or 1) ~= 0 and v2.repeats or 0)
-									end
-								end
-							end
-							local function addEases()
-								if self.multiselect == nil then
-									beattoolsNewMultiSelection()
-									self.multiselectStartBeat = nil
-									self.multiselectEndBeat = nil
-								end
-								local function addToMultiSelect(v2)
-									table.insert(self.multiselect.events, v2)
-									self.multiselect.eventTypes[v2.type] = true
-									if self.multiselectStartBeat == nil then
-										self.multiselectStartBeat = v2.time
-										self.multiselectEndBeat = v2.time
-									else
-										if self.multiselectStartBeat > v2.time then
-											self.multiselectStartBeat = v2.time
-										end
-										if self.multiselectEndBeat < v2.time then
-											self.multiselectEndBeat = v2.time
-										end
-									end
-								end
-								if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.ease[v].runEvents == 1 then
-									for i2, v2 in ipairs(self.level.events) do
-										if shouldSelect(v2) then addToMultiSelect(v2) end
-									end
-								elseif eventsDeleted == 0 then
-									local v3
-									for i2, v2 in ipairs(self.level.events) do
-										if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
-											v3 = v2
-										end
-									end
-									if v3 ~= nil then
-										addToMultiSelect(v3)
-									end
-								end
-								if self.multiselectStartBeat == nil then
-									self.multiselectStartBeat = 0
-									self.multiselectEndBeat = 360
-								end
-
-								self.p:hurtPulse()
-							end
-							if not mods.beattools.config.easeListSelectChanged then
-								if beattoolsEasesSelected[v] and (#(beattoolsEasings.ease[v] or {}) == 0 or eventsDeleted == #(beattoolsEasings.ease[v] or {})) then
-									beattoolsEasesSelected[v] = nil
-								else
-									beattoolsEasesSelected[v] = true
-									if #(beattoolsEasings.ease[v] or {}) > 0 then addEases() end
-								end
-							elseif #(beattoolsEasings.ease[v] or {}) > 0 and (eventsDeleted == 0 or eventsDeleted ~= #(beattoolsEasings.ease[v] or {})) then
-								addEases()
-							end
-						end
-						if imgui.IsItemClicked(1) then
-							log(mods.beattools, "Copied to clipboard: " .. text)
-							love.system.setClipboardText(text)
-							self.p:hurtPulse()
-						end
-						if imgui.IsItemClicked(2) then
-							if type(beattoolsAllEases[v]) == "boolean" then
-								self.placeEvent = "beattoolsEvent;setBoolean;var," .. v .. ",string;enable," .. text .. ",boolean"
-							else
-								self.placeEvent = "beattoolsEvent;ease;var," .. v .. ",string;value," .. text .. "," .. (type(beattoolsAllEases[v]) == "number" and "number" or "nil")
-							end
-						end
-
-						imgui.TableNextColumn()
-						if #(beattoolsEasings.ease[v] or {}) == 0 then
-							imgui.TextDisabled(v)
-						else
-							imgui.Text(v)
-						end
-					end
-				end
-			end
-			imgui.EndTable()
-
-			imgui.End()
-		end
+	if mods.beattools.config.easeList and utilitools.files.beattools.easeList then
+		utilitools.files.beattools.easeList(inputFlag)
 	end
 	if mods.beattools.config.bookmarkList then
 		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
 		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
 		if imgui.Begin("Bookmarks", nil, inputFlag) then
-			beattoolsGetCurrentEasing(self, "bookmarks", "bookmark", "editorBeat")
-			for i, v in ipairs(beattoolsEasings.bookmarks) do
+			self:beattoolsCurrentEasing("bookmarks", "bookmark", "editorBeat")
+			for i, v in ipairs(self.beattoolsEasings.bookmarks) do
 				if i ~= 1 then imgui.Separator() end
 				imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
 				imgui.SameLine()
 				local name = "Unnamed Bookmark"
 				if v.name and v.name ~= "" then name = v.name end
-				if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
+				if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == self.beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
 					self.editorBeat = v.time
 					self.selectedEvent = self.level.events[v.indexInLevel]
 				end
@@ -740,55 +597,55 @@ if true then
 		if imgui.Begin("Beattools", nil, inputFlag) then
 
 			if mods.beattools.config.colorPreview then
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "bgColor")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "voidColor")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "outline")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoise")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.bgNoiseColor")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "vfx.hom")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "bgColor")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "voidColor")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "outline")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.bgNoise")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.bgNoiseColor")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.hom")
 
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.faceColor")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.fillColor")
-				beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", "p.outlineColor")
-				beattoolsGetCurrentEasing(self, "songNameOverride", "newname", "editorBeat")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.faceColor")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.fillColor")
+				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.outlineColor")
+				self:beattoolsCurrentEasing("songNameOverride", "newname", "editorBeat")
 				for i = 1, 8 do
-					beattoolsGetCurrentEasing(self, "color", "r", "editorBeat", i, "r")
-					beattoolsGetCurrentEasing(self, "color", "g", "editorBeat", i, "g")
-					beattoolsGetCurrentEasing(self, "color", "b", "editorBeat", i, "b")
+					self:beattoolsCurrentEasing("color", "r", "editorBeat", i, "r")
+					self:beattoolsCurrentEasing("color", "g", "editorBeat", i, "g")
+					self:beattoolsCurrentEasing("color", "b", "editorBeat", i, "b")
 
 					local ColorButtonPos = imgui.GetCursorScreenPos()
 					local additionalInfo = ""
 
-					if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-						if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+					if not self.beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+						if self.beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nBackground Color"
 						end
-						if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+						if self.beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nVoid Color"
 						end
 					end
-					if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+					if self.beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and self.beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
 						additionalInfo = additionalInfo .. "\nOutline"
 					end
-					if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
-						additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
+					if self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+						additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
 					end
-					if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
+					if self.beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
 						additionalInfo = additionalInfo .. "\nPlayer Face Color"
 					end
-					if beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
+					if self.beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
 						additionalInfo = additionalInfo .. "\nPlayer Fill Color"
 					end
-					if beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
+					if self.beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
 						additionalInfo = additionalInfo .. "\nPlayer Outline Color"
 					end
 
 					if imgui.ColorButton(
-						"Color channel " .. i - 1 .. " (" .. (beattoolsCurrentEasings.editorBeat.color[i].r.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].r or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].g.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].g or {}) .. " " .. (beattoolsCurrentEasings.editorBeat.color[i].b.runEvents - 1) .. "/" .. #(beattoolsEasings.color[i].b or {}) .. " - " .. (beattoolsEasings.color[i].eventAmount or 0) .. " events)" .. additionalInfo,
+						"Color channel " .. i - 1 .. " (" .. (self.beattoolsCurrentEasings.editorBeat.color[i].r.runEvents - 1) .. "/" .. #(self.beattoolsEasings.color[i].r or {}) .. " " .. (self.beattoolsCurrentEasings.editorBeat.color[i].g.runEvents - 1) .. "/" .. #(self.beattoolsEasings.color[i].g or {}) .. " " .. (self.beattoolsCurrentEasings.editorBeat.color[i].b.runEvents - 1) .. "/" .. #(self.beattoolsEasings.color[i].b or {}) .. " - " .. (self.beattoolsEasings.color[i].eventAmount or 0) .. " events)" .. additionalInfo,
 						imgui.ImVec4_Float(
-							(beattoolsCurrentEasings.editorBeat.color[i].r.r or 0) / 255,
-							(beattoolsCurrentEasings.editorBeat.color[i].g.g or 0) / 255,
-							(beattoolsCurrentEasings.editorBeat.color[i].b.b or 0) / 255,
+							(self.beattoolsCurrentEasings.editorBeat.color[i].r.r or 0) / 255,
+							(self.beattoolsCurrentEasings.editorBeat.color[i].g.g or 0) / 255,
+							(self.beattoolsCurrentEasings.editorBeat.color[i].b.b or 0) / 255,
 							1
 						),
 						2^1,
@@ -810,7 +667,7 @@ if true then
 						end
 						local function addEases()
 							if self.multiselect == nil then
-								beattoolsNewMultiSelection()
+								self:newMulti()
 								self.multiselectStartBeat = nil
 								self.multiselectEndBeat = nil
 							end
@@ -829,7 +686,7 @@ if true then
 									end
 								end
 							end
-							if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or beattoolsCurrentEasings.editorBeat.color[i].runEvents == 1 then
+							if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or self.beattoolsCurrentEasings.editorBeat.color[i].runEvents == 1 then
 								for i2, v2 in ipairs(self.level.events) do
 									if shouldSelect(v2) then addToMultiSelect(v2) end
 								end
@@ -851,36 +708,36 @@ if true then
 
 							self.p:hurtPulse()
 						end
-						if (beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (beattoolsEasings.color[i].eventAmount or 0)) then
+						if (self.beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (self.beattoolsEasings.color[i].eventAmount or 0)) then
 							addEases()
 						end
 					end
 					if imgui.IsItemClicked(1) then
-						local hex = beattoolsRGB2Hex(beattoolsCurrentEasings.editorBeat.color[i].r.r, beattoolsCurrentEasings.editorBeat.color[i].g.g, beattoolsCurrentEasings.editorBeat.color[i].b.b)
+						local hex = beattoolsRGB2Hex(self.beattoolsCurrentEasings.editorBeat.color[i].r.r, self.beattoolsCurrentEasings.editorBeat.color[i].g.g, self.beattoolsCurrentEasings.editorBeat.color[i].b.b)
 						log(mods.beattools, "Copied to clipboard: " .. hex)
 						love.system.setClipboardText(hex)
 						self.p:hurtPulse()
 					end
 					if imgui.IsItemClicked(2) then
-						self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
+						self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. self.beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. self.beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. self.beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
 					end
 
 					if mods.beattools.config.colorEasePreview then
-						if not beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-							if beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+						if not self.beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
+							if self.beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
 								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
 								imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
 							end
-							if beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+							if self.beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
 								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
 								imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
 							end
 						end
-						if beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+						if self.beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and self.beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
 							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
 							imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
 						end
-						if beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+						if self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
 							imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
 							imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
 						end
@@ -890,17 +747,17 @@ if true then
 				end
 				imgui.SameLine()
 				local additionalInfo = ""
-				if beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
+				if self.beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
 					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
 					additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
 				end
-				if beattoolsCurrentEasings.editorBeat.songNameOverride.newname then
+				if self.beattoolsCurrentEasings.editorBeat.songNameOverride.newname then
 					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
-					additionalInfo = additionalInfo ..  "Song Name (" .. beattoolsCurrentEasings.editorBeat.songNameOverride.newname .. ")"
+					additionalInfo = additionalInfo ..  "Song Name (" .. self.beattoolsCurrentEasings.editorBeat.songNameOverride.newname .. ")"
 				end
 				if additionalInfo ~= "" then
 					imgui.Text("[+]")
-					imguiHelpers.tooltip(additionalInfo)
+					utilitools.imguiHelpers.tooltip(additionalInfo)
 				else
 					imgui.NewLine()
 				end
@@ -927,11 +784,11 @@ if true then
 		helpers.SetNextWindowSize(200, 300, window_flag)
 		imgui.ShowDemoWindow()
 	end
-	if mods.beattools.config.editorCalculator then
-		if utilitools.files.beattools.calculator then utilitools.files.beattools.calculator() end
+	if mods.beattools.config.editorCalculator and utilitools.files.beattools.calculator then
+		utilitools.files.beattools.calculator(inputFlag)
 	end
-	if mods.beattools.config.editorCalculator then
-		if utilitools.files.beattools.calculator then utilitools.files.beattools.test3() end
+	if mods.beattools.config.undoHistory and utilitools.files.beattools.undoHistory then
+		utilitools.files.beattools.undoHistory(inputFlag)
 	end
 end
 '''

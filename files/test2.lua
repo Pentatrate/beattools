@@ -1,7 +1,6 @@
 utilitools.try(mod, function()
 	local data = {}
 	local pathes = {}
-	local beattoolsAllEases = dpf.loadJson("Mods/beattools/easeList/all.json")
 	local function recursion(t, prev, recursions)
 		prev = prev or ""
 		recursions = recursions and recursions + 1 or 0
@@ -28,10 +27,10 @@ utilitools.try(mod, function()
 	local jsonText = "{\n"
 	for i, path in ipairs(pathes) do
 		local v = data[path]
-		if beattoolsAllEases[path] ~= v then
+		if beattools.easeList.unsorted.all[path] ~= v then
 			jsonText = jsonText .. "\t\"" .. path .. "\": " .. ({ ["boolean"] = tostring(v), string = '"' .. tostring(v) .. '"', number = v, ["nil"] = "null" })[type(v)] .. ",\n"
-			if beattoolsAllEases[path] ~= nil then
-				jsonText = jsonText .. "\t\"" .. path .. (type(v) ~= type(beattoolsAllEases[path]) and " ||||| " .. type(v) .. " was originally " .. type(beattoolsAllEases[path]) or "") .. " ||||| original value" .. "\": " .. ({ ["boolean"] = tostring(beattoolsAllEases[path]), string = '"' .. tostring(beattoolsAllEases[path]) .. '"', number = beattoolsAllEases[path], ["nil"] = "null" })[type(beattoolsAllEases[path])] .. ",\n"
+			if beattools.easeList.unsorted.all[path] ~= nil then
+				jsonText = jsonText .. "\t\"" .. path .. (type(v) ~= type(beattools.easeList.unsorted.all[path]) and " ||||| " .. type(v) .. " was originally " .. type(beattools.easeList.unsorted.all[path]) or "") .. " ||||| original value" .. "\": " .. ({ ["boolean"] = tostring(beattools.easeList.unsorted.all[path]), string = '"' .. tostring(beattools.easeList.unsorted.all[path]) .. '"', number = beattools.easeList.unsorted.all[path], ["nil"] = "null" })[type(beattools.easeList.unsorted.all[path])] .. ",\n"
 			end
 		end
 	end

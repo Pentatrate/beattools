@@ -895,13 +895,6 @@ return {
 		default = {},
 		off = {}
 	},
-	testKey4 = {
-		type = "key",
-		name = "Test Hotkey 4",
-		tooltips = { short = "Undo stuff" },
-		default = {},
-		off = {}
-	},
 	easeListUsedVars = {
 		type = "bool",
 		name = "Hide Unused Vars Eases",
@@ -912,6 +905,13 @@ return {
 		type = "bool",
 		name = "Loosen Speed Range",
 		tooltips = { short = "Game speed selector ranges from 0.01-50x instead of 0.5-5x" },
+		default = true,
+		off = false
+	},
+	undoHistory = {
+		type = "bool",
+		name = "Undo History",
+		tooltips = { short = "Shows all changes with the ability to jump between them" },
 		default = true,
 		off = false
 	},

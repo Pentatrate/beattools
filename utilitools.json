@@ -2,7 +2,12 @@
 	"short": "BT",
 	"dependencies": {
 		"utilitools": {
-			"versions": [[">=", "1.2.7"]],
+			"versions": [
+				[
+					">=",
+					"1.2.7"
+				]
+			],
 			"reason": "Required API. You may need to update this mod."
 		}
 	},
@@ -27,11 +32,11 @@
 		}
 	},
 	"files": {
-		"config": {
+		"startup": {
 			"extension": "lua",
 			"load": true
 		},
-		"calculator": {
+		"config": {
 			"extension": "lua",
 			"load": true
 		},
@@ -45,11 +50,36 @@
 			"load": true,
 			"call": true
 		},
+		"keys": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"imguiStyle": {
 			"extension": "lua",
 			"call": true
 		},
-		"keys": {
+		"undo": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"fakeRepeat": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"easeList": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"undoHistory": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"calculator": {
 			"extension": "lua",
 			"load": true,
 			"call": true
@@ -61,20 +91,6 @@
 		"test2": {
 			"extension": "lua",
 			"load": true
-		},
-		"test3": {
-			"extension": "lua",
-			"load": true
-		},
-		"undo": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"fakeRepeat": {
-			"extension": "lua",
-			"load": true,
-			"call": true
 		}
 	},
 	"config": true,

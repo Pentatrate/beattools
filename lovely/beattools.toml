@@ -33,53 +33,6 @@ payload = '''self.innerOptionsMenu:addNumber("ratemod", self, "rateMod", 0, 0.1,
 position = "at"
 target = "states/AtomMap.lua"
 
-# Utilitools requirement ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''cs = bs.load(project.initState)'''
-payload = '''
-if mods.utilitools == nil then
-	local buttonPressed = love.window.showMessageBox("Beattools", "Beattools requires Utilitools. Please install that mod.", { "Ok", "No" })
-	if buttonPressed == 2 then error("Beattools: This is what you get for not installing Utilitools even though this mod needs it") end
-	love.quit()
-	error("Beattools: Failed to quit game.")
-end
-beattools = beattools or {}
-utilitools.files.beattools.undo.firstTime()
-beattools.noFakeRepeat = {
-	ease = true,
-	tag = true,
-	setJoystickColor = true,
-	["c-me_b-me_iconsEase"] = true,
-	shinamon_offset = true,
-	shinamon_offsetAll = true,
-	shinamon_offsetEvenOdd = true
-}
-'''
-position = "after"
-target = "main.lua"
-
-# Imgui colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''imgui.love.Init()'''
-payload = '''
-mods.beattools.config.imguiStyles.default = nil
-utilitools.fileManager.beattools.imguiStyle.load()
-
-if type(mods.beattools.config.imguiColors) == "table" then
-	mods.beattools.config.imguiStyles["from old format"] = { colors = {}, vars = mods.beattools.config.imguiStyles.default.vars }
-	for k, v in pairs(mods.beattools.config.imguiColors) do
-		mods.beattools.config.imguiStyles["from old format"].colors[tostring(imgui[k])] = v
-	end
-	mods.beattools.config.imguiColors = "deprecated"
-end
-'''
-position = "after"
-target = "main.lua"
-
 # Multiselect delta ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

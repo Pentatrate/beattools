@@ -23,13 +23,6 @@ local beattoolsRandomizeWindows = mods.beattools.config.randomizeWindows ~= "off
 local beattoolsPlayerSprite = "idle"
 local beattoolsLastSpriteChange = 0
 
-local beattoolsAllEases = dpf.loadJson("Mods/beattools/easeList/all.json")
-local beattoolsUselessEases = dpf.loadJson("Mods/beattools/easeList/apparentlyUseless.json")
-local beattoolsTrollEases = dpf.loadJson("Mods/beattools/easeList/trollEases.json")
-local beattoolsAllEasesSorted = {}
-local beattoolsEasesSelected = {}
-beattoolsOnlyEases = {}
-beattoolsOnlyBooleans = {}
 local beattoolsTrackEasables
 local beattoolsDefaultEasings = {
 	color = {
@@ -95,8 +88,8 @@ local decoDefault = {
 	["ecRecolorA"] = 255
 
 }
-local beattoolsEasings = {}
-local beattoolsCurrentEasings = {}
+st.beattoolsEasings = {}
+st.beattoolsCurrentEasings = {}
 local beattoolsEasingFor = {
 	color = ipairs,
 	ease = pairs,
@@ -113,28 +106,12 @@ local beattoolsHighestEventGroupIndex = -1
 local beattoolsEventGroupLongest = 0
 local beattoolsEventVisibilities = {}
 
-for k, v in pairs(beattoolsAllEases) do
-	table.insert(beattoolsAllEasesSorted, k)
-	if type(v) == "boolean" then
-		table.insert(beattoolsOnlyBooleans, k)
-	else
-		table.insert(beattoolsOnlyEases, k)
-	end
+for k, v in pairs(beattools.easeList.unsorted.all) do
 	if v == "nil" then v = nil end
 	beattoolsDefaultEasings.ease[k] = { [type(v) == "boolean" and "enable" or "value"] = v }
 end
-table.sort(beattoolsAllEasesSorted, function(a, b)
-	if type(beattoolsAllEases[a]) ~= type(beattoolsAllEases[b]) then
-		if type(beattoolsAllEases[a]) == "number" then return true end
-		if type(beattoolsAllEases[b]) == "number" then return false end
-		return type(beattoolsAllEases[a]) == "boolean"
-	end
-	if a:sub(1, #"vfx.vars") == "vfx.vars" and b:sub(1, #"vfx.vars") == "vfx.vars" then
-		return tonumber(a:sub(#"vfx.vars" + 1)) < tonumber(b:sub(#"vfx.vars" + 1))
-	end
-	return a < b
-end)
-for k, v in pairs(beattoolsDefaultEasings) do beattoolsEasings[k] = {} end
+
+for k, v in pairs(beattoolsDefaultEasings) do st.beattoolsEasings[k] = {} end
 if true then -- add easing
 	local function beattoolsAddEasing(type, v, i, params, sub, subsub, convert)
 		local value = { indexInLevel = i }
@@ -175,19 +152,19 @@ if true then -- add easing
 			value.enable = v.side
 		end
 		if sub then
-			if beattoolsEasings[type][sub] == nil then
-				beattoolsEasings[type][sub] = {}
+			if st.beattoolsEasings[type][sub] == nil then
+				st.beattoolsEasings[type][sub] = {}
 			end
 			if subsub then
-				if beattoolsEasings[type][sub][subsub] == nil then
-					beattoolsEasings[type][sub][subsub] = {}
+				if st.beattoolsEasings[type][sub][subsub] == nil then
+					st.beattoolsEasings[type][sub][subsub] = {}
 				end
-				table.insert(beattoolsEasings[type][sub][subsub], value)
+				table.insert(st.beattoolsEasings[type][sub][subsub], value)
 			else
-				table.insert(beattoolsEasings[type][sub], value)
+				table.insert(st.beattoolsEasings[type][sub], value)
 			end
 		else
-			table.insert(beattoolsEasings[type], value)
+			table.insert(st.beattoolsEasings[type], value)
 		end
 	end
 	beattoolsTrackEasables = {
@@ -207,7 +184,7 @@ if true then -- add easing
 					temp = true
 				end
 				if temp then
-					beattoolsEasings.color[v.color + 1].eventAmount = (beattoolsEasings.color[v.color + 1].eventAmount or 0) +
+					st.beattoolsEasings.color[v.color + 1].eventAmount = (st.beattoolsEasings.color[v.color + 1].eventAmount or 0) +
 						1
 				end
 			end
@@ -234,7 +211,7 @@ if true then -- add easing
 			end
 		end,
 		ease = function(v, i)
-			if v.var ~= nil and v.var ~= "" and type(beattoolsAllEases[v.var]) == "number" then
+			if v.var ~= nil and v.var ~= "" and type(beattools.easeList.unsorted.all[v.var]) == "number" then
 				beattoolsAddEasing("ease", v, i, { "value", "start", "duration", "ease" }, v.var)
 				if v.repeats and v.repeats > 0 and (v.repeatDelay or 1) ~= 0 then
 					local v2 = helpers.copy(v)
@@ -283,7 +260,7 @@ if true then -- add easing
 			end
 		end,
 		setBoolean = function(v, i)
-			if v.var ~= nil and v.var ~= "" and type(beattoolsAllEases[v.var]) == "boolean" then
+			if v.var ~= nil and v.var ~= "" and type(beattools.easeList.unsorted.all[v.var]) == "boolean" then
 				beattoolsAddEasing("ease", v, i, { "enable" }, v.var)
 			end
 		end,
@@ -364,7 +341,7 @@ end
 
 local function beattoolsRGB2Hex(r, g, b) return ("%02X%02X%02X"):format(r, g, b) end
 
-local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, excludeIndex)
+function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex)
 	local time = 0
 	if time2 == "editorBeat" then
 		time = self.editorBeat or 0
@@ -372,8 +349,8 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 		time = time2 or 0
 	end
 	local beattoolsCurrentEased, beattoolsPrev, beattoolsCurrent, easingArray, easingVars
-	if beattoolsCurrentEasings[time2] == nil then
-		beattoolsCurrentEasings[time2] = {}
+	if self.beattoolsCurrentEasings[time2] == nil then
+		self.beattoolsCurrentEasings[time2] = {}
 	end
 	if type2 == "decos" then
 		beattoolsCurrentEased = { [subsub] = decoDefault[subsub]}
@@ -392,28 +369,28 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 		end
 	end
 	if sub then
-		if beattoolsEasings[type2] == nil then
-			beattoolsEasings[type2] = {}
+		if self.beattoolsEasings[type2] == nil then
+			self.beattoolsEasings[type2] = {}
 		end
-		if beattoolsCurrentEasings[time2][type2] == nil then
-			beattoolsCurrentEasings[time2][type2] = {}
+		if self.beattoolsCurrentEasings[time2][type2] == nil then
+			self.beattoolsCurrentEasings[time2][type2] = {}
 		end
 		if subsub then
-			if beattoolsEasings[type2][sub] == nil then
-				beattoolsEasings[type2][sub] = {}
+			if self.beattoolsEasings[type2][sub] == nil then
+				self.beattoolsEasings[type2][sub] = {}
 			end
-			if beattoolsCurrentEasings[time2][type2][sub] == nil then
-				beattoolsCurrentEasings[time2][type2][sub] = {}
+			if self.beattoolsCurrentEasings[time2][type2][sub] == nil then
+				self.beattoolsCurrentEasings[time2][type2][sub] = {}
 			end
-			easingArray = beattoolsEasings[type2][sub][subsub]
-			beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2][sub][subsub])
+			easingArray = self.beattoolsEasings[type2][sub][subsub]
+			beattoolsCurrent = helpers.copy(self.beattoolsCurrentEasings[time2][type2][sub][subsub])
 		else
-			easingArray = beattoolsEasings[type2][sub]
-			beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2][sub])
+			easingArray = self.beattoolsEasings[type2][sub]
+			beattoolsCurrent = helpers.copy(self.beattoolsCurrentEasings[time2][type2][sub])
 		end
 	else
-		easingArray = beattoolsEasings[type2]
-		beattoolsCurrent = helpers.copy(beattoolsCurrentEasings[time2][type2])
+		easingArray = self.beattoolsEasings[type2]
+		beattoolsCurrent = helpers.copy(self.beattoolsCurrentEasings[time2][type2])
 	end
 
 	if beattoolsCurrent ~= nil and beattoolsCurrent.lastCheckTime == time then
@@ -425,9 +402,9 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 	elseif vars == "bookmark" then
 		easingVars = { name = true, description = true, r = true, g = true, b = true }
 	elseif vars == "var" then
-		if type(beattoolsAllEases[sub]) == "number" or sub == "outline" then
+		if type(beattools.easeList.unsorted.all[sub]) == "number" or sub == "outline" then
 			easingVars = { value = true }
-		elseif type(beattoolsAllEases[sub]) == "boolean" then
+		elseif type(beattools.easeList.unsorted.all[sub]) == "boolean" then
 			easingVars = { enable = true }
 		end
 	else
@@ -500,12 +477,12 @@ local function beattoolsGetCurrentEasing(self, type2, vars, time2, sub, subsub, 
 	beattoolsCurrentEased.runEvents = i
 	if sub then
 		if subsub then
-			beattoolsCurrentEasings[time2][type2][sub][subsub] = beattoolsCurrentEased
+			self.beattoolsCurrentEasings[time2][type2][sub][subsub] = beattoolsCurrentEased
 		else
-			beattoolsCurrentEasings[time2][type2][sub] = beattoolsCurrentEased
+			self.beattoolsCurrentEasings[time2][type2][sub] = beattoolsCurrentEased
 		end
 	else
-		beattoolsCurrentEasings[time2][type2] = beattoolsCurrentEased
+		self.beattoolsCurrentEasings[time2][type2] = beattoolsCurrentEased
 	end
 
 	return beattoolsCurrentEased
@@ -518,16 +495,16 @@ local function beattoolsGetEventIndex(self, event)
 	end
 end
 
-local function beattoolsNewMultiSelection()
-	st.selectedEvent = nil
-	st.multiselect = {}
-	st.multiselect.events = {}
-	st.multiselect.eventTypes = {}
+function st:newMulti()
+	self.selectedEvent = nil
+	self.multiselect = {}
+	self.multiselect.events = {}
+	self.multiselect.eventTypes = {}
 
-	st.multiselectStartBeat = 0
-	st.multiselectEndBeat = 0
-	st.multiselectStartAngle = 0
-	st.multiselectEndAngle = 360
+	self.multiselectStartBeat = 0
+	self.multiselectEndBeat = 0
+	self.multiselectStartAngle = 0
+	self.multiselectEndAngle = 360
 end
 local function beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
@@ -559,7 +536,7 @@ local function beattoolsUntag(self, tags2)
 		table.insert(tags, v)
 	end
 
-	beattoolsNewMultiSelection()
+	st:newMulti()
 
 	local earliest, latest, tagEvents, tagName = nil, nil, nil, ""
 
@@ -727,7 +704,7 @@ local function beattoolsMakeSpace(index, reverse)
 	end
 end
 
-st.beattoolsCtrlSelect = function(event, force)
+function st.beattoolsCtrlSelect(event, force)
 	if not mods.beattools.config.ctrlSelect and not force then return end
 	st.ctrlSelectPending = false
 	st.deletePending = false
@@ -777,7 +754,7 @@ st.beattoolsCtrlSelect = function(event, force)
 			addToMulti(event)
 		end
 	else
-		beattoolsNewMultiSelection()
+		st:newMulti()
 		st.multiselectStartBeat = event.time
 		st.multiselectEndBeat = event.time
 		addToMulti(event)

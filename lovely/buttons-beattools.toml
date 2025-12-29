@@ -81,7 +81,7 @@ end, "tag selection", "t")
 -- select all
 self:addKeybind(function ()
 	if mods.beattools.config.selectAll then
-		beattoolsNewMultiSelection()
+		self:newMulti()
 		self.multiselectStartBeat = nil
 		self.multiselectEndBeat = nil
 		for i, event in ipairs(self.level.events) do
@@ -330,11 +330,11 @@ match_indent = true
 pattern = '''if imgui.Button('Delete event') then'''
 payload = '''
 if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
-	if beattoolsAllEases[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
-		beattoolsGetCurrentEasing(self, "ease", "var", "editorBeat", self.selectedEvent.var)
-		beattoolsGetCurrentEasing(self, "ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, beattoolsGetEventIndex(self, self.selectedEvent))
-		local eventTime = beattoolsCurrentEasings[self.selectedEvent.time].ease[self.selectedEvent.var][type(beattoolsAllEases[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
-		local editorTime = beattoolsCurrentEasings.editorBeat.ease[self.selectedEvent.var][type(beattoolsAllEases[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
+	if beattools.easeList.unsorted.all[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
+		self:beattoolsCurrentEasing("ease", "var", "editorBeat", self.selectedEvent.var)
+		self:beattoolsCurrentEasing("ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, beattoolsGetEventIndex(self, self.selectedEvent))
+		local eventTime = self.beattoolsCurrentEasings[self.selectedEvent.time].ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
+		local editorTime = self.beattoolsCurrentEasings.editorBeat.ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
 		if mods.beattools.config.easeListRound then
 			if type(eventTime) == "number" then
 				eventTime = helpers.round(eventTime * 1e3) / 1e3

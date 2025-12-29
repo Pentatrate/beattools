@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0"
+version = "1.0.0" 
 
 # Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -90,7 +90,7 @@ payload = '''
 				beattoolsLastSpriteChange = beattoolsTime
 			end
 		end
-		if mods.beattools.config.currentSprite then beattoolsGetCurrentEasing(self, "playerSprites", "spriteName", "editorBeat") end
+		if mods.beattools.config.currentSprite then self:beattoolsCurrentEasing("playerSprites", "spriteName", "editorBeat") end
 
 		-- Penta: This code is not optimised, but it doesnt have to be, "lively cranky" is just for fun
 		if mods.beattools.config.livelyCranky and beattoolsPlayerSprite == "><" then
@@ -99,8 +99,8 @@ payload = '''
 			self.p.forceSprite = "happy"
 		else
 			local forcedSprite = false
-			if mods.beattools.config.currentSprite and beattoolsCurrentEasings.editorBeat.playerSprites.spriteName ~= "" then
-				local spriteName = beattoolsCurrentEasings.editorBeat.playerSprites.spriteName
+			if mods.beattools.config.currentSprite and self.beattoolsCurrentEasings.editorBeat.playerSprites.spriteName ~= "" then
+				local spriteName = self.beattoolsCurrentEasings.editorBeat.playerSprites.spriteName
 				if spriteName:sub(-4):lower() == ".png" then
 					local filename = cLevel .. spriteName
 					if love.filesystem.exists(filename) then
@@ -117,7 +117,7 @@ payload = '''
 
 				if ({ [""] = true, none = true, idle = true, happy = true, miss = true, ["><"] = true, [":3"] = true })[spriteName] or cs.p.spr[spriteName] ~= nil then
 					cs.p.forceSprite = spriteName
-					cs.p.useFaceStencil = beattoolsCurrentEasings.editorBeat.playerSprites.useFaceStencil
+					cs.p.useFaceStencil = self.beattoolsCurrentEasings.editorBeat.playerSprites.useFaceStencil
 					forcedSprite = true
 				end
 			end
@@ -717,9 +717,9 @@ pattern = '''function st:updateBiggestBeat()'''
 payload = '''
 	beattoolsOverlap = {}
 	for k, v in pairs(beattoolsDefaultEasings) do
-		beattoolsEasings[k] = {}
+		self.beattoolsEasings[k] = {}
 	end
-	beattoolsCurrentEasings = {}
+	self.beattoolsCurrentEasings = {}
 '''
 position = "after"
 target = "states/Editor.lua"
@@ -783,7 +783,7 @@ match_indent = false
 pattern = '''	-- Penta's Beattools code marker
 end'''
 payload = '''
-	for kk, vv in pairs(beattoolsEasings) do
+	for kk, vv in pairs(self.beattoolsEasings) do
 		if beattoolsEasingFor[kk] == true then
 			table.sort(vv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end)
 		elseif type(beattoolsEasingFor[kk]) == "table" then

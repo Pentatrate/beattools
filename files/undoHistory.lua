@@ -1,5 +1,4 @@
-utilitools.try(mod, function()
-
+return function(inputFlag)
 	local function summary(changes)
 		local list = {
 			fullSave = { "Autosaved" },
@@ -100,7 +99,7 @@ utilitools.try(mod, function()
 
 	helpers.SetNextWindowPos(750, 400, window_flag or 'ImGuiCond_FirstUseEver')
 	helpers.SetNextWindowSize(200, 320, window_flag or 'ImGuiCond_FirstUseEver')
-	if imgui.Begin("Undo History", true) then
+	if imgui.Begin("Undo History", true, inputFlag) then
 		if imgui.BeginTabBar("beattoolsUndo") then
 			local first
 			local changes = {}
@@ -131,5 +130,4 @@ utilitools.try(mod, function()
 
 		imgui.End()
 	end
-
-end)
+end

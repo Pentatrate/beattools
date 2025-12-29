@@ -342,7 +342,6 @@ end
 undo.firstTime = function()
 	beattools = beattools or {}
 	beattools.moremetamethods = beattools.moremetamethods or {}
-
 	if beattools.moremetamethods.pairs == nil then
 		beattools.moremetamethods.pairs = pairs
 		_G.pairs = function(...)

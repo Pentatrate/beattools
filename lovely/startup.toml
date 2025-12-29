@@ -1,0 +1,41 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Utilitools requirement ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs = bs.load(project.initState)'''
+payload = '''
+if mods.utilitools == nil then
+	local buttonPressed = love.window.showMessageBox("Beattools", "Beattools requires Utilitools. Please install that mod.", { "Ok", "No" })
+	if buttonPressed == 2 then error("Beattools: This is what you get for not installing Utilitools even though this mod needs it") end
+	love.quit()
+	error("Beattools: Failed to quit game.")
+end
+utilitools.files.beattools.startup()
+'''
+position = "after"
+target = "main.lua"
+
+# Imgui colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.love.Init()'''
+payload = '''
+mods.beattools.config.imguiStyles.default = nil
+utilitools.fileManager.beattools.imguiStyle.load()
+
+if type(mods.beattools.config.imguiColors) == "table" then
+	mods.beattools.config.imguiStyles["from old format"] = { colors = {}, vars = mods.beattools.config.imguiStyles.default.vars }
+	for k, v in pairs(mods.beattools.config.imguiColors) do
+		mods.beattools.config.imguiStyles["from old format"].colors[tostring(imgui[k])] = v
+	end
+	mods.beattools.config.imguiColors = "deprecated"
+end
+'''
+position = "after"
+target = "main.lua"
