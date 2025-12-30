@@ -350,6 +350,7 @@ undo.firstTime = function()
 	end
 	if beattools.moremetamethods.insert == nil then
 		beattools.moremetamethods.insert = table.insert
+		---@diagnostic disable-next-line: duplicate-set-field
 		table.insert = function(...)
 			if utilitools.files.beattools.undo.insert(...) then
 				beattools.moremetamethods.insert(...)
@@ -358,6 +359,7 @@ undo.firstTime = function()
 	end
 	if beattools.moremetamethods.remove == nil then
 		beattools.moremetamethods.remove = table.remove
+		---@diagnostic disable-next-line: duplicate-set-field
 		table.remove = function(...)
 			if utilitools.files.beattools.undo.remove(...) then
 				beattools.moremetamethods.remove(...)

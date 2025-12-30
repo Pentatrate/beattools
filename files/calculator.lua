@@ -7,9 +7,9 @@ local function calc(math)
 	end
 end
 
-return function(inputFlag)
-	helpers.SetNextWindowPos(750, 400, window_flag or 'ImGuiCond_FirstUseEver')
-	helpers.SetNextWindowSize(200, 320, window_flag or 'ImGuiCond_FirstUseEver')
+return function(window_flag, inputFlag)
+	helpers.SetNextWindowPos(750, 400, window_flag)
+	helpers.SetNextWindowSize(200, 320, window_flag)
 	if imgui.Begin("Calculate", false, inputFlag) then
 		local saveToHistory = false
 		imgui.TextWrapped(mods.beattools.config.calculator.output)

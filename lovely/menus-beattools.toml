@@ -381,215 +381,14 @@ match_indent = true
 pattern = '''if self.goToBeatDialogue then'''
 payload = '''
 if true then
-	if mods.beattools.config.showEventGroups then
-		if self.level then
-			if self.level.properties.beattools == nil then self.level.properties.beattools = {} end
-			if beattoolsHighestEventGroupIndex == -1 then
-				if self.level.properties.beattools.eventGroups == nil then
-					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
-				end
-				beattoolsUpdateEventGroups()
-			end
-		end
-		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
-		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-		if imgui.Begin("Event Groups", nil, inputFlag) then
-			if self.level then
-				local function checkOverlapping(group, index)
-					local overlapping = false
-					if beattoolsEventIndices[index] then
-						if beattoolsEventIndices[index].events.custom or group.events.custom then
-							overlapping = true
-						else
-							for k, v in pairs(group.events) do
-								if beattoolsEventIndices[index].events[k] then
-									overlapping = true
-									break
-								end
-							end
-						end
-					end
-					return overlapping
-				end
-				if imgui.Button("Reset##EditorLayers") then
-					if self.level.properties.beattools.customEventGroups then
-						beattoolsMakeSpace(1, 3)
-					end
-					self.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
-					beattoolsUpdateEventGroups()
-					if self.level.properties.beattools.customEventGroups then
-						for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-							v.visibility = " - "
-						end
-						local i = 1
-						while i <= beattoolsHighestEventGroupIndex do
-							local v = beattoolsEventIndices[i]
-							if v then
-								while beattoolsEventIndices[i - 1] == nil and i > 1 do
-									beattoolsMakeSpace(i, true)
-									beattoolsUpdateEventGroups()
-									i = i - 1
-								end
-							end
-							i = i + 1
-						end
-					end
-					changing = true
-				end
-
-				local changing = false
-				if true then
-					local buffer = ffi.new("char[?]", 256)
-					ffi.copy(buffer, "Add Custom Group", #("Add Custom Group"))
-					imgui.SetNextItemWidth(-1e-9)
-					imgui.InputText("##addCustomEditorLayers", buffer, 256, 2^12)
-					local value = ffi.string(buffer)
-					if imgui.IsItemDeactivatedAfterEdit() and value and value ~= "" and value ~= "Add Custom Group" then
-						if self.level.properties.beattools.customEventGroups == nil then self.level.properties.beattools.customEventGroups = {} end
-						if self.level.properties.beattools.eventGroups[value] or self.level.properties.beattools.customEventGroups[value] then utilitools.prompts.error(mods.beattools, "Group name already exists") else
-							self.level.properties.beattools.customEventGroups[value] = {
-								events = { custom = true },
-								visibility = " - ",
-								index = #beattoolsEventIndices + 1
-							}
-							beattoolsUpdateEventGroups()
-							changing = true
-						end
-					end
-				end
-				local indexGroup = 0
-				for i, v in ipairs(beattoolsEventGroups) do
-					if v.index ~= indexGroup then
-						imgui.Separator()
-						indexGroup = v.index
-					end
-					imgui.AlignTextToFramePadding()
-					local currentPosition = imgui.GetCursorScreenPos()
-					imgui.PushClipRect(imgui.ImVec2_Float(currentPosition.x, currentPosition.y), imgui.ImVec2_Float(currentPosition.x + beattoolsEventGroupLongest, currentPosition.y + 20), true)
-					imgui.Text(v.name)
-					imgui.PopClipRect()
-					if v.name ~= "all" then
-						if not changing and (v.index > 1 or beattoolsEventIndices[v.index].groups > 1) then
-							imgui.SameLine(beattoolsEventGroupLongest + 10)
-							if imgui.Button("^##" .. v.name .. "_editorLayers") then
-								if beattoolsEventIndices[v.index].groups > 1 then
-									beattoolsMakeSpace(v.index)
-									v.index = v.index - 1
-								else
-									beattoolsMakeSpace(v.index, true)
-									if checkOverlapping(v, v.index) then
-										beattoolsMakeSpace(v.index)
-										v.index = v.index - 1
-									end
-								end
-								beattoolsUpdateEventGroups()
-								changing = true
-							end
-						end
-						if not changing and (beattoolsEventIndices[v.index + 1] or beattoolsEventIndices[v.index].groups > 1) then
-							imgui.SameLine(beattoolsEventGroupLongest + 28)
-							if imgui.Button("v##" .. v.name .. "_editorLayers") then
-								if beattoolsEventIndices[v.index].groups > 1 then
-									beattoolsMakeSpace(v.index + 1)
-									v.index = v.index + 1
-								else
-									beattoolsMakeSpace(v.index + 1, true)
-									if checkOverlapping(v, v.index + 1) then
-										beattoolsMakeSpace(v.index + 1)
-										v.index = v.index + 1
-									end
-								end
-								beattoolsUpdateEventGroups()
-								changing = true
-							end
-						end
-						if not changing then
-							imgui.SameLine(beattoolsEventGroupLongest + 46)
-							local valptr = ffi.new("int[1]", { v.index })
-							imgui.SetNextItemWidth(15)
-							imgui.InputInt("##" .. v.name .. "_insertEditorLayers", valptr, 0, nil, 2^12)
-							local value = valptr[0]
-							if imgui.IsItemDeactivatedAfterEdit() and value and value ~= v.index then
-								local origIndex = v.index
-								if value < 1 then
-									value = 1
-								elseif value > #beattoolsEventIndices + 1 then
-									value = #beattoolsEventIndices + 1
-								end
-								if checkOverlapping(v, value) then
-									beattoolsMakeSpace(value)
-								end
-								v.index = value
-								if beattoolsEventIndices[origIndex].groups <= 1 then
-									beattoolsMakeSpace(origIndex + 1, true)
-								end
-								beattoolsUpdateEventGroups()
-								changing = true
-							end
-						end
-					end
-					imgui.SameLine(beattoolsEventGroupLongest + 64)
-					local isOpen = imgui.BeginCombo("##" .. v.name .. "_visibilityEditorLayers", v.visibility, 2^4 + 2^5 + 2^7)
-					if isOpen then
-						for i, vv in ipairs(v.name ~= "all" and { " - ", "show", "transparent", "ghost", "hide" } or { "show", "transparent", "ghost", "hide" }) do
-							local selected = imgui.Selectable_Bool(vv, vv == v.visibility)
-							if selected and vv ~= v.visibility then
-								v.visibility = vv
-								beattoolsEventVisibilities = {}
-								self.selectedEvent = nil
-								self.multiselect = nil
-
-								self.multiselectStartBeat = nil
-								self.multiselectEndBeat = nil
-								self.multiselectStartAngle = nil
-								self.multiselectEndAngle = nil
-							end
-						end
-						imgui.EndCombo()
-					end
-					if v.events.custom then
-						imgui.SameLine()
-						if imgui.Button("Delete##" .. v.name .. "_deleteEditorLayers") then
-							self.level.properties.beattools.customEventGroups[v.name] = nil
-							local customEventsAmount = 0
-							for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-								customEventsAmount = customEventsAmount + 1
-							end
-							if customEventsAmount == 0 then
-								self.level.properties.beattools.customEventGroups = nil
-							end
-							beattoolsMakeSpace(v.index + 1, true)
-							beattoolsUpdateEventGroups()
-							changing = true
-						end
-					end
-				end
-			end
-			imgui.End()
-		end
+	if mods.beattools.config.showEventGroups and utilitools.files.beattools.eventGroups then
+		utilitools.files.beattools.eventGroups(window_flag, inputFlag)
 	end
 	if mods.beattools.config.easeList and utilitools.files.beattools.easeList then
-		utilitools.files.beattools.easeList(inputFlag)
+		utilitools.files.beattools.easeList(window_flag, inputFlag)
 	end
-	if mods.beattools.config.bookmarkList then
-		helpers.SetNextWindowPos(750, 420, "ImGuiCond_FirstUseEver")
-		helpers.SetNextWindowSize(200, 300, "ImGuiCond_FirstUseEver")
-		if imgui.Begin("Bookmarks", nil, inputFlag) then
-			self:beattoolsCurrentEasing("bookmarks", "bookmark", "editorBeat")
-			for i, v in ipairs(self.beattoolsEasings.bookmarks) do
-				if i ~= 1 then imgui.Separator() end
-				imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
-				imgui.SameLine()
-				local name = "Unnamed Bookmark"
-				if v.name and v.name ~= "" then name = v.name end
-				if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == self.beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
-					self.editorBeat = v.time
-					self.selectedEvent = self.level.events[v.indexInLevel]
-				end
-				if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
-			end
-			imgui.End()
-		end
+	if mods.beattools.config.bookmarkList and utilitools.files.beattools.bookmarkList then
+		utilitools.files.beattools.bookmarkList(window_flag, inputFlag)
 	end
 	if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
 		helpers.SetNextWindowPos(750, 420, window_flag)
@@ -785,10 +584,10 @@ if true then
 		imgui.ShowDemoWindow()
 	end
 	if mods.beattools.config.editorCalculator and utilitools.files.beattools.calculator then
-		utilitools.files.beattools.calculator(inputFlag)
+		utilitools.files.beattools.calculator(window_flag, inputFlag)
 	end
 	if mods.beattools.config.undoHistory and utilitools.files.beattools.undoHistory then
-		utilitools.files.beattools.undoHistory(inputFlag)
+		utilitools.files.beattools.undoHistory(window_flag, inputFlag)
 	end
 end
 '''

@@ -1,9 +1,9 @@
 local configHelpers = utilitools.configHelpers
 local imguiHelpers = utilitools.imguiHelpers
 
-return function(inputFlag)
-	helpers.SetNextWindowPos(750, 420, window_flag or 'ImGuiCond_FirstUseEver')
-	helpers.SetNextWindowSize(200, 300, window_flag or 'ImGuiCond_FirstUseEver')
+return function(window_flag, inputFlag)
+	helpers.SetNextWindowPos(750, 420, window_flag)
+	helpers.SetNextWindowSize(200, 300, window_flag)
 	if imgui.Begin("Ease List", nil, inputFlag) then
 		if imgui.TreeNode_Str("Filters") then
 			configHelpers.input("easeListUse")

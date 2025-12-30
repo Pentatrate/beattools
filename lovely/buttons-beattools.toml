@@ -332,7 +332,7 @@ payload = '''
 if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
 	if beattools.easeList.unsorted.all[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
 		self:beattoolsCurrentEasing("ease", "var", "editorBeat", self.selectedEvent.var)
-		self:beattoolsCurrentEasing("ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, beattoolsGetEventIndex(self, self.selectedEvent))
+		self:beattoolsCurrentEasing("ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, self:eventIndex(self.selectedEvent))
 		local eventTime = self.beattoolsCurrentEasings[self.selectedEvent.time].ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
 		local editorTime = self.beattoolsCurrentEasings.editorBeat.ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
 		if mods.beattools.config.easeListRound then

@@ -1,5 +1,7 @@
 local st = Gamestate:new('Editor') -- Penta: This comment is neccessary
 
+st.beattools = {}
+
 utilitools.files.beattools.undo.init()
 
 local beattoolsTime = 0
@@ -100,11 +102,12 @@ local beattoolsEasingFor = {
 	decos = { pairs, pairs }
 }
 
-local beattoolsEventGroups = {}
-local beattoolsEventIndices = {}
-local beattoolsHighestEventGroupIndex = -1
-local beattoolsEventGroupLongest = 0
-local beattoolsEventVisibilities = {}
+st.beattools.eventGroups = {}
+st.beattools.eventGroups.groups = {}
+st.beattools.eventGroups.indices = {}
+st.beattools.eventGroups.maxIndex = -1
+st.beattools.eventGroups.longest = 0
+st.beattools.eventGroups.visibility = {}
 
 for k, v in pairs(beattools.easeList.unsorted.all) do
 	if v == "nil" then v = nil end
@@ -488,13 +491,22 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 	return beattoolsCurrentEased
 end
 
-local function beattoolsGetEventIndex(self, event)
+function st:eventIndex(event)
 	if event == nil then return end
 	for i, v in ipairs(self.level.events) do
 		if v == event then return i end
 	end
 end
 
+function st:noSelection()
+	self.selectedEvent = nil
+	self.multiselect = nil
+
+	self.multiselectStartBeat = nil
+	self.multiselectEndBeat = nil
+	self.multiselectStartAngle = nil
+	self.multiselectEndAngle = nil
+end
 function st:newMulti()
 	self.selectedEvent = nil
 	self.multiselect = {}
@@ -506,6 +518,7 @@ function st:newMulti()
 	self.multiselectStartAngle = 0
 	self.multiselectEndAngle = 360
 end
+
 local function beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
 	if type(event) ~= "table" then
@@ -514,10 +527,10 @@ local function beattoolsGetEventVisibility(event)
 		return "transparent"
 	end
 	if event.type == nil then modlog(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
-	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
-	if beattoolsEventVisibilities[event.type][""] then return beattoolsEventVisibilities[event.type][""] end
+	if st.beattools.eventGroups.visibility[event.type] == nil then st.beattools.eventGroups.visibility[event.type] = {} end
+	if st.beattools.eventGroups.visibility[event.type][""] then return st.beattools.eventGroups.visibility[event.type][""] end
 	local visibility = "hide"
-	for i, v in ipairs(beattoolsEventGroups) do
+	for i, v in ipairs(st.beattools.eventGroups.groups) do
 		if v.visibility ~= " - " then
 			if v.events[event.type] or v.name == "all" then
 				visibility = v.visibility
@@ -526,7 +539,7 @@ local function beattoolsGetEventVisibility(event)
 			end
 		end
 	end
-	if not event.beattoolsCustomEventGroups then beattoolsEventVisibilities[event.type][""] = visibility end
+	if not event.beattoolsCustomEventGroups then st.beattools.eventGroups.visibility[event.type][""] = visibility end
 	return visibility
 end
 
@@ -579,7 +592,7 @@ local function beattoolsUntag(self, tags2)
 				if earliest > event.time then earliest = event.time end
 				if latest < event.time then latest = event.time end
 			end
-			table.remove(self.level.events, beattoolsGetEventIndex(self, currentTag))
+			table.remove(self.level.events, self:eventIndex(currentTag))
 			return false
 		end
 		return true
@@ -635,73 +648,52 @@ local function beattoolsSameEasing(event, selected)
 	if paramForType[event.type] == nil then return false end
 	return event[paramForType[event.type]] == selected[paramForType[event.type]]
 end
-local function beattoolsUpdateEventGroups()
-	st.selectedEvent = nil
-	st.multiselect = nil
+function st:beattoolsUpdateEventGroups()
+	self:noSelection()
 
-	st.multiselectStartBeat = nil
-	st.multiselectEndBeat = nil
-	st.multiselectStartAngle = nil
-	st.multiselectEndAngle = nil
-
-	beattoolsEventGroups = {}
-	beattoolsEventIndices = {}
-	beattoolsHighestEventGroupIndex = 1
-	beattoolsEventVisibilities = {}
+	self.beattools.eventGroups.groups = {}
+	self.beattools.eventGroups.indices = {}
+	self.beattools.eventGroups.maxIndex = 1
+	self.beattools.eventGroups.visibility = {}
 	local function processEventGroup(k, v)
 		local temp = v
 		temp.name = k
 
 		local textLength = imgui.GetFontSize() * 7 / 13 * temp.name:len()
-		if beattoolsEventGroupLongest < textLength then beattoolsEventGroupLongest = textLength end
+		if self.beattools.eventGroups.longest < textLength then self.beattools.eventGroups.longest = textLength end
 
-		if beattoolsHighestEventGroupIndex < temp.index then beattoolsHighestEventGroupIndex = temp.index end
+		if self.beattools.eventGroups.maxIndex < temp.index then self.beattools.eventGroups.maxIndex = temp.index end
 
-		if beattoolsEventIndices[temp.index] == nil then beattoolsEventIndices[temp.index] = { events = {}, groups = 0 } end
-		beattoolsEventIndices[temp.index].groups = beattoolsEventIndices[temp.index].groups + 1
+		if self.beattools.eventGroups.indices[temp.index] == nil then self.beattools.eventGroups.indices[temp.index] = { events = {}, groups = 0 } end
+		self.beattools.eventGroups.indices[temp.index].groups = self.beattools.eventGroups.indices[temp.index].groups + 1
 		for kk, vv in pairs(temp.events) do
-			beattoolsEventIndices[temp.index].events[kk] = true
+			self.beattools.eventGroups.indices[temp.index].events[kk] = true
 		end
 
-		if #beattoolsEventGroups == 0 then
-			table.insert(beattoolsEventGroups, temp)
+		if #self.beattools.eventGroups.groups == 0 then
+			table.insert(self.beattools.eventGroups.groups, temp)
 		else
 			local inserted = false
-			for i, vv in ipairs(beattoolsEventGroups) do
+			for i, vv in ipairs(self.beattools.eventGroups.groups) do
 				if not (temp.index > vv.index or (temp.index == vv.index and temp.name > vv.name)) then
-					table.insert(beattoolsEventGroups, i, temp)
+					table.insert(self.beattools.eventGroups.groups, i, temp)
 					inserted = true
 					break
 				end
 			end
-			if not inserted then table.insert(beattoolsEventGroups, temp) end
+			if not inserted then table.insert(self.beattools.eventGroups.groups, temp) end
 		end
 	end
-	for k, v in pairs(st.level.properties.beattools.eventGroups) do
+	for k, v in pairs(self.level.properties.beattools.eventGroups) do
 		processEventGroup(k, v)
 	end
-	if st.level.properties.beattools.customEventGroups then
-		for k, v in pairs(st.level.properties.beattools.customEventGroups) do
+	if self.level.properties.beattools.customEventGroups then
+		for k, v in pairs(self.level.properties.beattools.customEventGroups) do
 			processEventGroup(k, v)
 		end
 	end
 
-	st:updateBiggestBeat()
-end
-local function beattoolsMakeSpace(index, reverse)
-	if type(reverse) ~= "number" then reverse = reverse and -1 or 1 end
-	for k, v in pairs(st.level.properties.beattools.eventGroups) do
-		if v.index >= index then
-			v.index = v.index + reverse
-		end
-	end
-	if st.level.properties.beattools.customEventGroups then
-		for k, v in pairs(st.level.properties.beattools.customEventGroups) do
-			if v.index >= index then
-				v.index = v.index + reverse
-			end
-		end
-	end
+	self:updateBiggestBeat()
 end
 
 function st.beattoolsCtrlSelect(event, force)

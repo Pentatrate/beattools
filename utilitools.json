@@ -84,6 +84,16 @@
 			"load": true,
 			"call": true
 		},
+		"bookmarkList": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"eventGroups": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"test": {
 			"extension": "lua",
 			"load": true
