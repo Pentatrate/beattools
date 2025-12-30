@@ -270,7 +270,7 @@ match_indent = true
 pattern = '''-- check end of holds as well'''
 payload = '''
 -- check bounces of bounces as well
-if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] then
+if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] then
 	for ii = 1, (v.bounces or 1) do
 		local pos2 = self:getPosition(v.angle + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
 		if helpers.collide(

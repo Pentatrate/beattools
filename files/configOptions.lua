@@ -710,46 +710,11 @@ return {
 		default = true,
 		off = false
 	},
-	--   Hotkeys
-	selectNoneInPalette = {
-		type = "bool",
-		name = "Deselect Hotkey",
-		tooltips = { long = "Hotkey to select \"None\" in the event palette (n)", short = "n" },
-		default = true,
-		off = false
-	},
-	hideMenus = {
-		type = "bool",
-		name = "Hide Menus Hotkey",
-		tooltips = { long = "Hotkey to toggle hiding the editor menus (h)", short = "Hotkey to hide editor menus" },
-		default = true,
-		off = false
-	},
+	--   Hotkey
 	restartInPlaytest = {
 		type = "bool",
 		name = "Restart In Playtest",
 		tooltips = { long = "Hotkey to restart to the begin of playtest (restart hotkey)", short = "restart hotkey" },
-		default = true,
-		off = false
-	},
-	undoHotkeys = {
-		type = "bool",
-		name = "Undo Hotkeys",
-		tooltips = { long = "Hotkeys to undo (z) / redo (shift + z) single or multiple (ctrl) changes close in time to each other", short = "(ctrl: multiple) + (shift: redo) + z" },
-		default = true,
-		off = false
-	},
-	untaggingHotkeys = {
-		type = "bool",
-		name = "(Un)Tagging Hotkeys",
-		tooltips = { long = "Hotkeys to tag selected events (t),\nuntag selected events (shift + t) or\nuntag all tags with same tag as the selected ones (ctrl + t)", short = "(ctrl) + (shift) + t" },
-		default = true,
-		off = false
-	},
-	selectAll = {
-		type = "bool",
-		name = "Select All",
-		tooltips = { long = "Hotkey to select all events (ctrl + a)", short = "Hotkey to select all events" },
 		default = true,
 		off = false
 	},
@@ -914,6 +879,48 @@ return {
 		tooltips = { short = "Shows all changes with the ability to jump between them" },
 		default = true,
 		off = false
+	},
+	recordPosition = {
+		type = "key",
+		name = "Record Mouse Hotkey",
+		tooltips = { short = "Hotkey to record the current mouse position (default: r)" },
+		default = { { {}, "key:r" } },
+		off = {}
+	},
+	selectNone = {
+		type = "key",
+		name = "Deselect Hotkey",
+		tooltips = { long = "Hotkey to select \"None\" in the event palette (default: n)", short = "Deselect placing" },
+		default = { { {}, "key:n" } },
+		off = {}
+	},
+	tagSelection = {
+		type = "key",
+		name = "(Un)Tagging Hotkeys",
+		tooltips = { long = "Hotkeys to tag selected events (default: t),\nuntag selected events (default: shift + t) or\nuntag all tags with same tag as the selected ones (default: ctrl + t)", short = "Ctrl to untag tags with same name, shift to untag, normal to tag" },
+		default = { { {}, "key:t" } },
+		off = {}
+	},
+	selectAll = {
+		type = "key",
+		name = "Select All Hotkey",
+		tooltips = { long = "Hotkey to select all events (default: ctrl + a)", short = "Select all events" },
+		default = { { { ["key:lctrl"] = true }, "key:a" }, { { ["key:rctrl"] = true }, "key:a" } },
+		off = {}
+	},
+	undo = {
+		type = "key",
+		name = "Undo Hotkeys",
+		tooltips = { long = "Hotkeys to undo (default: z) / redo (default: shift + z) single or multiple (ctrl) changes close in time to each other", short = "Ctrl for multiple, shift to redo" },
+		default = { { {}, "key:z" } },
+		off = {}
+	},
+	hideMenus = {
+		type = "key",
+		name = "Hide Menus Hotkey",
+		tooltips = { long = "Hotkey to toggle hiding the editor menus (default: h)", short = "Hide editor menus" },
+		default = { { {}, "key:h" } },
+		off = {}
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

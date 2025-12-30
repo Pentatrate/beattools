@@ -7,98 +7,22 @@ version = "1.0.0"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''i = { "key:i" },'''
+pattern = '''function st:checkKeybinds()'''
 payload = '''
-t = { "key:t" },
-n = { "key:n" },
-z = { "key:z" },
-f = { "key:f" },
-h = { "key:h" },
+	utilitools.keybinds.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
 '''
 position = "after"
-target = "main.lua"
+target = "states/Editor.lua"
 
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''end, 'delete selected event', 'delete')'''
 payload = '''
--- record position
-self:addKeybind(function ()
-	if self.editMode then
-		if beattoolsRecordPosition and beattoolsRecordFunc then
-			if beattoolsRecordFunc then beattoolsRecordFunc(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision) end
-			beattoolsRecordPosition = false
-			beattoolsRecordFunc = nil
-			beattoolsRecordPrecision = 1
-		end
-	end
-end, "record position", "r")
 -- fold all config
 self:addKeybind(function ()
 	if self.editMode and mods.beattools.config.editorMenu then mods.beattools.config.foldAll = true end
 end, "fold all config", "f")
--- select none
-self:addKeybind(function ()
-	if mods.beattools.config.selectNoneInPalette and self.placeEvent ~= "" then
-		self.placeEvent = ""
-	end
-end, "select none", "n")
--- tag/untag selection
-self:addKeybind(function ()
-	-- tag selection
-	if mods.beattools.config.untaggingHotkeys and (self.multiselect or self.selectedEvent) and (not maininput:down("shift")) and (not maininput:down("ctrl")) then
-		self.changeToTagDialogue = true
-		self.newTagName = ''
-	end
-	-- untag single tag
-	if mods.beattools.config.untaggingHotkeys and maininput:down("shift") and (not maininput:down("ctrl")) then
-		if self.selectedEvent then
-			beattoolsUntag(self, { self.selectedEvent })
-		elseif self.multiselect then
-			beattoolsUntag(self, self.multiselect.events)
-		end
-	end
-	-- untag same tags
-	if mods.beattools.config.untaggingHotkeys and maininput:down("ctrl") and (not maininput:down("shift")) then
-		if self.selectedEvent then
-			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, { self.selectedEvent.tag }) return end
-			utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
-				beattoolsUntag(self, { self.selectedEvent.tag })
-			end)
-		elseif self.multiselect then
-			local tempEvents = {}
-			for i, v in ipairs(self.multiselect.events) do
-				if v.type == "tag" then table.insert(tempEvents, v.tag) end
-			end
-			if mods.beattools.config.ignoreUntagPrompt then beattoolsUntag(self, tempEvents) return end
-			utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
-				beattoolsUntag(self, tempEvents)
-			end)
-		end
-	end
-end, "tag selection", "t")
--- select all
-self:addKeybind(function ()
-	if mods.beattools.config.selectAll then
-		self:newMulti()
-		self.multiselectStartBeat = nil
-		self.multiselectEndBeat = nil
-		for i, event in ipairs(self.level.events) do
-			table.insert(self.multiselect.events, event)
-		end
-		for i, event in ipairs(self.multiselect.events) do
-			self.multiselect.eventTypes[event.type] = true
-			if self.multiselectStartBeat == nil then self.multiselectStartBeat, self.multiselectEndBeat = event.time, event.time end
-			if self.multiselectStartBeat > event.time then self.multiselectStartBeat = event.time end
-			if self.multiselectEndBeat < event.time then self.multiselectEndBeat = event.time end
-		end
-		if self.multiselectStartBeat == nil then
-			self.multiselectStartBeat = 0
-			self.multiselectEndBeat = 360
-		end
-	end
-end, "select all", "ctrl", "a")
 -- move to next
 self:addKeybind(function ()
 	if mods.beattools.config.jumpEvents then
@@ -113,7 +37,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -133,23 +57,12 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
 	end
 end, "move to previous", "ctrl", "move_down")
--- undo
-self:addKeybind(function ()
-	if mods.beattools.config.undoHotkeys then utilitools.files.beattools.undo.keybind() end
-end, "undo", "z")
--- hide menus
-self:addKeybind(function ()
-	if mods.beattools.config.hideMenus and not beattoolsRecordFunc then
-		beattoolsRecordPosition = not beattoolsRecordPosition
-		beattoolsRecordFunc = nil
-	end
-end, "hide menus", "h")
 '''
 position = "after"
 target = "states/Editor.lua"
@@ -424,12 +337,12 @@ if self.selectedEvent and mods.beattools.config.untaggingButtons then
 end
 if self.selectedEvent and mods.beattools.config.untaggingButtons and self.selectedEvent.type == "tag" then
 	if imgui.Button("Untag") then
-		beattoolsUntag(self, { self.selectedEvent })
+		self:beattoolsUntag({ self.selectedEvent })
 	end
 	imgui.SameLine()
 	if imgui.Button("Untag same tag name") then
 		utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
-			beattoolsUntag(self, { self.selectedEvent.tag })
+			self:beattoolsUntag({ self.selectedEvent.tag })
 		end)
 	end
 	imgui.Separator()
@@ -457,7 +370,7 @@ pattern = '''if imgui.Button('Delete selected events') then'''
 payload = '''
 if mods.beattools.config.untaggingButtons then
 	if imgui.Button("Untag") then
-		beattoolsUntag(self, self.multiselect.events)
+		self:beattoolsUntag(self.multiselect.events)
 	end
 	imgui.SameLine()
 	if imgui.Button("Untag same tag name") then
@@ -466,7 +379,7 @@ if mods.beattools.config.untaggingButtons then
 			if v.type == "tag" then table.insert(tempEvents, v.tag) end
 		end
 		utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
-			beattoolsUntag(self, tempEvents)
+			self:beattoolsUntag(tempEvents)
 		end)
 	end
 	imgui.Separator()

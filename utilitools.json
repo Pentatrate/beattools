@@ -55,6 +55,11 @@
 			"load": true,
 			"call": true
 		},
+		"editorKeys": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"imguiStyle": {
 			"extension": "lua",
 			"call": true

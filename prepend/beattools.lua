@@ -519,7 +519,7 @@ function st:newMulti()
 	self.multiselectEndAngle = 360
 end
 
-local function beattoolsGetEventVisibility(event)
+function st:beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
 	if type(event) ~= "table" then
 		utilitools.try(mods.beattools, function() error(tostring(event)) end)
@@ -527,10 +527,10 @@ local function beattoolsGetEventVisibility(event)
 		return "transparent"
 	end
 	if event.type == nil then modlog(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
-	if st.beattools.eventGroups.visibility[event.type] == nil then st.beattools.eventGroups.visibility[event.type] = {} end
-	if st.beattools.eventGroups.visibility[event.type][""] then return st.beattools.eventGroups.visibility[event.type][""] end
+	if self.beattools.eventGroups.visibility[event.type] == nil then self.beattools.eventGroups.visibility[event.type] = {} end
+	if self.beattools.eventGroups.visibility[event.type][""] then return self.beattools.eventGroups.visibility[event.type][""] end
 	local visibility = "hide"
-	for i, v in ipairs(st.beattools.eventGroups.groups) do
+	for i, v in ipairs(self.beattools.eventGroups.groups) do
 		if v.visibility ~= " - " then
 			if v.events[event.type] or v.name == "all" then
 				visibility = v.visibility
@@ -539,11 +539,11 @@ local function beattoolsGetEventVisibility(event)
 			end
 		end
 	end
-	if not event.beattoolsCustomEventGroups then st.beattools.eventGroups.visibility[event.type][""] = visibility end
+	if not event.beattoolsCustomEventGroups then self.beattools.eventGroups.visibility[event.type][""] = visibility end
 	return visibility
 end
 
-local function beattoolsUntag(self, tags2)
+function st:beattoolsUntag(tags2)
 	local tags = {}
 	for i, v in ipairs(tags2) do
 		table.insert(tags, v)
