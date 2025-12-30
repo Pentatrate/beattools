@@ -413,7 +413,7 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 
 	if beattoolsCurrentEased == nil then
 		beattoolsCurrentEased = {}
-		log(mods.beattools, "There's no default value for " ..
+		modlog(mods.beattools, "There's no default value for " ..
 			type2 .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. vars)
 	end
 
@@ -433,11 +433,11 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 
 		for k, v in pairs(easingVars) do
 			if beattoolsCurrentEased[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				log(mods.beattools, "There's no ease value for " ..
+				modlog(mods.beattools, "There's no ease value for " ..
 					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
 			end
 			if beattoolsPrev and beattoolsPrev[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				log(mods.beattools, "There's no previous ease value for " ..
+				modlog(mods.beattools, "There's no previous ease value for " ..
 					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
 			end
 		end
@@ -470,7 +470,7 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 	end
 
 	if type(beattoolsCurrentEased) ~= "table" then
-		log(mods.beattools,
+		modlog(mods.beattools,
 			"Not a table: " .. type2 .. "." .. sub .. "." .. subsub .. " => " .. tostring(beattoolsCurrentEased))
 	end
 	beattoolsCurrentEased.lastCheckTime = time
@@ -510,10 +510,10 @@ local function beattoolsGetEventVisibility(event)
 	if not mods.beattools.config.showEventGroups then return "show" end
 	if type(event) ~= "table" then
 		utilitools.try(mods.beattools, function() error(tostring(event)) end)
-		log(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
+		modlog(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
 		return "transparent"
 	end
-	if event.type == nil then log(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
+	if event.type == nil then modlog(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
 	if beattoolsEventVisibilities[event.type] == nil then beattoolsEventVisibilities[event.type] = {} end
 	if beattoolsEventVisibilities[event.type][""] then return beattoolsEventVisibilities[event.type][""] end
 	local visibility = "hide"
@@ -547,7 +547,7 @@ local function beattoolsUntag(self, tags2)
 			tagName = tagName2
 			return true
 		else
-			log(mods.beattools, "Untagging failed: Tag doesnt exist")
+			modlog(mods.beattools, "Untagging failed: Tag doesnt exist")
 			utilitools.prompts.error(mods.beattools, "Untagging failed: \"" .. tagName2 .. ".json\" doesnt exist")
 			return false
 		end
@@ -568,7 +568,7 @@ local function beattoolsUntag(self, tags2)
 				end
 				table.insert(self.level.events, event)
 				if self.multiselect == nil then
-					log(mods.beattools, "Multiselect nil - What? " .. i .. " " .. currentTag.tag)
+					modlog(mods.beattools, "Multiselect nil - What? " .. i .. " " .. currentTag.tag)
 				end
 				table.insert(self.multiselect.events, event)
 				self.multiselect.eventTypes[event.type] = true

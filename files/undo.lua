@@ -144,12 +144,12 @@ undo.injectSub = function ()
 		end
 		undo.events[tostring(cs.level.events[i])] = i
 	end
-	-- log(mod, "Injected metatable into " .. amount .. " events")
+	-- modlog(mod, "Injected metatable into " .. amount .. " events")
 end
 undo.inject = function()
 	setmetatable(cs.level.events, {
 		__newindex = function (t, k, v)
-			log(mod, "newindex GAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH")
+			modlog(mod, "newindex GAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH")
 			t[k] = v
 		end
 	})
@@ -159,7 +159,7 @@ end
 
 undo.newChangePre = function()
 	if #undo.changes > undo.index then
-		log(mod, "overwriting change history")
+		modlog(mod, "overwriting change history")
 	end
 	while #undo.changes > undo.index do
 		table.remove(undo.changes)
@@ -178,13 +178,13 @@ undo.areSimilar = function (list1, list2, dontRepeat)
 		for k, v in pairs(list3) do
 			if undo.keyTracked(k) then
 				if type(list4[k]) ~= type(v) then
-					log(mod, "different type: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+					modlog(mod, "different type: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 					return false
 				elseif type(v) == "table" and not dontRepeat[tostring(v)] and not dontRepeat[tostring(list4[k])] then
 					if not undo.areSimilar(v, list4[k]) then return false end
 				else
 					if list4[k] ~= v then
-						log(mod, "different: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+						modlog(mod, "different: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 						return false
 					end
 				end
@@ -217,7 +217,7 @@ undo.insert = function(list, pos, value)
 			end
 
 			undo.newChangePre()
-			--[[ log(mod,
+			--[[ modlog(mod,
 				"Adding: " ..
 				"\tindex: " .. tostring(pos)
 			) ]]
@@ -253,11 +253,11 @@ undo.remove = function(list, pos)
 				undo.changes[undo.index + 1].ref == list[pos] and
 				undo.changes[undo.index + 1].index == pos
 			and undo.areSimilar(undo.changes[undo.index + 1].ref, list[pos]) then
-				-- log(mod, "Manual redo")
+				-- modlog(mod, "Manual redo")
 				undo.index = undo.index + 1
 			else
 				undo.newChangePre()
-				--[[ log(mod,
+				--[[ modlog(mod,
 					"Removing:" ..
 					"\tindex: " .. tostring(pos)
 				) ]]
@@ -290,7 +290,7 @@ undo.change = function(t, k, v, hidden)
 	if not utilitools.files.beattools.undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and hidden[k] ~= v then
 		if undo.keyTracked(k) then
 			if utilitools.files.beattools.undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
-				if undo.events[tostring(t)] == nil then log("INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
+				if undo.events[tostring(t)] == nil then modlog("INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
 				if undo.changes[undo.index + 1] and
 					undo.changes[undo.index + 1].type == "change" and
 					undo.changes[undo.index + 1].ref == t and
@@ -298,11 +298,11 @@ undo.change = function(t, k, v, hidden)
 					undo.changes[undo.index + 1].key == k and
 					undo.changes[undo.index + 1].from == hidden[k]
 				and undo.changes[undo.index + 1].to == v then
-					-- log(mod, "Manual redo")
+					-- modlog(mod, "Manual redo")
 					undo.index = undo.index + 1
 				else
 					undo.newChangePre()
-					--[[ log(mod,
+					--[[ modlog(mod,
 						"Changing:" ..
 						"\tindex: " .. tostring(undo.events[tostring(t)]) .. "\n"..
 						"\tkey: " .. tostring(k) .. "\n"..
@@ -417,12 +417,12 @@ undo.keybind = function(doUndo, doMultiple)
 	local changedFakeRepeat = false
 
 	while success and change and (change.type == "fullSave" or not hasChanged or math.abs(tempTime - change.time) < (doMultiple and mods.beattools.config.groupTimeDifference or 0.01)) do
-		-- log(mod, (doUndo and "un" or "re") .. "doing " .. change.type .. " " .. (undo.index + (doUndo and 0 or 1)))
+		-- modlog(mod, (doUndo and "un" or "re") .. "doing " .. change.type .. " " .. (undo.index + (doUndo and 0 or 1)))
 		success = false
 
 		local function reAdd(action, data)
 			if not undo.areSimilar(data.ref, data.event) then
-				log(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
+				modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
 				undo.setParams(data.ref, data.event)
 			end
 			-- forceprint(action .. " add " .. data.index)
@@ -438,7 +438,7 @@ undo.keybind = function(doUndo, doMultiple)
 			if cs.level.events[data.index] then
 				if cs.level.events[data.index] == data.ref then
 					if not undo.areSimilar(cs.level.events[data.index], data.event) then
-						log(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
+						modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
 						undo.setParams(data.ref, data.event)
 					end
 					undo.unselect(data.ref)
@@ -451,17 +451,17 @@ undo.keybind = function(doUndo, doMultiple)
 					undo.shiftIndices(false, data.index, data.ref)
 					return true
 				else
-					log(mod, "EVENT DOES NOT MATCH: " .. action)
+					modlog(mod, "EVENT DOES NOT MATCH: " .. action)
 				end
 			else
-				log(mod, "EVENT DOES NOT EXIST: " .. action .. ": " .. data.index)
+				modlog(mod, "EVENT DOES NOT EXIST: " .. action .. ": " .. data.index)
 			end
 		end
 
 		local funcs = {
 			fullSave = function()
 				if #cs.level.events ~= #change.events then -- full recreate
-					-- log(mod, "full recreate start")
+					-- modlog(mod, "full recreate start")
 					while #cs.level.events > 0 do
 						undo.unselect(cs.level.events[#cs.level.events])
 						if cs.level.events[#cs.level.events].beattoolsRepeatParent or cs.level.events[#cs.level.events].beattoolsRepeatChild then
@@ -472,12 +472,12 @@ undo.keybind = function(doUndo, doMultiple)
 					for i, v in ipairs(change.events) do
 						reAdd("full recreate", v)
 					end
-					-- log(mod, "full recreate end")
+					-- modlog(mod, "full recreate end")
 					return true
 				else -- lazy
 					for i, v in ipairs(cs.level.events) do
 						if v ~= change.events[i].ref then
-							log(mod, "EVENT DOES NOT MATCH: lazy recreate")
+							modlog(mod, "EVENT DOES NOT MATCH: lazy recreate")
 							undo.unselect(cs.level.events)
 							if cs.level.events[i].beattoolsRepeatParent or cs.level.events[i].beattoolsRepeatChild then
 								changedFakeRepeat = true
@@ -485,7 +485,7 @@ undo.keybind = function(doUndo, doMultiple)
 							cs.level.events[i] = change.events[i].ref
 						end
 						if not undo.areSimilar(cs.level.events[i], change.events[i].event) then
-							log(mod, "EVENT PARAMS DO NOT MATCH: lazy recreate")
+							modlog(mod, "EVENT PARAMS DO NOT MATCH: lazy recreate")
 							if cs.level.events[i].beattoolsRepeatParent or cs.level.events[i].beattoolsRepeatChild then
 								changedFakeRepeat = true
 							end
@@ -509,13 +509,13 @@ undo.keybind = function(doUndo, doMultiple)
 							end
 							return true
 						else
-							log(mod, "EVENT VALUE DOES NOT MATCH: " .. tostring(cs.level.events[change.index][change.key]) .. " ~= " .. tostring(change[doUndo and "to" or "from"]))
+							modlog(mod, "EVENT VALUE DOES NOT MATCH: " .. tostring(cs.level.events[change.index][change.key]) .. " ~= " .. tostring(change[doUndo and "to" or "from"]))
 						end
 					else
-						log(mod, "EVENT DOES NOT MATCH: " .. tostring(cs.level.events[change.index]) .. " ~= " .. tostring(change.ref))
+						modlog(mod, "EVENT DOES NOT MATCH: " .. tostring(cs.level.events[change.index]) .. " ~= " .. tostring(change.ref))
 					end
 				else
-					log(mod, "EVENT DOES NOT EXIST: " .. tostring(change.index))
+					modlog(mod, "EVENT DOES NOT EXIST: " .. tostring(change.index))
 				end
 			end,
 			add = function()
@@ -545,10 +545,10 @@ undo.keybind = function(doUndo, doMultiple)
 				end
 				undo.undoing = false
 			else
-				log(mod, "NO CHANGE TYPE: " .. tostring(change.type))
+				modlog(mod, "NO CHANGE TYPE: " .. tostring(change.type))
 			end
 		else
-			log(mod, "NO CHANGE")
+			modlog(mod, "NO CHANGE")
 		end
 		change = undo.changes[undo.index + (doUndo and 0 or 1)]
 	end

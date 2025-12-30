@@ -214,7 +214,7 @@ if mods.beattools.config.spreadButtons then
 			if snappedAngle == nil then
 				if event == nil then
 					utilitools.prompts.error(mods.beattools, "Spread incorrect: snappedAngle is nil")
-					log(mods.beattools, "Spread incorrect: snappedAngle is nil")
+					modlog(mods.beattools, "Spread incorrect: snappedAngle is nil")
 					snappedAngle = 0
 				else
 					snappedAngle = beattoolsSnapAngle(event.angle, snap)

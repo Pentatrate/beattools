@@ -21,7 +21,7 @@ imguiStyle.saveStyle = function(styleName, notCurrent)
 		end
 	end
 	if not notCurrent then mods.beattools.config.currentImguiStyle = styleName end
-	log(mod, "Saving " .. styleName)
+	modlog(mod, "Saving " .. styleName)
 	imguiStyle.updateAllSavedStyles()
 end
 imguiStyle.promptStyleName = function(func)
@@ -59,7 +59,7 @@ imguiStyle.removeStyle = function(styleName)
 end
 imguiStyle.applyStyle = function(styleName)
 	if mods.beattools.config.imguiStyles[styleName] == nil then error("imguiStyle.applyStyle: styleName doesn't exist: " .. tostring(styleName)) end
-	log(mod, "Applying " .. styleName)
+	modlog(mod, "Applying " .. styleName)
 	if styleName == "default" then imgui.StyleColorsDark(imguiStyle.styleObj) else
 		for i = 0, imgui.ImGuiCol_COUNT - 1 do
 			if mods.beattools.config.imguiStyles[styleName].colors[tostring(i)] then
@@ -79,14 +79,14 @@ imguiStyle.applyStyle = function(styleName)
 end
 imguiStyle.updateAllSavedStyles = function()
 	local styles = {}
-	for k, v in pairs(mods.beattools.config.imguiStyles) do if v.name ~= k then log(mod, "imguiStyle.updateAllSavedStyles: " .. k .. " doesnt have a name") v.name = k end table.insert(styles, k) end
+	for k, v in pairs(mods.beattools.config.imguiStyles) do if v.name ~= k then modlog(mod, "imguiStyle.updateAllSavedStyles: " .. k .. " doesnt have a name") v.name = k end table.insert(styles, k) end
 	table.sort(styles)
 	imguiStyle.allSavedStyles = styles
-	log(mod, "Updated style list")
+	modlog(mod, "Updated style list")
 end
 imguiStyle.imguiColorsFormat = function(styleName)
 	mods.beattools.config.imguiStyles[styleName] = { name = styleName, vars = mods.beattools.config.imguiStyles.default.vars }
-	local function fail() log(mod, "Failed.") utilitools.prompts.error(mod, "ImGui data detected, but it's invalid :skull:") end
+	local function fail() modlog(mod, "Failed.") utilitools.prompts.error(mod, "ImGui data detected, but it's invalid :skull:") end
 	local text = love.system.getClipboardText()
 	for w in string.gmatch(string.gsub(text, "colors%[", "?"), "[^?]+") do
 		local i1 = string.find(w, "]", 1, true)

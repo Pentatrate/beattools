@@ -118,7 +118,7 @@ return function(inputFlag)
 						end
 					end
 					if imgui.IsItemClicked(1) then
-						log(mods.beattools, "Copied to clipboard: " .. text)
+						modlog(mods.beattools, "Copied to clipboard: " .. text)
 						love.system.setClipboardText(text)
 						cs.p:hurtPulse()
 					end

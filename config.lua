@@ -60,11 +60,11 @@ if imgui.BeginTabBar("beattoolsConfig") then
 													imguiStyleManager.promptStyleName(function(styleName)
 														jsonData.name = styleName
 														mods.beattools.config.imguiStyles[jsonData.name] = jsonData
-														log(mod, "Imported beattools format " .. tostring(jsonData.name))
+														modlog(mod, "Imported beattools format " .. tostring(jsonData.name))
 													end)
 												else
 													mods.beattools.config.imguiStyles[jsonData.name] = jsonData
-													log(mod, "Imported beattools format " .. tostring(jsonData.name))
+													modlog(mod, "Imported beattools format " .. tostring(jsonData.name))
 												end
 											end) end },
 											{ "ImGui Colors Format", imguiStyleManager.promptStyleName(imguiStyleManager.imguiColorsFormat) }
@@ -106,7 +106,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
 									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
 										local text = json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end)
-										log(mods.beattools, "Copied to clipboard: " .. text)
+										modlog(mods.beattools, "Copied to clipboard: " .. text)
 										love.system.setClipboardText(text)
 									end
 								end

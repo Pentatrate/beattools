@@ -125,10 +125,18 @@ payload = '''		if self.selectedEvent then'''
 position = "after"
 target = "states/Editor.lua"
 
-[[patches]]
+[[patches]] # 1.2.0a
 [patches.pattern]
 match_indent = false
 pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time)'''
+payload = '''		end'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]] # 1.2.1 beta
+[patches.pattern]
+match_indent = false
+pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time,'editor')'''
 payload = '''		end'''
 position = "after"
 target = "states/Editor.lua"
@@ -286,7 +294,7 @@ for _, v in ipairs(bounceSelection) do
 	if v[1] == self.overlappingEvents[1] then
 		self.bounceSelected = v[2]
 		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and (beattoolsTime - prevBounceSelectTime) / 60 <= 0.5 then
-			log(mods.beattools, "Double clicked bounce")
+			modlog(mods.beattools, "Double clicked bounce")
 			self.bounceSelectTime = -1
 		else
 			self.bounceSelectTime = beattoolsTime
@@ -537,7 +545,7 @@ if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 		self.unsavedChanges = true
 		self:updateBiggestBeat()
 	else
-		log(mods.beattools, "Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
+		modlog(mods.beattools, "Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
 	end
 elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
 '''
@@ -1274,31 +1282,6 @@ pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.r
 payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
 position = "at"
 target = "states/Editor.lua"
-
-# Annoying log ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''print(template)'''
-payload = '''-- print(template)'''
-position = "at"
-target = "levelformat/events/Vfx/deco.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''print("Using cached metadata for " .. filename)'''
-payload = '''-- print("Using cached metadata for " .. filename)'''
-position = "at"
-target = "obj/LevelManager.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''print("filename: " .. filename)'''
-payload = '''-- print("filename: " .. filename)'''
-position = "at"
-target = "obj/LevelManager.lua"
 
 # Draw less ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

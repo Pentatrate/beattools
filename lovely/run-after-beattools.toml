@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0" 
+version = "1.0.0"
 
 # Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -420,7 +420,7 @@ for i, v in ipairs(self.level.events) do --draw events
 payload = '''
 local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 	if beattoolsLayer == nil then
-		log(mods.beattools, "Invalid call: beattoolsLayer is nil")
+		modlog(mods.beattools, "Invalid call: beattoolsLayer is nil")
 		return
 	else
 		local gameplay = Event.info[v.type].gameplayLayer
