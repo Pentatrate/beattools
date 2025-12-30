@@ -65,7 +65,7 @@ return {
 			cs.multiselectEndBeat = 360
 		end
 	end,
-	undo = utilitools.files.beattools.undo.keybind,
+	undo = function() utilitools.files.beattools.undo.keybind() end,
 	hideMenus = function()
 		if not beattoolsRecordFunc then
 			modlog(mod, "lol")
