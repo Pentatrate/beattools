@@ -247,6 +247,7 @@ undo.insert = function(list, pos, value)
 end
 undo.remove = function(list, pos)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
+		local returnValue
 		if utilitools.files.beattools.undo.fakeRepeating or list[pos].beattoolsRepeatChild == nil then
 			if undo.changes[undo.index + 1] and
 				undo.changes[undo.index + 1].type == "remove" and
@@ -273,7 +274,7 @@ undo.remove = function(list, pos)
 				undo.shiftIndices(false, pos, list[pos])
 			end
 
-			beattools.moremetamethods.remove(list, pos)
+			returnValue = beattools.moremetamethods.remove(list, pos)
 
 			if undo.changes[undo.index].ref.beattoolsRepeatParent then
 				utilitools.files.beattools.fakeRepeat.remove(undo.changes[undo.index].ref.beattoolsRepeatParent)
@@ -282,7 +283,7 @@ undo.remove = function(list, pos)
 		else
 			-- forceprint("remove refused " .. pos)
 		end
-		return false
+		return false, returnValue
 	end
 	return true
 end
@@ -361,8 +362,11 @@ undo.firstTime = function()
 		beattools.moremetamethods.remove = table.remove
 		---@diagnostic disable-next-line: duplicate-set-field
 		table.remove = function(...)
-			if utilitools.files.beattools.undo.remove(...) then
-				beattools.moremetamethods.remove(...)
+			local override, returnValue = utilitools.files.beattools.undo.remove(...)
+			if override then
+				return beattools.moremetamethods.remove(...)
+			else
+				return returnValue
 			end
 		end
 	end

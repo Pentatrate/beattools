@@ -68,7 +68,6 @@ return {
 	undo = function() utilitools.files.beattools.undo.keybind() end,
 	hideMenus = function()
 		if not beattoolsRecordFunc then
-			modlog(mod, "lol")
 			_G.beattoolsRecordPosition = not beattoolsRecordPosition
 			_G.beattoolsRecordFunc = nil
 		end
