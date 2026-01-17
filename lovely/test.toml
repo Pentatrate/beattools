@@ -1,0 +1,194 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "-- modifiers, etc."
+payload = "local minInvisAt, maxInvisAt, minStartInvis, maxStartInvis, minCombo, maxCombo = utilitools.files.beattools.noiseDither.clamp(mods.beattools.config.minInvisAt, mods.beattools.config.maxInvisAt, mods.beattools.config.minStartInvis, mods.beattools.config.maxStartInvis, mods.beattools.config.minCombo, mods.beattools.config.maxCombo)"
+position = "before"
+target = "states/Results.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "savedata.options.accessibility.vfx ~= 'full' or"
+payload = "minStartInvis ~= 0 or maxStartInvis ~= 0 or"
+position = "after"
+target = "states/Results.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "local textWidth = fonts.digitalDisco:getWidth(str)"
+payload = '''
+if minStartInvis ~= 0 or maxStartInvis ~= 0 then
+	if str ~= "" then str = str .. ", " end
+	str = str .. "Hidden Modifier: "
+	if minCombo == maxCombo then
+		if maxInvisAt == maxStartInvis then
+			str = str .. maxInvisAt
+		else
+			str = str .. maxInvisAt .. " | " .. maxStartInvis
+		end
+	else
+		local invisAt
+		if minInvisAt == maxInvisAt then
+			invisAt = maxInvisAt
+		else
+			invisAt = minInvisAt .. "-" .. maxInvisAt
+		end
+		local startInvis
+		if minStartInvis == maxStartInvis then
+			startInvis = maxStartInvis
+		else
+			startInvis = minStartInvis .. "-" .. maxStartInvis
+		end
+		str = str .. invisAt .. " | " .. startInvis .. " | " .. minCombo .. "-" .. maxCombo
+	end
+end
+'''
+position = "before"
+target = "states/Results.lua"
+
+# Block Fading ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Simple Sprites
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "s:draw(index,x,y,r,sx,sy,16,16,kx,ky)"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "before"
+target = "obj/notes/Block.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "s:draw(index,x,y,r,sx,sy,16,16,kx,ky)"
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Block.lua"
+
+# Taps
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "local lineWidth = self:getTapMult(cs.vfx.tapWidthPulse)"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "after"
+target = "obj/notes/Block.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+love.graphics.setLineWidth(lineWidth)
+self.drawTapLines(x,y,r,sx,sy,kx,ky,radius1,radius2)
+'''
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Block.lua"
+
+# Chevron
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "love.graphics.line((x-size)*xScale,size*-1,x*xScale,0)"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "before"
+target = "obj/notes/Block.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "love.graphics.line((x-size)*xScale,size,x*xScale,0)"
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Block.lua"
+
+# Extrataps
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "function ExtraTap:drawTapLines(skipInner,innerPoly,outerPoly)"
+payload = "\tutilitools.files.beattools.noiseDither.dither(self)"
+position = "after"
+target = "obj/notes/ExtraTap.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "love.graphics.polygon('line',outerPoly)"
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/ExtraTap.lua"
+
+# Side Taps
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "local lineWidth = self:getTapMult(cs.vfx.tapWidthPulse)"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "after"
+target = "obj/notes/Side.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+love.graphics.setLineWidth(lineWidth)
+self:drawTapLines(x,y,r,hRadius,vRadius,xOffset)
+'''
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Side.lua"
+
+# Bounces
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "love.graphics.push()"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "before"
+target = "obj/notes/Bounce.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+	love.graphics.draw(sprites.note.finalbouncecenter,self.x,self.y,nil,nil,nil,8,8)
+end
+'''
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Bounce.lua"
+
+# Traces
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "if self.doDithering then setDither(1) end"
+payload = "utilitools.files.beattools.noiseDither.dither(self, self.doDithering)"
+position = "at"
+target = "obj/notes/Trace.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "if self.doDithering then setDither() end"
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "at"
+target = "obj/notes/Trace.lua"
+
+# Holds
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "local points,exitedEarly = self:getPoints(completion,true)"
+payload = "utilitools.files.beattools.noiseDither.dither(self)"
+position = "after"
+target = "obj/notes/Hold.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+	love.graphics.draw(self.particle2Sys, cs.p.x, cs.p.y, self.twistFactor)
+end
+'''
+payload = "utilitools.files.beattools.noiseDither.dither(false)"
+position = "after"
+target = "obj/notes/Hold.lua"

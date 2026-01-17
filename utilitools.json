@@ -106,6 +106,11 @@
 		"test2": {
 			"extension": "lua",
 			"load": true
+		},
+		"noiseDither": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

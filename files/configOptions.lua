@@ -732,6 +732,48 @@ return {
 		default = true,
 		off = false
 	},
+	minInvisAt = {
+		type = "float",
+		name = "Min Invis End Beat",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
+	maxInvisAt = {
+		type = "float",
+		name = "Max Invis End Beat",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
+	minStartInvis = {
+		type = "float",
+		name = "Min Invis Start Beat",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
+	maxStartInvis = {
+		type = "float",
+		name = "Max Invis Start Beat",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
+	minCombo = {
+		type = "float",
+		name = "Min Combo",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
+	maxCombo = {
+		type = "float",
+		name = "Max Combo",
+		tooltips = { short = "..." },
+		default = 0,
+		off = 0
+	},
 
 	-- newer options i couldnt be bothered to sort, especially after the config menu got reordered and i didnt reorder it in this file
 	bookmarkList = {
