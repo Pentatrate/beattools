@@ -58,7 +58,7 @@ target = "states/Results.lua"
 [patches.pattern]
 match_indent = true
 pattern = "s:draw(index,x,y,r,sx,sy,16,16,kx,ky)"
-payload = "utilitools.files.beattools.noiseDither.dither(self)"
+payload = "utilitools.files.beattools.noiseDither.dither(self, self.missed)"
 position = "before"
 target = "obj/notes/Block.lua"
 [[patches]]
@@ -179,7 +179,7 @@ target = "obj/notes/Trace.lua"
 [patches.pattern]
 match_indent = true
 pattern = "local points,exitedEarly = self:getPoints(completion,true)"
-payload = "utilitools.files.beattools.noiseDither.dither(self)"
+payload = "utilitools.files.beattools.noiseDither.dither(self, self.missed)"
 position = "after"
 target = "obj/notes/Hold.lua"
 [[patches]]

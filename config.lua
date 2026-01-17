@@ -1,30 +1,6 @@
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
-local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
-if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
-	if hasCombo then
-		mod.config.maxStartInvis = mod.config.maxStartInvis + 1
-		mod.config.maxInvisAt = mod.config.maxInvisAt + 1
-		mod.config.maxCombo = 1
-	else
-		mod.config.minCombo = 0
-		mod.config.maxCombo = 0
-	end
-end
-if hasCombo then
-	configHelpers.input("minInvisAt")
-end
-configHelpers.input("maxInvisAt")
-if hasCombo then
-	configHelpers.input("minStartInvis")
-end
-configHelpers.input("maxStartInvis")
-if hasCombo then
-	configHelpers.input("minCombo")
-	configHelpers.input("maxCombo")
-end
-mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
 
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
@@ -140,6 +116,31 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("testKey")
 			configHelpers.input("testKey2")
 			configHelpers.input("testKey3")
+			imgui.Separator()
+			local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
+			if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
+				if hasCombo then
+					mod.config.maxStartInvis = mod.config.maxStartInvis + 1
+					mod.config.maxInvisAt = mod.config.maxInvisAt + 1
+					mod.config.maxCombo = 1
+				else
+					mod.config.minCombo = 0
+					mod.config.maxCombo = 0
+				end
+			end
+			if hasCombo then
+				configHelpers.input("minInvisAt")
+			end
+			configHelpers.input("maxInvisAt")
+			if hasCombo then
+				configHelpers.input("minStartInvis")
+			end
+			configHelpers.input("maxStartInvis")
+			if hasCombo then
+				configHelpers.input("minCombo")
+				configHelpers.input("maxCombo")
+			end
+			mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
 		end)
 		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()
 			configHelpers.doc("general_fullDescription")

@@ -1,0 +1,13 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "pq = 1,"
+payload = "pq = 0,"
+position = "at"
+target = "lib/logging.lua"

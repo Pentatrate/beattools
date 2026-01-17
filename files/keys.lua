@@ -6,10 +6,12 @@ return {
 		utilitools.files.beattools.test2()
 	end,
 	testKey3 = function()
-		utilitools.try(mod, function ()
-			for k, v in pairs(mods.DetailedAcc) do
+		modlog(mod, "1 / 0 = " .. tostring(1 / 0))
+		--[[ utilitools.try(mod, function ()
+			for k, v in pairs(mods.utilitools) do
 				modlog(mod, k .. " " .. type(v))
 			end
-		end)
+			utilitools.config.save(mods.utilitools)
+		end) ]]
 	end
 }

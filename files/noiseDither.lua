@@ -1,11 +1,3 @@
---[[
-
-configs
-
-results screen
-
-]]
-
 local noiseDither = {}
 
 noiseDither.appliedNoise = false
