@@ -5,7 +5,7 @@
 			"versions": [
 				[
 					">=",
-					"1.2.12"
+					"1.2.21"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."

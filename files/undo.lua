@@ -379,7 +379,7 @@ undo.unselect = function(event)
 	if cs.multiselect and cs.multiselect.eventTypes[event.type] then
 		for _, v in ipairs(cs.multiselect.events) do
 			if v == event then
-				cs.beattoolsCtrlSelect(event, true)
+				cs:beattoolsCtrlSelect(event, true)
 			end
 		end
 	end

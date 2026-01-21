@@ -170,7 +170,7 @@ match_indent = true
 pattern = '''if maininput:down("ctrl") then'''
 payload = '''
 if mods.beattools.config.ctrlSelect and maininput:down("ctrl") then
-	self.beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
+	self:beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
 elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
 '''
 position = "at"
@@ -210,7 +210,7 @@ pattern = '''self.selectedEvent = self.level.events[v]
 self.cursorAngle = self.selectedEvent.angle'''
 payload = '''
 if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
-	self.beattoolsCtrlSelect(self.level.events[v])
+	self:beattoolsCtrlSelect(self.level.events[v])
 	self.ctrlSelectPending = false
 	self.cursorAngle = self.level.events[v].angle
 else

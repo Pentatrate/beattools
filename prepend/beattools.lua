@@ -696,36 +696,36 @@ function st:beattoolsUpdateEventGroups()
 	self:updateBiggestBeat()
 end
 
-function st.beattoolsCtrlSelect(event, force)
+function st:beattoolsCtrlSelect(event, force)
 	if not mods.beattools.config.ctrlSelect and not force then return end
-	st.ctrlSelectPending = false
-	st.deletePending = false
+	self.ctrlSelectPending = false
+	self.deletePending = false
 	local function addToMulti(event2)
-		table.insert(st.multiselect.events, event2)
-		st.multiselect.eventTypes[event2.type] = true
-		if st.multiselectStartBeat > event2.time then
-			st.multiselectStartBeat = event2.time
+		table.insert(self.multiselect.events, event2)
+		self.multiselect.eventTypes[event2.type] = true
+		if self.multiselectStartBeat > event2.time then
+			self.multiselectStartBeat = event2.time
 		end
-		if st.multiselectEndBeat < event2.time then
-			st.multiselectEndBeat = event2.time
+		if self.multiselectEndBeat < event2.time then
+			self.multiselectEndBeat = event2.time
 		end
 	end
-	if st.multiselect then
+	if self.multiselect then
 		local remove
-		for i, v in ipairs(st.multiselect.events) do
+		for i, v in ipairs(self.multiselect.events) do
 			if v == event then
 				remove = i
 				break
 			end
 		end
 		if remove then
-			table.remove(st.multiselect.events, remove)
+			table.remove(self.multiselect.events, remove)
 
 			local typeExists
-			local checkStart = event.time == st.multiselectStartBeat and st.multiselectEndBeat
-			local checkEnd = event.time == st.multiselectEndBeat and st.multiselectStartBeat
+			local checkStart = event.time == self.multiselectStartBeat and self.multiselectEndBeat
+			local checkEnd = event.time == self.multiselectEndBeat and self.multiselectStartBeat
 
-			for i, v in ipairs(st.multiselect.events) do
+			for i, v in ipairs(self.multiselect.events) do
 				if not typeExists and v.type == event.type then typeExists = true end
 				if checkStart or checkEnd then
 					if v.time == event.time then
@@ -739,21 +739,21 @@ function st.beattoolsCtrlSelect(event, force)
 					break
 				end
 			end
-			if not typeExists then st.multiselect.eventTypes[event.type] = nil end
-			if checkStart then st.multiselectStartBeat = checkStart end
-			if checkEnd then st.multiselectEndBeat = checkEnd end
+			if not typeExists then self.multiselect.eventTypes[event.type] = nil end
+			if checkStart then self.multiselectStartBeat = checkStart end
+			if checkEnd then self.multiselectEndBeat = checkEnd end
 		else
 			addToMulti(event)
 		end
 	else
-		st:newMulti()
-		st.multiselectStartBeat = event.time
-		st.multiselectEndBeat = event.time
+		self:newMulti()
+		self.multiselectStartBeat = event.time
+		self.multiselectEndBeat = event.time
 		addToMulti(event)
-		if st.lastSelected then
-			for i, v in ipairs(st.level.events) do
-				if v == st.lastSelected then
-					addToMulti(st.lastSelected)
+		if self.lastSelected then
+			for i, v in ipairs(self.level.events) do
+				if v == self.lastSelected then
+					addToMulti(self.lastSelected)
 					break
 				end
 			end
