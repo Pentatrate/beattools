@@ -3,11 +3,63 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# Results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# ... ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+pattern = '''print\(\' ?'''
+payload = "-- print('"
+position = "at"
+target = "main.lua"
+
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = "pq = 1,"
-payload = "pq = 0,"
+pattern = '''log('loaded event "'..info.name..'" ('..info.event..eType..')')'''
+payload = '''-- log('loaded event "'..info.name..'" ('..info.event..eType..')')'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "print(valueString)"
+payload = "print('['..tostring(environment)..'] '..valueString)"
 position = "at"
 target = "lib/logging.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "return log"
+payload = '''
+log._print = -1
+
+log.display.pq = 0
+log.display.steam = 0
+'''
+position = "before"
+target = "lib/logging.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('loading costume '.. name)"
+payload = "-- log('loading costume '.. name)"
+position = "at"
+target = "obj/Player.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = 'log("made state ".. name)'
+payload = '-- log("made state ".. name)'
+position = "at"
+target = "lib/basestate.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = 'log("made entity ".. name .." from " ..fname)'
+payload = '-- log("made entity ".. name .." from " ..fname)'
+position = "at"
+target = "lib/entityman.lua"

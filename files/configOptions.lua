@@ -964,6 +964,20 @@ return {
 		default = { { {}, "key:h" } },
 		off = {}
 	},
+	stopImGuiMove = {
+		type = "bool",
+		name = "Stop ImGui Move",
+		tooltips = { short = "Prevents the moving of windows in editor" },
+		default = false,
+		off = false
+	},
+	stopImGuiResize = {
+		type = "bool",
+		name = "Stop ImGui Resize",
+		tooltips = { short = "Prevents the resizing of windows in editor\nDoes not affect docked windows" },
+		default = false,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

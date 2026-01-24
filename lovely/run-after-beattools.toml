@@ -960,6 +960,31 @@ end
 position = "at"
 target = "states/Editor.lua"
 
+# Permanent Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader))\)'''
+payload = '''$rest , nil, (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader), ?\w+)\)'''
+payload = '''$rest , (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader), ?\w+), ?inputFlag\)'''
+payload = '''$rest , (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
 # Editor Colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

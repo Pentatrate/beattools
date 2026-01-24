@@ -25,7 +25,7 @@ return function(window_flag, inputFlag)
 	end
 	helpers.SetNextWindowPos(750, 420, window_flag)
 	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Event Groups", nil, inputFlag) then
+	if imgui.Begin("Event Groups", nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
 		if cs.level then
 			local function checkOverlapping(group, index)
 				local overlapping = false

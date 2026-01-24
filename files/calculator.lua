@@ -10,7 +10,7 @@ end
 return function(window_flag, inputFlag)
 	helpers.SetNextWindowPos(750, 400, window_flag)
 	helpers.SetNextWindowSize(200, 320, window_flag)
-	if imgui.Begin("Calculate", false, inputFlag) then
+	if imgui.Begin("Calculate", false, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
 		local saveToHistory = false
 		imgui.TextWrapped(mods.beattools.config.calculator.output)
 
