@@ -62,9 +62,9 @@ fakeRepeat.updateList = function()
 			if fakeRepeat.indices[v.beattoolsRepeatParent].parent then
 				modlog(mod, "Double repeat index " .. v.beattoolsRepeatParent)
 				modlog(mod, "Check  events:\n" ..
-					"\ttype: " .. fakeRepeat.indices[v.beattoolsRepeatParent].type .. "\n" ..
-					"\ttime: " .. fakeRepeat.indices[v.beattoolsRepeatParent].time .. "\n" ..
-					"\tangle: " .. fakeRepeat.indices[v.beattoolsRepeatParent].angle .. "\n" ..
+					"\ttype: " .. tostring(fakeRepeat.indices[v.beattoolsRepeatParent].type) .. "\n" ..
+					"\ttime: " .. tostring(fakeRepeat.indices[v.beattoolsRepeatParent].time) .. "\n" ..
+					"\tangle: " .. tostring(fakeRepeat.indices[v.beattoolsRepeatParent].angle) .. "\n" ..
 					"and\n" ..
 					"\ttype: " .. tostring(v.type) .. "\n" ..
 					"\ttime: " .. tostring(v.time) .. "\n" ..
