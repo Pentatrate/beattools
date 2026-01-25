@@ -416,8 +416,7 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 
 	if beattoolsCurrentEased == nil then
 		beattoolsCurrentEased = {}
-		modlog(mods.beattools, "There's no default value for " ..
-			type2 .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. vars)
+		modlog(mods.beattools, "There's no default value for " .. tostring(type2) .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. tostring(vars))
 	end
 
 	local i = 1
@@ -436,12 +435,10 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 
 		for k, v in pairs(easingVars) do
 			if beattoolsCurrentEased[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				modlog(mods.beattools, "There's no ease value for " ..
-					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
+				modlog(mods.beattools, "There's no ease value for " .. tostring(type2) .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. tostring(k))
 			end
 			if beattoolsPrev and beattoolsPrev[k] == nil and (type2 ~= "ease" or sub ~= "outline" or subsub ~= nil) then
-				modlog(mods.beattools, "There's no previous ease value for " ..
-					type2 .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. k)
+				modlog(mods.beattools, "There's no previous ease value for " .. tostring(type2) .. " . " .. tostring(sub) .. " . " .. tostring(subsub) .. " . " .. tostring(k))
 			end
 		end
 
@@ -473,8 +470,7 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 	end
 
 	if type(beattoolsCurrentEased) ~= "table" then
-		modlog(mods.beattools,
-			"Not a table: " .. type2 .. "." .. sub .. "." .. subsub .. " => " .. tostring(beattoolsCurrentEased))
+		modlog(mods.beattools, "Not a table: " .. tostring(type2) .. "." .. tostring(sub) .. "." .. tostring(subsub) .. " => " .. tostring(beattoolsCurrentEased))
 	end
 	beattoolsCurrentEased.lastCheckTime = time
 	beattoolsCurrentEased.runEvents = i
@@ -581,7 +577,7 @@ function st:beattoolsUntag(tags2)
 				end
 				table.insert(self.level.events, event)
 				if self.multiselect == nil then
-					modlog(mods.beattools, "Multiselect nil - What? " .. i .. " " .. currentTag.tag)
+					modlog(mods.beattools, "Multiselect nil - What? " .. tostring(i) .. " " .. tostring(currentTag.tag))
 				end
 				table.insert(self.multiselect.events, event)
 				self.multiselect.eventTypes[event.type] = true

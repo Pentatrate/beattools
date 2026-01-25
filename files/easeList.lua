@@ -4,7 +4,7 @@ local imguiHelpers = utilitools.imguiHelpers
 return function(window_flag, inputFlag)
 	helpers.SetNextWindowPos(750, 420, window_flag)
 	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Ease List", nil, inputFlag) then
+	if imgui.Begin("Ease List", nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
 		if imgui.TreeNode_Str("Filters") then
 			configHelpers.input("easeListUse")
 			configHelpers.input("easeListUsed")

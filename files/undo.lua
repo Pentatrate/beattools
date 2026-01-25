@@ -178,13 +178,13 @@ undo.areSimilar = function (list1, list2, dontRepeat)
 		for k, v in pairs(list3) do
 			if undo.keyTracked(k) then
 				if type(list4[k]) ~= type(v) then
-					modlog(mod, "different type: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+					modlog(mod, "different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 					return false
 				elseif type(v) == "table" and not dontRepeat[tostring(v)] and not dontRepeat[tostring(list4[k])] then
 					if not undo.areSimilar(v, list4[k]) then return false end
 				else
 					if list4[k] ~= v then
-						modlog(mod, "different: " .. k .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+						modlog(mod, "different: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 						return false
 					end
 				end
@@ -428,7 +428,7 @@ undo.keybind = function(doUndo, doMultiple)
 
 		local function reAdd(action, data)
 			if not undo.areSimilar(data.ref, data.event) then
-				modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
+				modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. tostring(action))
 				undo.setParams(data.ref, data.event)
 			end
 			-- forceprint(action .. " add " .. data.index)
@@ -444,7 +444,7 @@ undo.keybind = function(doUndo, doMultiple)
 			if cs.level.events[data.index] then
 				if cs.level.events[data.index] == data.ref then
 					if not undo.areSimilar(cs.level.events[data.index], data.event) then
-						modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. action)
+						modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. tostring(action))
 						undo.setParams(data.ref, data.event)
 					end
 					undo.unselect(data.ref)
@@ -457,10 +457,10 @@ undo.keybind = function(doUndo, doMultiple)
 					undo.shiftIndices(false, data.index, data.ref)
 					return true
 				else
-					modlog(mod, "EVENT DOES NOT MATCH: " .. action)
+					modlog(mod, "EVENT DOES NOT MATCH: " .. tostring(action))
 				end
 			else
-				modlog(mod, "EVENT DOES NOT EXIST: " .. action .. ": " .. data.index)
+				modlog(mod, "EVENT DOES NOT EXIST: " .. tostring(action) .. ": " .. tostring(data.index))
 			end
 		end
 

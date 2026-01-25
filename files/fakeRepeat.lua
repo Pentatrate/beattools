@@ -66,9 +66,9 @@ fakeRepeat.updateList = function()
 					"\ttime: " .. fakeRepeat.indices[v.beattoolsRepeatParent].time .. "\n" ..
 					"\tangle: " .. fakeRepeat.indices[v.beattoolsRepeatParent].angle .. "\n" ..
 					"and\n" ..
-					"\ttype: " .. v.type .. "\n" ..
-					"\ttime: " .. v.time .. "\n" ..
-					"\tangle: " .. v.angle
+					"\ttype: " .. tostring(v.type) .. "\n" ..
+					"\ttime: " .. tostring(v.time) .. "\n" ..
+					"\tangle: " .. tostring(v.angle)
 				)
 				fakeRepeat.remove(v.beattoolsRepeatParent, true, true)
 			else
