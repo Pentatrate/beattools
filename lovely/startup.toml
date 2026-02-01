@@ -26,6 +26,18 @@ target = "main.lua"
 match_indent = true
 pattern = '''imgui.love.Init()'''
 payload = '''
+-- why do i need this
+-- this code is run after utilitools startup
+-- all configs CANNOT be nil
+-- yet it crashes
+-- nothing is wrong
+-- yet it doesnt work
+-- why do i need this
+-- i cannot need this
+-- yet it crashes
+-- so ill put this here
+mods.beattools.config.imguiStyles = mods.beattools.config.imguiStyles or {}
+
 mods.beattools.config.imguiStyles.default = nil
 utilitools.fileManager.beattools.imguiStyle.load()
 
