@@ -232,6 +232,7 @@ pattern = '''self.selectedEvent = nil'''
 payload = '''if mods.beattools.config.deleteNothing and self.selectedEvent == nil and self.placeEvent ~= "" then
 	self.placeEvent = ""
 end
+self.holdEndSelected = false
 '''
 position = "before"
 target = "states/Editor.lua"
@@ -395,6 +396,7 @@ pattern = '''if #self.multiselect.events == 0 and #self.markers == 0 then'''
 payload = '''
 if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
 	self.selectedEvent = self.multiselect.events[1]
+	self.holdEndSelected = false
 	self:clearMultiselectVars()
 end
 if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then

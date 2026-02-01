@@ -12,6 +12,7 @@ return function(window_flag, inputFlag)
 			if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == cs.beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
 				cs.editorBeat = v.time
 				cs.selectedEvent = cs.level.events[v.indexInLevel]
+				cs.holdEndSelected = false
 			end
 			if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
 		end
