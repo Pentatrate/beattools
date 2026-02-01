@@ -168,7 +168,7 @@ fakeRepeat.update = function(event, irreversible, key, value)
 		-- forceprint("EEEEEEEEEEEEEEEEEE")
 		fakeRepeat.updateList()
 		if event.beattoolsRepeatParent and event.repeats ~= nil and event.repeats > 0 then
-			if key == "repeatDelay" then
+			if key == "repeatDelay" or irreversible then
 				fakeRepeat.reGenerate(event, irreversible)
 			end
 		else
