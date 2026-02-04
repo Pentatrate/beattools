@@ -81,8 +81,7 @@ local beattoolsKeysWhiteList = {   -- Add your parameters here if you want chang
 	beattoolsLayer = true        -- Mod: "Beattools" by Pentatrate
 }
 local beattoolsKeysBlacklist = { -- Add your parameters here if you dont want changes to this parameter to get saved and be undo-/redoable (especially when the parameter gets auto updated)
-	beattoolsIndex = true,       -- Mod: "Beattools" by Pentatrate
-	beattoolsInStack = true
+	-- Mod: "Beattools" by Pentatrate
 }
 
 undo = {
@@ -112,6 +111,7 @@ undo.keyTracked = function(k)
 end
 
 undo.init = function()
+	utilitools.files.beattools.eventStacking.init()
 	undo.changes = {}
 	undo.index = 0
 end
@@ -232,6 +232,7 @@ undo.insert = function(list, pos, value)
 
 			undo.shiftIndices(true, pos, value)
 			beattools.moremetamethods.insert(list, pos, value)
+			utilitools.files.beattools.eventStacking.addToStack(value)
 
 			if not utilitools.files.beattools.undo.fakeRepeating then
 				utilitools.files.beattools.fakeRepeat.update(value)
@@ -274,6 +275,7 @@ undo.remove = function(list, pos)
 				undo.shiftIndices(false, pos, list[pos])
 			end
 
+			utilitools.files.beattools.eventStacking.removeFromStack(list[pos])
 			returnValue = beattools.moremetamethods.remove(list, pos)
 
 			if undo.changes[undo.index].ref.beattoolsRepeatParent then
@@ -324,7 +326,10 @@ undo.change = function(t, k, v, hidden)
 
 				local temp = not utilitools.files.beattools.undo.fakeRepeating and (k == "time" and v - hidden[k] or v)
 
+
+				if ({ type = true, time = true, angle = true, order = true })[k] then utilitools.files.beattools.eventStacking.removeFromStack(t) end
 				hidden[k] = v
+				if ({ type = true, time = true, angle = true, order = true })[k] then utilitools.files.beattools.eventStacking.addToStack(t) end
 
 				if not utilitools.files.beattools.undo.fakeRepeating then
 					utilitools.files.beattools.fakeRepeat.update(t, false, k, temp)
@@ -391,6 +396,7 @@ undo.fullSave = function()
 	local events = {}
 	for i, v in ipairs(cs.level.events) do
 		events[i] = { event = helpers.copy(v), ref = v, index = i }
+		utilitools.files.beattools.eventStacking.addToStack(v)
 	end
 	table.insert(undo.changes, {
 		type = "fullSave",
@@ -510,7 +516,9 @@ undo.keybind = function(doUndo, doMultiple)
 					if cs.level.events[change.index] == change.ref then
 						if cs.level.events[change.index][change.key] == change[doUndo and "to" or "from"] then
 							-- forceprint((doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
+							if ({ type = true, time = true, angle = true, order = true })[change.key] then utilitools.files.beattools.eventStacking.removeFromStack(cs.level.events[change.index]) end
 							cs.level.events[change.index][change.key] = helpers.copy(change[doUndo and "from" or "to"])
+							if ({ type = true, time = true, angle = true, order = true })[change.key] then utilitools.files.beattools.eventStacking.addToStack(cs.level.events[change.index]) end
 							if cs.level.events[change.index].beattoolsRepeatParent or change.key == "beattoolsRepeatParent" then
 								changedFakeRepeat = true
 							end

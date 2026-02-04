@@ -79,6 +79,11 @@
 			"load": true,
 			"call": true
 		},
+		"eventGroupManager": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"easeList": {
 			"extension": "lua",
 			"load": true,

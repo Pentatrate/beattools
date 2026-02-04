@@ -20,7 +20,7 @@ return function(window_flag, inputFlag)
 			if cs.level.properties.beattools.eventGroups == nil then
 				cs.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
 			end
-			cs:beattoolsUpdateEventGroups()
+			utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 		end
 	end
 	helpers.SetNextWindowPos(750, 420, window_flag)
@@ -48,7 +48,7 @@ return function(window_flag, inputFlag)
 					makeSpace(1, 3)
 				end
 				cs.level.properties.beattools.eventGroups = helpers.copy(utilitools.files.beattools.configOptions.eventGroups.default)
-				cs:beattoolsUpdateEventGroups()
+				utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 				if cs.level.properties.beattools.customEventGroups then
 					for k, v in pairs(cs.level.properties.beattools.customEventGroups) do
 						v.visibility = " - "
@@ -59,7 +59,7 @@ return function(window_flag, inputFlag)
 						if v then
 							while cs.beattools.eventGroups.indices[i - 1] == nil and i > 1 do
 								makeSpace(i, true)
-								cs:beattoolsUpdateEventGroups()
+								utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 								i = i - 1
 							end
 						end
@@ -84,7 +84,7 @@ return function(window_flag, inputFlag)
 							visibility = " - ",
 							index = #cs.beattools.eventGroups.indices + 1
 						}
-						cs:beattoolsUpdateEventGroups()
+						utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 						changing = true
 					end
 				end
@@ -114,7 +114,7 @@ return function(window_flag, inputFlag)
 									v.index = v.index - 1
 								end
 							end
-							cs:beattoolsUpdateEventGroups()
+							utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 							changing = true
 						end
 					end
@@ -131,7 +131,7 @@ return function(window_flag, inputFlag)
 									v.index = v.index + 1
 								end
 							end
-							cs:beattoolsUpdateEventGroups()
+							utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 							changing = true
 						end
 					end
@@ -155,7 +155,7 @@ return function(window_flag, inputFlag)
 							if cs.beattools.eventGroups.indices[origIndex].groups <= 1 then
 								makeSpace(origIndex + 1, true)
 							end
-							cs:beattoolsUpdateEventGroups()
+							utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 							changing = true
 						end
 					end
@@ -185,7 +185,7 @@ return function(window_flag, inputFlag)
 							cs.level.properties.beattools.customEventGroups = nil
 						end
 						makeSpace(v.index + 1, true)
-						cs:beattoolsUpdateEventGroups()
+						utilitools.files.beattools.eventGroupManager.beattoolsUpdateEventGroups()
 						changing = true
 					end
 				end

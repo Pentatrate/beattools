@@ -10,8 +10,6 @@ local beattoolsSelect
 local beattoolsPrevSelect
 beattoolsAngleSnap = 4
 
-local beattoolsOverlap = {}  -- event stacking
-
 local beattoolsStartBeat  -- restart in playtest
 
 beattoolsRecordPosition = false -- record position
@@ -643,53 +641,6 @@ local function beattoolsSameEasing(event, selected)
 	local paramForType = { ease = "var", setColor = "color", deco = "id" }
 	if paramForType[event.type] == nil then return false end
 	return event[paramForType[event.type]] == selected[paramForType[event.type]]
-end
-function st:beattoolsUpdateEventGroups()
-	self:noSelection()
-
-	self.beattools.eventGroups.groups = {}
-	self.beattools.eventGroups.indices = {}
-	self.beattools.eventGroups.maxIndex = 1
-	self.beattools.eventGroups.visibility = {}
-	local function processEventGroup(k, v)
-		local temp = v
-		temp.name = k
-
-		local textLength = imgui.GetFontSize() * 7 / 13 * temp.name:len()
-		if self.beattools.eventGroups.longest < textLength then self.beattools.eventGroups.longest = textLength end
-
-		if self.beattools.eventGroups.maxIndex < temp.index then self.beattools.eventGroups.maxIndex = temp.index end
-
-		if self.beattools.eventGroups.indices[temp.index] == nil then self.beattools.eventGroups.indices[temp.index] = { events = {}, groups = 0 } end
-		self.beattools.eventGroups.indices[temp.index].groups = self.beattools.eventGroups.indices[temp.index].groups + 1
-		for kk, vv in pairs(temp.events) do
-			self.beattools.eventGroups.indices[temp.index].events[kk] = true
-		end
-
-		if #self.beattools.eventGroups.groups == 0 then
-			table.insert(self.beattools.eventGroups.groups, temp)
-		else
-			local inserted = false
-			for i, vv in ipairs(self.beattools.eventGroups.groups) do
-				if not (temp.index > vv.index or (temp.index == vv.index and temp.name > vv.name)) then
-					table.insert(self.beattools.eventGroups.groups, i, temp)
-					inserted = true
-					break
-				end
-			end
-			if not inserted then table.insert(self.beattools.eventGroups.groups, temp) end
-		end
-	end
-	for k, v in pairs(self.level.properties.beattools.eventGroups) do
-		processEventGroup(k, v)
-	end
-	if self.level.properties.beattools.customEventGroups then
-		for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-			processEventGroup(k, v)
-		end
-	end
-
-	self:updateBiggestBeat()
 end
 
 function st:beattoolsCtrlSelect(event, force)

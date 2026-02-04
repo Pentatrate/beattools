@@ -51,14 +51,6 @@ target = "obj/Player.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = 'log("made state ".. name)'
-payload = '-- log("made state ".. name)'
-position = "at"
-target = "lib/basestate.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = 'log("made entity ".. name .." from " ..fname)'
 payload = '-- log("made entity ".. name .." from " ..fname)'
 position = "at"

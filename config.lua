@@ -15,8 +15,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.doc("general_advanced")
 			configHelpers.input("speedScrolling")
 			imgui.Separator()
-			configHelpers.input("scanMargin")
-			imgui.Separator()
 			configHelpers.input("keyHandling")
 			imgui.Separator()
 			configHelpers.input("randomizeWindows")

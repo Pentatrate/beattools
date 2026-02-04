@@ -196,11 +196,11 @@ else
 end'''
 payload = '''
 if type(eventDraw) == "function" then
-	if event.isCursor then
+	--[[if event.isCursor then
 		if beattoolsOverlap["" .. event.time] ~=nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
 			beattoolsSelect = { event.time, event.angle % 360 }
 		end
-	end
+	end]]
 	local beattoolsTemp2 = event.angle
 	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
 		utilitools.files.beattools.undo.undoing = true
@@ -222,8 +222,8 @@ if type(eventDraw) == "function" then
 					elseif beattoolsParam < -99 then
 						beattoolsParam = "<-99"
 					end
-					pos[1] = helpers.round(pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset) - 6 - 20
-					pos[2] = helpers.round(pos[2]) - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset - 2
+					pos[1] = helpers.round(pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.xOffset) - 6 - 20
+					pos[2] = helpers.round(pos[2]) - utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.yOffset - 2
 					love.graphics.setColor(mods.beattools.config.bgColor.r, mods.beattools.config.bgColor.g, mods.beattools.config.bgColor.b, alpha)
 					if mods.beattools.config.shadow then
 						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 13 + 20, "right")
@@ -249,7 +249,7 @@ if type(eventDraw) == "function" then
 			utilitools.files.beattools.undo.undoing = false
 			utilitools.files.beattools.undo.fakeRepeating = false
 		end
-		local pos = cs:getPosition((function () if mods.beattools.config.displayEndAngle then return event.angle else return event.endAngle end end)(), event.time)
+		local pos = cs:getPosition((mods.beattools.config.displayEndAngle and event.angle or event.endAngle), event.time)
 		love.graphics.draw((function () if beattoolsLayer == "selected" or (mods.beattools.config.fakeRepeat and self.selectedEvent ~= nil and event.beattoolsRepeatChild ~= nil and event.beattoolsRepeatChild == self.selectedEvent.beattoolsRepeatParent) then return sprites.editor.endAngleMarkerSelected else return sprites.editor.endAngleMarker end end)(), pos[1], pos[2], 0, 1, 1, 11, 11)
 		if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
 			utilitools.files.beattools.undo.undoing = true
@@ -271,7 +271,7 @@ if type(eventDraw) == "function" then
 						return sprites.editor.repeatMarker
 					end
 				end)(),
-				pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset,
+				pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.yOffset,
 				0, 1, 1, 11, 11
 			)
 		end
@@ -312,15 +312,15 @@ else
 	local pos = cs:getPosition(event.angle, event.time)
 	if -16 < pos[1] and pos[1] < 616 and -16 < pos[2] and pos[2] < 376 then
 		if ((beattoolsLayer == "event" and event ~= self.selectedEvent) or beattoolsLayer == "selected") and event.time >= self.editorBeat then
-			if event.isCursor and beattoolsOverlap["" .. event.time] ~= nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
+			--[[if event.isCursor and beattoolsOverlap["" .. event.time] ~= nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
 				event.beattoolsIndex = beattoolsOverlap["" .. event.time]["" .. event.angle % 360][1]
 				if beattoolsOverlap["" .. event.time]["" .. event.angle % 360][2] then event.beattoolsIndex = (event.beattoolsIndex or 0) + 1 end
-			end
+			end]]
 			if event.beattoolsRepeatChild == nil or not mods.beattools.config.fakeRepeat then
-				love.graphics.draw(eventDraw, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
+				love.graphics.draw(eventDraw, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.yOffset, 0, 1, 1, 8, 8)
 				if beattoolsSameEasing(event, self.selectedEvent) then
 					love.graphics.setColor(mods.beattools.config.durationSameEasingColor.r, mods.beattools.config.durationSameEasingColor.g, mods.beattools.config.durationSameEasingColor.b, 1)
-					love.graphics.draw(sprites.editor.sameEasing, pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+					love.graphics.draw(sprites.editor.sameEasing, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
 					love.graphics.setColor(1, 1, 1, 1)
 				end
 				if mods.beattools.config.showParam ~= "none" and event[mods.beattools.config.showParam] ~= nil then
@@ -331,8 +331,8 @@ else
 					elseif beattoolsParam < -100 then
 						beattoolsParam = "<-100"
 					end
-					pos[1] = helpers.round(pos[1] + (event.beattoolsIndex or 0) * mods.beattools.config.xOffset) - 6 - 20
-					pos[2] = helpers.round(pos[2]) - (event.beattoolsIndex or 0) * mods.beattools.config.yOffset - 2
+					pos[1] = helpers.round(pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.xOffset) - 6 - 20
+					pos[2] = helpers.round(pos[2]) - utilitools.files.beattools.eventStacking.getIndex(event) * mods.beattools.config.yOffset - 2
 					love.graphics.setColor(mods.beattools.config.bgColor.r, mods.beattools.config.bgColor.g, mods.beattools.config.bgColor.b, 1)
 					if mods.beattools.config.shadow then
 						love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 13 + 20, "right")
@@ -434,7 +434,7 @@ local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 		end
 
 		local alpha = 1
-		if v.beattoolsInStack ~= nil then alpha = alpha * mods.beattools.config.alpha end
+		if utilitools.files.beattools.eventStacking.inStack(v) then alpha = alpha * mods.beattools.config.alpha end
 		if self:beattoolsGetEventVisibility(v) == "transparent" then alpha = alpha * 0.75 end
 		if self:beattoolsGetEventVisibility(v) == "ghost" then alpha = alpha * 0.25 end
 		self:drawEvent(v, alpha, beattoolsLayer)
@@ -445,7 +445,7 @@ local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 					if mods.beattools.config.whiteSelected ~= "off" then
 						love.graphics.setColor(mods.beattools.config.selectedBorderColor.r, mods.beattools.config.selectedBorderColor.g, mods.beattools.config.selectedBorderColor.b, mods.beattools.config.selectedBorderColor.a)
 					end
-					love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+					love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
 					love.graphics.setColor(1, 1, 1, 1)
 '''
 position = "at"
@@ -546,13 +546,11 @@ if true then -- Penta: beattools layer code
 	-- Penta: Stacked notes marker
 	if mods.beattools.config.stackingNotes then
 		love.graphics.setColor(1,1,1,1)
-		for time, angles in pairs(beattoolsOverlap) do
-			if time + 0 >= self.editorBeat and time + 0 <= self.editorBeat + self.drawDistance then
+		for time, angles in pairs(utilitools.files.beattools.eventStacking.gameplayStack) do
+			if time >= self.editorBeat and time <= self.editorBeat + self.drawDistance then
 				for angle, values in pairs(angles) do
-					if values[4] then
-						local pos = self:getPosition(angle, time)
-						love.graphics.draw(sprites.editor.stackingNotes, pos[1], pos[2], 0, 1, 1, 11, 11)
-					end
+					local pos = self:getPosition(angle, time)
+					love.graphics.draw(sprites.editor.stackingNotes, pos[1], pos[2], 0, 1, 1, 11, 11)
 				end
 			end
 		end
@@ -639,7 +637,7 @@ then
 		if mods.beattools.config.whiteSelected ~= "off" then
 			love.graphics.setColor(mods.beattools.config.selectedBorderColor.r, mods.beattools.config.selectedBorderColor.g, mods.beattools.config.selectedBorderColor.b, mods.beattools.config.selectedBorderColor.a)
 		end
-		love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + (self.selectedEvent.beattoolsIndex or 0) * mods.beattools.config.xOffset, pos[2] - (self.selectedEvent.beattoolsIndex or 0) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
+		love.graphics.draw(sprites.editor[mods.beattools.config.whiteSelected ~= "off" and (mods.beattools.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"], pos[1] + utilitools.files.beattools.eventStacking.getIndex(self.selectedEvent) * mods.beattools.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(self.selectedEvent) * mods.beattools.config.yOffset, 0, 1, 1, 11, 11)
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
@@ -675,7 +673,7 @@ payload = '''self:drawEvent({ type = eventType, angle = angle, time = time, isCu
 position = "at"
 target = "states/Editor.lua"
 
-# Determines event beattoolsOverlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Update biggest beat ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -702,10 +700,6 @@ if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect 
 	beattoolsPrevSelect = beattoolsSelect
 	self:updateBiggestBeat()
 end
-if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
-	beattoolsEditorBeat = helpers.round(self.editorBeat)
-	self:updateBiggestBeat()
-end
 '''
 position = "before"
 target = "states/Editor.lua"
@@ -715,7 +709,6 @@ target = "states/Editor.lua"
 match_indent = true
 pattern = '''function st:updateBiggestBeat()'''
 payload = '''
-	beattoolsOverlap = {}
 	for k, v in pairs(beattoolsDefaultEasings) do
 		self.beattoolsEasings[k] = {}
 	end
@@ -731,25 +724,6 @@ pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 payload = '''
 if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
 
-if self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] then
-	local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
-	if tostring(v.time) == "-0" then v.time = 0 end
-	if beattoolsOverlap["" .. v.time] == nil then
-		beattoolsOverlap["" .. v.time] = {}
-	end
-	if beattoolsOverlap["" .. v.time][beattoolsAngle] == nil then
-		beattoolsOverlap["" .. v.time][beattoolsAngle] = {0, false, 0, false}
-	end
-	if type(Event.editorDraw[v.type]) == "function" then
-		if beattoolsOverlap["" .. v.time][beattoolsAngle][2] then
-			beattoolsOverlap["" .. v.time][beattoolsAngle][4] = true
-		end
-		beattoolsOverlap["" .. v.time][beattoolsAngle][2] = true
-	else
-		beattoolsOverlap["" .. v.time][beattoolsAngle][1] = beattoolsOverlap["" .. v.time][beattoolsAngle][1] + 1
-	end
-end
-
 if mods.beattools.config.autoFixSides and v.type == "side" then
 	local prev = v.endAngle or v.angle
 	local after = prev % 360
@@ -763,18 +737,6 @@ end
 -- Penta's Beattools code marker
 '''
 position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''--trigger auto-backup every five minutes'''
-payload = '''if math.abs(self.editorBeat - beattoolsEditorBeat) > mods.beattools.config.scanMargin then
-	beattoolsEditorBeat = helpers.round(self.editorBeat)
-	self:updateBiggestBeat()
-end
-'''
-position = "before"
 target = "states/Editor.lua"
 
 [[patches]]
@@ -800,30 +762,6 @@ payload = '''
 			end
 		end
 	end
-
-	for i, v in ipairs(self.level.events) do
-		if not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and (self.editorBeat - mods.beattools.config.scanMargin <= v.time and v.time <= self.editorBeat + self.drawDistance + mods.beattools.config.scanMargin) and type(Event.editorDraw[v.type]) ~= "function" then
-			local beattoolsAngle = "" .. (function () if mods.beattools.config.displayEndAngle and v.endAngle ~= nil then return v.endAngle else return v.angle end end)() % 360
-			if tostring(v.time) == "-0" then v.time = 0 end
-			v.beattoolsIndex, v.beattoolsInStack = 0, nil
-			local noGameplay = true
-			if beattoolsOverlap["" .. v.time] and beattoolsOverlap["" .. v.time][beattoolsAngle] and (beattoolsOverlap["" .. v.time][beattoolsAngle][2] or beattoolsOverlap["" .. v.time][beattoolsAngle][1] > 1) then
-				v.beattoolsInStack = true
-				v.beattoolsIndex = beattoolsOverlap["" .. v.time][beattoolsAngle][3]
-				beattoolsOverlap["" .. v.time][beattoolsAngle][3] = beattoolsOverlap["" .. v.time][beattoolsAngle][3] + 1
-				if beattoolsOverlap["" .. v.time][beattoolsAngle][2] then
-					v.beattoolsIndex = (v.beattoolsIndex or 0) + 1
-					noGameplay = false
-				end
-			end
-			if beattoolsSelect ~= nil and noGameplay then
-				if true and beattoolsSelect[1] == v.time and beattoolsSelect[2] == v.angle % 360 then
-					v.beattoolsIndex = (v.beattoolsIndex or 0) + 1
-					v.beattoolsInStack = true
-				end
-			end
-		end
-	end
 '''
 position = "after"
 target = "states/Editor.lua"
@@ -839,7 +777,7 @@ if helpers.collide(
 payload = '''
 if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
-	{ x = pos[1] - 8 + (v.beattoolsIndex or 0) * mods.beattools.config.xOffset, y = pos[2] - 8 - (v.beattoolsIndex or 0) * mods.beattools.config.yOffset, width = 16, height = 16 }
+	{ x = pos[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }
 '''
 position = "at"
 target = "states/Editor.lua"
@@ -898,47 +836,48 @@ position = "after"
 target = "states/Editor.lua"
 
 # Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''v.play_onBeat = nil'''
-payload = '''
-v.beattoolsIndex = nil
-v.beattoolsInStack = nil
-'''
-position = "after"
-target = "obj/LevelManager.lua"
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''v.play_onBeat = nil'''
+# payload = '''
+# -- Penta:
+# -- here's where i would remove parameters i didnt want save in the level files
+# -- IF I HAD SOME!!! :(   /ref
+# '''
+# position = "after"
+# target = "obj/LevelManager.lua"
 
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
-payload = '''self:updateBiggestBeat()'''
-position = "after"
-target = "states/Editor.lua"
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''local upgraded = LevelManager:saveLevel(self.level, cLevel, self.forceSaveBoth, self.variant)'''
+# payload = '''-- self:updateBiggestBeat()'''
+# position = "after"
+# target = "states/Editor.lua"
 
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
-payload = '''self:updateBiggestBeat()'''
-position = "after"
-target = "states/Editor.lua"
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''LevelManager:saveLevel(self.level, cLevel, true, self.variant)'''
+# payload = '''-- self:updateBiggestBeat()'''
+# position = "after"
+# target = "states/Editor.lua"
 
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
-payload = '''self:updateBiggestBeat()'''
-position = "after"
-target = "states/Editor.lua"
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''LevelManager:saveLevel(self.level, cLevel..backup, true, self.variant)'''
+# payload = '''-- self:updateBiggestBeat()'''
+# position = "after"
+# target = "states/Editor.lua"
 
 # End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.regex]
 pattern = '''(?<func>self:getPosition)\((?<param>[^\n]+?)\.angle,'''
 payload = '''
-self:getPosition((function () if mods.beattools.config.displayEndAngle and $param.endAngle ~= nil then return $param.endAngle else return $param.angle end end)(),'''
+self:getPosition((mods.beattools.config.displayEndAngle and $param.endAngle or $param.angle),'''
 position = "at"
 target = "states/Editor.lua"
 

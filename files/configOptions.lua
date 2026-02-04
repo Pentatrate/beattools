@@ -149,12 +149,6 @@ return {
 		default = 0.35
 	},
 	--   Advanced
-	scanMargin = {
-		type = "int",
-		name = "Scan Margin",
-		tooltips = { long = "How many beats outside of the visible area to scan for event stacks. Too small values result results in lag when scrolling. Too large values result results in one lag* spike when the margin is reached.\n(Generally, the scan for event stacks is not laggy enough to even require this measure, so you can input large values)", short = "Beat margin for calculating event stacks" },
-		default = 64
-	},
 	keyHandling = {
 		type = "combo",
 		name = "Property Filter",
