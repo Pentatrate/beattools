@@ -6,8 +6,6 @@ local eventStacking = {
 
 --[[
 todo
-- visibility
--- ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)]
 - update biggest beat
 ]]
 
@@ -30,10 +28,18 @@ function eventStacking.getAngle(event)
 	return (mods.beattools.config.displayEndAngle and event.endAngle or event.angle) % 360
 end
 
-function eventStacking.addToStack(event)
+function eventStacking.addToStack(event, dontCheck)
 	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.addToStack: Invalid event: " .. tostring(event))) return end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
+
+	if not dontCheck then
+		local visibility, type = utilitools.files.beattools.eventGroups.eventVisibility(event, true)
+		if type ~= 1 then
+			modlog(mod, "refused " .. tostring(event.type) .. " " .. tostring(visibility) .. " " .. tostring(type))
+			return
+		end
+	end
 
 	eventStacking.stacks[event.time] = eventStacking.stacks[event.time] or {}
 	eventStacking.stacks[event.time][angle] = eventStacking.stacks[event.time][angle] or {}
@@ -48,6 +54,8 @@ function eventStacking.addToStack(event)
 		-- i could make this O(log(n)) instead of O(n), if it lags too much
 		if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
 		elseif v == event then
+			bool = false
+			modlog(mod, "duplicate")
 			return
 		elseif bool then
 			table.insert(t, i, event)

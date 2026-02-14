@@ -404,6 +404,7 @@ undo.fullSave = function()
 		time = undo.lastCheck
 	})
 	undo.newChangeSub()
+	utilitools.files.beattools.eventGroups.process()
 end
 
 undo.update = function()
@@ -441,6 +442,7 @@ undo.keybind = function(doUndo, doMultiple)
 			-- forceprint(action .. " add " .. data.index)
 			undo.shiftIndices(true, data.index, data.ref)
 			beattools.moremetamethods.insert(cs.level.events, data.index, data.ref)
+			utilitools.files.beattools.eventStacking.addToStack(data.ref)
 			if data.ref.beattoolsRepeatParent or data.ref.beattoolsRepeatChild then
 				-- forceprint("Added " .. tostring(data.ref.beattoolsRepeatParent) .. " " .. tostring(data.ref.beattoolsRepeatChild))
 				changedFakeRepeat = true
@@ -460,6 +462,7 @@ undo.keybind = function(doUndo, doMultiple)
 						-- forceprint("Removed " .. tostring(data.ref.beattoolsRepeatParent) .. " " .. tostring(data.ref.beattoolsRepeatChild))
 						changedFakeRepeat = true
 					end
+					utilitools.files.beattools.eventStacking.removeFromStack(data.ref)
 					beattools.moremetamethods.remove(cs.level.events, data.index)
 					undo.shiftIndices(false, data.index, data.ref)
 					return true

@@ -5,9 +5,6 @@ st.beattools = {}
 utilitools.files.beattools.undo.init()
 
 local beattoolsTime = 0
-local beattoolsEditorBeat = 0
-local beattoolsSelect
-local beattoolsPrevSelect
 beattoolsAngleSnap = 4
 
 local beattoolsStartBeat  -- restart in playtest
@@ -99,13 +96,6 @@ local beattoolsEasingFor = {
 	songNameOverride = true,
 	decos = { pairs, pairs }
 }
-
-st.beattools.eventGroups = {}
-st.beattools.eventGroups.groups = {}
-st.beattools.eventGroups.indices = {}
-st.beattools.eventGroups.maxIndex = -1
-st.beattools.eventGroups.longest = 0
-st.beattools.eventGroups.visibility = {}
 
 for k, v in pairs(beattools.easeList.unsorted.all) do
 	if v == "nil" then v = nil end
@@ -511,30 +501,6 @@ function st:newMulti()
 	self.multiselectEndBeat = 0
 	self.multiselectStartAngle = 0
 	self.multiselectEndAngle = 360
-end
-
-function st:beattoolsGetEventVisibility(event)
-	if not mods.beattools.config.showEventGroups then return "show" end
-	if type(event) ~= "table" then
-		utilitools.try(mods.beattools, function() error(tostring(event)) end)
-		modlog(mods.beattools, "eventVisibility: Parameter type is not table: " .. tostring(event))
-		return "transparent"
-	end
-	if event.type == nil then modlog(mods.beattools, "eventVisibility: Event type is nil: " .. tostring(event)) return "transparent" end
-	if self.beattools.eventGroups.visibility[event.type] == nil then self.beattools.eventGroups.visibility[event.type] = {} end
-	if self.beattools.eventGroups.visibility[event.type][""] then return self.beattools.eventGroups.visibility[event.type][""] end
-	local visibility = "hide"
-	for i, v in ipairs(self.beattools.eventGroups.groups) do
-		if v.visibility ~= " - " then
-			if v.events[event.type] or v.name == "all" then
-				visibility = v.visibility
-			elseif v.events.custom and event.beattoolsCustomEventGroups and event.beattoolsCustomEventGroups[v.name] then
-				visibility = v.visibility
-			end
-		end
-	end
-	if not event.beattoolsCustomEventGroups then self.beattools.eventGroups.visibility[event.type][""] = visibility end
-	return visibility
 end
 
 function st:beattoolsUntag(tags2)

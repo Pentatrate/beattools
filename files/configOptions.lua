@@ -972,6 +972,13 @@ return {
 		default = false,
 		off = false
 	},
+	toggleMenuMusic = {
+		type = "key",
+		name = "Toggle Menu Music",
+		tooltips = { short = "Toggles... you guessed it, the menu music on and off" },
+		default = {},
+		off = {}
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1061,50 +1068,120 @@ return {
 		type = "hidden",
 		name = "[internal] eventGroups",
 		default = {
-			all = {
-				events = { bookmark = true, tag = true, paddles = true, play = true, setBPM = true, showResults = true, block = true, extraTap = true, hold = true, inverse = true, mine = true, mineHold = true, side = true, deco = true, ease = true, forcePlayerSprite = true, hom = true, noise = true, outline = true, playSound = true, setBgColor = true, setBoolean = true, setColor = true, toggleParticles = true --[[EA events]], advancetextdeco = true, aft = true, easeSequence = true, retime = true, songNameOverride = true, textdeco = true, bounce = true, setBounceHeight = true },
-				visibility = "show",
-				index = 0
+			{
+				events = "all",
+				index = 0,
+				name = "all",
+				time = 1,
+				visibility = "show"
 			},
-			gameplay = {
-				events = { paddles = true, block = true, extraTap = true, hold = true, inverse = true, mine = true, mineHold = true, side = true --[[EA events]], bounce = true, setBounceHeight = true },
-				visibility = " - ",
-				index = 1
+			{
+				events = {
+					bookmark = true
+				},
+				index = 1,
+				name = "bookmarks",
+				time = 2,
+				visibility = " - "
 			},
-			song = {
-				events = { play = true, setBPM = true, showResults = true, playSound = true --[[EA events]], retime = true },
-				visibility = " - ",
-				index = 1
+			{
+				events = {
+					block = true,
+					bounce = true,
+					extraTap = true,
+					hold = true,
+					inverse = true,
+					mine = true,
+					mineHold = true,
+					paddles = true,
+					setBounceHeight = true,
+					side = true
+				},
+				index = 1,
+				name = "gameplay",
+				time = 2,
+				visibility = " - "
 			},
-			visuals = {
-				events = { deco = true, ease = true, forcePlayerSprite = true, hom = true, noise = true, outline = true, setBgColor = true, setBoolean = true, setColor = true, toggleParticles = true --[[EA events]], advancetextdeco = true, aft = true, easeSequence = true, songNameOverride = true, textdeco = true },
-				visibility = " - ",
-				index = 1
+			{
+				events = {
+					play = true,
+					playSound = true,
+					retime = true,
+					setBPM = true,
+					showResults = true
+				},
+				index = 1,
+				name = "song",
+				time = 3,
+				visibility = " - "
 			},
-			color = {
-				events = { hom = true, noise = true, outline = true, setBgColor = true, setColor = true },
-				visibility = " - ",
-				index = 2
+			{
+				events = {
+					advancetextdeco = true,
+					aft = true,
+					deco = true,
+					ease = true,
+					easeSequence = true,
+					forcePlayerSprite = true,
+					hom = true,
+					noise = true,
+					outline = true,
+					setBgColor = true,
+					setBoolean = true,
+					setColor = true,
+					songNameOverride = true,
+					textdeco = true,
+					toggleParticles = true
+				},
+				index = 1,
+				name = "visuals",
+				temp = -2,
+				time = 4,
+				visibility = " - "
 			},
-			bookmarks = {
-				events = { bookmark = true },
-				visibility = " - ",
-				index = 3
+			{
+				events = {
+					hom = true,
+					noise = true,
+					outline = true,
+					setBgColor = true,
+					setColor = true
+				},
+				index = 2,
+				name = "color",
+				time = 5,
+				visibility = " - "
 			},
-			tags = {
-				events = { tag = true },
-				visibility = " - ",
-				index = 3
+			{
+				events = {
+					tag = true
+				},
+				index = 1,
+				name = "tags",
+				time = 5,
+				visibility = " - "
 			},
-			deco = {
-				events = { deco = true, advancetextdeco = true, textdeco = true },
-				visibility = " - ",
-				index = 3
+			{
+				events = {
+					advancetextdeco = true,
+					deco = true,
+					textdeco = true
+				},
+				index = 2,
+				name = "deco",
+				time = 7,
+				visibility = " - "
 			},
-			eases = {
-				events = { ease = true, setBoolean = true, easeSequence = true },
-				visibility = " - ",
-				index = 3
+			{
+				events = {
+					ease = true,
+					easeSequence = true,
+					setBoolean = true
+				},
+				index = 2,
+				name = "eases",
+				time = 8,
+				visibility = " - "
 			}
 		}
 	},

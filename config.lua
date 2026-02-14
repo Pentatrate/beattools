@@ -14,6 +14,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		configHelpers.treeNode("Advanced", function()
 			configHelpers.doc("general_advanced")
 			configHelpers.input("speedScrolling")
+			configHelpers.input("toggleMenuMusic")
 			imgui.Separator()
 			configHelpers.input("keyHandling")
 			imgui.Separator()

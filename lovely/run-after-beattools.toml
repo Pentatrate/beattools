@@ -196,11 +196,6 @@ else
 end'''
 payload = '''
 if type(eventDraw) == "function" then
-	--[[if event.isCursor then
-		if beattoolsOverlap["" .. event.time] ~=nil and beattoolsOverlap["" .. event.time]["" .. event.angle % 360] ~= nil then
-			beattoolsSelect = { event.time, event.angle % 360 }
-		end
-	end]]
 	local beattoolsTemp2 = event.angle
 	if mods.beattools.config.displayEndAngle and event.endAngle ~= nil then
 		utilitools.files.beattools.undo.undoing = true
@@ -435,8 +430,8 @@ local function beattoolsDrawEvent(i, v, beattoolsLayer) --draw events
 
 		local alpha = 1
 		if utilitools.files.beattools.eventStacking.inStack(v) then alpha = alpha * mods.beattools.config.alpha end
-		if self:beattoolsGetEventVisibility(v) == "transparent" then alpha = alpha * 0.75 end
-		if self:beattoolsGetEventVisibility(v) == "ghost" then alpha = alpha * 0.25 end
+		if utilitools.files.beattools.eventGroups.eventVisibility(v) == "transparent" then alpha = alpha * 0.75 end
+		if utilitools.files.beattools.eventGroups.eventVisibility(v) == "ghost" then alpha = alpha * 0.25 end
 		self:drawEvent(v, alpha, beattoolsLayer)
 		if (beattoolsLayer == "event" or beattoolsLayer == "note") and self.multiselect and v.time >= self.editorBeat then
 			for ii, vv in ipairs(self.multiselect.events) do
@@ -489,7 +484,7 @@ if true then -- Penta: beattools layer code
 	local layerNote, layerEndAngleMarker, layerDuration, layerEvent, layerRepeatMarker = {}, {}, {}, {}, {}
 
 	for i, v in ipairs(self.level.events) do
-		if Event.info[v.type] and v ~= self.selectedEvent and self:beattoolsGetEventVisibility(v) ~= "hide" then
+		if Event.info[v.type] and v ~= self.selectedEvent and utilitools.files.beattools.eventGroups.eventVisibility(v) ~= "hide" then
 			local function isBetween(x, low, high)
 				return x >= low and x <= high
 			end
@@ -594,7 +589,7 @@ if self.layers.gameplay == 1 then
 end
 
 --redraw selected event on top
-if self.selectedEvent and self:beattoolsGetEventVisibility(self.selectedEvent) ~= "hide"
+if self.selectedEvent and utilitools.files.beattools.eventGroups.eventVisibility(self.selectedEvent) ~= "hide"
 	and self.selectedEvent.time +
 	(
 		mods.beattools.config.markRepeat ~= "off" and self.selectedEvent.repeats ~= nil and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay ~= 0
@@ -679,7 +674,6 @@ target = "states/Editor.lua"
 match_indent = true
 pattern = '''  color(cs.voidColor)'''
 payload = '''
-	beattoolsSelect = nil
 	love.graphics.setFont(fonts.main)
 	if self.editMode then
 		love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
@@ -696,10 +690,6 @@ match_indent = true
 pattern = '''--trigger auto-backup every five minutes'''
 payload = '''
 utilitools.files.beattools.undo.update()
-if (beattoolsSelect == nil) ~= (beattoolsPrevSelect == nil) or (beattoolsSelect ~= nil and (beattoolsSelect[1] ~= beattoolsPrevSelect[1] or beattoolsSelect[2] ~= beattoolsPrevSelect[2])) then
-	beattoolsPrevSelect = beattoolsSelect
-	self:updateBiggestBeat()
-end
 '''
 position = "before"
 target = "states/Editor.lua"
@@ -775,7 +765,7 @@ if helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
 payload = '''
-if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and helpers.collide(
+if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }
 '''
@@ -788,14 +778,14 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
-payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] then'''
+payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then'''
 position = "at"
 target = "states/Editor.lua"
 
 [[patches]]
 [patches.regex]
 pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
-payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
+payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
 position = "at"
 target = "states/Editor.lua"
 

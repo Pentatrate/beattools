@@ -6,9 +6,15 @@ return {
 		utilitools.files.beattools.test2()
 	end,
 	testKey3 = function()
-		for k, v in pairs(log.display) do
-			if v ~= 0 then
-				modlog(mod, "\tLog Display: \"" .. k .. "\": " .. v)
+		utilitools.try(mod, function() modlog(mod, imgui.GetStyle().Colors[imgui.ImGuiCol_SliderGrab]) end)
+	end,
+	toggleMenuMusic = function()
+		if cs.menuMusicManager then
+			savedata.options.audio.playMenuMusic = not savedata.options.audio.playMenuMusic
+			if savedata.options.audio.playMenuMusic then
+				cs.menuMusicManager:play()
+			else
+				cs.menuMusicManager:stop()
 			end
 		end
 	end

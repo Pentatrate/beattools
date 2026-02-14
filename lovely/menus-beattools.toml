@@ -381,8 +381,8 @@ match_indent = true
 pattern = '''if self.goToBeatDialogue then'''
 payload = '''
 if true then
-	if mods.beattools.config.showEventGroups and utilitools.files.beattools.eventGroups then
-		utilitools.files.beattools.eventGroups(window_flag, inputFlag)
+	if mods.beattools.config.showEventGroups and utilitools.files.beattools.eventGroupWindow then
+		utilitools.files.beattools.eventGroupWindow(window_flag, inputFlag)
 	end
 	if mods.beattools.config.easeList and utilitools.files.beattools.easeList then
 		utilitools.files.beattools.easeList(window_flag, inputFlag)

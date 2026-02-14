@@ -37,7 +37,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -57,7 +57,7 @@ self:addKeybind(function ()
 		else
 			local closest = nil
 			for i, v in ipairs(self.level.events) do
-				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[self:beattoolsGetEventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
 			end
 			if closest ~= nil then self.editorBeat = closest end
 		end
@@ -281,52 +281,7 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and not beattools.noF
 	imgui.Separator()
 end
 if self.selectedEvent and mods.beattools.config.showEventGroups then
-	if self.level.properties.beattools.customEventGroups then
-		if imgui.TreeNode_Str("Event Groups##beattoolsSelectedEventGroups") then
-			local hasAllCustomGroups = true
-			for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-				if not (self.selectedEvent.beattoolsCustomEventGroups and self.selectedEvent.beattoolsCustomEventGroups[k]) then
-					hasAllCustomGroups = false
-					break
-				end
-			end
-			if not hasAllCustomGroups then
-				local isOpen = imgui.BeginCombo("##beattoolsAddSelectedEventGroup", "Add Custom Event Group", 2^4 + 2^5 + 2^7)
-				if isOpen then
-					for k, v in pairs(self.level.properties.beattools.customEventGroups) do
-						if not (self.selectedEvent.beattoolsCustomEventGroups and self.selectedEvent.beattoolsCustomEventGroups[k]) then
-							local selected = imgui.Selectable_Bool(k .. "##beattoolsAddSelectedEventGroup")
-							if selected then
-								if self.selectedEvent.beattoolsCustomEventGroups == nil then self.selectedEvent.beattoolsCustomEventGroups = {} end
-								self.selectedEvent.beattoolsCustomEventGroups[k] = true
-							end
-						end
-					end
-					imgui.EndCombo()
-				end
-			end
-			local selectedCustomEventGroups = 0
-			if self.selectedEvent.beattoolsCustomEventGroups then
-				for k, v in pairs(self.selectedEvent.beattoolsCustomEventGroups) do
-					if self.level.properties.beattools.customEventGroups[k] then
-						if imgui.Button(k .. "##beattoolsSelectedEventGroup") then
-							self.selectedEvent.beattoolsCustomEventGroups[k] = nil
-						end
-						selectedCustomEventGroups = selectedCustomEventGroups + 1
-					else
-						self.selectedEvent.beattoolsCustomEventGroups[k] = nil
-					end
-				end
-				if selectedCustomEventGroups == 0 then
-					self.selectedEvent.beattoolsCustomEventGroups = nil
-				end
-			end
-			imgui.TreePop()
-		end
-		imgui.Separator()
-	elseif self.selectedEvent.beattoolsCustomEventGroups then
-		self.selectedEvent.beattoolsCustomEventGroups = nil
-	end
+	utilitools.files.beattools.eventGroups.eventCustomGroup(self.selectedEvent)
 end
 if self.selectedEvent and mods.beattools.config.roundSelectedTimes then self.selectedEvent.time = helpers.round(self.selectedEvent.time * 1e3) / 1e3 end
 if self.selectedEvent and mods.beattools.config.untaggingButtons then
