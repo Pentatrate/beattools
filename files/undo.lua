@@ -379,8 +379,8 @@ end
 
 undo.unselect = function(event)
 	if cs.selectedEvent == event then
+		cs:noSelection()
 		cs.selectedEvent = nil
-		cs.holdEndSelected = false
 	end
 	if cs.multiselect and cs.multiselect.eventTypes[event.type] then
 		for _, v in ipairs(cs.multiselect.events) do

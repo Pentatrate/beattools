@@ -15,10 +15,14 @@ It has a dedicated post named `Beattools` in the `ea-mods` forum
 ## How to install
 
 1. Download zip:
-	Either directly download the repository as a zip (I recommend this)
+	Either directly download the repository as a zip (**I recommend this**)
+
+	Then rename the mod folder to `utilitools`
+
 	![Screenshot downloading as zip](https://github.com/user-attachments/assets/0653e3ef-cfe0-4b41-825f-a7e786feda4d)
 
 	or download the "latest" release (The latest release may not have features added in later commits)
+
 	![Screenshot to find releases](https://github.com/user-attachments/assets/2acbead3-fad3-476b-9525-43fb1d728cb6)
 
 2. Unzip and place in `beatblock/Mods/` folder (where all the other mods are)

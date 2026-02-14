@@ -109,8 +109,8 @@ pattern = '''self.multiselectEndAngle = self.multiselectCopyEndAngle'''
 payload = '''
 if mods.beattools.config.copySingle and self.copySingle then
 	self:clearMultiselectVars()
+	self:noSelection()
 	self.selectedEvent = newEvents[1]
-	self.holdEndSelected = false
 end
 '''
 position = "after"
@@ -216,8 +216,8 @@ if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	self.cursorAngle = self.level.events[v].angle
 else
 	self.ctrlSelectPending = false
+	self:noSelection()
 	self.selectedEvent = self.level.events[v]
-	self.holdEndSelected = false
 	-- Changes cursor angle to match event angle
 	self.cursorAngle = self.selectedEvent.angle
 end
@@ -543,8 +543,8 @@ if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 	end
 	if Event.info[placingEvent.type] then
 		table.insert(self.level.events, placingEvent)
+		self:noSelection()
 		self.selectedEvent = self.level.events[#self.level.events]
-		self.holdEndSelected = false
 		self.unsavedChanges = true
 		self:updateBiggestBeat()
 	else

@@ -490,6 +490,10 @@ function st:noSelection()
 	self.multiselectEndBeat = nil
 	self.multiselectStartAngle = nil
 	self.multiselectEndAngle = nil
+
+	self.holdEndSelected = nil
+	self.deletePending = nil
+	self.bounceSelected = nil
 end
 function st:newMulti()
 	self.selectedEvent = nil
@@ -501,6 +505,10 @@ function st:newMulti()
 	self.multiselectEndBeat = 0
 	self.multiselectStartAngle = 0
 	self.multiselectEndAngle = 360
+
+	self.holdEndSelected = nil
+	self.deletePending = nil
+	self.bounceSelected = nil
 end
 
 function st:beattoolsUntag(tags2)
