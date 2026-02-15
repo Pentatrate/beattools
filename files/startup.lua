@@ -11,9 +11,9 @@ beattools.noFakeRepeat = {
 }
 beattools.easeList = {
 	unsorted = {
-		all = dpf.loadJson("Mods/beattools/easeList/all.json"),
-		uselessEases = dpf.loadJson("Mods/beattools/easeList/useless.json"),
-		troll = dpf.loadJson("Mods/beattools/easeList/troll.json")
+		all = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/all.json"),
+		uselessEases = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/useless.json"),
+		troll = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/troll.json")
 	},
 	sorted = {
 	},

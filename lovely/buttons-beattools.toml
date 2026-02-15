@@ -351,9 +351,9 @@ match_indent = true
 pattern = '''if #self.multiselect.events == 0 and #self.markers == 0 then'''
 payload = '''
 if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
+	local event = self.multiselect.events[1]
 	self:noSelection()
-	self.selectedEvent = self.multiselect.events[1]
-	self:clearMultiselectVars()
+	self.selectedEvent = event
 end
 if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then
 '''

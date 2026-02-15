@@ -6,7 +6,6 @@ return {
 		utilitools.files.beattools.test2()
 	end,
 	testKey3 = function()
-		utilitools.try(mod, function() modlog(mod, imgui.GetStyle().Colors[imgui.ImGuiCol_SliderGrab]) end)
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

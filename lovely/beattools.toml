@@ -126,15 +126,7 @@ payload = '''		if self.selectedEvent then'''
 position = "after"
 target = "states/Editor.lua"
 
-[[patches]] # 1.2.0a
-[patches.pattern]
-match_indent = false
-pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time)'''
-payload = '''		end'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]] # 1.2.1 beta
+[[patches]]
 [patches.pattern]
 match_indent = false
 pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time,'editor')'''

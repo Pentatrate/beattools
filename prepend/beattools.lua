@@ -666,6 +666,8 @@ function st:beattoolsCtrlSelect(event, force)
 		else
 			addToMulti(event)
 		end
+	elseif event == self.lastSelected then
+		self:noSelection()
 	else
 		self:newMulti()
 		self.multiselectStartBeat = event.time
@@ -679,5 +681,10 @@ function st:beattoolsCtrlSelect(event, force)
 				end
 			end
 		end
+	end
+	if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
+		local event2 = self.multiselect.events[1]
+		self:noSelection()
+		self.selectedEvent = event2
 	end
 end
