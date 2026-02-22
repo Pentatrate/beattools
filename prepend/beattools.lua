@@ -494,6 +494,8 @@ function st:noSelection()
 	self.holdEndSelected = nil
 	self.deletePending = nil
 	self.bounceSelected = nil
+	self.bounceSelectTime = 0
+	self.bounceSelectAccumulation = 0
 end
 function st:newMulti()
 	self.selectedEvent = nil
@@ -509,6 +511,8 @@ function st:newMulti()
 	self.holdEndSelected = nil
 	self.deletePending = nil
 	self.bounceSelected = nil
+	self.bounceSelectTime = 0
+	self.bounceSelectAccumulation = 0
 end
 
 function st:beattoolsUntag(tags2)
@@ -608,13 +612,6 @@ function st:beattoolsUntag(tags2)
 	self.p:hurtPulse()
 	self:updateBiggestBeat()
 	self.unsavedChanges = true
-end
-
-local function beattoolsSameEasing(event, selected)
-	if not (mods.beattools.config.markSameEasing and selected and event ~= selected and event.type == selected.type) then return false end
-	local paramForType = { ease = "var", setColor = "color", deco = "id" }
-	if paramForType[event.type] == nil then return false end
-	return event[paramForType[event.type]] == selected[paramForType[event.type]]
 end
 
 function st:beattoolsCtrlSelect(event, force)

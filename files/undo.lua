@@ -112,6 +112,8 @@ end
 
 undo.init = function()
 	utilitools.files.beattools.eventStacking.init()
+	utilitools.files.beattools.eventVisuals.reset()
+	utilitools.files.beattools.eventGroups.init()
 	undo.changes = {}
 	undo.index = 0
 end
@@ -232,6 +234,7 @@ undo.insert = function(list, pos, value)
 
 			undo.shiftIndices(true, pos, value)
 			beattools.moremetamethods.insert(list, pos, value)
+			utilitools.files.beattools.eventVisuals.cacheEvent(value)
 			utilitools.files.beattools.eventStacking.addToStack(value)
 
 			if not utilitools.files.beattools.undo.fakeRepeating then
@@ -275,6 +278,7 @@ undo.remove = function(list, pos)
 				undo.shiftIndices(false, pos, list[pos])
 			end
 
+			utilitools.files.beattools.eventVisuals.cacheEvent(list[pos], true)
 			utilitools.files.beattools.eventStacking.removeFromStack(list[pos])
 			returnValue = beattools.moremetamethods.remove(list, pos)
 
@@ -326,10 +330,11 @@ undo.change = function(t, k, v, hidden)
 
 				local temp = not utilitools.files.beattools.undo.fakeRepeating and (k == "time" and v - hidden[k] or v)
 
-
-				if ({ type = true, time = true, angle = true, order = true })[k] then utilitools.files.beattools.eventStacking.removeFromStack(t) end
+				if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(t, true) end
+				if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.removeFromStack(t) end
 				hidden[k] = v
-				if ({ type = true, time = true, angle = true, order = true })[k] then utilitools.files.beattools.eventStacking.addToStack(t) end
+				if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(t) end
+				if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.addToStack(t) end
 
 				if not utilitools.files.beattools.undo.fakeRepeating then
 					utilitools.files.beattools.fakeRepeat.update(t, false, k, temp)
@@ -396,6 +401,7 @@ undo.fullSave = function()
 	local events = {}
 	for i, v in ipairs(cs.level.events) do
 		events[i] = { event = helpers.copy(v), ref = v, index = i }
+		utilitools.files.beattools.eventVisuals.cacheEvent(v)
 		utilitools.files.beattools.eventStacking.addToStack(v)
 	end
 	table.insert(undo.changes, {
@@ -442,6 +448,7 @@ undo.keybind = function(doUndo, doMultiple)
 			-- forceprint(action .. " add " .. data.index)
 			undo.shiftIndices(true, data.index, data.ref)
 			beattools.moremetamethods.insert(cs.level.events, data.index, data.ref)
+			utilitools.files.beattools.eventVisuals.cacheEvent(data.ref)
 			utilitools.files.beattools.eventStacking.addToStack(data.ref)
 			if data.ref.beattoolsRepeatParent or data.ref.beattoolsRepeatChild then
 				-- forceprint("Added " .. tostring(data.ref.beattoolsRepeatParent) .. " " .. tostring(data.ref.beattoolsRepeatChild))
@@ -462,6 +469,7 @@ undo.keybind = function(doUndo, doMultiple)
 						-- forceprint("Removed " .. tostring(data.ref.beattoolsRepeatParent) .. " " .. tostring(data.ref.beattoolsRepeatChild))
 						changedFakeRepeat = true
 					end
+					utilitools.files.beattools.eventVisuals.cacheEvent(data.ref, true)
 					utilitools.files.beattools.eventStacking.removeFromStack(data.ref)
 					beattools.moremetamethods.remove(cs.level.events, data.index)
 					undo.shiftIndices(false, data.index, data.ref)
@@ -519,9 +527,12 @@ undo.keybind = function(doUndo, doMultiple)
 					if cs.level.events[change.index] == change.ref then
 						if cs.level.events[change.index][change.key] == change[doUndo and "to" or "from"] then
 							-- forceprint((doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
-							if ({ type = true, time = true, angle = true, order = true })[change.key] then utilitools.files.beattools.eventStacking.removeFromStack(cs.level.events[change.index]) end
+							if (utilitools.files.beattools.eventVisuals.listen)[change.key] then utilitools.files.beattools.eventVisuals.cacheEvent(cs.level.events[change.index], true) end
+							if (utilitools.files.beattools.eventStacking.listen)[change.key] then utilitools.files.beattools.eventStacking.removeFromStack(cs.level.events[change.index]) end
 							cs.level.events[change.index][change.key] = helpers.copy(change[doUndo and "from" or "to"])
-							if ({ type = true, time = true, angle = true, order = true })[change.key] then utilitools.files.beattools.eventStacking.addToStack(cs.level.events[change.index]) end
+							if (utilitools.files.beattools.eventVisuals.listen)[change.key] then utilitools.files.beattools.eventVisuals.cacheEvent(cs.level.events[change.index]) end
+							if (utilitools.files.beattools.eventStacking.listen)[change.key] then utilitools.files.beattools.eventStacking.addToStack(cs.level.events[change.index]) end
+
 							if cs.level.events[change.index].beattoolsRepeatParent or change.key == "beattoolsRepeatParent" then
 								changedFakeRepeat = true
 							end

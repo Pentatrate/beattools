@@ -266,7 +266,7 @@ payload = '''
 -- check bounces of bounces as well
 if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then
 	for ii = 1, (v.bounces or 1) do
-		local pos2 = self:getPosition(v.angle + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
+		local pos2 = self:getPosition((mods.beattools.config.displayEndAngle and v.endAngle or v.angle) + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
 		if helpers.collide(
 			{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 			{ x = pos2[1] - 8, y = pos2[2] - 8, width = 16, height = 16 }) then

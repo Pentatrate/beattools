@@ -1,7 +1,8 @@
 local eventStacking = {
 	stacks = {},
 	gameplayStack = {},
-	events = {}
+	events = {},
+	listen = { type = true, time = true, angle = true, order = true }
 }
 
 --[[
@@ -55,7 +56,7 @@ function eventStacking.addToStack(event, dontCheck)
 		if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
 		elseif v == event then
 			bool = false
-			modlog(mod, "duplicate")
+			-- modlog(mod, "duplicate")
 			return
 		elseif bool then
 			table.insert(t, i, event)

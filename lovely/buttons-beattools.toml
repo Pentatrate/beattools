@@ -269,7 +269,7 @@ if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.c
 	end
 	imgui.Separator()
 end
-if self.selectedEvent and mods.beattools.config.fakeRepeat and not beattools.noFakeRepeat[self.selectedEvent.type] then
+if self.selectedEvent and mods.beattools.config.fakeRepeat and not utilitools.files.beattools.eventVisuals.hasRepeat[self.selectedEvent.type] then
 	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
 		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})

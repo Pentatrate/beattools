@@ -84,6 +84,11 @@
 			"load": true,
 			"call": true
 		},
+		"eventVisuals": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"easeList": {
 			"extension": "lua",
 			"load": true,

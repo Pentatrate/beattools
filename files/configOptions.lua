@@ -524,7 +524,7 @@ return {
 	alpha = {
 		type = "float",
 		name = "Alpha",
-		tooltips = { long = "Draws non-notes with this opacity when stacked\n(1 = opaque)", short = "Opacity of stacked events" },
+		tooltips = { long = "Draws non-notes with this alpha value when stacked\n(1 = opaque)", short = "Alpha value of stacked events" },
 		default = 0.5,
 		off = 1
 	},
@@ -979,6 +979,20 @@ return {
 		default = {},
 		off = {}
 	},
+	alphaTransparent = {
+		type = "float",
+		name = "Transparent",
+		tooltips = { long = "Alpha value of transparent events\n(1 = opaque)", short = "Alpha value of transparent events" },
+		default = 0.75,
+		off = 1
+	},
+	alphaGhost = {
+		type = "float",
+		name = "Ghost",
+		tooltips = { long = "Alpha value of ghost events\n(1 = opaque)", short = "Alpha value of ghost events" },
+		default = 0.25,
+		off = 1
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1062,127 +1076,6 @@ return {
 			traceEase = "trEase",
 			side = true,
 			variableName = "var"
-		}
-	},
-	eventGroups = { -- Penta: lingering code from when event groups were saved in the mod config. this is still needed though
-		type = "hidden",
-		name = "[internal] eventGroups",
-		default = {
-			{
-				events = "all",
-				index = 0,
-				name = "all",
-				time = 1,
-				visibility = "show"
-			},
-			{
-				events = {
-					bookmark = true
-				},
-				index = 1,
-				name = "bookmarks",
-				time = 2,
-				visibility = " - "
-			},
-			{
-				events = {
-					block = true,
-					bounce = true,
-					extraTap = true,
-					hold = true,
-					inverse = true,
-					mine = true,
-					mineHold = true,
-					paddles = true,
-					setBounceHeight = true,
-					side = true
-				},
-				index = 1,
-				name = "gameplay",
-				time = 2,
-				visibility = " - "
-			},
-			{
-				events = {
-					play = true,
-					playSound = true,
-					retime = true,
-					setBPM = true,
-					showResults = true
-				},
-				index = 1,
-				name = "song",
-				time = 3,
-				visibility = " - "
-			},
-			{
-				events = {
-					advancetextdeco = true,
-					aft = true,
-					deco = true,
-					ease = true,
-					easeSequence = true,
-					forcePlayerSprite = true,
-					hom = true,
-					noise = true,
-					outline = true,
-					setBgColor = true,
-					setBoolean = true,
-					setColor = true,
-					songNameOverride = true,
-					textdeco = true,
-					toggleParticles = true
-				},
-				index = 1,
-				name = "visuals",
-				temp = -2,
-				time = 4,
-				visibility = " - "
-			},
-			{
-				events = {
-					hom = true,
-					noise = true,
-					outline = true,
-					setBgColor = true,
-					setColor = true
-				},
-				index = 2,
-				name = "color",
-				time = 5,
-				visibility = " - "
-			},
-			{
-				events = {
-					tag = true
-				},
-				index = 1,
-				name = "tags",
-				time = 5,
-				visibility = " - "
-			},
-			{
-				events = {
-					advancetextdeco = true,
-					deco = true,
-					textdeco = true
-				},
-				index = 2,
-				name = "deco",
-				time = 7,
-				visibility = " - "
-			},
-			{
-				events = {
-					ease = true,
-					easeSequence = true,
-					setBoolean = true
-				},
-				index = 2,
-				name = "eases",
-				time = 8,
-				visibility = " - "
-			}
 		}
 	},
 	calculator = {

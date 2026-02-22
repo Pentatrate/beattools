@@ -1,0 +1,28 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Link up official editor layers with event groups ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local layerStateNames = {'Active', 'Inactive', 'Hidden'}
+imgui.Text("Layers")
+self.layers.gameplay = helpers.SliderInt('Gameplay', self.layers.gameplay, 1,3,
+	layerStateNames[self.layers.gameplay], "ImGuiSliderFlags_NoInput")
+self.layers.vfx = helpers.SliderInt('VFX', self.layers.vfx, 1,3,
+	layerStateNames[self.layers.vfx], "ImGuiSliderFlags_NoInput")
+'''
+payload = '''utilitools.files.beattools.eventGroups.officialLayers()'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''return not ((gameplay and self.layers.gameplay ~= 1) or ((not gameplay) and self.layers.vfx ~= 1))'''
+payload = '''return self.layers[gameplay and "gameplay" or "vfx"] <= 2'''
+position = "at"
+target = "states/Editor.lua"

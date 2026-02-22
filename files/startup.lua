@@ -1,14 +1,5 @@
 _G.beattools = beattools or {}
 beattools.moremetamethods = beattools.moremetamethods or {}
-beattools.noFakeRepeat = {
-	ease = true,
-	tag = true,
-	setJoystickColor = true,
-	["c-me_b-me_iconsEase"] = true,
-	shinamon_offset = true,
-	shinamon_offsetAll = true,
-	shinamon_offsetEvenOdd = true
-}
 beattools.easeList = {
 	unsorted = {
 		all = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/all.json"),

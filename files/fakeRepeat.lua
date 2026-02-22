@@ -143,7 +143,7 @@ fakeRepeat.updateChildren = function(index, key, value)
 end
 fakeRepeat.update = function(event, irreversible, key, value)
 	if (not mods.beattools.config.fakeRepeat) and (not irreversible) then return end
-	if beattools.noFakeRepeat[event.type] then event.beattoolsRepeatParent = nil fakeRepeat.updateList() return end
+	if utilitools.files.beattools.eventVisuals.hasRepeat[event.type] then event.beattoolsRepeatParent = nil fakeRepeat.updateList() return end
 	-- forceprint("CALLED THIS SHIT METHTABLE MY ASS")
 
 	if ({ repeats = true, repeatDelay = true })[key] or irreversible or event.beattoolsRepeatParent == nil or fakeRepeat.indices[event.beattoolsRepeatParent] == nil or fakeRepeat.indices[event.beattoolsRepeatParent].parent ~= event then
