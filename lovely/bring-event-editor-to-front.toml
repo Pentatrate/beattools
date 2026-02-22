@@ -1,0 +1,35 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Bring event editor to front ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.selectedEvent = self.level.events[self.overlappingEvents[1]]'''
+payload = '''
+if mods.beattools.config.focusEventEditor and not ((mouse.altpress == -1) and (self.currentlyDragging ~= "dragSelection")) then
+	beattools = beattools or {}
+	beattools.eventEditorFocus = 2
+end
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Begin("Event Editor",nil,inputFlag)'''
+payload = '''
+if beattools and beattools.eventEditorFocus then
+	modlog(mods.beattools, "Brought to front 2")
+	imgui.SetNextWindowFocus()
+	beattools.eventEditorFocus = beattools.eventEditorFocus - 1
+	if beattools.eventEditorFocus <= 0 then beattools.eventEditorFocus = nil end
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+#SetNextWindowFocus
+#imgui.Begin("Event Editor",nil)

@@ -993,6 +993,13 @@ return {
 		default = 0.25,
 		off = 1
 	},
+	focusEventEditor = {
+		type = "bool",
+		name = "Focus Event Editor",
+		tooltips = { short = "Brings the event editor to the front when selecting an event" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
