@@ -227,10 +227,17 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 				love.graphics.draw(eventDraw, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset, 0, 1, 1, 8, 8)
 			end
 
+			if event.editorOutline then
+				setColor(event.editorOutline.r / 255, event.editorOutline.g / 255, event.editorOutline.b / 255, 1)
+				love.graphics.setLineWidth(2)
+				love.graphics.rectangle("line", pos[1] - 8, pos[2] - 8, 16, 16)
+			end
+
 			if not event.isCursor and beattoolsLayer == "sameEasing" then
 				setColor(mod.config.durationSameEasingColor.r, mod.config.durationSameEasingColor.g, mod.config.durationSameEasingColor.b, 1)
 				love.graphics.draw(sprites.editor.sameEasing, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset, 0, 1, 1, 11, 11)
 			end
+
 			eventVisuals.drawParam(event, pos)
 		end
 	end

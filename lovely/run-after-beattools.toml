@@ -180,29 +180,6 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''
-function st:drawEvent(event,alpha)
-	alpha = alpha or 1
-	local eventDraw = Event.editorDraw[event.type] or sprites.editor.genericevent
-
-
-	love.graphics.setColor(1,1,1,alpha)
-	if type(eventDraw) == 'function' then
-		eventDraw(event, self.editorBeat, self.editorBeat + self.drawDistance)
-	else
-		local pos = cs:getPosition(event.angle, event.time)
-		love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
-	end
-
-end
-'''
-payload = ""
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
 for i, v in ipairs(self.level.events) do --draw events
 	if Event.info[v.type] and Event.checkActiveRange[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
 		local gameplay = Event.info[v.type].gameplayLayer

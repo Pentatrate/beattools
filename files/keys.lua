@@ -6,6 +6,8 @@ return {
 		utilitools.files.beattools.test2()
 	end,
 	testKey3 = function()
+		local t;
+		t[1] = nil
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then
