@@ -4,7 +4,8 @@ beattools.easeList = {
 	unsorted = {
 		all = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/all.json"),
 		uselessEases = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/useless.json"),
-		troll = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/troll.json")
+		troll = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/troll.json"),
+		desc = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/desc.json")
 	},
 	sorted = {
 	},

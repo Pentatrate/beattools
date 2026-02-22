@@ -75,7 +75,7 @@ Hotkeys:
 
 Contributions:
   - Pentatrate: Almost all code
-  - K4kadu: Reworking most editor marker images]],
+  - K4kadu: Reworking most editor marker images, some code from "Editor Outline" for compatibility]],
 	},
 	general_menuOptions = {
 		long =

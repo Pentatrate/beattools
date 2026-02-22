@@ -41,7 +41,7 @@ return function(window_flag, inputFlag)
 					end
 
 					local pressed = imgui.Selectable_Bool(text, beattools.easeList.selected[v], imgui.ImGuiSelectableFlags_SpanAllColumns)
-					imguiHelpers.tooltip((cs.beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(cs.beattoolsEasings.ease[v] or {}) .. " events")
+					imguiHelpers.tooltip((beattools.easeList.unsorted.desc[v] and tostring(beattools.easeList.unsorted.desc[v]) .. "\n" or "") .. (cs.beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(cs.beattoolsEasings.ease[v] or {}) .. " events")
 
 					if pressed then
 						local function shouldSelect(v2)
