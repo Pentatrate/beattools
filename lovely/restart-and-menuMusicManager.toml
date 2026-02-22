@@ -1,0 +1,73 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Menumusicmanager in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs = bs.load(returnData.state)'''
+payload = '''
+if self.menuMusicManager then
+	self.menuMusicManager:clearOnBeatHooks()
+	self.menuMusicManager:forceUnmute()
+	cs.menuMusicManager = self.menuMusicManager
+	if not mods.beattools.config.menuMusicInEditor then self.menuMusicManager.music:play() end
+end
+'''
+position = "after"
+target = "states/Editor.lua"
+
+# Inject on playtest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function st:playLevel()'''
+payload = '''
+	beattoolsStartBeat = self.startBeat
+	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
+	beattoolsPlayerSprite = ""
+	self.p.forceSprite = ""
+	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then self.menuMusicManager:forceMute() end
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function st:stopLevel()'''
+payload = '''
+function st:stopLevel(dontUnmute)
+	beattoolsPlayerSprite = "><"
+	beattoolsLastSpriteChange = beattoolsTime
+	if not dontUnmute and self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then
+		self.menuMusicManager:forceUnmute()
+	end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+# Playtest restart and lagback fix  ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+if maininput:pressed("back") then
+	self:stopLevel()
+'''
+payload = '''
+if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
+	self.pauseBeat = nil
+	self:stopLevel(true)
+
+	self.startBeat = beattoolsStartBeat
+	self:playLevel()
+end
+if maininput:pressed("back") then
+	self.pauseBeat = nil
+	self:stopLevel()
+'''
+position = "at"
+target = "states/Editor.lua"
