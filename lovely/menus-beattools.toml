@@ -60,7 +60,7 @@ target = "states/Results.lua"
 match_indent = true
 pattern = '''self:imgui()'''
 payload = '''
-if not beattoolsRecordPosition then self:imgui() beattoolsRandomizeWindows = false end
+if not beattoolsRecordPosition then self:imgui() beattools.randomizeWindows = false end
 for i = 1, 7 do
 	if mods.beattools.config.currentPaddle then
 		self:beattoolsCurrentEasing("paddles", "enabled", "editorBeat", i, "enabled")

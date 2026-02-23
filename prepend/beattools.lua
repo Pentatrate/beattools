@@ -5,9 +5,7 @@ st.beattools = {}
 utilitools.files.beattools.undo.init()
 
 local beattoolsTime = 0
-beattoolsAngleSnap = 4
-
-local beattoolsStartBeat  -- restart in playtest
+beattools.angleSnap = 4
 
 beattoolsRecordPosition = false -- record position
 beattoolsRecordFunc = nil
@@ -15,10 +13,10 @@ beattoolsRecordFunc = nil
 local beattoolsPlayerSpriteChanged = {}
 local beattoolsLastSpriteModified = 0
 
-local beattoolsRandomizeWindows = mods.beattools.config.randomizeWindows ~= "off" -- randomize windows
+beattools.randomizeWindows = mods.beattools.config.randomizeWindows ~= "off"
 
-local beattoolsPlayerSprite = "idle"
-local beattoolsLastSpriteChange = 0
+beattools.playerSprite = "idle"
+beattools.lastSpriteChange = 0
 
 local beattoolsTrackEasables
 local beattoolsDefaultEasings = {

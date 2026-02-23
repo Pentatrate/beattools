@@ -37,27 +37,27 @@ payload = '''
 	end
 	beattoolsTime = beattoolsTime + dt
 	if self.editMode then
-		--[[if beattoolsPlayerSprite == "idle" then
-			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 8 - 0.1 then
-				beattoolsPlayerSprite = "closed"
-				beattoolsLastSpriteChange = beattoolsTime
+		--[[if beattools.playerSprite == "idle" then
+			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 8 - 0.1 then
+				beattools.playerSprite = "closed"
+				beattools.lastSpriteChange = beattoolsTime
 			end
-		elseif beattoolsPlayerSprite == "closed" then
-			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 0.1 then
-				beattoolsPlayerSprite = "idle"
-				beattoolsLastSpriteChange = beattoolsTime
+		elseif beattools.playerSprite == "closed" then
+			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 0.1 then
+				beattools.playerSprite = "idle"
+				beattools.lastSpriteChange = beattoolsTime
 			end
-		else]]if beattoolsPlayerSprite == "><" then
-			if (beattoolsTime - beattoolsLastSpriteChange) / 60 > 1 then
-				beattoolsPlayerSprite = "idle"
-				beattoolsLastSpriteChange = beattoolsTime
+		else]]if beattools.playerSprite == "><" then
+			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 1 then
+				beattools.playerSprite = "idle"
+				beattools.lastSpriteChange = beattoolsTime
 			end
 		end
 		if mods.beattools.config.currentSprite then self:beattoolsCurrentEasing("playerSprites", "spriteName", "editorBeat") end
 
 		-- Penta: This code is not optimised, but it doesnt have to be, "lively cranky" is just for fun
-		if mods.beattools.config.livelyCranky and beattoolsPlayerSprite == "><" then
-			self.p.forceSprite = beattoolsPlayerSprite
+		if mods.beattools.config.livelyCranky and beattools.playerSprite == "><" then
+			self.p.forceSprite = beattools.playerSprite
 		elseif mods.beattools.config.livelyCranky and maininput:down("modifier") then
 			self.p.forceSprite = "happy"
 		else
@@ -88,7 +88,7 @@ payload = '''
 				--[[if mods.beattools.config.livelyCranky and beattoolsTime - ((#beattoolsChangeList > 0 and beattoolsChangeList[#beattoolsChangeList].time) or 0) > 60 * 60 then
 					self.p.forceSprite = "sleep"
 				else]]if mods.beattools.config.livelyCranky then
-					self.p.forceSprite = beattoolsPlayerSprite
+					self.p.forceSprite = beattools.playerSprite
 				else
 					self.p.forceSprite = ""
 				end
@@ -469,7 +469,7 @@ target = "states/Editor.lua"
 line_prepend = "$indent"
 pattern = '''[^\S\n]*helpers\.SetNextWindowPos\([^\S\n]*?(?<param1>\d+)[^\S\n]*?,[^\S\n]*?(?<param2>\d+)[^\S\n]*?,[^\S\n]*?(?<param3>[\w"'_ ]+?)[^\S\n]*?\)[^\S\n]*?\n(?<indent>\s+)helpers\.SetNextWindowSize\([^\S\n]*?(?<param5>\d+)[^\S\n]*?,[^\S\n]*?(?<param6>\d+)[^\S\n]*?,[^\S\n]*?(?<param7>[\w"'_ ]+?)[^\S\n]*?\)'''
 payload = '''
-if mods.beattools.config.randomizeWindows ~= "off" and beattoolsRandomizeWindows then
+if mods.beattools.config.randomizeWindows ~= "off" and beattools.randomizeWindows then
 	local sx, sy = math.random(100, 400), math.random(100, 400)
 	helpers.SetNextWindowPos(math.random(0, 1200 - sx), math.random(0, 720 - sy), "ImGuiCond_Always")
 	helpers.SetNextWindowSize(sx, sy, "ImGuiCond_Always")

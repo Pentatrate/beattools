@@ -89,6 +89,11 @@
 			"load": true,
 			"call": true
 		},
+		"easing": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"easeList": {
 			"extension": "lua",
 			"load": true,

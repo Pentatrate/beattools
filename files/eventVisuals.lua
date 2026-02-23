@@ -247,10 +247,12 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		local time = event.time
 		local angle = event.angle
 
-		if mod.config.bounceDragging and cs.bounceSelected then
-			angle, time = angle + (event.rotation or 0) * cs.bounceSelected, time + (event.delay or 1) * cs.bounceSelected
-		elseif cs.holdEndSelected then
-			angle, time = event.angle2, time + event.duration
+		if not cs.multiselect then
+			if mod.config.bounceDragging and cs.bounceSelected then
+				angle, time = angle + (event.rotation or 0) * cs.bounceSelected, time + (event.delay or 1) * cs.bounceSelected
+			elseif cs.holdEndSelected then
+				angle, time = event.angle2, time + (event.duration or 1)
+			end
 		end
 
 		if isVisible(time) then

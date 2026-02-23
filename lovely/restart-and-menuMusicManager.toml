@@ -25,9 +25,9 @@ target = "states/Editor.lua"
 match_indent = true
 pattern = '''function st:playLevel()'''
 payload = '''
-	beattoolsStartBeat = self.startBeat
-	if mods.beattools.config.randomizeWindows == "playtest" then beattoolsRandomizeWindows = true end
-	beattoolsPlayerSprite = ""
+	beattools.restartBeat = self.startBeat
+	if mods.beattools.config.randomizeWindows == "playtest" then beattools.randomizeWindows = true end
+	beattools.playerSprite = ""
 	self.p.forceSprite = ""
 	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then self.menuMusicManager:forceMute() end
 '''
@@ -40,8 +40,8 @@ match_indent = true
 pattern = '''function st:stopLevel()'''
 payload = '''
 function st:stopLevel(dontUnmute)
-	beattoolsPlayerSprite = "><"
-	beattoolsLastSpriteChange = beattoolsTime
+	beattools.playerSprite = "><"
+	beattools.lastSpriteChange = beattoolsTime
 	if not dontUnmute and self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then
 		self.menuMusicManager:forceUnmute()
 	end
@@ -62,7 +62,7 @@ if mods.beattools.config.restartInPlaytest and maininput:pressed("restart") then
 	self.pauseBeat = nil
 	self:stopLevel(true)
 
-	self.startBeat = beattoolsStartBeat
+	self.startBeat = beattools.restartBeat
 	self:playLevel()
 end
 if maininput:pressed("back") then
