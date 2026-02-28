@@ -17,8 +17,6 @@ local eventVisuals = {
 
 local canv = love.graphics.newCanvas(project.res.x, project.res.y)
 
--- love.graphics.newCanvas(project.res.x, project.res.y)
-
 -- love.graphics.setCanvas(self.layerCanvas.gameplay)
 -- love.graphics.clear()
 

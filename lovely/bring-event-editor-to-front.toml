@@ -23,7 +23,6 @@ match_indent = true
 pattern = '''imgui.Begin("Event Editor",nil,inputFlag)'''
 payload = '''
 if beattools and beattools.eventEditorFocus then
-	modlog(mods.beattools, "Brought to front 2")
 	imgui.SetNextWindowFocus()
 	beattools.eventEditorFocus = beattools.eventEditorFocus - 1
 	if beattools.eventEditorFocus <= 0 then beattools.eventEditorFocus = nil end

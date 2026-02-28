@@ -163,14 +163,8 @@ target = "obj/GameManager.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''
-imgui.SameLine()
-imgui.Text(propertyName)
-'''
-payload = '''
-imgui.SameLine()
-imgui.Text(label)
-'''
+pattern = '''imgui.Text(propertyName)'''
+payload = '''imgui.Text(utilitools.imguiHelpers.visibleLabel(label))'''
 position = "at"
 target = "obj/GameManager.lua"
 
