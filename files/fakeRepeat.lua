@@ -60,7 +60,7 @@ fakeRepeat.updateList = function()
 		if v.beattoolsRepeatParent ~= nil then
 			fakeRepeat.addIndex(v.beattoolsRepeatParent)
 			if fakeRepeat.indices[v.beattoolsRepeatParent].parent then
-				modlog(mod, "Double repeat index " .. v.beattoolsRepeatParent)
+				modlog(mod, debug.traceback("Double repeat index " .. v.beattoolsRepeatParent))
 				modlog(mod, "Check  events:\n" ..
 					"\ttype: " .. tostring(fakeRepeat.indices[v.beattoolsRepeatParent].type) .. "\n" ..
 					"\ttime: " .. tostring(fakeRepeat.indices[v.beattoolsRepeatParent].time) .. "\n" ..

@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = -1 # run before menus-beattools.toml
-version = "1.0.0"
+version = "1.0.0" 
 
 # True or nil fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -13,7 +13,7 @@ event[propertyName] = numptr[0]
 '''
 payload = '''
 imgui.Checkbox('##bool'..imguiUniqueName, numptr)
-event[propertyName] = numptr[0] or (not properties.trueOrNil and false) or (properties.trueOrNil and nil)
+event[propertyName] = numptr[0] or (function() if properties.trueOrNil then return nil else return false end end)()
 '''
 position = "at"
 target = "obj/GameManager.lua"
