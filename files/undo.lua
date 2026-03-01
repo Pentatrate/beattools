@@ -103,18 +103,31 @@ undo = {
 		})
 	end,
 	undoing = false,
-	fakeRepeating = false
+	fakeRepeating = false,
+	linkFiles = {
+		eventVisuals = true,
+		eventStacking = true,
+		easing = true
+	}
 }
+
+undo.link = function(event, remove, k)
+	for file, _ in pairs(undo.linkFiles) do
+		if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
+			utilitools.files.beattools[file].cacheEvent(event, remove, k)
+		end
+	end
+end
 
 undo.keyTracked = function(k)
 	return (mods.beattools.config.keyHandling == "blacklist" and not beattoolsKeysBlacklist[k]) or (mods.beattools.config.keyHandling == "whitelist" and beattoolsKeysWhiteList[k])
 end
 
 undo.init = function()
-	utilitools.files.beattools.eventStacking.init()
-	utilitools.files.beattools.eventVisuals.reset()
+	for file, _ in pairs(undo.linkFiles) do
+		utilitools.files.beattools[file].init()
+	end
 	utilitools.files.beattools.eventGroups.init()
-	utilitools.files.beattools.easing.init()
 	undo.changes = {}
 	undo.index = 0
 end
@@ -178,6 +191,10 @@ undo.areSimilar = function (list1, list2, dontRepeat)
 	dontRepeat[tostring(list1)] = true
 	dontRepeat[tostring(list2)] = true
 	local function compare(list3, list4)
+		if type(list3) ~= "table" or type(list4) ~= "table" then
+			modlog(mod, "expected table: " .. tostring(list3) .. ", " .. tostring(list4))
+			return false
+		end
 		for k, v in pairs(list3) do
 			if undo.keyTracked(k) then
 				if type(list4[k]) ~= type(v) then
@@ -219,27 +236,50 @@ undo.insert = function(list, pos, value)
 				undo.meta(value)
 			end
 
-			undo.newChangePre()
-			--[[ modlog(mod,
-				"Adding: " ..
-				"\tindex: " .. tostring(pos)
-			) ]]
-			table.insert(undo.changes, {
-				type = "add",
-				event = helpers.copy(value),
-				ref = value,
-				index = pos,
-				time = undo.lastCheck
-			})
-			undo.newChangeSub()
+			if
+				undo.changes[undo.index + 1] and
+				undo.changes[undo.index + 1].type == "add" and
+				-- undo.changes[undo.index + 1].ref == value and
+				-- undo.changes[undo.index + 1].index == pos and
+				undo.areSimilar(undo.changes[undo.index + 1].ref, value)
+			then
+				value = undo.changes[undo.index + 1].ref
+				undo.changes[undo.index + 1].index = pos
+
+				-- modlog(mod, "Manual redo insert")
+				undo.index = undo.index + 1
+			elseif
+				undo.changes[undo.index] and
+				undo.changes[undo.index].type == "remove" and
+				-- undo.changes[undo.index].ref == value and
+				-- undo.changes[undo.index].index == pos and
+				undo.areSimilar(undo.changes[undo.index].ref, value)
+			then
+				value = undo.changes[undo.index].ref
+				undo.changes[undo.index].index = pos
+
+				-- modlog(mod, "Manual undo delete")
+				undo.index = undo.index - 1
+			else
+				-- modlog(mod, tostring(undo.changes[undo.index]) .. " " .. tostring(undo.changes[undo.index].type == "remove") .. " " .. tostring(undo.changes[undo.index].index == pos) .. " " .. tostring(undo.areSimilar(undo.changes[undo.index].ref, value)))
+				undo.newChangePre()
+				--[[ modlog(mod,
+					"Adding: " ..
+					"\tindex: " .. tostring(pos)
+				) ]]
+				table.insert(undo.changes, {
+					type = "add",
+					event = helpers.copy(value),
+					ref = value,
+					index = pos,
+					time = undo.lastCheck
+				})
+				undo.newChangeSub()
+			end
 
 			undo.shiftIndices(true, pos, value)
 			beattools.moremetamethods.insert(list, pos, value)
-
-			local e = value
-			utilitools.files.beattools.eventVisuals.cacheEvent(e)
-			utilitools.files.beattools.eventStacking.addToStack(e)
-			utilitools.files.beattools.easing.insert(e)
+			undo.link(value)
 
 			if not utilitools.files.beattools.undo.fakeRepeating then
 				utilitools.files.beattools.fakeRepeat.update(value)
@@ -257,13 +297,24 @@ undo.remove = function(list, pos)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
 		local returnValue
 		if utilitools.files.beattools.undo.fakeRepeating or list[pos].beattoolsRepeatChild == nil then
-			if undo.changes[undo.index + 1] and
+			if
+				undo.changes[undo.index + 1] and
 				undo.changes[undo.index + 1].type == "remove" and
 				undo.changes[undo.index + 1].ref == list[pos] and
-				undo.changes[undo.index + 1].index == pos
-			and undo.areSimilar(undo.changes[undo.index + 1].ref, list[pos]) then
-				-- modlog(mod, "Manual redo")
+				undo.changes[undo.index + 1].index == pos and
+				undo.areSimilar(undo.changes[undo.index + 1].ref, list[pos])
+			then
+				-- modlog(mod, "Manual redo delete")
 				undo.index = undo.index + 1
+			elseif
+				undo.changes[undo.index] and
+				undo.changes[undo.index].type == "add" and
+				undo.changes[undo.index].ref == list[pos] and
+				undo.changes[undo.index].index == pos and
+				undo.areSimilar(undo.changes[undo.index].ref, list[pos])
+			then
+				-- modlog(mod, "Manual undo insert")
+				undo.index = undo.index - 1
 			else
 				undo.newChangePre()
 				--[[ modlog(mod,
@@ -278,18 +329,15 @@ undo.remove = function(list, pos)
 					time = undo.lastCheck
 				})
 				undo.newChangeSub()
-
-				undo.shiftIndices(false, pos, list[pos])
 			end
 
-			local e = list[pos]
-			utilitools.files.beattools.eventVisuals.cacheEvent(e, true)
-			utilitools.files.beattools.eventStacking.removeFromStack(e)
-			utilitools.files.beattools.easing.remove(e)
+			local event = list[pos]
 
+			undo.link(list[pos], true)
 			returnValue = beattools.moremetamethods.remove(list, pos)
+			undo.shiftIndices(false, pos, list[pos])
 
-			if undo.changes[undo.index].ref.beattoolsRepeatParent then
+			if event.beattoolsRepeatParent then
 				utilitools.files.beattools.fakeRepeat.remove(undo.changes[undo.index].ref.beattoolsRepeatParent)
 			end
 			cs:updateBiggestBeat()
@@ -305,15 +353,28 @@ undo.change = function(t, k, v, hidden)
 		if undo.keyTracked(k) then
 			if utilitools.files.beattools.undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
 				if undo.events[tostring(t)] == nil then modlog("INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
-				if undo.changes[undo.index + 1] and
+				if
+					undo.changes[undo.index + 1] and
 					undo.changes[undo.index + 1].type == "change" and
 					undo.changes[undo.index + 1].ref == t and
 					undo.changes[undo.index + 1].index == undo.events[tostring(t)] and
 					undo.changes[undo.index + 1].key == k and
-					undo.changes[undo.index + 1].from == hidden[k]
-				and undo.changes[undo.index + 1].to == v then
-					-- modlog(mod, "Manual redo")
+					undo.changes[undo.index + 1].from == hidden[k] and
+					undo.changes[undo.index + 1].to == v
+				then
+					-- modlog(mod, "Manual redo change")
 					undo.index = undo.index + 1
+				elseif
+					undo.changes[undo.index] and
+					undo.changes[undo.index].type == "change" and
+					undo.changes[undo.index].ref == t and
+					undo.changes[undo.index].index == undo.events[tostring(t)] and
+					undo.changes[undo.index].key == k and
+					undo.changes[undo.index].from == v and
+					undo.changes[undo.index].to == hidden[k]
+				then
+					-- modlog(mod, "Manual undo change")
+					undo.index = undo.index - 1
 				else
 					undo.newChangePre()
 					--[[ modlog(mod,
@@ -337,16 +398,9 @@ undo.change = function(t, k, v, hidden)
 
 				local temp = not utilitools.files.beattools.undo.fakeRepeating and (k == "time" and v - hidden[k] or v)
 
-				local e = t
-				if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(e, true) end
-				if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.removeFromStack(e) end
-				utilitools.files.beattools.easing.remove(e, k)
-
+				undo.link(t, true, k)
 				hidden[k] = v
-
-				if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(e) end
-				if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.addToStack(e) end
-				utilitools.files.beattools.easing.insert(e, k)
+				undo.link(t, nil, k)
 
 				if not utilitools.files.beattools.undo.fakeRepeating then
 					utilitools.files.beattools.fakeRepeat.update(t, false, k, temp)
@@ -413,11 +467,7 @@ undo.fullSave = function()
 	local events = {}
 	for i, v in ipairs(cs.level.events) do
 		events[i] = { event = helpers.copy(v), ref = v, index = i }
-
-		local e = v
-		utilitools.files.beattools.eventVisuals.cacheEvent(e)
-		utilitools.files.beattools.eventStacking.addToStack(e)
-		utilitools.files.beattools.easing.insert(e)
+		undo.link(v)
 	end
 	table.insert(undo.changes, {
 		type = "fullSave",
@@ -463,11 +513,7 @@ undo.keybind = function(doUndo, doMultiple)
 			-- forceprint(action .. " add " .. data.index)
 			undo.shiftIndices(true, data.index, data.ref)
 			beattools.moremetamethods.insert(cs.level.events, data.index, data.ref)
-
-			local e = data.ref
-			utilitools.files.beattools.eventVisuals.cacheEvent(e)
-			utilitools.files.beattools.eventStacking.addToStack(e)
-			utilitools.files.beattools.easing.insert(e)
+			undo.link(data.ref)
 
 			if data.ref.beattoolsRepeatParent or data.ref.beattoolsRepeatChild then
 				-- forceprint("Added " .. tostring(data.ref.beattoolsRepeatParent) .. " " .. tostring(data.ref.beattoolsRepeatChild))
@@ -489,13 +535,10 @@ undo.keybind = function(doUndo, doMultiple)
 						changedFakeRepeat = true
 					end
 
-					local e = data.ref
-					utilitools.files.beattools.eventVisuals.cacheEvent(e, true)
-					utilitools.files.beattools.eventStacking.removeFromStack(e)
-					utilitools.files.beattools.easing.remove(e)
-
+					undo.link(data.ref, true)
 					beattools.moremetamethods.remove(cs.level.events, data.index)
 					undo.shiftIndices(false, data.index, data.ref)
+
 					return true
 				else
 					modlog(mod, "EVENT DOES NOT MATCH: " .. tostring(action))
@@ -550,17 +593,10 @@ undo.keybind = function(doUndo, doMultiple)
 					if cs.level.events[change.index] == change.ref then
 						if cs.level.events[change.index][change.key] == change[doUndo and "to" or "from"] then
 							-- forceprint((doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
-							local e = cs.level.events[change.index]
-							local k = change.key
-							if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(e, true) end
-							if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.removeFromStack(e) end
-							utilitools.files.beattools.easing.remove(e, k)
 
+							undo.link(cs.level.events[change.index], true, change.key)
 							cs.level.events[change.index][change.key] = helpers.copy(change[doUndo and "from" or "to"])
-
-							if (utilitools.files.beattools.eventVisuals.listen)[k] then utilitools.files.beattools.eventVisuals.cacheEvent(e) end
-							if (utilitools.files.beattools.eventStacking.listen)[k] then utilitools.files.beattools.eventStacking.addToStack(e) end
-							utilitools.files.beattools.easing.insert(e, k)
+							undo.link(cs.level.events[change.index], nil, change.key)
 
 							if cs.level.events[change.index].beattoolsRepeatParent or change.key == "beattoolsRepeatParent" then
 								changedFakeRepeat = true

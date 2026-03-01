@@ -131,6 +131,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"stopwatch": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

@@ -224,10 +224,10 @@ function eventGroups.eventVisibility(event)
 				eventGroups.eventCache[tostring(event)].visibility = visibility
 				if eventGroups.type[visibility] == 1 then
 					utilitools.files.beattools.eventVisuals.cacheEvent(event)
-					utilitools.files.beattools.eventStacking.addToStack(event, true)
+					utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
 				else
 					utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-					utilitools.files.beattools.eventStacking.removeFromStack(event)
+					utilitools.files.beattools.eventStacking.cacheEvent(event, true)
 				end
 			end
 			eventGroups.eventCache[tostring(event)].visibility = visibility
@@ -266,10 +266,10 @@ function eventGroups.eventVisibility(event)
 		if visibility ~= visibility2 and eventGroups.type[visibility] ~= eventGroups.type[visibility2] then
 			if eventGroups.type[visibility] == 1 then
 				utilitools.files.beattools.eventVisuals.cacheEvent(event)
-				utilitools.files.beattools.eventStacking.addToStack(event, true)
+				utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
 			else
 				utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-				utilitools.files.beattools.eventStacking.removeFromStack(event)
+				utilitools.files.beattools.eventStacking.cacheEvent(event, true)
 			end
 		end
 	end

@@ -127,7 +127,7 @@ function easing.createEase(event, track, param)
 	return arr
 end
 
-function easing.insert(event, k)
+function easing.cacheEvent(event, remove, k)
 	if true then return end
 	local arr, track = easing.getArr(event, k)
 	if not arr or not track then return end
@@ -137,28 +137,18 @@ function easing.insert(event, k)
 		local i = easing.search(arr2, event.time, event.order or 0, easing.getIndex(event))
 
 		if arr2[i] and arr2[i].event == event then
-			-- nothing
+			if remove then
+				table.remove(arr2, i)
+			else
+				-- nothing
+			end
 		else
-			local ease = easing.createEase(event, track, param)
-			if ease then table.insert(arr2, i + 1, ease) end
-		end
-		easing.print(arr2)
-	end
-end
-
-function easing.remove(event, k)
-	if true then return end
-	local arr, track = easing.getArr(event, k)
-	if not arr or not track then return end
-
-	for param, _ in pairs(track.params) do
-		local arr2 = arr[param]
-		local i = easing.search(arr2, event.time, event.order or 0, easing.getIndex(event))
-
-		if arr2[i] and arr2[i].event == event then
-			table.remove(arr2, i)
-		else
-			modlog(mod, "[" .. param .. "] failed to remove event " .. tostring(i))
+			if remove then
+				modlog(mod, "[" .. param .. "] failed to remove event " .. tostring(i))
+			else
+				local ease = easing.createEase(event, track, param)
+				if ease then table.insert(arr2, i + 1, ease) end
+			end
 		end
 		easing.print(arr2)
 	end

@@ -107,7 +107,7 @@ return function(window_flag, inputFlag)
 				for i, change in ipairs(utilitools.files.beattools.undo.changes) do
 					if #changes == 0 then first = i end
 					table.insert(changes, change)
-					if utilitools.files.beattools.undo.changes[i + 1] == nil or math.abs(change.time - utilitools.files.beattools.undo.changes[i + 1].time) >= 0.01 then
+					if utilitools.files.beattools.undo.changes[i + 1] == nil or math.abs(change.time - utilitools.files.beattools.undo.changes[i + 1].time) >= 0.01 or utilitools.files.beattools.undo.index == i then
 						if imgui.Selectable_Bool(summary(changes) .. "##" .. i, i <= utilitools.files.beattools.undo.index) then
 							local temp = 0
 							while utilitools.files.beattools.undo.index < first and temp < 1e3 do

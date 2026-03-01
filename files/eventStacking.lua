@@ -29,8 +29,8 @@ function eventStacking.getAngle(event)
 	return (mods.beattools.config.displayEndAngle and event.endAngle or event.angle) % 360
 end
 
-function eventStacking.addToStack(event, dontCheck)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.addToStack: Invalid event: " .. tostring(event))) return end
+function eventStacking.cacheEvent(event, remove, _k, dontCheck)
+	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.cacheEvent: Invalid event: " .. tostring(event))) return end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
 
@@ -48,88 +48,78 @@ function eventStacking.addToStack(event, dontCheck)
 
 	local t = eventStacking.stacks[event.time][angle][k]
 
-	local bool = true
-	local i = 1
-	while i <= #t do
-		local v = t[i]
-		-- i could make this O(log(n)) instead of O(n), if it lags too much
-		if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
-		elseif v == event then
-			bool = false
-			-- modlog(mod, "duplicate")
-			return
-		elseif bool then
-			table.insert(t, i, event)
+	if remove then
+		local i = 1
+		while i <= #t do
+			local v = t[i]
+			-- i could make this O(log(n)) instead of O(n), if it lags too much
+			if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
+			elseif v == event then
+				eventStacking.events[tostring(v)] = nil
+				if k == "func" and #t <= 2 and eventStacking.gameplayStack[event.time] and eventStacking.gameplayStack[event.time][angle] then
+					eventStacking.gameplayStack[event.time][angle] = nil
+					local bool = true
+					for _, _ in pairs(eventStacking.gameplayStack[event.time]) do
+						bool = false
+						break
+					end
+					if bool then eventStacking.gameplayStack[event.time] = nil end
+				end
+				table.remove(t, i)
+				i = i - 1
+			elseif k == "img" then
+				if eventStacking.events[tostring(v)] == i - 1 then modlog("DOESNT EXIST") break end
+				eventStacking.events[tostring(v)] = i - 1
+			else break end
+			i = i + 1
+		end
+
+		if #t == 0 then
+			eventStacking.stacks[event.time][angle][k] = nil
+			t = nil
+			if eventStacking.stacks[event.time][angle][eventStacking.getOppsositeType(event)] == nil then
+				eventStacking.stacks[event.time][angle] = nil
+				for _, _ in pairs(eventStacking.stacks[event.time]) do
+					return
+				end
+				eventStacking.stacks[event.time] = nil
+			end
+		end
+	else
+		local bool = true
+		local i = 1
+		while i <= #t do
+			local v = t[i]
+			-- i could make this O(log(n)) instead of O(n), if it lags too much
+			if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
+			elseif v == event then
+				bool = false
+				-- modlog(mod, "duplicate")
+				return
+			elseif bool then
+				table.insert(t, i, event)
+				bool = false
+				if k == "img" then
+					eventStacking.events[tostring(event)] = i - 1
+				elseif #t > 1 then
+					eventStacking.gameplayStack[event.time] = eventStacking.gameplayStack[event.time] or {}
+					eventStacking.gameplayStack[event.time][angle] = true
+				end
+			elseif k == "img" then
+				if eventStacking.events[tostring(v)] == i - 1 then break end
+				eventStacking.events[tostring(v)] = i - 1
+			else return end
+			i = i + 1
+		end
+		if bool then
+			table.insert(t, event)
 			bool = false
 			if k == "img" then
-				eventStacking.events[tostring(event)] = i - 1
+				eventStacking.events[tostring(event)] = #t - 1
 			elseif #t > 1 then
 				eventStacking.gameplayStack[event.time] = eventStacking.gameplayStack[event.time] or {}
 				eventStacking.gameplayStack[event.time][angle] = true
 			end
-		elseif k == "img" then
-			if eventStacking.events[tostring(v)] == i - 1 then break end
-			eventStacking.events[tostring(v)] = i - 1
-		else return end
-		i = i + 1
-	end
-	if bool then
-		table.insert(t, event)
-		bool = false
-		if k == "img" then
-			eventStacking.events[tostring(event)] = #t - 1
-		elseif #t > 1 then
-			eventStacking.gameplayStack[event.time] = eventStacking.gameplayStack[event.time] or {}
-			eventStacking.gameplayStack[event.time][angle] = true
-		end
-	end
-end
-
-function eventStacking.removeFromStack(event)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.removeFromStack: Invalid event: " .. tostring(event))) return end
-	local k = eventStacking.getType(event)
-	local angle = eventStacking.getAngle(event)
-
-	eventStacking.stacks[event.time] = eventStacking.stacks[event.time] or {}
-	eventStacking.stacks[event.time][angle] = eventStacking.stacks[event.time][angle] or {}
-	eventStacking.stacks[event.time][angle][k] = eventStacking.stacks[event.time][angle][k] or {}
-
-	local t = eventStacking.stacks[event.time][angle][k]
-
-	local i = 1
-	while i <= #t do
-		local v = t[i]
-		-- i could make this O(log(n)) instead of O(n), if it lags too much
-		if v.type < event.type or (v.type == event.type and ((v.order or 0) < (event.order or 0) or ((v.order or 0) == (event.order or 0) and (tostring(v) < tostring(event))))) then
-		elseif v == event then
-			eventStacking.events[tostring(v)] = nil
-			if k == "func" and #t <= 2 and eventStacking.gameplayStack[event.time] and eventStacking.gameplayStack[event.time][angle] then
-				eventStacking.gameplayStack[event.time][angle] = nil
-				local bool = true
-				for _, _ in pairs(eventStacking.gameplayStack[event.time]) do
-					bool = false
-					break
-				end
-				if bool then eventStacking.gameplayStack[event.time] = nil end
-			end
-			table.remove(t, i)
-			i = i - 1
-		elseif k == "img" then
-			if eventStacking.events[tostring(v)] == i - 1 then modlog("DOESNT EXIST") break end
-			eventStacking.events[tostring(v)] = i - 1
-		else break end
-		i = i + 1
-	end
-
-	if #t == 0 then
-		eventStacking.stacks[event.time][angle][k] = nil
-		t = nil
-		if eventStacking.stacks[event.time][angle][eventStacking.getOppsositeType(event)] == nil then
-			eventStacking.stacks[event.time][angle] = nil
-			for _, _ in pairs(eventStacking.stacks[event.time]) do
-				return
-			end
-			eventStacking.stacks[event.time] = nil
 		end
 	end
 end

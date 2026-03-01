@@ -53,7 +53,7 @@ local function beattoolsSameEasing(event, selected)
 	return event[paramForType[event.type]] == selected[paramForType[event.type]]
 end
 
-function eventVisuals.reset()
+function eventVisuals.init()
 	eventVisuals.eventCache = {}
 end
 
