@@ -146,14 +146,14 @@ fakeRepeat.update = function(event, irreversible, key, value)
 	if utilitools.files.beattools.eventVisuals.hasRepeat[event.type] then event.beattoolsRepeatParent = nil fakeRepeat.updateList() return end
 	-- forceprint("CALLED THIS SHIT METHTABLE MY ASS")
 
-	if ({ repeats = true, repeatDelay = true })[key] or irreversible or event.beattoolsRepeatParent == nil or fakeRepeat.indices[event.beattoolsRepeatParent] == nil or fakeRepeat.indices[event.beattoolsRepeatParent].parent ~= event then
-		if key == "repeats" then
-			if (event.beattoolsRepeatParent == nil or fakeRepeat.indices[event.beattoolsRepeatParent] == nil or fakeRepeat.indices[event.beattoolsRepeatParent].parent ~= event) and event.repeats ~= nil and event.repeats > 0 then
-				utilitools.files.beattools.undo.fakeRepeating = true
-				event.repeatDelay = 1
-				utilitools.files.beattools.undo.fakeRepeating = false
-				fakeRepeat.reGenerate(event, false, fakeRepeat.newIndex())
-			end
+	local invalidRepeatParent = event.beattoolsRepeatParent == nil or fakeRepeat.indices[event.beattoolsRepeatParent] == nil or fakeRepeat.indices[event.beattoolsRepeatParent].parent ~= event
+	if ({ repeats = true, repeatDelay = true })[key] or irreversible or invalidRepeatParent then
+		if invalidRepeatParent and event.repeats ~= nil and event.repeats > 0 then
+			utilitools.files.beattools.undo.fakeRepeating = true
+			event.repeatDelay = event.repeatDelay or 1
+			utilitools.files.beattools.undo.fakeRepeating = false
+			fakeRepeat.reGenerate(event, false, fakeRepeat.newIndex())
+		elseif key == "repeats" then
 			if event.repeats == nil or event.repeats == 0 then
 				-- forceprint("no parent")
 				fakeRepeat.remove(event.beattoolsRepeatParent, true)
