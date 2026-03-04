@@ -17,11 +17,11 @@ function eventStacking.init()
 end
 
 function eventStacking.getType(event)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.getType: Invalid event: " .. tostring(event))) return "func" end
+	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getType: Invalid event: ", event) return "func" end
 	return type(Event.editorDraw[event.type]) == "function" and "func" or "img"
 end
 function eventStacking.getOppsositeType(event)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.getOppsositeType: Invalid event: " .. tostring(event))) return "func" end
+	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getOppsositeType: Invalid event: ", event) return "func" end
 	return type(Event.editorDraw[event.type]) == "function" and "img" or "func"
 end
 
@@ -30,7 +30,7 @@ function eventStacking.getAngle(event)
 end
 
 function eventStacking.cacheEvent(event, remove, _k, dontCheck)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.cacheEvent: Invalid event: " .. tostring(event))) return end
+	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.cacheEvent: Invalid event: ", event) return end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
 
@@ -125,7 +125,7 @@ function eventStacking.cacheEvent(event, remove, _k, dontCheck)
 end
 
 function eventStacking.getIndex(event)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.getIndex: Invalid event: " .. tostring(event))) return "func" end
+	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getIndex: Invalid event: ", event) return "func" end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
 
@@ -151,7 +151,7 @@ function eventStacking.getIndex(event)
 end
 
 function eventStacking.inStack(event)
-	if not (event and event.type and event.time and event.angle) then modlog(mod, debug.traceback("eventStacking.inStack: Invalid event: " .. tostring(event))) return "func" end
+	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.inStack: Invalid event: ", event) return "func" end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
 

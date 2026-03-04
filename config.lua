@@ -100,9 +100,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 							func = function()
 								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
 									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
-										local text = json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end)
-										modlog(mods.beattools, "Copied to clipboard: " .. text)
-										love.system.setClipboardText(text)
+										utilitools.string.toClipboard(json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end))
 									end
 								end
 							end

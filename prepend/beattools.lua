@@ -441,15 +441,13 @@ function st:beattoolsCurrentEasing(type2, vars, time2, sub, subsub, excludeIndex
 				end
 			end)()
 			if beattoolsCurrentEased.duration ~= nil and beattoolsCurrentEased.duration > 0 and time < beattoolsEventTime + beattoolsCurrentEased.duration and beattoolsPrev then
-				local beattoolsEase = (flux.easing[beattoolsCurrentEased.ease] or flux.easing["linear"])((time - beattoolsEventTime) /
-					beattoolsCurrentEased.duration)
+				local beattoolsEase = (flux.easing[beattoolsCurrentEased.ease] or flux.easing["linear"])((time - beattoolsEventTime) / beattoolsCurrentEased.duration)
 				if vars == "var" and beattoolsCurrentEased.start ~= nil then
 					beattoolsPrev.value = beattoolsCurrentEased.start
 				end
 
 				for k, v in pairs(easingVars) do
-					beattoolsCurrentEased[k] = beattoolsPrev[k] +
-						beattoolsEase * (beattoolsCurrentEased[k] - beattoolsPrev[k])
+					beattoolsCurrentEased[k] = beattoolsPrev[k] + beattoolsEase * (beattoolsCurrentEased[k] - beattoolsPrev[k])
 				end
 			end
 		end

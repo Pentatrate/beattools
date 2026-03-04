@@ -118,9 +118,7 @@ return function(window_flag, inputFlag)
 						end
 					end
 					if imgui.IsItemClicked(1) then
-						modlog(mods.beattools, "Copied to clipboard: " .. text)
-						love.system.setClipboardText(text)
-						cs.p:hurtPulse()
+						utilitools.string.toClipboard(text)
 					end
 					if imgui.IsItemClicked(2) then
 						if type(beattools.easeList.unsorted.all[v]) == "boolean" then

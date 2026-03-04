@@ -13,6 +13,9 @@ return function(window_flag, inputFlag)
 	if imgui.Begin("Calculate", false, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
 		local saveToHistory = false
 		imgui.TextWrapped(mods.beattools.config.calculator.output)
+		if imgui.IsItemClicked(1) then -- right click
+			utilitools.string.toClipboard(mods.beattools.config.calculator.output)
+		end
 
 		local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator", mods.beattools.config.calculator.input, "", nil, nil, nil)
 
@@ -52,6 +55,9 @@ return function(window_flag, inputFlag)
 					imgui.TextDisabled(v.input)
 					if imgui.Selectable_Bool(v.output, false) then
 						newInput = newInput .. " " .. v.output
+					end
+					if imgui.IsItemClicked(1) then -- right click
+						utilitools.string.toClipboard(v.output)
 					end
 				end
 				imgui.EndTabItem("History##beattoolsCalculator")

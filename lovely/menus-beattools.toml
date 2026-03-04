@@ -507,9 +507,7 @@ if true then
 					end
 					if imgui.IsItemClicked(1) then
 						local hex = beattoolsRGB2Hex(self.beattoolsCurrentEasings.editorBeat.color[i].r.r, self.beattoolsCurrentEasings.editorBeat.color[i].g.g, self.beattoolsCurrentEasings.editorBeat.color[i].b.b)
-						modlog(mods.beattools, "Copied to clipboard: " .. hex)
-						love.system.setClipboardText(hex)
-						self.p:hurtPulse()
+						utilitools.string.toClipboard(hex)
 					end
 					if imgui.IsItemClicked(2) then
 						self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. self.beattoolsCurrentEasings.editorBeat.color[i].r.r .. ",number;g," .. self.beattoolsCurrentEasings.editorBeat.color[i].g.g .. ",number;b," .. self.beattoolsCurrentEasings.editorBeat.color[i].b.b .. ",number"
