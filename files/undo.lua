@@ -352,7 +352,7 @@ undo.change = function(t, k, v, hidden)
 	if not utilitools.files.beattools.undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and hidden[k] ~= v then
 		if undo.keyTracked(k) then
 			if utilitools.files.beattools.undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
-				if undo.events[tostring(t)] == nil then modlog("INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
+				if undo.events[tostring(t)] == nil then modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
 				if
 					undo.changes[undo.index + 1] and
 					undo.changes[undo.index + 1].type == "change" and

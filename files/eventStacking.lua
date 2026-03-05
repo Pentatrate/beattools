@@ -68,7 +68,7 @@ function eventStacking.cacheEvent(event, remove, _k, dontCheck)
 				table.remove(t, i)
 				i = i - 1
 			elseif k == "img" then
-				if eventStacking.events[tostring(v)] == i - 1 then modlog("DOESNT EXIST") break end
+				if eventStacking.events[tostring(v)] == i - 1 then modwarn(mod, "DOESNT EXIST") break end
 				eventStacking.events[tostring(v)] = i - 1
 			else break end
 			i = i + 1
