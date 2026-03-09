@@ -56,6 +56,7 @@ function noiseDither.apply(doDither)
 		if (doDither and noiseDither.ditherMap or noiseDither.noiseMap)[i] then
 			for _, v in ipairs((doDither and noiseDither.ditherMap or noiseDither.noiseMap)[i]) do
 				love.graphics.stencil(function()
+					love.graphics.setPointSize(1)
 					love.graphics.points(unpack(v))
 				end, "replace", i, true)
 			end
@@ -123,6 +124,12 @@ function noiseDither.dither(note, doDither)
 			pct = pct > 0 and 1 or 0
 		end
 		pct = helpers.clamp(pct, 0, 1)
+		if pct == 1 and not doDither then
+			if type(love.graphics.getCanvas()) ~= "table" then
+				noiseDither.old = love.graphics.getCanvas()
+			end
+			return
+		end
 	elseif doDither then
 		pct = 1
 	else

@@ -2,19 +2,20 @@ return function(window_flag, inputFlag)
 	helpers.SetNextWindowPos(750, 420, window_flag)
 	helpers.SetNextWindowSize(200, 300, window_flag)
 	if imgui.Begin("Bookmarks", nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
-		cs:beattoolsCurrentEasing("bookmarks", "bookmark", "editorBeat")
-		for i, v in ipairs(cs.beattoolsEasings.bookmarks) do
+		if not (utilitools.files.beattools.easing.list.bookmark and utilitools.files.beattools.easing.list.bookmark["_"] and utilitools.files.beattools.easing.list.bookmark["_"]["_"]) then imgui.End() return end
+		local _, count = utilitools.files.beattools.easing.getEase("bookmark", nil, cs.editorBeat, nil, nil)
+		for i, bookmark in ipairs(utilitools.files.beattools.easing.list.bookmark["_"]["_"]) do
 			if i ~= 1 then imgui.Separator() end
-			imgui.ColorButton("", imgui.ImVec4_Float((v.r or 0) / 255, (v.g or 0) / 255, (v.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
+			imgui.ColorButton("", imgui.ImVec4_Float((bookmark.event.r or 0) / 255, (bookmark.event.g or 0) / 255, (bookmark.event.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
 			imgui.SameLine()
 			local name = "Unnamed Bookmark"
-			if v.name and v.name ~= "" then name = v.name end
-			if imgui.Selectable_Bool(v.name .. " (Time: " .. (helpers.round(v.time * 1e3) / 1e3) .. ")", v.indexInLevel == cs.beattoolsCurrentEasings.editorBeat.bookmarks.indexInLevel) then
-				cs.editorBeat = v.time
+			if bookmark.event.name and bookmark.event.name ~= "" then name = bookmark.event.name end
+			if imgui.Selectable_Bool(name .. " (Time: " .. (helpers.round(bookmark.event.time * 1e3) / 1e3) .. ")", count.index == i) then
+				cs.editorBeat = bookmark.event.time
 				cs:noSelection()
-				cs.selectedEvent = cs.level.events[v.indexInLevel]
+				cs.selectedEvent = cs.level.events[utilitools.files.beattools.easing.getIndex(bookmark.event)]
 			end
-			if v.description and v.description ~= "" then imgui.Indent() imgui.TextWrapped(v.description) imgui.Unindent() end
+			if bookmark.event.description and bookmark.event.description ~= "" then imgui.Indent() imgui.TextWrapped(bookmark.event.description) imgui.Unindent() end
 		end
 		imgui.End()
 	end

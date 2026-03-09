@@ -5,14 +5,17 @@ Parallel:  Split the parameter to ease them separately, like `r`, `g`, and `b` i
 It can be both like in the set paddle event
 
 TODO:
-- paddles: paddle 0 affect all paddles
+- ease: repeats
 ]]
 
 local easing = {
 	track = {
 		ease = { different = "var", parallel = false, duration = { value = true }, start = { value = "start" }, params = { value = true, start = true } },
 		setColor = { different = "color", parallel = true, duration = { r = true, g = true, b = true }, start = false, params = { r = true, g = true, b = true } },
-		paddles = { different = "paddle", parallel = true, duration = { newWidth = true, newAngle = true }, start = false, params = { newWidth = true, newAngle = true, enabled = true } }
+		paddles = { different = "paddle", parallel = true, duration = { newWidth = true, newAngle = true }, start = false, params = { newWidth = true, newAngle = true, enabled = true } },
+		bookmark = { different = false, parallel = false, duration = false, start = false, params = { name = true, description = true, r = true, g = true, b = true } },
+		forcePlayerSprite = { different = false, parallel = true, duration = false, start = false, params = { spriteName = true, useFaceStencil = true, shader = true } },
+		songNameOverride = { different = false, parallel = false, duration = false, start = false, params = { newname = true } }
 	},
 	list = {},
 	cache = {},
@@ -35,17 +38,30 @@ function easing.default(eventId, different)
 		end,
 		paddles = function()
 			return { enabled = different == 1, newWidth = 70, newAngle = 0 }
+		end,
+		bookmark = function()
+			return { name = "Start", description = "", r = 0, g = 0, b = 0 }
+		end,
+		forcePlayerSprite = function()
+			return { spriteName = "" }
+		end,
+		songNameOverride = function()
+			return { newname = nil }
 		end
 	}
 	if defaults[eventId] then return defaults[eventId]() end
 	modwarn(mod, "easing.default: No default for event ", eventId, " and different ", different)
 end
 
-function easing.init()
-	easing.list = {}
+function easing.clearCache()
 	easing.cache = {}
 	easing.access = {}
 	easing.index = 0
+end
+
+function easing.init()
+	easing.list = {}
+	easing.clearCache()
 end
 
 function easing.getIndex(event)
@@ -113,13 +129,13 @@ function easing.search(arr, time, order, index)
 end
 
 function easing.getArr(event, k, fakeDifferent)
-	if type(event) ~= "table" then return end
-	if not fakeDifferent and not event.time then return end
-	if not event.type then return end
+	if type(event) ~= "table" then modwarn(mod, "Not table: ", event, k, fakeDifferent) return end
+	if not fakeDifferent and not event.time then modwarn(mod, "No time: ", event, k, fakeDifferent) return end
+	if not event.type then modwarn(mod, "No type: ", event, k, fakeDifferent) return end
 
 	local track = easing.track[event.type]
-	if not track then return end
-	if track.different and not (fakeDifferent or event[track.different]) then return end
+	if not track then if fakeDifferent then modwarn(mod, "No track: ", event.type, event, k, fakeDifferent) end return end
+	if track.different and not (fakeDifferent or event[track.different]) then modwarn(mod, "No different: ", event, k, fakeDifferent) return end
 
 	local param
 	if not k then param = true
@@ -129,36 +145,58 @@ function easing.getArr(event, k, fakeDifferent)
 	-- convert here
 	elseif track.params and track.params[k] then param = true end -- auto updated via table reference, except when converting, ill implement that laterrrrrr
 
-	if param then
-		local function init(arr, k2) arr[k2] = arr[k2] or {} return arr[k2] end
-		local arr = easing.list
-		-- convert here
+	if not param then
+		if track.duration and k == "duration" then easing.clearCache() end
+		return
+	end
+
+	local function init(arr, k2) arr[k2] = arr[k2] or {} return arr[k2] end
+	local arr = easing.list
+	local different = track.different and (fakeDifferent or event[track.different])
+
+	-- convert here
+	if event.type == "paddles" and (event.paddle == 0 or fakeDifferent == 0) then
 		arr = init(arr, event.type)
-		-- convert here
+		for i = 1, 8 do
+			init(arr, i)
+		end
+
+		local arr2 = {}
+		for param2, _ in pairs(track.params) do
+			if fakeDifferent or (event[param2] and (not k or not track.params[k] or param2 == k)) then
+				arr2[param2] = {}
+				for i = 1, 8 do
+					table.insert(arr2[param2], init(arr[i], param2))
+				end
+			end
+		end
+		return arr2, track
+	else
+		arr = init(arr, event.type)
 		arr = init(arr, track.different and (fakeDifferent or event[track.different]) or "_")
 		if track.parallel then
 			local arr2 = {}
 			-- convert here
 			for param2, _ in pairs(track.params) do
-				if fakeDifferent or event[param2] and (not k or not track.params[k] or param2 == k) then
-					arr2[param2] = init(arr, param2)
+				if fakeDifferent or (event[param2] and (not k or not track.params[k] or param2 == k)) then
+					arr2[param2] = { init(arr, param2) }
 				end
 			end
 			return arr2, track
 		else
-			return { ["_"] = init(arr, "_") }, track
+			return { ["_"] = { init(arr, "_") } }, track
 		end
 	end
 end
 
 function easing.cacheEvent(event, remove, k)
-	if true then return end
+	-- if true then return end
 	local arr, track = easing.getArr(event, k)
 	if not arr or not track then return end
 
 	local function cache(param)
-		local list = arr[param]
-		if list then
+		if not arr[param] then return end
+		for _, list in ipairs(arr[param]) do
 			local i = easing.search(list, event.time, event.order or 0, easing.getIndex(event))
 
 			if list[i] and list[i].event == event then
@@ -181,85 +219,105 @@ function easing.cacheEvent(event, remove, k)
 		end
 	end
 	if track.parallel then
-		for param, _ in pairs(track.params) do
+		for param, _ in pairs(arr) do
 			cache(param)
 		end
 	else
 		cache("_")
 	end
+
+	easing.clearCache()
 end
 
-function easing.getEase(eventId, different, parallel, time, order, index)
+function easing.getEase(eventId, different, time, order, index)
 	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
 	if not arr or not track or not time then return end
-	local keys = table.concat({ eventId, track.different and different or "_", track.parallel and parallel or "_", time, order or "_", index or "_" }, " | ")
+	if cs.level and cs.level.properties and cs.level.properties.loadBeat and time < cs.level.properties.loadBeat then
+		time = cs.level.properties.loadBeat
+		order = nil
+		index = nil
+	end
+	if cs.level and cs.level.properties and cs.level.properties.startingBeat and time < cs.level.properties.startingBeat then
+		time = cs.level.properties.startingBeat
+		order = nil
+		index = nil
+	end
+	local keys = table.concat({ eventId, track.different and different or "_", time, order or "_", index or "_" }, " | ")
 
 	while easing.cache[1] and easing.cache[1].time + 1 < love.timer.getTime() do
 		local element = table.remove(easing.cache)
 		easing.index = easing.index + 1
 		easing.access[element.keys] = nil
-		modlog(mod, "removed cache")
 	end
 	if easing.access[keys] then
-		easing.cache[easing.access[keys] - easing.index].time = love.timer.getTime()
-		modlog(mod, "using cache")
-		return easing.cache[easing.access[keys] - easing.index].values
+		local cached = easing.cache[easing.access[keys] - easing.index]
+		if not cached then modwarn(mod, "No cache? ", eventId, different, time, order, index) end
+		return cached.values, cached.count
 	end
 
 	local values = easing.default(eventId, different)
 	local prevValues = track.duration and helpers.copy(values)
+	local count = { event = {} }
+	for param, _ in pairs(track.params) do count[param] = { index = 0, total = 0 } end
 
 	local function get(param)
-		local list = arr[param]
-		if list  then
-			local i = easing.search(list, time, order, index)
+		local list = arr[param][1]
+		local i = easing.search(list, time, order, index)
 
-			if list[i] then
-				local function get2(param2)
-					local event = list[i].event
+		if count[param] then count[param].total = #list end
 
-					-- convert here
-					if track.duration and track.duration[param2] and event.duration then
-						if track.start and track.start[param2] and event[track.start[param2]] then
-							-- start cannot be parallel
-							prevValues[param2] = event[track.start[param2]]
-						elseif list[i - 1] then
-							prevValues[param2] = list[i - 1].event[param2]
-						elseif i - 1 ~= 0 then
-							modwarn(mod, "easing.getEase: This shouldnt happen 2: [", param, "] [", param2, "] ", eventId, different, parallel, time, order, index)
-						end
+		if list[i] then
+			local function get2(param2)
+				local event = list[i].event
 
-						if type(event[param2]) == "number" and type(prevValues[param2]) == "number" then
-							local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
-							completion = (flux.easing[event.ease] or flux.easing["linear"])(completion)
-							local diff = event[param2] - prevValues[param2]
-							values[param2] = prevValues[param2] + diff * completion
-						else
-							values[param2] = event[param2]
-							modlog(mod, "[" .. param .. "] [" .. param2 .. "] NaN " .. values[param2])
-						end
-					else
-						values[param2] = event[param2]
-					end
-					modlog(mod, "[" .. param .. "] [" .. param2 .. "] " .. values[param2])
+				if track.parallel then
+					count[param2].index = i
+					count[param2].total = #list
+					count.event[param2] = event
+				else
+					count.index = i
+					count.total = #list
+					count.event = event
 				end
 
-				if track.parallel then get2(param) else for param2, _ in pairs(track.params) do get2(param2) end end
-			elseif i ~= 0 then
-				modwarn(mod, "easing.getEase: This shouldnt happen 2: [", param, "] ", eventId, different, parallel, time, order, index)
+				-- convert here
+				if track.duration and track.duration[param2] and event.duration and event.duration ~= 0 then
+					if track.start and track.start[param2] and event[track.start[param2]] then
+						-- start cannot be parallel
+						prevValues[param2] = event[track.start[param2]]
+					elseif list[i - 1] then
+						prevValues[param2] = list[i - 1].event[param2]
+					elseif i - 1 ~= 0 then
+						modwarn(mod, "easing.getEase: This shouldnt happen 2: [", param, "] [", param2, "] ", eventId, different, time, order, index)
+					end
+
+					if type(event[param2]) == "number" and type(prevValues[param2]) == "number" then
+						local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
+						completion = (flux.easing[event.ease] or flux.easing["linear"])(completion)
+						local diff = event[param2] - prevValues[param2]
+						values[param2] = prevValues[param2] + diff * completion
+					else
+						values[param2] = event[param2]
+						modlog(mod, "[" .. param .. "] [" .. param2 .. "] NaN " .. values[param2])
+					end
+				else
+					values[param2] = event[param2]
+				end
+				-- modlog(mod, "[" .. param .. "] [" .. param2 .. "] " .. values[param2])
 			end
-		else
-			-- values are defaulted
-			modlog(mod, "[" .. param .. "] no table for param " .. tostring(param))
+
+			if track.parallel then get2(param) else for param2, _ in pairs(track.params) do get2(param2) end end
+		elseif i ~= 0 then
+			modwarn(mod, "easing.getEase: This shouldnt happen 2: [", param, "] ", eventId, different, time, order, index)
 		end
 	end
 
-	if track.parallel then for param, _ in pairs(track.params) do get(param) end else get("_") end
+	if track.parallel then for param, _ in pairs(arr) do get(param) end else get("_") end
 
-	table.insert(easing.cache, { time = love.timer.getTime(), values = values, keys = keys })
+	table.insert(easing.cache, { time = love.timer.getTime(), values = values, keys = keys, count = count })
 	easing.access[keys] = #easing.cache + easing.index
 
-	return values
+	return values, count
 end
 
 return easing

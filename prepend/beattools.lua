@@ -20,30 +20,7 @@ beattools.lastSpriteChange = 0
 
 local beattoolsTrackEasables
 local beattoolsDefaultEasings = {
-	color = {
-		{ r = { r = 255 }, g = { g = 255 }, b = { b = 255 } },
-		{ r = { r = 0 },   g = { g = 0 },   b = { b = 0 } },
-		{ r = { r = 127 }, g = { g = 127 }, b = { b = 127 } },
-		{ r = { r = 191 }, g = { g = 191 }, b = { b = 191 } },
-		{ r = { r = 0 },   g = { g = 0 },   b = { b = 0 } },
-		{ r = { r = 0 },   g = { g = 0 },   b = { b = 0 } },
-		{ r = { r = 0 },   g = { g = 0 },   b = { b = 0 } },
-		{ r = { r = 0 },   g = { g = 0 },   b = { b = 0 } }
-	},
 	ease = {},
-	paddles = {
-		{ enabled = { enabled = true },  newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } },
-		{ enabled = { enabled = false }, newWidth = { newWidth = 70 }, newAngle = { newAngle = 0 } }
-	},
-	bookmarks = { name = "Start", description = "", r = 0, g = 0, b = 0, time = -1e9, order = 1e9, start = true },
-	playerSprites = { spriteName = "" },
-	songNameOverride = { newname = nil },
 	decos = { }
 }
 local decoDefault = {
@@ -86,12 +63,7 @@ local decoDefault = {
 st.beattoolsEasings = {}
 st.beattoolsCurrentEasings = {}
 local beattoolsEasingFor = {
-	color = ipairs,
 	ease = pairs,
-	paddles = { ipairs, pairs },
-	bookmarks = true,
-	playerSprites = true,
-	songNameOverride = true,
 	decos = { pairs, pairs }
 }
 
@@ -157,27 +129,6 @@ if true then -- add easing
 		end
 	end
 	beattoolsTrackEasables = {
-		setColor = function(v, i)
-			if v.color ~= nil then
-				local temp = false
-				if v.r ~= nil then
-					beattoolsAddEasing("color", v, i, { "r", "duration", "ease" }, v.color + 1, "r")
-					temp = true
-				end
-				if v.g ~= nil then
-					beattoolsAddEasing("color", v, i, { "g", "duration", "ease" }, v.color + 1, "g")
-					temp = true
-				end
-				if v.b ~= nil then
-					beattoolsAddEasing("color", v, i, { "b", "duration", "ease" }, v.color + 1, "b")
-					temp = true
-				end
-				if temp then
-					st.beattoolsEasings.color[v.color + 1].eventAmount = (st.beattoolsEasings.color[v.color + 1].eventAmount or 0) +
-						1
-				end
-			end
-		end,
 		setBgColor = function(v, i)
 			if v.color ~= nil then
 				beattoolsAddEasing("ease", v, i, {}, "bgColor", nil, "bgColor")
@@ -216,38 +167,6 @@ if true then -- add easing
 				beattoolsAddEasing("ease", v, i, { "enable" }, "vfx.hom")
 			end
 		end,
-		paddles = function(v, i)
-			if v.paddle ~= nil then
-				local function addEasing(i)
-					if v.enabled ~= nil then
-						beattoolsAddEasing("paddles", v, i, { "enabled" }, i, "enabled")
-					end
-					if v.newWidth ~= nil then
-						beattoolsAddEasing("paddles", v, i, { "newWidth", "duration", "ease" }, i, "newWidth")
-					end
-					if v.newAngle ~= nil then
-						beattoolsAddEasing("paddles", v, i, { "newAngle", "duration", "ease" }, i, "newAngle")
-					end
-				end
-				if v.paddle == 0 then
-					for i = 1, 7 do
-						addEasing(i)
-					end
-				else
-					addEasing(v.paddle)
-				end
-			end
-		end,
-		bookmark = function(v, i)
-			if v.name ~= nil and v.name ~= "" then
-				beattoolsAddEasing("bookmarks", v, i, { "name", "description", "r", "g", "b" })
-			end
-		end,
-		forcePlayerSprite = function(v, i)
-			if v.spriteName ~= nil then
-				beattoolsAddEasing("playerSprites", v, i, { "spriteName", "useFaceStencil" })
-			end
-		end,
 		setBoolean = function(v, i)
 			if v.var ~= nil and v.var ~= "" and type(beattools.easeList.unsorted.all[v.var]) == "boolean" then
 				beattoolsAddEasing("ease", v, i, { "enable" }, v.var)
@@ -268,11 +187,6 @@ if true then -- add easing
 			end
 			if v.side ~= nil then
 				beattoolsAddEasing("ease", v, i, {}, "vfx.noteParticles.side", nil, "particlesSide")
-			end
-		end,
-		songNameOverride = function(v, i)
-			if v.newname ~= nil then
-				beattoolsAddEasing("songNameOverride", v, i, { "newname" })
 			end
 		end,
 		deco = function(v, i)
