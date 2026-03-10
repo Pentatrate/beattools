@@ -23,6 +23,10 @@ local easing = {
 	index = 0
 }
 
+function easing.convert(event)
+
+end
+
 function easing.default(eventId, different)
 	local defaults = {
 		ease = function()
@@ -257,8 +261,14 @@ function easing.getEase(eventId, different, time, order, index)
 
 	local values = easing.default(eventId, different)
 	local prevValues = track.duration and helpers.copy(values)
-	local count = { event = {} }
-	for param, _ in pairs(track.params) do count[param] = { index = 0, total = 0 } end
+	local count = {}
+	if track.parallel then
+		count.event = {}
+		for param, _ in pairs(track.params) do count[param] = { index = 0, total = 0 } end
+	else
+		count.index = 0
+		count.total = 0
+	end
 
 	local function get(param)
 		local list = arr[param][1]
