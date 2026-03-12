@@ -17,13 +17,17 @@ local easing = {
 		forcePlayerSprite = { different = false, parallel = true, duration = false, start = false, params = { spriteName = true, useFaceStencil = true, shader = true } },
 		songNameOverride = { different = false, parallel = false, duration = false, start = false, params = { newname = true } }
 	},
+	convert = {
+		setBoolean = { different = "var", parallel = false, duration = false, params = { enable = "value" } }
+	},
 	list = {},
 	cache = {},
 	access = {},
 	index = 0
 }
 
-function easing.convert(event)
+function easing.convert(event, type, different, parallel)
+	local r = {}
 
 end
 

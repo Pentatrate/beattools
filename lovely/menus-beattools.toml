@@ -440,13 +440,21 @@ if true then
 								return v2.type == "setColor" and v2.color == i - 1
 							end
 							local eventsDeleted = 0
-							if self.multiselect ~= nil then
+							local easesDeleted = 0
+							if self.multiselect then
 								for i2 = #self.multiselect.events, 1, -1 do
 									local v2 = self.multiselect.events[i2]
 									if shouldSelect(v2) then
 										table.remove(self.multiselect.events, i2)
+										easesDeleted = easesDeleted + (v2.r and 1) + (v2.g and 1) + (v2.b and 1)
 										eventsDeleted = eventsDeleted + 1
 									end
+								end
+							elseif self.selectedEvent then
+								if shouldSelect(self.selectedEvent) then
+									easesDeleted = easesDeleted + (self.selectedEvent.r and 1) + (self.selectedEvent.g and 1) + (self.selectedEvent.b and 1)
+									eventsDeleted = eventsDeleted + 1
+									self.selectedEvent = nil
 								end
 							end
 							local function addEases()
@@ -492,7 +500,7 @@ if true then
 
 								self.p:hurtPulse()
 							end
-							if (self.beattoolsEasings.color[i].eventAmount or 0) > 0 and (eventsDeleted == 0 or eventsDeleted ~= (self.beattoolsEasings.color[i].eventAmount or 0)) then
+							if colC.r.total + colC.g.total + colC.b.total > 0 and (eventsDeleted == 0 or easesDeleted ~= colC.r.total + colC.g.total + colC.b.total) then
 								addEases()
 							end
 						end
