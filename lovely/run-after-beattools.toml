@@ -304,7 +304,6 @@ if mods.beattools.config.autoFixSides and v.type == "side" then
 		end
 	end
 end
--- Penta's Beattools code marker
 '''
 position = "after"
 target = "states/Editor.lua"

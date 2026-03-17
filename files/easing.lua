@@ -455,6 +455,7 @@ function easing.getEase(eventId, different, time, order, index)
 						event[param2] = originalEvent[param2]
 					end
 					event.duration = originalEvent.duration
+					event.ease = originalEvent.ease
 				end
 				event.order = originalEvent.order
 
@@ -487,9 +488,13 @@ function easing.getEase(eventId, different, time, order, index)
 					else
 						values[param] = event[param]
 						modwarn(mod, "[" .. parallel .. "] [" .. param .. "] NaN " .. values[param])
+						event.duration = nil
+						event.ease = nil
 					end
 				else
 					values[param] = event[param]
+					event.duration = nil
+					event.ease = nil
 				end
 
 
@@ -510,7 +515,26 @@ function easing.getEase(eventId, different, time, order, index)
 end
 
 function easing.select(eventId, different)
+	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
+	if not arr or not track then modwarn(mod, "Invalid input") return end
 
+	local selected = {}
+	if cs.multiselect then
+		for i = #cs.multiselect.events, 1, -1 do
+			local v2 = cs.multiselect.events[i]
+			if shouldSelect(v2) then
+				table.remove(cs.multiselect.events, i)
+				easesDeleted = easesDeleted + (v2.r and 1) + (v2.g and 1) + (v2.b and 1)
+				eventsDeleted = eventsDeleted + 1
+			end
+		end
+	elseif cs.selectedEvent then
+		if shouldSelect(cs.selectedEvent) then
+			easesDeleted = easesDeleted + (cs.selectedEvent.r and 1) + (cs.selectedEvent.g and 1) + (cs)
+			eventsDeleted = eventsDeleted + 1
+			cs.selectedEvent = nil
+		end
+	end
 end
 
 return easing
