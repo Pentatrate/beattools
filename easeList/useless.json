@@ -30,7 +30,5 @@
 	"rateMod": 1,
 	"songLoaded": false,
 	"startBeat": 0,
-	"vfx.time": 0,
-
-	"fsrBeat": 6
+	"vfx.time": 0
 }

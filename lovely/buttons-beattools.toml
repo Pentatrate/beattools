@@ -246,10 +246,10 @@ pattern = '''if imgui.Button('Delete event') then'''
 payload = '''
 if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
 	if beattools.easeList.unsorted.all[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
-		self:beattoolsCurrentEasing("ease", "var", "editorBeat", self.selectedEvent.var)
-		self:beattoolsCurrentEasing("ease", "var", self.selectedEvent.time, self.selectedEvent.var, nil, self:eventIndex(self.selectedEvent))
-		local eventTime = self.beattoolsCurrentEasings[self.selectedEvent.time].ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
-		local editorTime = self.beattoolsCurrentEasings.editorBeat.ease[self.selectedEvent.var][type(beattools.easeList.unsorted.all[self.selectedEvent.var]) == "boolean" and "enable" or "value"]
+		local ease, count = utilitools.files.beattools.easing.getEase("ease", self.selectedEvent.var, cs.editorBeat, nil, nil)
+		local ease2, count2 = utilitools.files.beattools.easing.getEase("ease", self.selectedEvent.var, self.selectedEvent.time, self.selectedEvent.order, utilitools.files.beattools.easing.getIndex(self.selectedEvent) - 1)
+		local eventTime = ease2.value
+		local editorTime = ease.value
 		if mods.beattools.config.easeListRound then
 			if type(eventTime) == "number" then
 				eventTime = helpers.round(eventTime * 1e3) / 1e3

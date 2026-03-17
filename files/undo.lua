@@ -485,7 +485,9 @@ undo.update = function()
 			undo.inject()
 		end
 		if #undo.changes == 0 then
+			utilitools.files.beattools.stopwatch.time("Start")
 			undo.fullSave()
+			utilitools.files.beattools.stopwatch.time("First Full Save")
 		end
 	end
 end

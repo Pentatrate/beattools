@@ -6,11 +6,8 @@ return {
 		utilitools.files.beattools.test2()
 	end,
 	testKey3 = function()
-		if true then return end
-		utilitools.files.beattools.easing.getEase("ease", "p.x", cs.editorBeat, nil, nil)
 		-- modlog(mod, tostring(love.filesystem.getRealDirectory("Workshop/")))
-		local t;
-		t[1] = nil
+		-- error("Force crash hotkey pressed")
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

@@ -1,5 +1,6 @@
 local configHelpers = utilitools.configHelpers
 local imguiHelpers = utilitools.imguiHelpers
+configHelpers.setMod(mod)
 
 return function(window_flag, inputFlag)
 	helpers.SetNextWindowPos(750, 420, window_flag)
@@ -20,28 +21,28 @@ return function(window_flag, inputFlag)
 			if ((not mods.beattools.config.easeListUse) or beattools.easeList.unsorted.uselessEases[v] == nil)
 			and ((not mods.beattools.config.easeListSerious) or beattools.easeList.unsorted.troll[v] == nil)
 			and ((not mods.beattools.config.easeListSelected) or beattools.easeList.selected[v]) then
-				cs:beattoolsCurrentEasing("ease", "var", "editorBeat", v)
-				if ((not mods.beattools.config.easeListUsed) or #(cs.beattoolsEasings.ease[v] or {}) > 0)
-				and ((not mods.beattools.config.easeListUsedVars) or v == "vfx.vars0" or v:sub(1, #"vfx.vars") ~= "vfx.vars" or #(cs.beattoolsEasings.ease[v] or {}) > 0) then
+				local ease, count = utilitools.files.beattools.easing.getEase("ease", v, cs.editorBeat, nil, nil)
+				if ((not mods.beattools.config.easeListUsed) or count.total > 0)
+				and ((not mods.beattools.config.easeListUsedVars) or v == "vfx.vars0" or v:sub(1, #"vfx.vars") ~= "vfx.vars" or count.total > 0) then
 					imgui.TableNextRow()
 					imgui.TableNextColumn()
 
 					local text
 					if type(beattools.easeList.unsorted.all[v]) == "boolean" then
-						text = tostring(cs.beattoolsCurrentEasings.editorBeat.ease[v].enable)
+						text = tostring(ease.value)
 					elseif type(beattools.easeList.unsorted.all[v]) == "number" or v == "outline" then
-						if cs.beattoolsCurrentEasings.editorBeat.ease[v].value == nil or not mods.beattools.config.easeListRound then
-							text = tostring(cs.beattoolsCurrentEasings.editorBeat.ease[v].value)
+						if ease.value == nil or not mods.beattools.config.easeListRound then
+							text = tostring(ease.value)
 						else
-							text = tostring(helpers.round(cs.beattoolsCurrentEasings.editorBeat.ease[v].value * 1e3) / 1e3)
+							text = tostring(helpers.round(ease.value * 1e3) / 1e3)
 						end
 					end
 					if mods.beattools.config.easeListSelectChanged then
-						beattools.easeList.selected[v] = cs.beattoolsCurrentEasings.editorBeat.ease[v][type(beattools.easeList.unsorted.all[v]) == "boolean" and "enable" or "value"] ~= beattools.easeList.unsorted.all[v] or nil
+						beattools.easeList.selected[v] = ease.value ~= beattools.easeList.unsorted.all[v] or nil
 					end
 
 					local pressed = imgui.Selectable_Bool(text, beattools.easeList.selected[v], imgui.ImGuiSelectableFlags_SpanAllColumns)
-					imguiHelpers.tooltip((beattools.easeList.unsorted.desc[v] and tostring(beattools.easeList.unsorted.desc[v]) .. "\n" or "") .. (cs.beattoolsCurrentEasings.editorBeat.ease[v].runEvents - 1) .. "/" .. #(cs.beattoolsEasings.ease[v] or {}) .. " events")
+					imguiHelpers.tooltip((beattools.easeList.unsorted.desc[v] and tostring(beattools.easeList.unsorted.desc[v]) .. "\n" or "") .. count.index .. "/" .. count.total .. " events")
 
 					if pressed then
 						local function shouldSelect(v2)
@@ -84,7 +85,7 @@ return function(window_flag, inputFlag)
 									end
 								end
 							end
-							if (cs.selectedEvent and shouldSelect(cs.selectedEvent)) or eventsDeleted == 1 or cs.beattoolsCurrentEasings.editorBeat.ease[v].runEvents == 1 then
+							if (cs.selectedEvent and shouldSelect(cs.selectedEvent)) or eventsDeleted == 1 or count.index == 0 then
 								for i2, v2 in ipairs(cs.level.events) do
 									if shouldSelect(v2) then addToMultiSelect(v2) end
 								end
@@ -107,13 +108,13 @@ return function(window_flag, inputFlag)
 							cs.p:hurtPulse()
 						end
 						if not mods.beattools.config.easeListSelectChanged then
-							if beattools.easeList.selected[v] and (#(cs.beattoolsEasings.ease[v] or {}) == 0 or eventsDeleted == #(cs.beattoolsEasings.ease[v] or {})) then
+							if beattools.easeList.selected[v] and (count.total == 0 or eventsDeleted == count.total) then
 								beattools.easeList.selected[v] = nil
 							else
 								beattools.easeList.selected[v] = true
-								if #(cs.beattoolsEasings.ease[v] or {}) > 0 then addEases() end
+								if count.total > 0 then addEases() end
 							end
-						elseif #(cs.beattoolsEasings.ease[v] or {}) > 0 and (eventsDeleted == 0 or eventsDeleted ~= #(cs.beattoolsEasings.ease[v] or {})) then
+						elseif count.total > 0 and (eventsDeleted == 0 or eventsDeleted ~= count.total) then
 							addEases()
 						end
 					end
@@ -129,7 +130,7 @@ return function(window_flag, inputFlag)
 					end
 
 					imgui.TableNextColumn()
-					if #(cs.beattoolsEasings.ease[v] or {}) == 0 then
+					if count.total == 0 then
 						imgui.TextDisabled(v)
 					else
 						imgui.Text(v)

@@ -23,7 +23,7 @@
 	"level.metadata.bg": false,
 	"level.metadata.difficulty": 0,
 	"level.metadata.lightWarning": false,
-	"level.properties.formatversion": 17,
+	"level.properties.formatversion": 18,
 	"level.properties.offset": 8,
 	"level.properties.speed": 70,
 	"maxHits": 0,
@@ -302,8 +302,6 @@
 	"vfx.chromaticAberration.enabled": false,
 	"vfx.chromaticAberration.intensity": 1,
 	"vfx.chromaticAberration.threshold": 1,
-	"fsrBeat": 6,
-	"progessBarStartOffset": 6,
 	"loadingBeats": false,
 
 	"allowNegativeHoldLeniencyPleaseOnlyEnableThisIfYouKnowWhatYouAreDoing": false,
@@ -340,14 +338,14 @@
 	"pauseMenu.menu.cooldownMax": 0,
 	"pauseMenu.menu.delete": false,
 	"pauseMenu.menu.layer": 0,
-	"pauseMenu.menu.maxWidth": 89,
+	"pauseMenu.menu.maxWidth": 56,
 	"pauseMenu.menu.maxY": 40,
 	"pauseMenu.menu.selection": 1,
-	"pauseMenu.menu.selectionY": -20,
+	"pauseMenu.menu.selectionY": 0,
 	"pauseMenu.menu.skipRender": true,
 	"pauseMenu.menu.skipUpdate": true,
 	"pauseMenu.menu.upLayer": 0,
-	"pauseMenu.menu.width": 89,
+	"pauseMenu.menu.width": 56,
 	"pauseMenu.menu.x": 0,
 	"pauseMenu.menu.y": 0,
 	"pauseMenu.pausePosition.h": 160,
@@ -374,5 +372,31 @@
 	"vfx.bgNoise_OLD.b": 1,
 	"vfx.bgNoise_OLD.enable": false,
 	"vfx.bgNoise_OLD.g": 1,
-	"vfx.bgNoise_OLD.r": 1
+	"vfx.bgNoise_OLD.r": 1,
+
+	"additionalHoldWidth": 0,
+	"noteVolume": 1,
+
+	"currentHealth": -1,
+	"maxHealth": -1,
+
+	"p.lookXOffset": 0,
+	"p.uvx": 0,
+	"p.uvy": 0,
+
+	"level.metadata.lyricsWarning": false,
+
+	"vfx.noteParticles.mineHoldEnd": true,
+	"vfx.noteParticles.mineHoldHit": true,
+
+	"vfx.useVFXDistanceForVFXAngle": true,
+
+	"rtf.glitchNextTimeThreshold": 5,
+	"rtf.glitchRngSeed": 5,
+	"rtf.glitchTimeThresholdChangeRate": 5,
+	"rtf.nextTimeThreshold": 30,
+	"rtf.rngSeed": 4,
+	"rtf.time": 0,
+	"rtf.timeScale": 1,
+	"rtf.timeThresholdChangeRate": 30
 }

@@ -292,24 +292,8 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''function st:updateBiggestBeat()'''
-payload = '''
-	-- utilitools.files.beattools.stopwatch.time("Start")
-	for k, v in pairs(beattoolsDefaultEasings) do
-		self.beattoolsEasings[k] = {}
-	end
-	self.beattoolsCurrentEasings = {}
-'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 payload = '''
-if beattoolsTrackEasables[v.type] then beattoolsTrackEasables[v.type](v, i) end
-
 if mods.beattools.config.autoFixSides and v.type == "side" then
 	local prev = v.endAngle or v.angle
 	local after = prev % 360
@@ -321,35 +305,6 @@ if mods.beattools.config.autoFixSides and v.type == "side" then
 	end
 end
 -- Penta's Beattools code marker
-'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = false
-pattern = '''	-- Penta's Beattools code marker
-end'''
-payload = '''
-	-- utilitools.files.beattools.stopwatch.time("Biggest beat end")
-	for kk, vv in pairs(self.beattoolsEasings) do
-		if beattoolsEasingFor[kk] == true then
-			table.sort(vv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end)
-		elseif type(beattoolsEasingFor[kk]) == "table" then
-			for kkk, vvv in beattoolsEasingFor[kk][1](vv) do
-				if vvv ~= nil then
-					for kkkk, vvvv in beattoolsEasingFor[kk][2](vvv) do
-						if vvvv ~= nil then table.sort(vvvv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end) end
-					end
-				end
-			end
-		else
-			for kkk, vvv in beattoolsEasingFor[kk](vv) do
-				if vvv ~= nil then table.sort(vvv, function (a, b) return a.time + (a.order or 0) / 10000 < b.time + (b.order or 0) / 10000 end) end
-			end
-		end
-	end
-	-- utilitools.files.beattools.stopwatch.time("Get easings end")
 '''
 position = "after"
 target = "states/Editor.lua"

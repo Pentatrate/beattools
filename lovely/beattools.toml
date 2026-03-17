@@ -663,7 +663,7 @@ target = "obj/GameManager.lua"
 match_indent = true
 pattern = '''if cs.level.properties.loadBeat and cs.cBeat < 0 and v.time <= cs.level.properties.loadBeat then'''
 payload = '''
-if mods.beattools.config.customLevelVisuals then
+if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
 	if v.type == "setColor" then
 		beattoolsNoColors = false
 	elseif v.type == "outline" then

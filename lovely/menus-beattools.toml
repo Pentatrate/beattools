@@ -388,16 +388,17 @@ if true then
 		if imgui.Begin("Beattools", nil, inputFlag) then
 
 			if mods.beattools.config.colorPreview then
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "bgColor")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "voidColor")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "outline")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.bgNoise")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.bgNoiseColor")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "vfx.hom")
+				local bgColor, bgColorC = utilitools.files.beattools.easing.getEase("ease", "bgColor", cs.editorBeat, nil, nil)
+				local voidColor, voidColorC = utilitools.files.beattools.easing.getEase("ease", "voidColor", cs.editorBeat, nil, nil)
+				local outline, outlineC = utilitools.files.beattools.easing.getEase("ease", "outline", cs.editorBeat, nil, nil)
+				local bgNoise, bgNoiseC = utilitools.files.beattools.easing.getEase("ease", "vfx.bgNoise", cs.editorBeat, nil, nil)
+				local bgNoiseColor, bgNoiseColorC = utilitools.files.beattools.easing.getEase("ease", "vfx.bgNoiseColor", cs.editorBeat, nil, nil)
+				local hom, homC = utilitools.files.beattools.easing.getEase("ease", "vfx.hom", cs.editorBeat, nil, nil)
 
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.faceColor")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.fillColor")
-				self:beattoolsCurrentEasing("ease", "var", "editorBeat", "p.outlineColor")
+				local faceColor, faceColorC = utilitools.files.beattools.easing.getEase("ease", "p.faceColor", cs.editorBeat, nil, nil)
+				local fillColor, fillColorC = utilitools.files.beattools.easing.getEase("ease", "p.fillColor", cs.editorBeat, nil, nil)
+				local outlineColor, outlineColorC = utilitools.files.beattools.easing.getEase("ease", "p.outlineColor", cs.editorBeat, nil, nil)
+
 				local songName, songNameC = utilitools.files.beattools.easing.getEase("songNameOverride", nil, cs.editorBeat, nil, nil)
 				for i = 1, 8 do
 					local col, colC = utilitools.files.beattools.easing.getEase("setColor", i - 1, cs.editorBeat, nil, nil)
@@ -405,27 +406,27 @@ if true then
 						local ColorButtonPos = imgui.GetCursorScreenPos()
 						local additionalInfo = ""
 
-						if not self.beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-							if self.beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+						if not hom.value then
+							if bgColor.value == i - 1 then
 								additionalInfo = additionalInfo .. "\nBackground Color"
 							end
-							if self.beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+							if voidColor.value == i - 1 then
 								additionalInfo = additionalInfo .. "\nVoid Color"
 							end
 						end
-						if self.beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and self.beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+						if outline.value ~= nil and outline.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nOutline"
 						end
-						if self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
-							additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value * 1e3) / 1e1) .. "%)"
+						if bgNoise.value ~= 0 and bgNoise.value ~= 1 and bgNoiseColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(bgNoise.value * 1e3) / 1e1) .. "%)"
 						end
-						if self.beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == i - 1 then
+						if faceColor.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nPlayer Face Color"
 						end
-						if self.beattoolsCurrentEasings.editorBeat.ease["p.fillColor"].value == i - 1 then
+						if fillColor.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nPlayer Fill Color"
 						end
-						if self.beattoolsCurrentEasings.editorBeat.ease["p.outlineColor"].value == i - 1 then
+						if outlineColor.value == i - 1 then
 							additionalInfo = additionalInfo .. "\nPlayer Outline Color"
 						end
 
@@ -505,7 +506,7 @@ if true then
 							end
 						end
 						if imgui.IsItemClicked(1) then
-							local hex = beattoolsRGB2Hex(col.r, col.g, col.b)
+							local hex = beattools.rgb2hex(col.r, col.g, col.b)
 							utilitools.string.toClipboard(hex)
 						end
 						if imgui.IsItemClicked(2) then
@@ -513,21 +514,21 @@ if true then
 						end
 
 						if mods.beattools.config.colorEasePreview then
-							if not self.beattoolsCurrentEasings.editorBeat.ease["vfx.hom"].enable then
-								if self.beattoolsCurrentEasings.editorBeat.ease.bgColor.value == i - 1 then
+							if not hom.value then
+								if bgColor.value == i - 1 then
 									imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
 									imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
 								end
-								if self.beattoolsCurrentEasings.editorBeat.ease.voidColor.value == i - 1 then
+								if voidColor.value == i - 1 then
 									imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
 									imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
 								end
 							end
-							if self.beattoolsCurrentEasings.editorBeat.ease.outline.value ~= nil and self.beattoolsCurrentEasings.editorBeat.ease.outline.value == i - 1 then
+							if outline.value ~= nil and outline.value == i - 1 then
 								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
 								imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
 							end
-							if self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoise"].value ~= 0 and self.beattoolsCurrentEasings.editorBeat.ease["vfx.bgNoiseColor"].value == i - 1 then
+							if bgNoise.value ~= 0 and bgNoise.value ~= 1 and bgNoiseColor.value == i - 1 then
 								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
 								imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
 							end
@@ -538,7 +539,7 @@ if true then
 				end
 				imgui.SameLine()
 				local additionalInfo = ""
-				if self.beattoolsCurrentEasings.editorBeat.ease["p.faceColor"].value == -1 then
+				if faceColor.value == -1 then
 					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
 					additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
 				end
