@@ -3,19 +3,6 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# Undo Copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''copies = copies or {}'''
-payload = '''
-if getmetatable(orig) and getmetatable(orig).beattoolsUndoInject then
-	orig = getmetatable(orig).hidden
-end
-'''
-position = "after"
-target = "lib/helpers.lua"
-
 # Ratemod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -114,107 +101,6 @@ if mods.beattools.config.copySingle and self.copySingle then
 end
 '''
 position = "after"
-target = "states/Editor.lua"
-
-# Ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = false
-pattern = '''self.selectedEvent = self.level.events[self.overlappingEvents[1]]
-end'''
-payload = '''		if self.selectedEvent then'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = false
-pattern = '''' event. ' .. self.selectedEvent.angle .. '|' .. self.selectedEvent.time,'editor')'''
-payload = '''		end'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.lastClickX, self.lastClickY = mouse.rx, mouse.ry'''
-payload = '''
-self.lastSelected = self.selectedEvent
-self.ctrlSelectPending = mods.beattools.config.ctrlSelect and maininput:down("ctrl")
-'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''function st:SelectEvent()
-	self:clearMultiselectVars()'''
-payload = '''
-function st:SelectEvent()
-	if not mods.beattools.config.ctrlSelect or not maininput:down("ctrl") then self:clearMultiselectVars() end
-'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if maininput:down("ctrl") then'''
-payload = '''
-if mods.beattools.config.ctrlSelect and maininput:down("ctrl") then
-	self:beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
-elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
-'''
-position = "at"
-target = "states/Editor.lua"
-
-# Overlapping ctrl select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if imgui.Selectable_Bool(Event.info[e.type].name .. ' (ID ' .. v .. ')') then'''
-payload = '''
-if imgui.Selectable_Bool(
-	Event.info[e.type].name .. ' (ID ' .. v .. ')',
-	mods.beattools.config.ctrlSelect and self.ctrlSelectPending and self.multiselect and self.multiselect.events and (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(self.multiselect.events, self.level.events[v])
-) then
-'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if self.deletePending then'''
-payload = '''
-if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
-	imgui.Text("Select which event to ctrl select:")
-elseif self.deletePending then
-'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.selectedEvent = self.level.events[v]
--- Changes cursor angle to match event angle
-self.cursorAngle = self.selectedEvent.angle'''
-payload = '''
-if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
-	self:beattoolsCtrlSelect(self.level.events[v])
-	self.ctrlSelectPending = false
-	self.cursorAngle = self.level.events[v].angle
-else
-	self.ctrlSelectPending = false
-	self:noSelection()
-	self.selectedEvent = self.level.events[v]
-	-- Changes cursor angle to match event angle
-	self.cursorAngle = self.selectedEvent.angle
-end
-'''
-position = "at"
 target = "states/Editor.lua"
 
 # Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -1228,16 +1114,3 @@ pattern = '''yTotal = yTotal + myHeight'''
 payload = '''if y - myHeight * 0.5 < 360 or y + myHeight * 0.5 > 0 then'''
 position = "after"
 target = "states/SongSelect.lua"
-
-# Undo save all ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if love.timer.getTime() - self.lastSaved > 300 then'''
-payload = '''
-	if #utilitools.files.beattools.undo.changes == utilitools.files.beattools.undo.index then
-		utilitools.files.beattools.undo.fullSave()
-	end
-'''
-position = "after"
-target = "states/Editor.lua"

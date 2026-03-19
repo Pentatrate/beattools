@@ -282,16 +282,6 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''--trigger auto-backup every five minutes'''
-payload = '''
-utilitools.files.beattools.undo.update()
-'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
 payload = '''
 if mods.beattools.config.autoFixSides and v.type == "side" then
@@ -323,8 +313,6 @@ if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and
 '''
 position = "at"
 target = "states/Editor.lua"
-# currently expect 1 default match and 1 match for "Hold Dragging" v1.0.0 by Kakadu and "Ctrl Select" v1.2.0 by Kakadu each
-# Penta: hmmm with EA, not anymore, uhhh
 
 [[patches]]
 [patches.pattern]

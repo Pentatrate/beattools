@@ -1,5 +1,5 @@
 _G.beattools = beattools or {}
-beattools.moremetamethods = beattools.moremetamethods or {}
+
 beattools.easeList = {
 	unsorted = {
 		all = dpf.loadJson(utilitools.folderManager.modPath(mods.beattools) .. "/easeList/all.json"),
@@ -13,7 +13,6 @@ beattools.easeList = {
 	eases = {},
 	bools = {}
 }
-
 for k, v in pairs(beattools.easeList.unsorted.all) do
 	table.insert(beattools.easeList.sorted, k)
 	if type(v) == "boolean" then table.insert(beattools.easeList.bools, k) else table.insert(beattools.easeList.eases, k) end
@@ -29,5 +28,8 @@ table.sort(beattools.easeList.sorted, function(a, b)
 	end
 	return a < b
 end)
+
+beattools.moremetamethods = beattools.moremetamethods or {}
+function beattools.rgb2hex(r, g, b) return ("%02X%02X%02X"):format(r, g, b) end
 
 utilitools.files.beattools.undo.firstTime()

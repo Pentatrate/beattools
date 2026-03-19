@@ -1,0 +1,40 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Undo Copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''copies = copies or {}'''
+payload = '''
+if getmetatable(orig) and getmetatable(orig).beattoolsUndoInject then
+	orig = getmetatable(orig).hidden
+end
+'''
+position = "after"
+target = "lib/helpers.lua"
+
+# Undo save all ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if love.timer.getTime() - self.lastSaved > 300 then'''
+payload = '''
+	if #utilitools.files.beattools.undo.changes == utilitools.files.beattools.undo.index then
+		utilitools.files.beattools.undo.fullSave()
+	end
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''--trigger auto-backup every five minutes'''
+payload = '''
+utilitools.files.beattools.undo.update()
+'''
+position = "before"
+target = "states/Editor.lua"

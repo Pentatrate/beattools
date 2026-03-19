@@ -17,20 +17,20 @@ return function(window_flag, inputFlag)
 			imgui.TreePop()
 		end
 		imgui.BeginTable("easeList", 2, imgui.ImGuiTableFlags_RowBg + imgui.ImGuiTableFlags_BordersInnerH + imgui.ImGuiTableFlags_BordersInnerV + imgui.ImGuiTableFlags_SizingFixedFit)
-		for i, v in ipairs(beattools.easeList.sorted) do
-			if ((not mods.beattools.config.easeListUse) or beattools.easeList.unsorted.uselessEases[v] == nil)
-			and ((not mods.beattools.config.easeListSerious) or beattools.easeList.unsorted.troll[v] == nil)
-			and ((not mods.beattools.config.easeListSelected) or beattools.easeList.selected[v]) then
-				local ease, count = utilitools.files.beattools.easing.getEase("ease", v, cs.editorBeat, nil, nil)
+		for i, different in ipairs(beattools.easeList.sorted) do
+			if ((not mods.beattools.config.easeListUse) or beattools.easeList.unsorted.uselessEases[different] == nil)
+			and ((not mods.beattools.config.easeListSerious) or beattools.easeList.unsorted.troll[different] == nil)
+			and ((not mods.beattools.config.easeListSelected) or beattools.easeList.selected[different]) then
+				local ease, count = utilitools.files.beattools.easing.getEase("ease", different, cs.editorBeat, nil, nil)
 				if ((not mods.beattools.config.easeListUsed) or count.total > 0)
-				and ((not mods.beattools.config.easeListUsedVars) or v == "vfx.vars0" or v:sub(1, #"vfx.vars") ~= "vfx.vars" or count.total > 0) then
+				and ((not mods.beattools.config.easeListUsedVars) or different == "vfx.vars0" or different:sub(1, #"vfx.vars") ~= "vfx.vars" or count.total > 0) then
 					imgui.TableNextRow()
 					imgui.TableNextColumn()
 
 					local text
-					if type(beattools.easeList.unsorted.all[v]) == "boolean" then
+					if type(beattools.easeList.unsorted.all[different]) == "boolean" then
 						text = tostring(ease.value)
-					elseif type(beattools.easeList.unsorted.all[v]) == "number" or v == "outline" then
+					elseif type(beattools.easeList.unsorted.all[different]) == "number" or different == "outline" then
 						if ease.value == nil or not mods.beattools.config.easeListRound then
 							text = tostring(ease.value)
 						else
@@ -38,102 +38,27 @@ return function(window_flag, inputFlag)
 						end
 					end
 					if mods.beattools.config.easeListSelectChanged then
-						beattools.easeList.selected[v] = ease.value ~= beattools.easeList.unsorted.all[v] or nil
+						beattools.easeList.selected[different] = ease.value ~= beattools.easeList.unsorted.all[different] or nil
 					end
 
-					local pressed = imgui.Selectable_Bool(text, beattools.easeList.selected[v], imgui.ImGuiSelectableFlags_SpanAllColumns)
-					imguiHelpers.tooltip((beattools.easeList.unsorted.desc[v] and tostring(beattools.easeList.unsorted.desc[v]) .. "\n" or "") .. count.index .. "/" .. count.total .. " events")
+					imgui.Selectable_Bool(text, beattools.easeList.selected[different], imgui.ImGuiSelectableFlags_SpanAllColumns)
+					imguiHelpers.tooltip((beattools.easeList.unsorted.desc[different] and tostring(beattools.easeList.unsorted.desc[different]) .. "\n" or "") .. count.index .. "/" .. count.total .. " events")
 
-					if pressed then
-						local function shouldSelect(v2)
-							if v == "bgColor" and v2.type == "setBgColor" and v2.color ~= nil then return true end
-							if v == "voidColor" and v2.type == "setBgColor" and v2.voidColor ~= nil then return true end
-							if v == "outline" then return v2.type == "outline" and (v2.enable ~= nil or v2.color ~= nil) end
-							if v == "vfx.bgNoise" and v2.type == "noise" and v2.chance ~= nil then return true end
-							if v == "vfx.bgNoiseColor" and v2.type == "noise" and v2.color ~= nil then return true end
-							if v:sub(1, 18) == "vfx.noteParticles." and v2.type == "toggleParticles" and v2[v:sub(19)] ~= nil then return true end
-							return v2.type == (type(beattools.easeList.unsorted.all[v]) == "boolean" and "setBoolean" or "ease") and v2.var == v
-						end
-						local eventsDeleted = 0
-						if cs.multiselect ~= nil then
-							for i2 = #cs.multiselect.events, 1, -1 do
-								local v2 = cs.multiselect.events[i2]
-								if shouldSelect(v2) then
-									table.remove(cs.multiselect.events, i2)
-									eventsDeleted = eventsDeleted + 1 + (v2.type == "ease" and v2.repeats and v2.repeats > 0 and (v2.repeatDelay or 1) ~= 0 and v2.repeats or 0)
-								end
-							end
-						end
-						local function addEases()
-							if cs.multiselect == nil then
-								cs:newMulti()
-								cs.multiselectStartBeat = nil
-								cs.multiselectEndBeat = nil
-							end
-							local function addToMultiSelect(v2)
-								table.insert(cs.multiselect.events, v2)
-								cs.multiselect.eventTypes[v2.type] = true
-								if cs.multiselectStartBeat == nil then
-									cs.multiselectStartBeat = v2.time
-									cs.multiselectEndBeat = v2.time
-								else
-									if cs.multiselectStartBeat > v2.time then
-										cs.multiselectStartBeat = v2.time
-									end
-									if cs.multiselectEndBeat < v2.time then
-										cs.multiselectEndBeat = v2.time
-									end
-								end
-							end
-							if (cs.selectedEvent and shouldSelect(cs.selectedEvent)) or eventsDeleted == 1 or count.index == 0 then
-								for i2, v2 in ipairs(cs.level.events) do
-									if shouldSelect(v2) then addToMultiSelect(v2) end
-								end
-							elseif eventsDeleted == 0 then
-								local v3
-								for i2, v2 in ipairs(cs.level.events) do
-									if shouldSelect(v2) and v2.time <= cs.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
-										v3 = v2
-									end
-								end
-								if v3 ~= nil then
-									addToMultiSelect(v3)
-								end
-							end
-							if cs.multiselectStartBeat == nil then
-								cs.multiselectStartBeat = 0
-								cs.multiselectEndBeat = 360
-							end
-
-							cs.p:hurtPulse()
-						end
-						if not mods.beattools.config.easeListSelectChanged then
-							if beattools.easeList.selected[v] and (count.total == 0 or eventsDeleted == count.total) then
-								beattools.easeList.selected[v] = nil
-							else
-								beattools.easeList.selected[v] = true
-								if count.total > 0 then addEases() end
-							end
-						elseif count.total > 0 and (eventsDeleted == 0 or eventsDeleted ~= count.total) then
-							addEases()
-						end
-					end
-					if imgui.IsItemClicked(1) then
-						utilitools.string.toClipboard(text)
-					end
+					if imgui.IsItemClicked(0) then modlog(mod, "yes, im selecting eases rn") utilitools.files.beattools.easing.select("ease", different) end
+					if imgui.IsItemClicked(1) then utilitools.string.toClipboard(text) end
 					if imgui.IsItemClicked(2) then
-						if type(beattools.easeList.unsorted.all[v]) == "boolean" then
-							cs.placeEvent = "beattoolsEvent;setBoolean;var," .. v .. ",string;enable," .. text .. ",boolean"
+						if type(beattools.easeList.unsorted.all[different]) == "boolean" then
+							cs.placeEvent = "beattoolsEvent;setBoolean;var," .. different .. ",string;enable," .. text .. ",boolean"
 						else
-							cs.placeEvent = "beattoolsEvent;ease;var," .. v .. ",string;value," .. text .. "," .. (type(beattools.easeList.unsorted.all[v]) == "number" and "number" or "nil")
+							cs.placeEvent = "beattoolsEvent;ease;var," .. different .. ",string;value," .. text .. "," .. (type(beattools.easeList.unsorted.all[different]) == "number" and "number" or "nil")
 						end
 					end
 
 					imgui.TableNextColumn()
 					if count.total == 0 then
-						imgui.TextDisabled(v)
+						imgui.TextDisabled(different)
 					else
-						imgui.Text(v)
+						imgui.Text(different)
 					end
 				end
 			end

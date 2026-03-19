@@ -136,6 +136,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"ctrlSelect": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

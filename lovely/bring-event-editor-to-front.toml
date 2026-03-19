@@ -14,7 +14,7 @@ if mods.beattools.config.focusEventEditor and not ((mouse.altpress == -1) and (s
 	beattools.eventEditorFocus = 2
 end
 '''
-position = "after"
+position = "before" # must be before for compat with ctrlSelect
 target = "states/Editor.lua"
 
 [[patches]]

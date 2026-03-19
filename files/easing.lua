@@ -518,21 +518,87 @@ function easing.select(eventId, different)
 	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
 	if not arr or not track then modwarn(mod, "Invalid input") return end
 
-	local selected = {}
-	if cs.multiselect then
-		for i = #cs.multiselect.events, 1, -1 do
-			local v2 = cs.multiselect.events[i]
-			if shouldSelect(v2) then
-				table.remove(cs.multiselect.events, i)
-				easesDeleted = easesDeleted + (v2.r and 1) + (v2.g and 1) + (v2.b and 1)
-				eventsDeleted = eventsDeleted + 1
+	local eased, count = easing.getEase(eventId, different, cs.editorBeat, nil, nil)
+	if not eased or not count then modlog(mod, "Invalid input") return end
+	if track.parallel then
+		local noEvents = true
+		for parallel, _ in pairs(arr) do
+			if count[parallel].total ~= 0 then
+				noEvents = false
+				break
 			end
 		end
+		if noEvents then return end
+	else
+		if not count.total or count.total == 0 then return end
+	end
+
+	local easeSelected = {}
+	local easeNotSelected = {}
+	local totalSelected = {}
+	local atLeastPartiallySelected = false -- selected at least one ease
+	local  fullySelected = true -- selected all eases
+	local function addToLastSelected(event, index)
+		totalSelected[tostring(event)] = { event = event, index = index }
+	end
+	if cs.multiselect then
+		for i = #cs.multiselect.events, 1, -1 do
+			addToLastSelected(cs.multiselect.events[i], i)
+		end
 	elseif cs.selectedEvent then
-		if shouldSelect(cs.selectedEvent) then
-			easesDeleted = easesDeleted + (cs.selectedEvent.r and 1) + (cs.selectedEvent.g and 1) + (cs)
-			eventsDeleted = eventsDeleted + 1
-			cs.selectedEvent = nil
+		addToLastSelected(cs.selectedEvent)
+	end
+
+	local function get(parallel)
+		local list = arr[parallel][1]
+
+		for _, ease in ipairs(list) do
+			local event = ease.event
+			if totalSelected[tostring(event)] then
+				easeSelected[tostring(event)] = totalSelected[tostring(event)]
+				if not atLeastPartiallySelected then atLeastPartiallySelected = true end
+			else
+				easeNotSelected[tostring(event)] = { event = event }
+				if fullySelected then fullySelected = false end
+			end
+		end
+	end
+	if track.parallel then for parallel, _ in pairs(arr) do get(parallel) end else get("_") end
+
+	local function ctrlSelectAll(t)
+		local i = 0
+		for _, event in pairs(t) do
+			i = i + 1
+			cs:beattoolsCtrlSelect(event.event, true)
+		end
+	end
+	if atLeastPartiallySelected then
+		if fullySelected then
+			ctrlSelectAll(easeSelected)
+		else
+			ctrlSelectAll(easeNotSelected)
+			if cs.p then cs.p:hurtPulse() end
+		end
+	else
+		local event
+		if track.parallel then
+			for parallel, _ in pairs(arr) do
+				local event2 = count.event[parallel]
+				event = event and (event == event2 or event.time > event2.time or (event.time == event2.time and (event.order > event2.order or (event.order == event2.order and easing.getIndex(event) > easing.getIndex(event2))))) and event or event2
+			end
+		else
+			event = count.event
+		end
+		if not event then
+			ctrlSelectAll(easeNotSelected)
+			if cs.p then cs.p:hurtPulse() end
+		else
+			if event then
+				cs:beattoolsCtrlSelect(event, true)
+				cs.editorBeat = event.time
+			else
+				modwarn(mod, "NO EVENT", count.index, count.total, eventId, different)
+			end
 		end
 	end
 end

@@ -430,85 +430,14 @@ if true then
 							additionalInfo = additionalInfo .. "\nPlayer Outline Color"
 						end
 
-						if imgui.ColorButton(
+						imgui.ColorButton(
 							"Color channel " .. i - 1 .. " (" .. colC.r.index .. "/" .. colC.r.total .. " " .. colC.g.index .. "/" .. colC.g.total .. " " .. colC.b.index .. "/" .. colC.b.total .. " events)" .. additionalInfo,
 							imgui.ImVec4_Float(col.r / 255, col.g / 255, col.b / 255, 1),
 							2^1,
 							imgui.ImVec2_Float(20, 20)
-						) then
-							forceprint("pressed")
-							local function shouldSelect(v2)
-								return v2.type == "setColor" and v2.color == i - 1
-							end
-							local eventsDeleted = 0
-							local easesDeleted = 0
-							if self.multiselect then
-								for i2 = #self.multiselect.events, 1, -1 do
-									local v2 = self.multiselect.events[i2]
-									if shouldSelect(v2) then
-										table.remove(self.multiselect.events, i2)
-										easesDeleted = easesDeleted + (v2.r and 1) + (v2.g and 1) + (v2.b and 1)
-										eventsDeleted = eventsDeleted + 1
-									end
-								end
-							elseif self.selectedEvent then
-								if shouldSelect(self.selectedEvent) then
-									easesDeleted = easesDeleted + (self.selectedEvent.r and 1) + (self.selectedEvent.g and 1) + (self.selectedEvent.b and 1)
-									eventsDeleted = eventsDeleted + 1
-									self.selectedEvent = nil
-								end
-							end
-							local function addEases()
-								if self.multiselect == nil then
-									self:newMulti()
-									self.multiselectStartBeat = nil
-									self.multiselectEndBeat = nil
-								end
-								local function addToMultiSelect(v2)
-									table.insert(self.multiselect.events, v2)
-									self.multiselect.eventTypes[v2.type] = true
-									if self.multiselectStartBeat == nil then
-										self.multiselectStartBeat = v2.time
-										self.multiselectEndBeat = v2.time
-									else
-										if self.multiselectStartBeat > v2.time then
-											self.multiselectStartBeat = v2.time
-										end
-										if self.multiselectEndBeat < v2.time then
-											self.multiselectEndBeat = v2.time
-										end
-									end
-								end
-								if (self.selectedEvent and shouldSelect(self.selectedEvent)) or eventsDeleted == 1 or colC.r.index + colC.g.index + colC.b.index == 0 then
-									for i2, v2 in ipairs(self.level.events) do
-										if shouldSelect(v2) then addToMultiSelect(v2) end
-									end
-								elseif eventsDeleted == 0 then
-									local v3
-									for i2, v2 in ipairs(self.level.events) do
-										if shouldSelect(v2) and v2.time <= self.editorBeat and (v3 == nil or v2.time > v3.time or (v2.time == v3.time and (v2.order or 0) >= (v3.order or 0))) then
-											v3 = v2
-										end
-									end
-									if v3 ~= nil then
-										addToMultiSelect(v3)
-									end
-								end
-								if self.multiselectStartBeat == nil then
-									self.multiselectStartBeat = 0
-									self.multiselectEndBeat = 360
-								end
-
-								self.p:hurtPulse()
-							end
-							if colC.r.total + colC.g.total + colC.b.total > 0 and (eventsDeleted == 0 or easesDeleted ~= colC.r.total + colC.g.total + colC.b.total) then
-								addEases()
-							end
-						end
-						if imgui.IsItemClicked(1) then
-							local hex = beattools.rgb2hex(col.r, col.g, col.b)
-							utilitools.string.toClipboard(hex)
-						end
+						)
+						if imgui.IsItemClicked(0) then utilitools.files.beattools.easing.select("setColor", i - 1) end
+						if imgui.IsItemClicked(1) then utilitools.string.toClipboard(beattools.rgb2hex(col.r, col.g, col.b)) end
 						if imgui.IsItemClicked(2) then
 							self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. col.r .. ",number;g," .. col.g .. ",number;b," .. col.b .. ",number"
 						end

@@ -1,8 +1,9 @@
 local st = Gamestate:new('Editor') -- Penta: This comment is neccessary
 
-st.beattools = {}
-
 utilitools.files.beattools.undo.init()
+utilitools.files.beattools.ctrlSelect.init(st)
+
+-- will want to overhaul the code below soon
 
 local beattoolsTime = 0
 beattools.angleSnap = 4
@@ -17,8 +18,6 @@ beattools.randomizeWindows = mods.beattools.config.randomizeWindows ~= "off"
 
 beattools.playerSprite = "idle"
 beattools.lastSpriteChange = 0
-
-function beattools.rgb2hex(r, g, b) return ("%02X%02X%02X"):format(r, g, b) end
 
 function st:eventIndex(event)
 	if event == nil then return end
@@ -157,76 +156,4 @@ function st:beattoolsUntag(tags2)
 	self.p:hurtPulse()
 	self:updateBiggestBeat()
 	self.unsavedChanges = true
-end
-
-function st:beattoolsCtrlSelect(event, force)
-	if not mods.beattools.config.ctrlSelect and not force then return end
-	self.ctrlSelectPending = false
-	self.deletePending = false
-	local function addToMulti(event2)
-		table.insert(self.multiselect.events, event2)
-		self.multiselect.eventTypes[event2.type] = true
-		if self.multiselectStartBeat > event2.time then
-			self.multiselectStartBeat = event2.time
-		end
-		if self.multiselectEndBeat < event2.time then
-			self.multiselectEndBeat = event2.time
-		end
-	end
-	if self.multiselect then
-		local remove
-		for i, v in ipairs(self.multiselect.events) do
-			if v == event then
-				remove = i
-				break
-			end
-		end
-		if remove then
-			table.remove(self.multiselect.events, remove)
-
-			local typeExists
-			local checkStart = event.time == self.multiselectStartBeat and self.multiselectEndBeat
-			local checkEnd = event.time == self.multiselectEndBeat and self.multiselectStartBeat
-
-			for i, v in ipairs(self.multiselect.events) do
-				if not typeExists and v.type == event.type then typeExists = true end
-				if checkStart or checkEnd then
-					if v.time == event.time then
-						checkStart = false
-						checkEnd = false
-					end
-					if checkStart and v.time < checkStart then checkStart = v.time end
-					if checkEnd and v.time > checkEnd then checkEnd = v.time end
-				end
-				if typeExists and not checkStart and not checkEnd then
-					break
-				end
-			end
-			if not typeExists then self.multiselect.eventTypes[event.type] = nil end
-			if checkStart then self.multiselectStartBeat = checkStart end
-			if checkEnd then self.multiselectEndBeat = checkEnd end
-		else
-			addToMulti(event)
-		end
-	elseif event == self.lastSelected then
-		self:noSelection()
-	else
-		self:newMulti()
-		self.multiselectStartBeat = event.time
-		self.multiselectEndBeat = event.time
-		addToMulti(event)
-		if self.lastSelected then
-			for i, v in ipairs(self.level.events) do
-				if v == self.lastSelected then
-					addToMulti(self.lastSelected)
-					break
-				end
-			end
-		end
-	end
-	if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
-		local event2 = self.multiselect.events[1]
-		self:noSelection()
-		self.selectedEvent = event2
-	end
 end
