@@ -214,7 +214,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 
 		setColor(1, 1, 1, 1)
-		eventDraw(event, cs.editorBeat, cs.editorBeat + cs.drawDistance, 1.0)
+		eventDraw(event, cs.editorBeat, cs.editorBeat + cs.drawDistance)
 		color.r, color.g, color.b, color.a = love.graphics.getColor()
 	end
 	if isVisible(event.time) then
@@ -226,6 +226,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			end
 
 			-- Code by K4kadu
+			-- copied from her mod "Editor Outline" for compatibility
 			if event.editorOutline then
 				setColor(event.editorOutline.r / 255, event.editorOutline.g / 255, event.editorOutline.b / 255, 1)
 				love.graphics.setLineWidth(2)
@@ -465,22 +466,24 @@ function eventVisuals.drawEvents()
 
 	setColor(1, 1, 1, 1)
 
-	--[[ --draw layers
-	love.graphics.setColor(1,1,1,0.3)
-	if cs.layers.vfx == 2 then
-		love.graphics.draw(cs.layerCanvas.vfx)
+	-- Code by K4kadu
+	-- copied from her mod "Stream Generator" (help by Nittneuk) for compatibility
+	if sgen and sgen.previewEvents ~= {} then
+		for i, v in ipairs(sgen.previewEvents) do -- draw preview events
+			if Event.info[v.type] and Event.checkActiveRange[v.type](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
+				love.graphics.setColor(1,1,1,1) -- maybe give the user an alpha slider?
+				local pos = cs:getPosition(v.angle, v.time)
+				pos[1], pos[2] = helpers.round(pos[1]), helpers.round(pos[2])
+				local sprite = sgen.sprites[v.type]
+				local rotation = v.type == "side" and v.angle*0.01745329 or 0
+				love.graphics.draw(sprite, pos[1], pos[2], rotation, 1, 1, 10, 10)
+				if v.tap then
+					love.graphics.draw(sgen.sprites.tap, pos[1], pos[2], 0, 1, 1, 19, 19)
+				end
+			end
+		end
 	end
-	if cs.layers.gameplay == 2 then
-		love.graphics.draw(cs.layerCanvas.gameplay)
-	end
-
-	love.graphics.setColor(1,1,1,1)
-	if cs.layers.vfx == 1 then
-		love.graphics.draw(cs.layerCanvas.vfx)
-	end
-	if cs.layers.gameplay == 1 then
-		love.graphics.draw(cs.layerCanvas.gameplay)
-	end ]]
+	-- Kaks code end
 
 	if beattoolsRecordPosition and beattoolsRecordFunc then
 		setColor(mod.config.lineColor.r, mod.config.lineColor.g, mod.config.lineColor.b, 1)

@@ -1,0 +1,46 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Copy single event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+	end
+end,
+'copy',
+'''
+payload = '''
+		self.copySingle = false
+	elseif mods.beattools.config.copySingle and self.selectedEvent then
+		self.copy = helpers.copy({ self.selectedEvent })
+		self.copy[1].time = 0
+		self.copySize = 0
+
+		self.multiselectCopyStartAngle = 0
+		self.multiselectCopyEndAngle = 360
+
+		self.p:hurtPulse()
+		self.copySingle = true
+	end
+end,
+'copy',
+'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.multiselectEndAngle = self.multiselectCopyEndAngle'''
+payload = '''
+if mods.beattools.config.copySingle and self.copySingle then
+	self:clearMultiselectVars()
+	self:noSelection()
+	self.selectedEvent = newEvents[1]
+end
+'''
+position = "after"
+target = "states/Editor.lua"

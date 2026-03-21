@@ -1,0 +1,30 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# in use in a-menus-beattools.toml
+
+# Adjusting zoom limits ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, 20), 300)'''
+payload = '''self.zoom = math.min(math.max(self.zoom + mouse.sy * 2, mods.beattools.config.zoomMin), mods.beattools.config.zoomMax)'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.drawDistance = 10'''
+payload = '''self.drawDistance = mods.beattools.config.editorBeats'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''self\.zoom, self\.smallestBeat\)'''
+payload = '''self.zoom, self.smallestBeat - mods.beattools.config.scrollPast)'''
+position = "at"
+target = "states/Editor.lua"

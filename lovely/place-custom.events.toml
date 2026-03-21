@@ -1,0 +1,48 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Used in files/easeList.lua and a-menus-beattools.toml
+
+# Place custom event ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.placeEvent ~= '' and Event.info[self.placeEvent] then'''
+payload = '''
+if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
+	local placingEvent = { time = self.cursorBeat, angle = self.cursorAngle }
+	for w in self.placeEvent:gmatch("[^;]+") do
+		if w ~= "beattoolsEvent" then
+			if w:match(",") == nil then
+				placingEvent.type = w
+			else
+				local temp = {}
+				for ww in w:gmatch("[^,]+") do
+					table.insert(temp, ww)
+				end
+				if false then end
+				({
+					string = function () end,
+					number = function () temp[2] = tonumber(temp[2]) end,
+					boolean = function () temp[2] = temp[2] == "true" and true or false end,
+					["nil"] = function () temp[2] = nil end
+				})[temp[3]]()
+				placingEvent[temp[1]] = temp[2]
+			end
+		end
+	end
+	if Event.info[placingEvent.type] then
+		table.insert(self.level.events, placingEvent)
+		self:noSelection()
+		self.selectedEvent = self.level.events[#self.level.events]
+		self.unsavedChanges = true
+		self:updateBiggestBeat()
+	else
+		modlog(mods.beattools, "Invalid customized event type: \"" .. tostring(placingEvent.type) .. "\"")
+	end
+elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
+'''
+position = "at"
+target = "states/Editor.lua"

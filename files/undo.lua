@@ -107,7 +107,8 @@ undo = {
 	linkFiles = {
 		eventVisuals = true,
 		eventStacking = true,
-		easing = true
+		easing = true,
+		biggestBeat = true
 	}
 }
 

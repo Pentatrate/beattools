@@ -1,0 +1,18 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Deselect ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''else
+	self.deletePending = true'''
+payload = '''
+elseif mods.beattools.config.deleteNothing and self.selectedEvent == nil and self.placeEvent ~= "" and #self.overlappingEvents == 0 then
+	self.placeEvent = ""
+	st:noSelection()
+'''
+position = "before"
+target = "states/Editor.lua"

@@ -1,0 +1,21 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Ignore loop points ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.levelData and self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+target = "states/SongSelect.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.levelData.metadata.loopPointsEnable then'''
+payload = '''if not mods.beattools.config.ignoreLoopPoints and self.levelData and self.levelData.metadata.loopPointsEnable then'''
+position = "at"
+target = "obj/Map/LevelQuark.lua"

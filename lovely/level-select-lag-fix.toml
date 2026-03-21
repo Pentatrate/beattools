@@ -1,0 +1,26 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Draw less ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = false
+pattern = '''
+--folder
+love.graphics.print(v.name,x+10,y-15,0,2,2)
+'''
+payload = '''
+		end
+'''
+position = "after"
+target = "states/SongSelect.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''yTotal = yTotal + myHeight'''
+payload = '''if y - myHeight * 0.5 < 360 or y + myHeight * 0.5 > 0 then'''
+position = "after"
+target = "states/SongSelect.lua"

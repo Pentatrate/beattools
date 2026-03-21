@@ -1,0 +1,31 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# hell.
+
+# End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to activate on', { step = beatStep })'''
+payload = '''local beattoolsTemp1 = self.selectedEvent.endAngle'''
+position = "before"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if imgui.Button('Delete event') then'''
+payload = '''
+if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle == 0 then
+	utilitools.files.beattools.undo.undoing = true
+	utilitools.files.beattools.undo.fakeRepeating = true
+	self.selectedEvent.endAngle = self.selectedEvent.angle
+	utilitools.files.beattools.undo.undoing = false
+	utilitools.files.beattools.undo.fakeRepeating = false
+end
+'''
+position = "before"
+target = "states/Editor.lua"

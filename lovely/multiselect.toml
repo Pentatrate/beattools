@@ -1,0 +1,75 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Rememeber multiselect delta ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.multieditdeltamode = false'''
+payload = '''self.multieditdeltamode = (function () if mods.beattools.config.rememberMultiselectDelta then return mods.beattools.config.multiselectDelta end return false end)()'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)'''
+payload = '''
+if mods.beattools.config.rememberMultiselectDelta then
+	mods.beattools.config.multiselectDelta = helpers.InputBool('Delta Mode', mods.beattools.config.multiselectDelta)
+	self.multieditdeltamode = mods.beattools.config.multiselectDelta
+else
+	self.multieditdeltamode = helpers.InputBool('Delta Mode', self.multieditdeltamode)
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+# Multiselect angle range movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.multiselectStartAngle = self.multiselectStartAngle + angle
+self.multiselectEndAngle = self.multiselectEndAngle + angle
+'''
+payload = '''
+if not (self.multiselectStartAngle == 0 and self.multiselectEndAngle == 360) then
+	self.multiselectStartAngle = self.multiselectStartAngle + angle
+	self.multiselectEndAngle = self.multiselectEndAngle + angle
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+# Better multiselect move ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''v.time = v.time + deltaBeat'''
+payload = '''
+if mods.beattools.config.betterMoveSelection and v.endAngle then
+	v.endAngle = v.endAngle * deltaScale + deltaAngle
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+
+# Fix multiselect bug with untagger ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if changed then'''
+payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if first[k] ~= v then'''
+payload = '''if tostring(first[k]) ~= tostring(v) then'''
+position = "at"
+target = "states/Editor.lua"

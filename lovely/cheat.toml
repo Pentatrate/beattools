@@ -1,0 +1,104 @@
+[manifest]
+dump_lua = true
+priority = -2147483643 # -2147483647 + 4
+version = "1.0.0"
+
+# has 1 patch somewhere else due to overlap with restart in playtest (restart-and-menuMusicManager.toml)
+
+# Cheat ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function GameManager:resetLevel()'''
+payload = '''	self.CHEATmaxBeat = nil'''
+position = "after"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function GameManager:update(dt)'''
+payload = '''
+function GameManager:CHEATconvertToBeat(number, forceSeconds)
+	if forceSeconds or mods.beattools.config.lagUseSeconds then
+		return number / (60 / GameManager:getBPM() / (GameManager.rateMod or 1))
+	end
+	return number
+end
+
+'''
+position = "before"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs.cBeat = cs.source:getBeat()'''
+payload = '''
+local tempTime = cs.source:getBeat()
+-- Penta:
+-- cs.cBeat is the old one
+-- tempTime is the new one
+if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBeat + self:CHEATconvertToBeat(mods.beattools.config.lagThreshhold) <= tempTime then
+	forceprint("LAG DETECTED!!!")
+	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
+	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
+	if cs.cBeat - tempTime >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click', soundObject = sounds['click']}) end
+	if cs.cBeat - tempTime >= 2 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 2, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
+	if cs.cBeat - tempTime >= 1 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 1, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
+	if cs.cBeat - tempTime >= 0 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 0, type = 'playSound', volume = '1', pitch = '1.75', sound = 'side', soundObject = sounds['side']}) end
+	cs.pauseBeat = cs.cBeat
+	cs.source:setBeat(tempTime)
+	self.CHEATlagBack = (self.CHEATlagBack or 0) + 1
+end
+cs.cBeat = tempTime
+'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Lag back in option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.innerOptionsMenu:addOption('back', function() self.inOptionsMenu = false end, ySpacing * 7)'''
+payload = '''self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)'''
+position = "before"
+target = "states/SongSelect.lua"
+
+# Cheat in results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs.songOffset = 0'''
+payload = '''self.CHEATlagBack = 0'''
+position = "before"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs.levelinfo = self.levelinfo'''
+payload = '''cs.CHEATlagBack = self.gm.CHEATlagBack'''
+position = "after"
+target = "states/Game.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
+payload = '''self.CHEATlagBack ~= 0 or'''
+position = "before"
+target = "states/Results.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local textWidth = fonts.digitalDisco:getWidth(str)'''
+payload = '''
+if self.CHEATlagBack ~= 0 then
+	if str ~= '' then str = str .. ', ' end
+	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
+end
+'''
+position = "before"
+target = "states/Results.lua"

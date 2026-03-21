@@ -28,12 +28,3 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
-
-# Lag back in option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.innerOptionsMenu:addOption('back', function() self.inOptionsMenu = false end, ySpacing * 7)'''
-payload = '''self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)'''
-position = "before"
-target = "states/SongSelect.lua"

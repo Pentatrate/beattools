@@ -1,0 +1,13 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Save configs ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self:leave()'''
+payload = '''utilitools.config.save(mods.beattools)'''
+position = "before"
+target = "states/Editor.lua"

@@ -1,0 +1,13 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Optionslist movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.cooldownMax = 10'''
+payload = '''self.cooldownMax = mods.beattools.config.speedScrolling and 0 or 10'''
+position = "at"
+target = "obj/OptionsList.lua"

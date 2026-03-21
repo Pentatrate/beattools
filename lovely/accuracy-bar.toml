@@ -1,0 +1,104 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Acc bar ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if cs.vfx.drawCombo and cs.vfx.drawUI then'''
+payload = '''
+if mods.beattools.config.accBar then
+	local realAcc = (((cs.currentMaxHits or 1) - (cs.misses or 0) - ((cs.barelies or 0) / 4)) / (cs.currentMaxHits or 1))
+	if realAcc ~= realAcc then realAcc = 1 end
+	if cs.beattoolsPrevAcc == nil or cs.beattoolsPrevAcc ~= cs.beattoolsPrevAcc then cs.beattoolsPrevAcc = realAcc end
+	local acc = cs.beattoolsPrevAcc + (realAcc - cs.beattoolsPrevAcc) * mods.beattools.config.accBarSmooth
+	cs.beattoolsPrevAcc = acc
+	if acc > 0 then
+		local gradeMargins = {
+			{100, 'perfect'},
+			{98, 's','plus'},
+			{95, 's'},
+			{93, 'a','plus'},
+			{90, 'a'},
+			{87, 'b','plus'},
+			{83, 'b'},
+			{80, 'b','minus'},
+			{77, 'c','plus'},
+			{73, 'c'},
+			{70, 'c','minus'},
+			{64, 'd','plus'},
+			{56, 'd'},
+			{50, 'd','minus'},
+			{0, 'f'}
+		}
+		for i, v in ipairs(gradeMargins) do
+			if acc * 100 >= v[1] then
+				local accBarBgColors = { note = 0, player = cs.p.fillColor, ["UI/BG"] = cs.bgColor, ["outline/BG"] = cs.bgColor }
+				local accBarFgColors = { note = 1, player = cs.p.outlineColor, ["UI/BG"] = cs.vfx.uiColor, ["outline/BG"] = cs.outline or 0 }
+				local accBarColorScheme = mods.beattools.config.accBarColors
+				if accBarColorScheme == "auto" then
+					local accBarColorDiff
+					for k, vv in pairs(accBarBgColors) do
+						local colorDiff = math.abs((shuv.pal[accBarFgColors[k]].r + shuv.pal[accBarFgColors[k]].g + shuv.pal[accBarFgColors[k]].b) - (shuv.pal[vv].r + shuv.pal[vv].g + shuv.pal[vv].b))
+						if accBarColorDiff == nil or accBarColorDiff < colorDiff then
+							accBarColorScheme = k
+							accBarColorDiff = colorDiff
+						end
+					end
+				end
+				local subAcc = 0
+				local subAcc2 = 1
+				local drawBar = ({
+					top = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x * subAcc, 0,
+							project.res.x * subAcc2, mods.beattools.config.accBarWidth
+						)
+					end,
+					bottom = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x * subAcc, project.res.y - mods.beattools.config.accBarWidth,
+							project.res.x * subAcc2, project.res.y
+						)
+					end,
+					left = function ()
+						love.graphics.rectangle(
+							"fill",
+							0, project.res.y * subAcc,
+							mods.beattools.config.accBarWidth, project.res.y * subAcc2
+						)
+					end,
+					right = function ()
+						love.graphics.rectangle(
+							"fill",
+							project.res.x - mods.beattools.config.accBarWidth, project.res.y * subAcc,
+							project.res.x, project.res.y * subAcc2
+						)
+					end
+				})[mods.beattools.config.accBarSide]
+				if v[2] ~= "perfect" then
+					color(accBarBgColors[accBarColorScheme])
+					drawBar()
+					if mods.beattools.config.accBarReverse then
+						subAcc = 1 - (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+						subAcc2 = 1
+					else
+						subAcc = 0
+						subAcc2 = (acc * 100 - v[1]) / (gradeMargins[i - 1][1] - v[1])
+					end
+				end
+				color(accBarFgColors[accBarColorScheme])
+				drawBar()
+				color(cs.vfx.uiColor)
+				break
+			end
+		end
+	end
+end
+'''
+position = "before"
+target = "obj/GameManager.lua"

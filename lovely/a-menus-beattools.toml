@@ -16,44 +16,6 @@ end
 position = "after"
 target = "levelformat/events/Notes/bounce.lua"
 
-# Cheat in results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''cs.songOffset = 0'''
-payload = '''self.CHEATlagBack = 0'''
-position = "before"
-target = "obj/GameManager.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''cs.levelinfo = self.levelinfo'''
-payload = '''cs.CHEATlagBack = self.gm.CHEATlagBack'''
-position = "after"
-target = "states/Game.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
-payload = '''self.CHEATlagBack ~= 0 or'''
-position = "before"
-target = "states/Results.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''local textWidth = fonts.digitalDisco:getWidth(str)'''
-payload = '''
-if self.CHEATlagBack ~= 0 then
-	if str ~= '' then str = str .. ', ' end
-	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
-end
-'''
-position = "before"
-target = "states/Results.lua"
-
 # Hide menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

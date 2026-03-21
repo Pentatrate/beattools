@@ -1,0 +1,19 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Fix for penta's dream skin ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if bodyShape == "2p5d" then'''
+payload = '''
+if costume.body and (bodyShape ~= "2p5d" or costume.body.bodyInvisible) and costume.body.body2p5d then
+	if costume.body.bodyInvisible then bodyShape = "invisible" end
+	self:drawToCanvas(costume, bodyShape, 3)
+	self:drawToCanvas(costume, bodyShape, 0)
+elseif bodyShape == "2p5d" then
+'''
+position = "at"
+target = "obj/Player.lua"

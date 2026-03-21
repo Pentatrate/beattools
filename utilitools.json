@@ -94,6 +94,11 @@
 			"load": true,
 			"call": true
 		},
+		"biggestBeat": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"easeList": {
 			"extension": "lua",
 			"load": true,

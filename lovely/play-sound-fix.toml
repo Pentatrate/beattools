@@ -1,0 +1,33 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Fix play sound annoyance ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local oLTotal = 0'''
+payload = '''cs.loadingBeats = true'''
+position = "before"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''prof.pop("GameManager update")'''
+payload = '''cs.loadingBeats = false'''
+position = "after"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)'''
+payload = '''
+if not cs.loadingBeats then
+	te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)
+end
+'''
+position = "at"
+target = "levelformat/events/Vfx/playSound.lua"

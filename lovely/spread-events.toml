@@ -1,0 +1,137 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Spread events ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text("Select which event to edit:")'''
+payload = '''
+if mods.beattools.config.spreadButtons then
+	local beattoolsShowSpreadPrompt = true
+	for i, v in ipairs(self.overlappingEvents) do
+		if type(Event.editorDraw[self.level.events[v].type]) ~= "function" and self.level.events[v].time ~= self.level.events[self.overlappingEvents[1]].time then
+			beattoolsShowSpreadPrompt = false
+		end
+	end
+	if beattoolsShowSpreadPrompt then
+		local function beattoolsGetSameTime(sameTime)
+			for i, v in ipairs(self.level.events) do
+				if v.time == self.level.events[self.overlappingEvents[1]].time then
+					table.insert(sameTime, v)
+				end
+			end
+		end
+		local function beattoolsSnapAngle(angle, snap)
+			return ((math.floor(angle / (360 / snap) + 0.5) * (360 / snap))) % 360
+		end
+		local function beattoolsSameAngle(event, sameTime)
+			for i, v in ipairs(sameTime) do
+				if event.angle % 360 == v.angle % 360 and event ~= v then
+					return true
+				end
+			end
+			return false
+		end
+		local function beattoolsSpread(snap, sameTime, snappedAngle, event)
+			if snappedAngle == nil then
+				if event == nil then
+					utilitools.prompts.error(mods.beattools, "Spread incorrect: snappedAngle is nil")
+					modlog(mods.beattools, "Spread incorrect: snappedAngle is nil")
+					snappedAngle = 0
+				else
+					snappedAngle = beattoolsSnapAngle(event.angle, snap)
+				end
+			end
+			local newAngle
+			for ii = 1, snap - 1 do
+				if mods.beattools.config.spreadType == "around" then
+					newAngle = (snappedAngle + 360 / snap * math.floor((ii + 1) / 2) * ((ii % 2) - 0.5) * 2) % 360
+				elseif mods.beattools.config.spreadType == "clockwise" then
+					newAngle = (snappedAngle + 360 / snap * ii) % 360
+				elseif mods.beattools.config.spreadType == "counterclockwise" then
+					newAngle = (snappedAngle + 360 / snap * -ii) % 360
+				elseif mods.beattools.config.spreadType == "absolute" then
+					newAngle = (360 / snap * ii) % 360
+				end
+				if newAngle == -0 then newAngle = 0 end
+				local beattoolsFree = true
+				for iii, vv in ipairs(sameTime) do
+					if newAngle == vv.angle % 360 then -- Penta: vv.angle cannot be -0
+						beattoolsFree = false
+						break
+					end
+				end
+				if beattoolsFree then break end
+				if ii == snap - 1 then
+					return beattoolsSpread(snap * 2, sameTime, snappedAngle)
+				end
+			end
+			return newAngle
+		end
+
+
+		if imgui.Button("Spread events") then
+			local beattoolsSameTime = {}
+			beattoolsGetSameTime(beattoolsSameTime)
+			for i, v in ipairs(self.overlappingEvents) do
+				v = self.level.events[v]
+				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			for i, v in ipairs(self.overlappingEvents) do
+				v = self.level.events[v]
+				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			self:updateBiggestBeat()
+			self.overlappingEventsDialogue = false
+		end
+
+
+		beattoolsShowSpreadPrompt = true
+		for i, v in ipairs(self.overlappingEvents) do
+			if self.level.events[v].angle % 360 ~= self.level.events[self.overlappingEvents[1]].angle % 360 then
+				beattoolsShowSpreadPrompt = false
+			end
+		end
+		if beattoolsShowSpreadPrompt then
+			if imgui.Button("Spread all events at angle") then
+				local beattoolsSameTime, beattoolsAngle = {}, self.level.events[self.overlappingEvents[1]].angle % 360
+				beattoolsGetSameTime(beattoolsSameTime)
+				for i, v in ipairs(beattoolsSameTime) do
+					if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 == beattoolsAngle and (v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) or beattoolsSameAngle(v, beattoolsSameTime)) then
+						v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+					end
+				end
+				self:updateBiggestBeat()
+				self.overlappingEventsDialogue = false
+			end
+		end
+
+
+		if imgui.Button("Spread all events at time") then
+			local beattoolsSameTime = {}
+			beattoolsGetSameTime(beattoolsSameTime)
+			for i, v in ipairs(beattoolsSameTime) do
+				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			for i, v in ipairs(beattoolsSameTime) do
+				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
+				end
+			end
+			self:updateBiggestBeat()
+			self.overlappingEventsDialogue = false
+		end
+	end
+end
+'''
+position = "after"
+target = "states/Editor.lua"

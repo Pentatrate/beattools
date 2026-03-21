@@ -3,6 +3,8 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
+# more menuMusicManager in angle-beat-snap-saving.toml and a-run-after-beattools.toml
+
 # Menumusicmanager in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -18,6 +20,35 @@ end
 '''
 position = "after"
 target = "states/Editor.lua"
+
+# Menumusicmanager in Song Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.menuMusicManager:stop()
+cLevel = filename'''
+payload = '''
+if self.menuMusicManager and not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
+	self.menuMusicManager:stop()
+end
+cLevel = filename
+'''
+position = "at"
+target = "states/SongSelect.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cs = bs.load('Editor')'''
+payload = '''
+if self.menuMusicManager then
+	self.menuMusicManager:clearOnBeatHooks()
+	self.menuMusicManager:forceUnmute()
+	cs.menuMusicManager = self.menuMusicManager
+end
+'''
+position = "after"
+target = "states/SongSelect.lua"
 
 # Inject on playtest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

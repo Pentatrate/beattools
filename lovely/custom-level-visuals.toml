@@ -1,0 +1,57 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Custom level visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local loadBeatQueue = {}'''
+payload = '''
+local beattoolsNoColors = true
+'''
+position = "after"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if cs.level.properties.loadBeat and cs.cBeat < 0 and v.time <= cs.level.properties.loadBeat then'''
+payload = '''
+if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
+	if v.type == "setColor" then
+		beattoolsNoColors = false
+	elseif v.type == "outline" then
+		if not ({ [0] = true, [1] = true })[v.color] then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "noise" then
+		if (not ({ [0] = true, [1] = true })[v.color]) then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "setBgColor" then
+		if (not ({ [0] = true, [1] = true })[v.color]) and (not ({ [0] = true, [1] = true })[v.voidColor]) then
+			beattoolsNoColors = false
+		end
+	elseif v.type == "deco" then
+		if v.hide ~= true then
+			beattoolsNoColors = false
+		end
+	end
+end
+'''
+position = "before"
+target = "obj/GameManager.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''table.sort(loadBeatQueue,function(k1, k2)'''
+payload = '''
+if mods.beattools.config.customLevelVisuals and beattoolsNoColors then
+	shuv.pal[0].r, shuv.pal[0].g, shuv.pal[0].b = mods.beattools.config.customWhiteColor.r * 255, mods.beattools.config.customWhiteColor.g * 255, mods.beattools.config.customWhiteColor.b * 255
+	shuv.pal[1].r, shuv.pal[1].g, shuv.pal[1].b = mods.beattools.config.customBlackColor.r * 255, mods.beattools.config.customBlackColor.g * 255, mods.beattools.config.customBlackColor.b * 255
+end
+'''
+position = "before"
+target = "obj/GameManager.lua"

@@ -1,0 +1,68 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# in use in a-menus-beattools.toml
+
+# Angle/Beat snap saving ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text("Angle: " .. angleSnapText)
+end'''
+payload = '''
+mods.beattools.config.angleSnap = self.angleSnap
+mods.beattools.config.customAngleSnap = self.customAngleSnap
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.angleSnapValues = { 8, 12, 16, 24, 32 }
+self.angleSnap = 3
+self.customAngleSnap = 32'''
+payload = '''
+self.angleSnapValues = mods.beattools.config.angleSnapValues
+self.angleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.angleSnap or mods.beattools.config.angleDefault
+self.customAngleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customAngleSnap or mods.beattools.config.customAngleDefault
+
+self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
+if not self.menuMusicManager then
+	self.menuMusicManager = em.init("MenuMusicManager")
+	self.menuMusicManager:play()
+	if not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
+		self.menuMusicManager:stop()
+	end
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text("Beat: " .. beatSnapText)
+end'''
+payload = '''
+mods.beattools.config.beatSnap = self.beatSnap
+mods.beattools.config.customBeatSnap = self.customBeatSnap
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.beatSnapValues = { 1, 2, 3, 4, 5, 6, 8, 12, 16 }
+self.beatSnap = 2
+self.customBeatSnap = 16'''
+payload = '''
+self.beatSnapValues = mods.beattools.config.beatSnapValues
+self.beatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.beatSnap or mods.beattools.config.beatDefault
+self.customBeatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools.config.customBeatSnap or mods.beattools.config.customBeatDefault
+'''
+position = "at"
+target = "states/Editor.lua"

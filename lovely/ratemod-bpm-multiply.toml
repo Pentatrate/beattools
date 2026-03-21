@@ -1,0 +1,42 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Bpm with rateMod ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''level.metadata.bpm = loc.get('bpm',{level.metadata.bpm})'''
+payload = '''level.metadata.rawBpm = level.metadata.bpm'''
+position = "before"
+target = "obj/LevelManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''level.metadata.bpm = minBPM .. '-' .. maxBPM'''
+payload = '''
+level.metadata.rawMinBpm = minBPM
+level.metadata.rawMaxBpm = maxBPM
+'''
+position = "before"
+target = "obj/LevelManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')'''
+payload = '''
+if mods.beattools.config.levelSelectMultiplyBpm and self.rateMod and self.rateMod ~= 1 then
+	if type(level.rawMetadata.rawBpm) == "number" then
+		love.graphics.printf(loc.get("bpm", { level.rawMetadata.rawBpm * self.rateMod .. " (" .. level.rawMetadata.rawBpm .. " x" .. self.rateMod .. ")" }), xBorder + xOffset, bpmY, wrapLimit, "left")
+	elseif type(level.rawMetadata.rawMinBpm) == "number" then
+		love.graphics.printf(loc.get("bpm", { level.rawMetadata.rawMinBpm * self.rateMod .. "-" .. level.rawMetadata.rawMaxBpm * self.rateMod .. " (" .. level.rawMetadata.rawBpm .. " x" .. self.rateMod .. ")" }), xBorder + xOffset, bpmY, wrapLimit, "left")
+	end
+else
+	love.graphics.printf(level.bpm,xBorder+xOffset,bpmY,wrapLimit,'left')
+end
+'''
+position = "at"
+target = "states/SongSelect.lua"
