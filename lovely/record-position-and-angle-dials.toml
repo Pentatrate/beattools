@@ -3,6 +3,32 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
+# Hide menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self:imgui()'''
+payload = '''
+if not beattoolsRecordPosition then self:imgui() beattools.randomizeWindows = false end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+# Exit mouse capture ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.unsavedChanges then'''
+payload = '''
+if beattoolsRecordPosition then
+	beattoolsRecordPosition = false
+	beattoolsRecordFunc = nil
+	beattoolsRecordPrecision = 1
+elseif self.unsavedChanges then
+'''
+position = "at"
+target = "states/Editor.lua"
+
 # Coordinate copy ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

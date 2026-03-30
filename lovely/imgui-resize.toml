@@ -1,0 +1,135 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
+payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Ctrl + i menu resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''9999)'''
+payload = '''9999, mods.beattools.config.fullSize and "max" or nil)'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function helpers.InputTextMultiline(label, text, size)'''
+payload = '''
+function helpers.InputTextMultiline(label, text, size, size2)
+	if size2 ~= nil and size2:sub(1, 3) == "max" then
+		local lines = 1
+		for _ in text:gmatch("\n") do
+			lines = lines + 1
+		end
+		size2 = imgui.ImVec2_Float(
+			utilitools.imguiHelpers.getWidth(label) - (size2 == "maxTooltip" and (not mods.beattools.config.hideHelpMarkers) and 29 or 0),
+			imgui.GetFontSize() * lines + 6
+		)
+	end
+'''
+position = "at"
+target = "lib/imguihelper.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
+payload = '''imgui.InputTextMultiline(label, buffer, size, size2)'''
+position = "at"
+target = "lib/imguihelper.lua"
+
+# Input resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local enabled = true'''
+payload = '''
+local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or (((propertyType == 'decimal') or (propertyType == 'int')) and propertyName or imguiUniqueName)
+local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
+'''
+position = "after"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.PushItemWidth(100)'''
+payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length) end'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local truncatedResult = math.floor(1000*result+0.5)/1000
+local truncatedProperty = math.floor(1000*propertyOld+0.5)/1000
+'''
+payload = '''
+local precision = mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and 1e12 or 1e3
+local truncatedResult = math.floor(precision * result + 0.5) / precision
+local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
+'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text(propertyName)'''
+payload = '''imgui.Text(utilitools.imguiHelpers.visibleLabel(label))'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%.3f", event[propertyName]))'''
+payload = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format(mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or "%.3f", event[propertyName]))'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.PushItemWidth(60)'''
+payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length * 1 - 4 * 2 - 19 * 2 + imgui.GetStyle().ItemInnerSpacing.x - imgui.GetStyle().ItemSpacing.x) end -- Penta: these values are hard coded in the parser lol'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''imguiUniqueName, (?<param>numptr|event)'''
+payload = '''label, $param'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
+end
+
+helpers.imguiHelpMarker(tooltip)'''
+payload = '''
+	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
+end
+
+if mods.beattools.config.hideHelpMarkers then
+	utilitools.imguiHelpers.tooltip(tooltip)
+else helpers.imguiHelpMarker(tooltip) end
+'''
+position = "at"
+target = "obj/GameManager.lua"

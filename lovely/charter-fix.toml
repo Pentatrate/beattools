@@ -1,0 +1,37 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Charter fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if not self.variant then
+	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
+else'''
+payload = '''
+if mods.beattools.config.browserCharter or (not self.variant) then
+	self.level.metadata.charter = self.level.metadata.charter or ""
+	self.level.metadata.charter = helpers.InputText("Charter", self.level.metadata.charter, 9999)
+	helpers.imguiHelpMarker("This is the name that will be displayed on the Beatblock Browser.")
+end
+if self.variant then
+'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = '',slot ?=0 ?\}'''
+payload = '''self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''charter = 'Charter','''
+payload = '''charter = mods.beattools.config.charter,'''
+position = "at"
+target = "obj/LevelManager.lua"

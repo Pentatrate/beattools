@@ -1,0 +1,74 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Hotkeys ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function st:checkKeybinds()'''
+payload = '''
+	utilitools.keybinds.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
+'''
+position = "after"
+target = "states/Editor.lua"
+
+# Jump ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''end, 'delete selected event', 'delete')'''
+payload = '''
+-- move to next
+self:addKeybind(function ()
+	if mods.beattools.config.jumpEvents then
+		if self.multiselect then
+			local closest = nil
+			for i, v in ipairs(self.multiselect.events) do
+				if v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		elseif self.selectedEvent then
+			self.editorBeat = self.selectedEvent.time
+		else
+			local closest = nil
+			for i, v in ipairs(self.level.events) do
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and v.time > self.editorBeat and (closest == nil or ((maininput:down("shift") and closest < v.time) or ((not maininput:down("shift")) and closest > v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		end
+	end
+end, "move to next", "ctrl", "move_up")
+-- move to previous
+self:addKeybind(function ()
+	if mods.beattools.config.jumpEvents then
+		if self.multiselect then
+			local closest = nil
+			for i, v in ipairs(self.multiselect.events) do
+				if v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		elseif self.selectedEvent then
+			self.editorBeat = self.selectedEvent.time
+		else
+			local closest = nil
+			for i, v in ipairs(self.level.events) do
+				if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and v.time < self.editorBeat and (closest == nil or ((maininput:down("shift") and closest > v.time) or ((not maininput:down("shift")) and closest < v.time))) then closest = v.time end
+			end
+			if closest ~= nil then self.editorBeat = closest end
+		end
+	end
+end, "move to previous", "ctrl", "move_down")
+'''
+position = "after"
+target = "states/Editor.lua"
+
+# Prevent ctrl hotkey overlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) then'''
+payload = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) and ((not mods.beattools.config.jumpEvents) or (not maininput:down("ctrl"))) then'''
+position = "at"
+target = "states/Editor.lua"

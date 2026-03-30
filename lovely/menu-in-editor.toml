@@ -1,0 +1,154 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Menu in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.goToBeatDialogue then'''
+payload = '''
+if true then
+	if mods.beattools.config.showEventGroups and utilitools.files.beattools.eventGroupWindow then
+		utilitools.files.beattools.eventGroupWindow(window_flag, inputFlag)
+	end
+	if mods.beattools.config.easeList and utilitools.files.beattools.easeList then
+		utilitools.files.beattools.easeList(window_flag, inputFlag)
+	end
+	if mods.beattools.config.bookmarkList and utilitools.files.beattools.bookmarkList then
+		utilitools.files.beattools.bookmarkList(window_flag, inputFlag)
+	end
+	if mods.beattools.config.editorMenu or mods.beattools.config.colorPreview or mods.beattools.config.coordsDisplay then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		if imgui.Begin("Beattools", nil, inputFlag) then
+
+			if mods.beattools.config.colorPreview then
+				local bgColor, bgColorC = utilitools.files.beattools.easing.getEase("ease", "bgColor", cs.editorBeat, nil, nil)
+				local voidColor, voidColorC = utilitools.files.beattools.easing.getEase("ease", "voidColor", cs.editorBeat, nil, nil)
+				local outline, outlineC = utilitools.files.beattools.easing.getEase("ease", "outline", cs.editorBeat, nil, nil)
+				local bgNoise, bgNoiseC = utilitools.files.beattools.easing.getEase("ease", "vfx.bgNoise", cs.editorBeat, nil, nil)
+				local bgNoiseColor, bgNoiseColorC = utilitools.files.beattools.easing.getEase("ease", "vfx.bgNoiseColor", cs.editorBeat, nil, nil)
+				local hom, homC = utilitools.files.beattools.easing.getEase("ease", "vfx.hom", cs.editorBeat, nil, nil)
+
+				local faceColor, faceColorC = utilitools.files.beattools.easing.getEase("ease", "p.faceColor", cs.editorBeat, nil, nil)
+				local fillColor, fillColorC = utilitools.files.beattools.easing.getEase("ease", "p.fillColor", cs.editorBeat, nil, nil)
+				local outlineColor, outlineColorC = utilitools.files.beattools.easing.getEase("ease", "p.outlineColor", cs.editorBeat, nil, nil)
+
+				local songName, songNameC = utilitools.files.beattools.easing.getEase("songNameOverride", nil, cs.editorBeat, nil, nil)
+				for i = 1, 8 do
+					local col, colC = utilitools.files.beattools.easing.getEase("setColor", i - 1, cs.editorBeat, nil, nil)
+					if col then
+						local ColorButtonPos = imgui.GetCursorScreenPos()
+						local additionalInfo = ""
+
+						if not hom.value then
+							if bgColor.value == i - 1 then
+								additionalInfo = additionalInfo .. "\nBackground Color"
+							end
+							if voidColor.value == i - 1 then
+								additionalInfo = additionalInfo .. "\nVoid Color"
+							end
+						end
+						if outline.value ~= nil and outline.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nOutline"
+						end
+						if bgNoise.value ~= 0 and bgNoise.value ~= 1 and bgNoiseColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nNoise (" .. (helpers.round(bgNoise.value * 1e3) / 1e1) .. "%)"
+						end
+						if faceColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nPlayer Face Color"
+						end
+						if fillColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nPlayer Fill Color"
+						end
+						if outlineColor.value == i - 1 then
+							additionalInfo = additionalInfo .. "\nPlayer Outline Color"
+						end
+
+						imgui.ColorButton(
+							"Color channel " .. i - 1 .. " (" .. colC.r.index .. "/" .. colC.r.total .. " " .. colC.g.index .. "/" .. colC.g.total .. " " .. colC.b.index .. "/" .. colC.b.total .. " events)" .. additionalInfo,
+							imgui.ImVec4_Float(love.math.colorFromBytes(col.r, col.g, col.b, 255)),
+							2^1,
+							imgui.ImVec2_Float(20, 20)
+						)
+						if imgui.IsItemClicked(0) then utilitools.files.beattools.easing.select("setColor", i - 1) end
+						if imgui.IsItemClicked(1) then utilitools.string.toClipboard(beattools.rgb2hex(col.r, col.g, col.b)) end
+						if imgui.IsItemClicked(2) then
+							self.placeEvent = "beattoolsEvent;setColor;color," .. i - 1 .. ",number;r," .. col.r .. ",number;g," .. col.g .. ",number;b," .. col.b .. ",number"
+						end
+
+						if mods.beattools.config.colorEasePreview then
+							if not hom.value then
+								if bgColor.value == i - 1 then
+									imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y))
+									imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10))
+								end
+								if voidColor.value == i - 1 then
+									imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y))
+									imgui.Image(sprites.editor.events.setbgcolor, imgui.ImVec2_Float(10, 10), nil, nil, imgui.ImVec4_Float(1, 1, 1, 0.5))
+								end
+							end
+							if outline.value ~= nil and outline.value == i - 1 then
+								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x, ColorButtonPos.y + 10))
+								imgui.Image(sprites.editor.events.outline, imgui.ImVec2_Float(10, 10))
+							end
+							if bgNoise.value ~= 0 and bgNoise.value ~= 1 and bgNoiseColor.value == i - 1 then
+								imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 10, ColorButtonPos.y + 10))
+								imgui.Image(sprites.editor.events.noise, imgui.ImVec2_Float(10, 10))
+							end
+						end
+
+						imgui.SetCursorScreenPos(imgui.ImVec2_Float(ColorButtonPos.x + 25, ColorButtonPos.y))
+					end
+				end
+				imgui.SameLine()
+				local additionalInfo = ""
+				if faceColor.value == -1 then
+					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+					additionalInfo = additionalInfo ..  "Player Face Color (Original Face Colors)"
+				end
+				if songName.newname then
+					if additionalInfo ~= "" then additionalInfo = additionalInfo .. "\n" end
+					additionalInfo = additionalInfo ..  "Song Name (" .. songName.newname .. ") "
+				end
+				if additionalInfo ~= "" then
+					imgui.Text("[+]")
+					utilitools.imguiHelpers.tooltip(additionalInfo)
+				else
+					imgui.NewLine()
+				end
+			end
+			if mods.beattools.config.coordsDisplay then
+				imgui.TextUnformatted("X/Y: " .. helpers.round(mouse.rx) .. "/" ..  helpers.round(mouse.ry))
+			end
+			if mods.beattools.config.editorMenu then
+				if utilitools.files.beattools.config then utilitools.files.beattools.config() end
+				if self.zoom then
+					if self.zoom < mods.beattools.config.zoomMin then self.zoom = mods.beattools.config.zoomMin end
+					if self.zoom > mods.beattools.config.zoomMax then self.zoom = mods.beattools.config.zoomMax end
+					self.drawDistance = mods.beattools.config.editorBeats
+					self.angleSnapValues = mods.beattools.config.angleSnapValues
+					self.beatSnapValues = mods.beattools.config.beatSnapValues
+				end
+			end
+
+			imgui.End()
+		end
+	end
+	if mods.beattools.config.imguiGuide then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		imgui.ShowDemoWindow()
+	end
+	if mods.beattools.config.editorCalculator and utilitools.files.beattools.calculator then
+		utilitools.files.beattools.calculator(window_flag, inputFlag)
+	end
+	if mods.beattools.config.undoHistory and utilitools.files.beattools.undoHistory then
+		utilitools.files.beattools.undoHistory(window_flag, inputFlag)
+	end
+end
+'''
+position = "before"
+target = "states/Editor.lua"
