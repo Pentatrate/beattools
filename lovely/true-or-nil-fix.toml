@@ -7,6 +7,14 @@ version = "1.0.0"
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = '''oldval = event[propertyName] or false'''
+payload = '''oldval = event[propertyName] or (function() if properties.trueOrNil then return nil else return false end end)()'''
+position = "at"
+target = "obj/GameManager.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''
 imgui.Checkbox('##bool'..imguiUniqueName, numptr)
 event[propertyName] = numptr[0]

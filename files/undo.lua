@@ -176,7 +176,7 @@ end
 
 undo.newChangePre = function()
 	if #undo.changes > undo.index then
-		-- modlog(mod, "overwriting change history")
+		modwarn(mod, "overwriting change history")
 	end
 	while #undo.changes > undo.index do
 		table.remove(undo.changes)
@@ -378,13 +378,13 @@ undo.change = function(t, k, v, hidden)
 					undo.index = undo.index - 1
 				else
 					undo.newChangePre()
-					--[[ modlog(mod,
+					modwarn(mod,
 						"Changing:" ..
 						"\tindex: " .. tostring(undo.events[tostring(t)]) .. "\n"..
 						"\tkey: " .. tostring(k) .. "\n"..
 						"\tfrom: " .. tostring(hidden[k]) .. "\n"..
 						"\tto: " .. tostring(v)
-					) ]]
+					)
 					table.insert(undo.changes, {
 						type = "change",
 						ref = t,

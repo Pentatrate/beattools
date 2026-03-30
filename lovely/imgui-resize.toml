@@ -57,6 +57,8 @@ pattern = '''local enabled = true'''
 payload = '''
 local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or (((propertyType == 'decimal') or (propertyType == 'int')) and propertyName or imguiUniqueName)
 local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
+utilitools.files.beattools.undo.undoing = true
+utilitools.files.beattools.undo.fakeRepeating = true
 '''
 position = "after"
 target = "obj/GameManager.lua"
@@ -117,19 +119,25 @@ target = "obj/GameManager.lua"
 
 [[patches]]
 [patches.pattern]
-match_indent = true
+match_indent = false
 pattern = '''
+	event[propertyName] = oldval
 	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
 end
 
 helpers.imguiHelpMarker(tooltip)'''
 payload = '''
-	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
-end
+		event[propertyName] = oldval
+		utilitools.files.beattools.undo.undoing = false
+		utilitools.files.beattools.undo.fakeRepeating = false
+		cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
+	end
+	utilitools.files.beattools.undo.undoing = false
+	utilitools.files.beattools.undo.fakeRepeating = false
 
-if mods.beattools.config.hideHelpMarkers then
-	utilitools.imguiHelpers.tooltip(tooltip)
-else helpers.imguiHelpMarker(tooltip) end
+	if mods.beattools.config.hideHelpMarkers then
+		utilitools.imguiHelpers.tooltip(tooltip)
+	else helpers.imguiHelpMarker(tooltip) end
 '''
 position = "at"
 target = "obj/GameManager.lua"
