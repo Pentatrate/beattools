@@ -7,7 +7,10 @@ version = "1.0.0"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''for i, v in ipairs(self.level.events) do --draw events'''
+pattern = '''
+love.graphics.setCanvas(self.layerCanvas.gameplay)
+love.graphics.clear()
+'''
 payload = '''
 utilitools.files.beattools.eventVisuals.drawEvents()
 --[[
@@ -60,9 +63,7 @@ match_indent = true
 pattern = '''
 st:setFgDraw(function(self)
 '''
-payload = '''
-]]
-'''
+payload = ''']]'''
 position = "before"
 target = "states/Editor.lua"
 
@@ -71,6 +72,13 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''
+love.graphics.setCanvas(self.layerCanvas.gameplay)
+love.graphics.clear()
+
+love.graphics.setCanvas(self.layerCanvas.vfx)
+love.graphics.clear()
+
+
 for i, v in ipairs(self.level.events) do --draw events
 	if Event.info[v.type] and Event.checkActiveRange[v.type](v, self.editorBeat, self.editorBeat + self.drawDistance) then
 		local gameplay = Event.info[v.type].gameplayLayer
@@ -119,7 +127,7 @@ if self.selectedEvent and self.editorBeat <= self.selectedEvent.time then
 	if not self.holdEndSelected then
 		pos = self:getPosition(self.selectedEvent.angle, self.selectedEvent.time)
 	else
-		local pos = self:getPosition(self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration)
+		pos = self:getPosition(self.selectedEvent.angle2, self.selectedEvent.time + self.selectedEvent.duration)
 	end
 	self:drawEvent(self.selectedEvent)
 	love.graphics.draw(sprites.editor.selected, pos[1], pos[2], 0, 1, 1, 11, 11)

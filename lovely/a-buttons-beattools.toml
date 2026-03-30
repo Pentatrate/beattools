@@ -238,8 +238,8 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
-payload = '''{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })
+pattern = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
+payload = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })
 self:deleteSelectedEvent()'''
 position = "at"
 target = "states/Editor.lua"
@@ -257,24 +257,5 @@ target = "states/Editor.lua"
 match_indent = true
 pattern = '''local tagEvents = helpers.copy(self.multiselect.events)'''
 payload = '''local tagEvents = helpers.copy(self.multiselect and self.multiselect.events or { self.selectedEvent })'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-love.filesystem.forceSaveInSource(false)
-
-for i, v in ipairs(self.multiselect.events) do
-	for _i, _v in ipairs(self.level.events) do
-		if _v == v then
-			table.remove(self.level.events, _i)
-		end
-	end
-end
-self.multiselect.events = {}
-'''
-payload = '''love.filesystem.forceSaveInSource(false)'''
 position = "at"
 target = "states/Editor.lua"

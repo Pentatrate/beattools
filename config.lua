@@ -332,6 +332,20 @@ if imgui.BeginTabBar("beattoolsConfig") then
 						configHelpers.input("bgColor")
 					end)
 			end)
+			configHelpers.treeNode("Rings", function()
+				configHelpers.input("multiselectRings")
+				configHelpers.input("multiselectColor")
+				imgui.Separator()
+				configHelpers.input("bookmarkRings")
+				imgui.Separator()
+				configHelpers.input("biggestBeatsRings")
+				if mod.config.biggestBeatsRings then configHelpers.input("biggestBeatsColor") end
+				imgui.Separator()
+				configHelpers.input("startingBeatRing")
+				if mod.config.startingBeatRing then configHelpers.input("startingBeatColor") end
+				configHelpers.input("loadBeatRing")
+				if mod.config.loadBeatRing then configHelpers.input("loadBeatColor") end
+			end)
 			configHelpers.treeNode("Events", function()
 				configHelpers.doc("editor_visuals_stacking")
 				configHelpers.input("xOffset")

@@ -6,7 +6,7 @@ return function(window_flag, inputFlag)
 		local _, count = utilitools.files.beattools.easing.getEase("bookmark", nil, cs.editorBeat, nil, nil)
 		for i, bookmark in ipairs(utilitools.files.beattools.easing.list.bookmark["_"]["_"]) do
 			if i ~= 1 then imgui.Separator() end
-			imgui.ColorButton("", imgui.ImVec4_Float((bookmark.event.r or 0) / 255, (bookmark.event.g or 0) / 255, (bookmark.event.b or 0) / 255, 1), 2^1, imgui.ImVec2_Float(20, 20))
+			imgui.ColorButton("", imgui.ImVec4_Float(love.math.colorFromBytes(bookmark.event.r or 0, bookmark.event.g or 0, bookmark.event.b or 0, 255)), 2^1, imgui.ImVec2_Float(20, 20))
 			imgui.SameLine()
 			local name = "Unnamed Bookmark"
 			if bookmark.event.name and bookmark.event.name ~= "" then name = bookmark.event.name end

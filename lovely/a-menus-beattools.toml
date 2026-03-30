@@ -3,19 +3,6 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# Silly nisenen gimmick ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''Event.property(event,'string', 'easeSequence', 'Ease sequence to use, if any', {optional = true, default = ''})'''
-payload = '''
-if mods.beattools.config.sillyNisenenGimmick then
-	Event.property(event, "bool", "sillyNisenenGimmick", "Randomizes angles for bounces\nOverrides rotation with a high value", { optional = true, default = true })
-end
-'''
-position = "after"
-target = "levelformat/events/Notes/bounce.lua"
-
 # Hide menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -23,18 +10,6 @@ match_indent = true
 pattern = '''self:imgui()'''
 payload = '''
 if not beattoolsRecordPosition then self:imgui() beattools.randomizeWindows = false end
-for i = 1, 8 do
-	if mods.beattools.config.currentPaddle then
-		local paddle, paddleC = utilitools.files.beattools.easing.getEase("paddles", i, cs.editorBeat, nil, nil)
-		self.p.paddles[i].enabled = paddle.enabled
-		self.p.paddles[i].paddleSize = paddle.newWidth
-		self.p.paddles[i].baseAngle = paddle.newAngle
-	else
-		self.p.paddles[i].enabled = i == 1
-		self.p.paddles[i].paddleSize = 70
-		self.p.paddles[i].baseAngle = 0
-	end
-end
 '''
 position = "at"
 target = "states/Editor.lua"
@@ -155,15 +130,14 @@ target = "obj/GameManager.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''
-if properties.default then
-		tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
+	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
 end
 
 helpers.imguiHelpMarker(tooltip)'''
 payload = '''
-if properties.default then
-	tooltip = tooltip .. '\nDefault value: ' .. tostring(properties.default)
+	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
 end
+
 if mods.beattools.config.hideHelpMarkers then
 	utilitools.imguiHelpers.tooltip(tooltip)
 else helpers.imguiHelpMarker(tooltip) end
@@ -273,7 +247,7 @@ pattern = '''love.graphics.circle("fill", project.res.cx, project.res.cy, self:b
 payload = '''
 love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))
 if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(bookmark.r / 255, bookmark.g / 255, bookmark.b / 255, 1)
+	love.graphics.setColor(love.math.colorFromBytes(bookmark.r, bookmark.g, bookmark.b, 255))
 	love.graphics.arc("line", "open", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat), 0, 2 * math.pi, 100)
 end
 '''
@@ -293,7 +267,7 @@ local textWidth = love.graphics.getFont():getWidth(beatText)
 local bookmarkBeatTextWidth = love.graphics.getFont():getWidth(bookmarkBeatText)
 
 if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(bookmark.r / 255, bookmark.g / 255, bookmark.b / 255, 1)
+	love.graphics.setColor(love.math.colorFromBytes(bookmark.r, bookmark.g, bookmark.b, 255))
 	love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
 end
 '''
@@ -394,7 +368,7 @@ if true then
 
 						imgui.ColorButton(
 							"Color channel " .. i - 1 .. " (" .. colC.r.index .. "/" .. colC.r.total .. " " .. colC.g.index .. "/" .. colC.g.total .. " " .. colC.b.index .. "/" .. colC.b.total .. " events)" .. additionalInfo,
-							imgui.ImVec4_Float(col.r / 255, col.g / 255, col.b / 255, 1),
+							imgui.ImVec4_Float(love.math.colorFromBytes(col.r, col.g, col.b, 255)),
 							2^1,
 							imgui.ImVec2_Float(20, 20)
 						)

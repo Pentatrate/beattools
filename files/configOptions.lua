@@ -1000,6 +1000,65 @@ return {
 		default = true,
 		off = false
 	},
+	multiselectColor = {
+		type = "color",
+		name = "Multiselect Color",
+		tooltips = { short = "Color used for multiselection" },
+		default = { r = 0, g = 1, b = 0 }
+	},
+	biggestBeatsColor = {
+		type = "color",
+		name = "Limit Color",
+		tooltips = { short = "Color used for the largest and smallest beat with events of a level" },
+		default = { r = 0.5, g = 0.5, b = 0.5 }
+	},
+	startingBeatColor = {
+		type = "color",
+		name = "Starting Beat Color",
+		tooltips = { short = "Color used for the starting beat" },
+		default = { r = 1, g = 0, b = 0 }
+	},
+	loadBeatColor = {
+		type = "color",
+		name = "Start Beat Color",
+		tooltips = { short = "Color used for the load beat" },
+		default = { r = 1, g = 0, b = 0 }
+	},
+	multiselectRings = {
+		type = "bool",
+		name = "Multiselect Rings",
+		tooltips = { short = "Use modded multiselect rings for improved visual clarity" },
+		default = true,
+		off = false
+	},
+	biggestBeatsRings = {
+		type = "bool",
+		name = "Limit Rings",
+		tooltips = { short = "Draw rings for the largest and smallest beat with events of a level" },
+		default = false,
+		off = false
+	},
+	startingBeatRing = {
+		type = "bool",
+		name = "Starting Beat Ring",
+		tooltips = { short = "Draw a ring for the starting beat" },
+		default = true,
+		off = false
+	},
+	loadBeatRing = {
+		type = "bool",
+		name = "Start Beat Ring",
+		tooltips = { short = "Draw a ring for the load beat" },
+		default = true,
+		off = false
+	},
+	bookmarkRings = {
+		type = "bool",
+		name = "Bookmark Rings",
+		tooltips = { short = "Draw outline rings for bookmarks instead\nIncompatible with \"Bookmark Outline Rings\" by K4kadu" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

@@ -244,42 +244,6 @@ payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepea
 position = "at"
 target = "states/Editor.lua"
 
-# Updating stack detection more often ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if maininput:pressed("move_up") then'''
-payload = '''self:updateBiggestBeat()'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if maininput:pressed("move_down") then'''
-payload = '''self:updateBiggestBeat()'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.selectedEvent.angle = angle'''
-payload = '''
-local beattoolsTemp = false
-if self.selectedEvent.angle ~= self.cursorAngle or self.selectedEvent.time ~= self.cursorBeat then beattoolsTemp = true end
-'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.selectedEvent.time = self.cursorBeat'''
-payload = '''if beattoolsTemp then self:updateBiggestBeat() end'''
-position = "after"
-target = "states/Editor.lua"
-
 # Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
 # [patches.pattern]

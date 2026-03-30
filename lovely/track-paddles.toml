@@ -1,0 +1,26 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Track paddles ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''em.draw()'''
+payload = '''
+for i = 1, 8 do
+	if mods.beattools.config.currentPaddle then
+		local paddle, paddleC = utilitools.files.beattools.easing.getEase("paddles", i, cs.editorBeat, nil, nil)
+		self.p.paddles[i].enabled = paddle.enabled
+		self.p.paddles[i].paddleSize = paddle.newWidth
+		self.p.paddles[i].baseAngle = paddle.newAngle
+	else
+		self.p.paddles[i].enabled = i == 1
+		self.p.paddles[i].paddleSize = 70
+		self.p.paddles[i].baseAngle = 0
+	end
+end
+'''
+position = "before"
+target = "states/Editor.lua"

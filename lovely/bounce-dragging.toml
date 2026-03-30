@@ -64,24 +64,24 @@ target = "states/Editor.lua"
 [patches.pattern]
 match_indent = true
 pattern = '''if not self.holdEndSelected then
-	self.selectedEvent.time = self.selectedEvent.time + beat'''
+	mod.time = self.selectedEvent.time + beat'''
 payload = '''
 if mods.beattools.config.bounceDragging and self.bounceSelected then
 	if mods.beattools.config.bounceDoubleClick and self.bounceSelectTime == -1 then
 		self.bounceSelectAccumulation = self.bounceSelectAccumulation + beat
 		if math.abs(self.bounceSelectAccumulation) >= (self.selectedEvent.delay or 1) then
 			local bounceDiff = math.floor(self.bounceSelectAccumulation / (self.selectedEvent.delay or 1))
-			self.selectedEvent.bounces = math.max(self.selectedEvent.bounces + bounceDiff, 1)
+			mod.bounces = math.max(self.selectedEvent.bounces + bounceDiff, 1)
 			self.bounceSelected = math.max(self.bounceSelected + bounceDiff, 1)
 			self.bounceSelectAccumulation = self.bounceSelectAccumulation % (self.selectedEvent.delay or 1)
 		end
 	else
 		-- If the user is holding a bounced bounce, we only move the rotation/delay.
-		self.selectedEvent.rotation = (self.selectedEvent.rotation or 0) + angle / self.bounceSelected
-		self.selectedEvent.delay = math.max((self.selectedEvent.delay or 1) + beat / self.bounceSelected, 0)
+		mod.rotation = (self.selectedEvent.rotation or 0) + angle / self.bounceSelected
+		mod.delay = math.max((self.selectedEvent.delay or 1) + beat / self.bounceSelected, 0)
 	end
 elseif not self.holdEndSelected then
-	self.selectedEvent.time = self.selectedEvent.time + beat
+	mod.time = self.selectedEvent.time + beat
 '''
 position = "at"
 target = "states/Editor.lua"

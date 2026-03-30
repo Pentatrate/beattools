@@ -17,9 +17,6 @@ local eventVisuals = {
 
 local canv = love.graphics.newCanvas(project.res.x, project.res.y)
 
--- love.graphics.setCanvas(self.layerCanvas.gameplay)
--- love.graphics.clear()
-
 local color = { r = 1, g = 1, b = 1, a = 1 }
 local function setColor(r, g, b, a)
 	r = r or color.r
@@ -228,7 +225,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			-- Code by K4kadu
 			-- copied from her mod "Editor Outline" for compatibility
 			if event.editorOutline then
-				setColor(event.editorOutline.r / 255, event.editorOutline.g / 255, event.editorOutline.b / 255, 1)
+				setColor(love.math.colorFromBytes(event.editorOutline.r, event.editorOutline.g, event.editorOutline.b, 255))
 				love.graphics.setLineWidth(2)
 				love.graphics.rectangle("line", pos[1] - 8, pos[2] - 8, 16, 16)
 			end

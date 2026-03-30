@@ -48,23 +48,23 @@ target = "states/Editor.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''v.time = v.time + deltaBeat'''
+pattern = '''changes.time = v.time + deltaBeat'''
 payload = '''
 if mods.beattools.config.betterMoveSelection and v.endAngle then
-	v.endAngle = v.endAngle * deltaScale + deltaAngle
+	changes.endAngle = v.endAngle * deltaScale + deltaAngle
 end
 '''
 position = "before"
 target = "states/Editor.lua"
 
 # Fix multiselect bug with untagger ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if changed then'''
-payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
-position = "at"
-target = "states/Editor.lua"
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''if changed then'''
+# payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
+# position = "at"
+# target = "states/Editor.lua" dont know, but i think this was fixed in 1.4.0?
 
 [[patches]]
 [patches.pattern]

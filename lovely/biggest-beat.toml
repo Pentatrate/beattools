@@ -1,0 +1,90 @@
+[manifest]
+dump_lua = true
+priority = -2147483643 # -2147483647 + 4
+version = "1.0.0"
+
+# Draw beats ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''--draw beat lines / beat snap'''
+payload = '''
+utilitools.files.beattools.biggestBeat.drawBiggestBeat()
+'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''--circle around center'''
+payload = '''utilitools.files.beattools.biggestBeat.drawAboveBeatLines()'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+# Draw more beats and remove multiselect area ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''love.graphics.setColor(0, 1, 0, 1)'''
+payload = '''
+utilitools.files.beattools.biggestBeat.drawMultiAngles()
+--[[
+Penta:
+Here is where the original multiselect drawing code is
+Beattools completely overhauls it
+]]
+if not mods.beattools.config.multiselectRings then
+love.graphics.setColor(mods.beattools.config.multiselectColor.r, mods.beattools.config.multiselectColor.g, mods.beattools.config.multiselectColor.b, 1)
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = false
+pattern = '''
+	drawArcBox(self.multiselectStartBeat, self.multiselectEndBeat, self.multiselectStartAngle, self.multiselectEndAngle)
+end
+'''
+payload = '''
+		end
+'''
+position = "after"
+target = "states/Editor.lua"
+times = 1
+
+# Remove bookmark rings ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''--draw bookmark rings'''
+payload = '''
+--[[
+Penta:
+Here is where the original bookmark ring drawing code is
+Beattools completely overhauls it
+]]
+if not mods.beattools.config.bookmarkRings then
+'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = false
+pattern = '''
+		love.graphics.circle("line", project.res.cx, project.res.cy, self:beatToRadius(v.time))
+	end
+end
+'''
+payload = '''
+		end
+'''
+position = "after"
+target = "states/Editor.lua"
+times = 1
