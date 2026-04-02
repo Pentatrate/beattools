@@ -7,16 +7,16 @@ return {
 	end,
 	testKey3 = function()
 		-- modlog(mod, tostring(love.filesystem.getRealDirectory("Workshop/")))
+
 		-- error("Force crash hotkey pressed")
-		-- modlog(mod, utilitools.keybinds.generateText("keyboardEditor", "play", false))
+
 		--[[ for url, data in pairs(utilitools.internet.cache) do
 			modlog(mod, url, data.code)
 		end ]]
+
 		-- local e = utilitools.internet.cache["https://api.github.com/repos/Pentatrate/test-dummy/releases"].body
 		-- modlog(mod, e, type(e))
-		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache))
-		-- modlog(mod, 30 + (mods.beattools.config.gearshiftPopulation - 1) * 2)
-		modlog(mod, mouse.rx, mouse.ry, mouse.sx, mouse.sy)
+		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

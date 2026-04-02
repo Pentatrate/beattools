@@ -1,0 +1,82 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Adds more splashes ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''-- is cranky real?'''
+payload = '''
+local additionalSplashes = {
+	"Alien crater, Cranky invader!",
+	"now thats quality!",
+	"Sync your levels!",
+	"æ",
+	"me witnessing horrors beyond my comprehension {i dont get it}",
+	"You never... FREAKING... LISTEEEEEENN!!!!!",
+	"Up, down, up, down, beat your lemon-blocks!",
+	"Urgh, Curse You!",
+	"Give me that block!",
+	"I came back to beat the blocks.",
+	"candace im sorry",
+	"WARNING: Conga Line In Progress!",
+	"Reanimate!",
+	"Rea! Dy! Get! Set!",
+	"One Miss, Too Late, Three Barelies, For Me.",
+	":cat2:",
+	"You are not in the crankdoers file, this incedent will be reported.",
+	"Turn off anti-aliasing!",
+	"his name is p.delete you should set him to true",
+	[[Whats the song that goes "Waaaa, Waa Waa Waaa"?]],
+	"Beatblock goes boop boop beep, somethin' ain't right here!",
+	"did someone say it go i heard it go",
+	"19,742 bytes!",
+	"Don't Hold Back!",
+	"Embrace the Spiral!"
+}
+-- splashes = { unpack(splashes), unpack(additionalSplashes) }
+'''
+position = "before"
+target = "preload/splashes.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+table.insert(splashes,"There are "..(#splashes+1).." splashes! Collect them all!")
+log(splashes[#splashes])
+'''
+payload = '''
+table.insert(splashes,"There are "..(#splashes+1).." vanilla splashes! Collect them all!")
+log(splashes[#splashes])
+table.insert(additionalSplashes, "There are " .. (#additionalSplashes + 2) .. " modded splashes! Collect them all!")
+log(additionalSplashes[#additionalSplashes])
+table.insert(additionalSplashes, "There are " .. (#splashes + #additionalSplashes + 1) .. " total splashes! Collect them all!")
+log(additionalSplashes[#additionalSplashes])
+local totalSplashes = { unpack(splashes) } -- should be faster then helpers.copy i think, not that it matters
+for _, splash in ipairs(additionalSplashes) do table.insert(totalSplashes, splash) end
+log(#totalSplashes)
+'''
+position = "at"
+target = "preload/splashes.lua"
+
+# Adds splashes to randomiser ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local splash = splashes[num or math.random(#splashes)]'''
+payload = '''
+if num and (num < 1 or num % 1 ~= 0) then num = nil end -- idiot check
+local splash
+if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+	if num and num > #splashes + #additionalSplashes then num = nil end
+	splash = totalSplashes[num or math.random(#totalSplashes)]
+else
+	if num and num > #splashes then num = nil end
+	splash = splashes[num or math.random(#splashes)]
+end
+'''
+position = "at"
+target = "preload/splashes.lua"

@@ -1082,10 +1082,17 @@ return {
 	},
 	gearshiftPopulation = {
 		type = "int",
-		name = "Gearshift University Population",
+		name = "Gearshift Population",
 		tooltips = { short = "Hear Professor Gearshifts beautiful voice more often!" },
 		default = 1,
 		off = 1
+	},
+	moreSplashes = {
+		type = "bool",
+		name = "More Splashes",
+		tooltips = { short = "\"moar splash text with more refrences and community funnies™\"\n- Gotchfutchian" },
+		default = true,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

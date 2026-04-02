@@ -138,6 +138,13 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			end
 			mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
 		end)
+		configHelpers.treeNode("Jokes", function()
+			configHelpers.treeNode("Professor Gearshift", function()
+				configHelpers.input("alwaysGearshift")
+				configHelpers.input("gearshiftPopulation")
+			end)
+			configHelpers.input("moreSplashes")
+		end)
 		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()
 			configHelpers.doc("general_fullDescription")
 		end)
@@ -452,13 +459,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("recordPosition")
 			end)
-		end)
-		imgui.EndTabItem("Editor##beattoolsConfig")
-	end
-	if imgui.BeginTabItem("Jokes##beattoolsConfig") then
-		configHelpers.treeNode("Professor Gearshift", function()
-			configHelpers.input("alwaysGearshift")
-			configHelpers.input("gearshiftPopulation")
 		end)
 		imgui.EndTabItem("Editor##beattoolsConfig")
 	end
