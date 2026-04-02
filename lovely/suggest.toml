@@ -1,21 +1,25 @@
 [manifest]
 dump_lua = true
-priority = 0
+priority = 1
 version = "1.0.0"
 
 # Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''Event.property(event,'string', 'var', 'Variable to ease (must be a child of cs)', {default = ''})'''
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattools.easeList.eases)'''
+pattern = '''
+imgui.InputText(label, numptr, 9999)
+if imgui.IsItemDeactivated() then
+	event[propertyName] = ffi.string(numptr)
+end
+'''
+payload = '''
+if event.type == "ease" and propertyName == "var" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), beattools.easeList.eases)
+end
+if event.type == "setBoolean" and propertyName == "var" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), beattools.easeList.bools)
+end
+'''
 position = "after"
-target = "levelformat/events/Vfx/ease.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''Event.property(event,'string', 'var', 'Variable to set (must be a child of cs)', {default = ''})'''
-payload = '''event.var = utilitools.suggest.suggest(event.var, beattools.easeList.bools)'''
-position = "after"
-target = "levelformat/events/Vfx/setBoolean.lua"
+target = "obj/GameManager.lua"

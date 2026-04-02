@@ -16,15 +16,7 @@ return {
 		-- modlog(mod, e, type(e))
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache))
 		-- modlog(mod, 30 + (mods.beattools.config.gearshiftPopulation - 1) * 2)
-		local imguiStyle = imgui.GetStyle()
-		local separatorHeight = imguiStyle.ItemSpacing.y
-		local imguiInputHeight = imguiStyle.ItemSpacing.y + imgui.GetFontSize() + imguiStyle.FramePadding.y * 2
-		local separatorAmount = 2
-		local imguiInputAmount = 3
-		if mods["devonly-events"] and mods["devonly-events"].enabled then
-			imguiInputAmount = imguiInputAmount + 1
-		end
-		modlog(mod, imguiInputHeight * imguiInputAmount + separatorHeight * separatorAmount)
+		modlog(mod, mouse.rx, mouse.ry, mouse.sx, mouse.sy)
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then
