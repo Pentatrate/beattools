@@ -9,10 +9,29 @@ version = "1.0.0"
 match_indent = true
 pattern = '''function st:checkKeybinds()'''
 payload = '''
-	utilitools.keybinds.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
+	if utilitools.keybinds then
+		utilitools.keybinds.checkBindsStart()
+		utilitools.keybinds.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
+		utilitools.keybinds.checkBindsEnd()
+		if utilitools.keybinds.lastPressed then return end
+		if utilitools.keybinds.listening and utilitools.keybinds.listening.listening then return end
+	end
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
+
+# Text ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text(loc.get("editorKeybinds"))'''
+payload = '''
+utilitools.files.beattools.editorKeysWindow.imgui(loc.get("editorKeybinds"))
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
 
 # Jump ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -63,6 +82,7 @@ end, "move to previous", "ctrl", "move_down")
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 # Prevent ctrl hotkey overlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -72,3 +92,4 @@ pattern = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) th
 payload = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) and ((not mods.beattools.config.jumpEvents) or (not maininput:down("ctrl"))) then'''
 position = "at"
 target = "states/Editor.lua"
+times = 1

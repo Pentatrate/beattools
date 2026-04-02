@@ -567,13 +567,6 @@ return {
 		off = false
 	},
 	--   Features
-	deleteNothing = {
-		type = "bool",
-		name = "Quick Deselect",
-		tooltips = { long = "Right click nothing to select \"None\" in the event palette", short = "Right click nothing to deselect placable event" },
-		default = true,
-		off = false
-	},
 	saveAngleBeatSnap = {
 		type = "bool",
 		name = "Save Angle/Beat Snap",
@@ -944,11 +937,32 @@ return {
 		default = { { { ["key:lctrl"] = true }, "key:a" }, { { ["key:rctrl"] = true }, "key:a" } },
 		off = {}
 	},
-	undo = {
+	undoMultiple = {
 		type = "key",
-		name = "Undo Hotkeys",
-		tooltips = { long = "Hotkeys to undo (default: z) / redo (default: shift + z) single or multiple (ctrl) changes close in time to each other", short = "Ctrl for multiple, shift to redo" },
+		name = "Undo Hotkey",
+		tooltips = { long = "Hotkey to undo (default: ctrl + z)", short = "Undo multiple changes" },
+		default = { { { ["key:lctrl"] = true }, "key:z" }, { { ["key:rctrl"] = true }, "key:z" } },
+		off = {}
+	},
+	redoMultiple = {
+		type = "key",
+		name = "Redo Hotkey",
+		tooltips = { long = "Hotkey to redo (default: ctrl + shift + z)", short = "Redo multiple changes" },
+		default = { { { ["key:lctrl"] = true, ["key:lshift"] = true }, "key:z" }, { { ["key:rctrl"] = true, ["key:rshift"] = true }, "key:z" }, { { ["key:lctrl"] = true, ["key:rshift"] = true }, "key:z" }, { { ["key:rctrl"] = true, ["key:lshift"] = true }, "key:z" } },
+		off = {}
+	},
+	undoSingle = {
+		type = "key",
+		name = "Undo Single Hotkey",
+		tooltips = { long = "Hotkey to undo a single change (default: z)", short = "Undo single change" },
 		default = { { {}, "key:z" } },
+		off = {}
+	},
+	redoSingle = {
+		type = "key",
+		name = "Redo Single Hotkey",
+		tooltips = { long = "Hotkey to redo a single change (default: shift + z)", short = "Redo single change" },
+		default = { { { ["key:lshift"] = true }, "key:z" }, { { ["key:rshift"] = true }, "key:z" } },
 		off = {}
 	},
 	hideMenus = {
@@ -1058,6 +1072,20 @@ return {
 		tooltips = { short = "Draw outline rings for bookmarks instead\nIncompatible with \"Bookmark Outline Rings\" by K4kadu" },
 		default = true,
 		off = false
+	},
+	alwaysGearshift = {
+		type = "bool",
+		name = "Always Hear Gearshift",
+		tooltips = { short = "Hear Professor Gearshifts beautiful voice regardless of costume!" },
+		default = false,
+		off = false
+	},
+	gearshiftPopulation = {
+		type = "int",
+		name = "Gearshift University Population",
+		tooltips = { short = "Hear Professor Gearshifts beautiful voice more often!" },
+		default = 1,
+		off = 1
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

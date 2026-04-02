@@ -1,0 +1,24 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Always hear gearshift ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if savedata.aprilFools.voicedGearshift and savedata.costumes.currentCostume == "gearshift" then'''
+payload = '''if savedata.aprilFools.voicedGearshift and savedata.costumes.currentCostume == "gearshift" or mods.beattools.config.alwaysGearshift then'''
+position = "at"
+target = "obj/Player.lua"
+times = 1
+
+# Always hear gearshift ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local threshold = 30'''
+payload = '''local threshold = 30 + (mods.beattools.config.gearshiftPopulation - 1) * 2'''
+position = "at"
+target = "obj/Player.lua"
+times = 1

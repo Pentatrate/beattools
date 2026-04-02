@@ -378,13 +378,13 @@ undo.change = function(t, k, v, hidden)
 					undo.index = undo.index - 1
 				else
 					undo.newChangePre()
-					modwarn(mod,
+					--[[ modwarn(mod,
 						"Changing:" ..
 						"\tindex: " .. tostring(undo.events[tostring(t)]) .. "\n"..
 						"\tkey: " .. tostring(k) .. "\n"..
 						"\tfrom: " .. tostring(hidden[k]) .. "\n"..
 						"\tto: " .. tostring(v)
-					)
+					) ]]
 					table.insert(undo.changes, {
 						type = "change",
 						ref = t,

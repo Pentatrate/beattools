@@ -5,7 +5,7 @@
 			"versions": [
 				[
 					">=",
-					"1.2.24"
+					"1.2.34"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."
@@ -120,6 +120,11 @@
 			"call": true
 		},
 		"eventGroupWindow": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"editorKeysWindow": {
 			"extension": "lua",
 			"load": true,
 			"call": true

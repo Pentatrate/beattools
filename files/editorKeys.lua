@@ -1,6 +1,4 @@
 return {
-	testKey3 = function() utilitools.try(mod, function()
-	end) end,
 	recordPosition = function()
 		if cs.editMode and beattoolsRecordPosition and beattoolsRecordFunc then
 			if beattoolsRecordFunc then beattoolsRecordFunc(helpers.round(mouse.rx / beattoolsRecordPrecision) * beattoolsRecordPrecision, helpers.round(mouse.ry / beattoolsRecordPrecision) * beattoolsRecordPrecision) end
@@ -65,7 +63,10 @@ return {
 			cs.multiselectEndBeat = 360
 		end
 	end,
-	undo = function() utilitools.files.beattools.undo.keybind() end,
+	undoSingle = function() utilitools.files.beattools.undo.keybind(true, false) end,
+	redoSingle = function() utilitools.files.beattools.undo.keybind(false, false) end,
+	undoMultiple = function() utilitools.files.beattools.undo.keybind(true, true) end,
+	redoMultiple = function() utilitools.files.beattools.undo.keybind(false, true) end,
 	hideMenus = function()
 		if not beattoolsRecordFunc then
 			_G.beattoolsRecordPosition = not beattoolsRecordPosition

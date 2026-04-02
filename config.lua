@@ -394,8 +394,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			end)
 			configHelpers.treeNode("Features", function()
 				configHelpers.doc("editor_features_features")
-				configHelpers.input("deleteNothing")
-				imgui.Separator()
 				configHelpers.input("saveAngleBeatSnap")
 				configHelpers.condTreeNode("Angle/Beat Defaults", "saveAngleBeatSnap", false,
 					true,
@@ -442,7 +440,11 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.input("hideMenus")
 				configHelpers.input("restartInPlaytest")
 				imgui.Separator()
-				configHelpers.input("undo")
+				configHelpers.input("undoMultiple")
+				configHelpers.input("redoMultiple")
+				configHelpers.input("undoSingle")
+				configHelpers.input("redoSingle")
+				imgui.Separator()
 				configHelpers.input("tagSelection")
 				imgui.Separator()
 				configHelpers.input("selectAll")
@@ -450,6 +452,13 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("recordPosition")
 			end)
+		end)
+		imgui.EndTabItem("Editor##beattoolsConfig")
+	end
+	if imgui.BeginTabItem("Jokes##beattoolsConfig") then
+		configHelpers.treeNode("Professor Gearshift", function()
+			configHelpers.input("alwaysGearshift")
+			configHelpers.input("gearshiftPopulation")
 		end)
 		imgui.EndTabItem("Editor##beattoolsConfig")
 	end

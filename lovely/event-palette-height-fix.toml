@@ -1,0 +1,30 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Code originally from: K4kadu
+# Modified for general use instead of hard coded values
+# include that second line in the pattern to make sure we never accidentally apply this to another object
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+size.y = size.y - 120
+if imgui.BeginListBox("##palette", size) then
+'''
+payload = '''
+local imguiStyle = imgui.GetStyle()
+local separatorHeight = imguiStyle.ItemSpacing.y
+local imguiInputHeight = imguiStyle.ItemSpacing.y + imgui.GetFontSize() + imguiStyle.FramePadding.y * 2
+local separatorAmount = 2
+local imguiInputAmount = 3
+if mods["devonly-events"] and mods["devonly-events"].enabled then
+	imguiInputAmount = imguiInputAmount + 1
+end
+size.y = size.y - (imguiInputHeight * imguiInputAmount + separatorHeight * separatorAmount)
+if imgui.BeginListBox("##palette", size) then
+'''
+position = "at"
+target = "states/Editor.lua"
