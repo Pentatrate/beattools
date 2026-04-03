@@ -7,6 +7,15 @@ version = "1.0.0"
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = '''if floor ~= false then'''
+payload = '''if beattools.stacking.stacking then pos[1], pos[2] = pos[1] + beattools.stacking.x, pos[2] + beattools.stacking.y end'''
+position = "before"
+target = "states/Editor.lua"
+
+# Rerouting to beattools event visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''
 love.graphics.setCanvas(self.layerCanvas.gameplay)
 love.graphics.clear()

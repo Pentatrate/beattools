@@ -32,6 +32,13 @@ local function setColor(r, g, b, a)
 	end
 end
 
+local function startStack(event)
+	beattools.stacking.stacking, beattools.stacking.x, beattools.stacking.y = true, utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, -utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset
+end
+local function endStack()
+	beattools.stacking.stacking, beattools.stacking.x, beattools.stacking.y = false, 0, 0
+end
+
 local globalAlpha = 1
 
 local function isVisible(x, y, low, high)
@@ -114,8 +121,8 @@ function eventVisuals.drawParam(event, pos1)
 			beattoolsParam = tostring(beattoolsParam)
 		end
 		local pos = {}
-		pos[1] = helpers.round(pos1[1]) + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset - 6 - 20
-		pos[2] = helpers.round(pos1[2]) - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset - 2
+		pos[1] = helpers.round(pos1[1]) - 6 - 20
+		pos[2] = helpers.round(pos1[2]) - 2
 		setColor(mod.config.bgColor.r, mod.config.bgColor.g, mod.config.bgColor.b, 1)
 		if mod.config.shadow then
 			love.graphics.printf(beattoolsParam, pos[1] + 1, pos[2] + 1, 13 + 20, "right")
@@ -170,8 +177,7 @@ function eventVisuals.drawRepeat(event, beattoolsLayer)
 	local sprite = (beattoolsLayer == "repeatMarker" and sprites.editor.repeatMarker) or (beattoolsLayer == "sameEasingRepeatMarker" and sprites.editor.repeatMarkerSameEasing) or sprites.editor.repeatMarkerSelected
 	local repeating = eventVisuals.hasRepeat[event.type] and event.repeats and event.repeats > 0 and (not event.repeatDelay or event.repeatDelay >= 0)
 
-	local stackX = repeating and 0 or utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset
-	local stackY = repeating and 0 or utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset
+	if not repeating then startStack(event) end
 	for i = repeating and 1 or 0, repeating and event.repeats or 0 do
 		local time = event.time + i * (event.repeatDelay or 1)
 		if isVisible(time) then
@@ -179,12 +185,13 @@ function eventVisuals.drawRepeat(event, beattoolsLayer)
 			if inBounds(pos, 8) then
 				love.graphics.draw(
 					sprite,
-					helpers.round(pos[1] + stackX), helpers.round(pos[2] - stackY),
+					helpers.round(pos[1]), helpers.round(pos[2]),
 					0, 1, 1, 11, 11
 				)
 			end
 		end
 	end
+	if not repeating then endStack() end
 end
 function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	if beattoolsLayer ~= "note" and beattoolsLayer ~= "event" and beattoolsLayer ~= "sameEasing" and beattoolsLayer ~= "selected" then
@@ -194,6 +201,16 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	alpha = alpha or 1
 
 	local eventDraw = Event.editorDraw[event.type] or sprites.editor.genericevent
+	local function drawEvent(pos)
+		setColor(1, 1, 1, 1)
+		if type(eventDraw) == "function" then
+			eventDraw(event, cs.editorBeat, cs.editorBeat + cs.drawDistance)
+			color.r, color.g, color.b, color.a = love.graphics.getColor()
+		else
+			pos = pos or cs:getPosition(event.angle, event.time)
+			love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
+		end
+	end
 
 	if alpha ~= 1 then
 		love.graphics.setCanvas(canv)
@@ -201,7 +218,8 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	end
 
 	local beattoolsTemp2 = event.angle
-	if type(eventDraw) == "function" then
+	startStack(event)
+	if utilitools.files.beattools.eventStacking.getType(event) == "func" then
 		if mod.config.displayEndAngle and event.endAngle then
 			utilitools.files.beattools.undo.undoing = true
 			utilitools.files.beattools.undo.fakeRepeating = true
@@ -210,16 +228,13 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			utilitools.files.beattools.undo.fakeRepeating = false
 		end
 
-		setColor(1, 1, 1, 1)
-		eventDraw(event, cs.editorBeat, cs.editorBeat + cs.drawDistance)
-		color.r, color.g, color.b, color.a = love.graphics.getColor()
+		drawEvent()
 	end
 	if isVisible(event.time) then
 		local pos = cs:getPosition(event.angle, event.time)
 		if inBounds(pos, 8) then
-			if type(eventDraw) ~= "function" then
-				setColor(1, 1, 1, 1)
-				love.graphics.draw(eventDraw, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset, 0, 1, 1, 8, 8)
+			if utilitools.files.beattools.eventStacking.getType(event) == "img" then
+				drawEvent(pos)
 			end
 
 			-- Code by K4kadu
@@ -233,7 +248,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 
 			if not event.isCursor and beattoolsLayer == "sameEasing" then
 				setColor(mod.config.durationSameEasingColor.r, mod.config.durationSameEasingColor.g, mod.config.durationSameEasingColor.b, 1)
-				love.graphics.draw(sprites.editor.sameEasing, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset, 0, 1, 1, 11, 11)
+				love.graphics.draw(sprites.editor.sameEasing, pos[1], pos[2], 0, 1, 1, 11, 11)
 			end
 
 			eventVisuals.drawParam(event, pos)
@@ -260,11 +275,12 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 					setColor(1, 1, 1, 1)
 				end
 				local sprite = sprites.editor[mod.config.whiteSelected ~= "off" and (mod.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"]
-				love.graphics.draw(sprite, pos[1] + utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, pos[2] - utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset, 0, 1, 1, 11, 11)
+				love.graphics.draw(sprite, pos[1], pos[2], 0, 1, 1, 11, 11)
 			end
 		end
 	end
-	if type(eventDraw) == "function" and mod.config.displayEndAngle and event.endAngle then
+	endStack()
+	if utilitools.files.beattools.eventStacking.getType(event) == "func" and mod.config.displayEndAngle and event.endAngle then
 		utilitools.files.beattools.undo.undoing = true
 		utilitools.files.beattools.undo.fakeRepeating = true
 		event.angle = beattoolsTemp2
@@ -367,7 +383,7 @@ function eventVisuals.drawEvents()
 					elseif sameEase then
 						addTo(layerSameEasing)
 					else
-						if type(Event.editorDraw[v.type]) == "function" then
+						if utilitools.files.beattools.eventStacking.getType(v) == "func" then
 							addTo(layerNote)
 							if v.endAngle and checkMarker("markEndAnglePosition") and isVisible(v.time) then
 								addTo(layerEndAngleMarker)

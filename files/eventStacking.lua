@@ -16,13 +16,26 @@ function eventStacking.init()
 	eventStacking.events = {}
 end
 
+local chartTypeExceptions = {
+	paddles = true,
+	setBounceHeight = true,
+	ladybug_coin = true,
+	extraTap = true
+}
 function eventStacking.getType(event)
-	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getType: Invalid event: ", event) return "func" end
-	return type(Event.editorDraw[event.type]) == "function" and "func" or "img"
+	local eventType
+	if type(event) == "table" then
+		if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getType: Invalid event: ", event) return "func" end
+		eventType = event.type
+	elseif type(event) == "string" then
+		eventType = event
+	end
+	if not Event.info[eventType] then modwarn(mod, "eventStacking.getType: Invalid event type: ", event) return "func" end
+	if Event.editorDraw[eventType] == nil then return "img" end -- genericevent
+	return Event.info[eventType].storeInChart and not chartTypeExceptions[eventType] and "func" or "img"
 end
-function eventStacking.getOppsositeType(event)
-	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.getOppsositeType: Invalid event: ", event) return "func" end
-	return type(Event.editorDraw[event.type]) == "function" and "img" or "func"
+function eventStacking.getOppositeType(event)
+	return eventStacking.getType(event) == "func" and "img" or "func"
 end
 
 function eventStacking.getAngle(event)
@@ -77,7 +90,7 @@ function eventStacking.cacheEvent(event, remove, _k, dontCheck)
 		if #t == 0 then
 			eventStacking.stacks[event.time][angle][k] = nil
 			t = nil
-			if eventStacking.stacks[event.time][angle][eventStacking.getOppsositeType(event)] == nil then
+			if eventStacking.stacks[event.time][angle][eventStacking.getOppositeType(event)] == nil then
 				eventStacking.stacks[event.time][angle] = nil
 				for _, _ in pairs(eventStacking.stacks[event.time]) do
 					return
@@ -140,9 +153,9 @@ function eventStacking.getIndex(event)
 			end
 		end
 
-		if eventStacking.stacks[event.time][angle][eventStacking.getOppsositeType(event)] then
+		if eventStacking.stacks[event.time][angle][eventStacking.getOppositeType(event)] then
 			return index + 1
-		elseif cs.placeEvent ~= "" and type(Event.editorDraw[cs.placeEvent]) == "function" and cs.cursorBeat == event.time and cs.cursorAngle % 360 == angle then
+		elseif cs.placeEvent ~= "" and eventStacking.getType(cs.placeEvent) == "func" and cs.cursorBeat == event.time and cs.cursorAngle % 360 == angle then
 			return index + 1
 		end
 		return index
@@ -157,7 +170,7 @@ function eventStacking.inStack(event)
 
 	if event and event.time and event.angle and k == "img" and eventStacking.stacks[event.time] and eventStacking.stacks[event.time][angle] then
 		local t = eventStacking.stacks[event.time][angle][k]
-		return t and (#t > 1 or eventStacking.stacks[event.time][angle][eventStacking.getOppsositeType(event)])
+		return t and (#t > 1 or eventStacking.stacks[event.time][angle][eventStacking.getOppositeType(event)])
 	end
 	return false
 end

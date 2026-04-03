@@ -12,7 +12,7 @@ payload = '''
 if mods.beattools.config.spreadButtons then
 	local beattoolsShowSpreadPrompt = true
 	for i, v in ipairs(self.overlappingEvents) do
-		if type(Event.editorDraw[self.level.events[v].type]) ~= "function" and self.level.events[v].time ~= self.level.events[self.overlappingEvents[1]].time then
+		if utilitools.files.beattools.eventStacking.getType(self.level.events[v]) == "img" and self.level.events[v].time ~= self.level.events[self.overlappingEvents[1]].time then
 			beattoolsShowSpreadPrompt = false
 		end
 	end
@@ -78,13 +78,13 @@ if mods.beattools.config.spreadButtons then
 			beattoolsGetSameTime(beattoolsSameTime)
 			for i, v in ipairs(self.overlappingEvents) do
 				v = self.level.events[v]
-				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+				if utilitools.files.beattools.eventStacking.getType(v) == "img" and beattoolsSameAngle(v, beattoolsSameTime) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
 			end
 			for i, v in ipairs(self.overlappingEvents) do
 				v = self.level.events[v]
-				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+				if utilitools.files.beattools.eventStacking.getType(v) == "img" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
 			end
@@ -104,7 +104,7 @@ if mods.beattools.config.spreadButtons then
 				local beattoolsSameTime, beattoolsAngle = {}, self.level.events[self.overlappingEvents[1]].angle % 360
 				beattoolsGetSameTime(beattoolsSameTime)
 				for i, v in ipairs(beattoolsSameTime) do
-					if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 == beattoolsAngle and (v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) or beattoolsSameAngle(v, beattoolsSameTime)) then
+					if utilitools.files.beattools.eventStacking.getType(v) == "img" and v.angle % 360 == beattoolsAngle and (v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) or beattoolsSameAngle(v, beattoolsSameTime)) then
 						v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 					end
 				end
@@ -118,12 +118,12 @@ if mods.beattools.config.spreadButtons then
 			local beattoolsSameTime = {}
 			beattoolsGetSameTime(beattoolsSameTime)
 			for i, v in ipairs(beattoolsSameTime) do
-				if type(Event.editorDraw[v.type]) ~= "function" and beattoolsSameAngle(v, beattoolsSameTime) then
+				if utilitools.files.beattools.eventStacking.getType(v) == "img" and beattoolsSameAngle(v, beattoolsSameTime) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
 			end
 			for i, v in ipairs(beattoolsSameTime) do
-				if type(Event.editorDraw[v.type]) ~= "function" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
+				if utilitools.files.beattools.eventStacking.getType(v) == "img" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
 			end
