@@ -10,10 +10,11 @@ match_indent = true
 pattern = '''function st:checkKeybinds()'''
 payload = '''
 	if utilitools.keybinds then
-		utilitools.keybinds.checkBindsStart()
-		utilitools.keybinds.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
-		utilitools.keybinds.checkBindsEnd()
-		if utilitools.keybinds.lastPressed then return end
+		utilitools.keybinds.mod.checkBindsStart()
+		utilitools.keybinds.mod.checkBinds(mods.beattools, utilitools.files.beattools.editorKeys)
+		utilitools.keybinds.mod.checkBinds(mods.beattools, self.beattoolsEditorKeybinds or {})
+		utilitools.keybinds.mod.checkBindsEnd()
+		if utilitools.keybinds.mod.lastPressed then return end
 		if utilitools.keybinds.listening and utilitools.keybinds.listening.listening then return end
 	end
 '''
@@ -26,10 +27,24 @@ times = 1
 [patches.pattern]
 match_indent = true
 pattern = '''imgui.Text(loc.get("editorKeybinds"))'''
-payload = '''
-utilitools.files.beattools.editorKeysWindow.imgui(loc.get("editorKeybinds"))
-'''
+payload = '''utilitools.files.beattools.editorKeysWindow.imgui(loc.get("editorKeybinds"))'''
 position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# Reroute keybinds ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''function st:addKeybind(func, name, k1, k2, k3)'''
+payload = '''
+	if utilitools.files.beattools.configOptions["editorKeybind " .. name] then
+		self.beattoolsEditorKeybinds = self.beattoolsEditorKeybinds or {}
+		self.beattoolsEditorKeybinds["editorKeybind " .. name] = func
+		return
+	end
+'''
+position = "after"
 target = "states/Editor.lua"
 times = 1
 

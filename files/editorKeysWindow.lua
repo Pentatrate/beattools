@@ -2,7 +2,7 @@ local editorKeysWindow = {}
 
 function editorKeysWindow.imgui(text)
 	local splits = { { type = "text", text = text } }
-	local function split(pattern, category, keyId, replaceText)
+	local function split(pattern, category, keyId, modded, replaceText)
 		local fullPattern = "\n" .. pattern .. " - "
 		local i = 1
 		while splits[i] do
@@ -33,7 +33,7 @@ function editorKeysWindow.imgui(text)
 						end
 						local labelEnd = prevText:find("\n", patternEnd + 1, true)
 						if labelEnd then
-							table.insert(splits, i2 + 1, { type = "key", label = prevText:sub(patternEnd + 1, labelEnd - 1), category = category, key = keyId })
+							table.insert(splits, i2 + 1, { type = "key", label = prevText:sub(patternEnd + 1, labelEnd - 1), category = category, key = keyId, modded = modded })
 							if prevText:sub(labelEnd + 1) ~= "" then
 								table.insert(splits, i2 + 2, { type = "text", text = prevText:sub(labelEnd + 1) })
 							end
@@ -47,18 +47,31 @@ function editorKeysWindow.imgui(text)
 			i = i + 1
 		end
 	end
-	split("Esc", "keyboardMenu", "back")
-	split("S", "keyboardEditor", "save")
+
+	split("Ctrl + LMB", nil, nil, nil, (mod.config.ctrlSelect and utilitools.keybinds.text.generate("controltable", "c", false, true) or utilitools.keybinds.text.generate("keyboardEditor", "modifier", false, true)) .. " + LMB")
+
+	split("Esc", "keyboardMenu", "back", false)
+	split("S", "keyboardEditor", "save", false)
+
 	split("P", "keyboardEditor", "play")
-	split("Ctrl + P", nil, nil, utilitools.keybinds.generateText("keyboardEditor", "modifier", false, true) .. " + " .. utilitools.keybinds.generateText("keyboardEditor", "play", false, true))
-	split("Ctrl + LMB", nil, nil, (mod.config.ctrlSelect and "C" or utilitools.keybinds.generateText("keyboardEditor", "modifier", false, true)) .. " + LMB")
+	split("Shift + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "shift", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
+	split("Ctrl + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "ctrl", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
+
+	split("F", mods.beattools, "editorKeybind jump to event position", true)
+	split("Ctrl + R", mods.beattools, "editorKeybind reset window positions", true)
+	split("Shift + ]", mods.beattools, "editorKeybind speedmod UP", true)
+	split("Shift + [", mods.beattools, "editorKeybind speedmod DOWN", true)
+
 	for i, part in ipairs(splits) do
 		if part.type == "text" then
 			imgui.Text(part.text)
 		elseif part.type == "key" then
-			utilitools.imguiHelpers.inputKey(part.label, part.category, part.key, utilitools.keybinds.generateText(part.category, part.key, false), false)
+			utilitools.imguiHelpers.inputKey(part.label, part.category, part.key, utilitools.keybinds.text.generate(part.category, part.key, part.modded, false), part.modded)
 		end
 	end
+end
+
+function editorKeysWindow.reroute(keybindName, func)
 end
 
 return editorKeysWindow

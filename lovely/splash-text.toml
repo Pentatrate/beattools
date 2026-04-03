@@ -60,7 +60,6 @@ table.insert(additionalSplashes, "There are " .. (#splashes + #additionalSplashe
 log(additionalSplashes[#additionalSplashes])
 local totalSplashes = { unpack(splashes) } -- should be faster then helpers.copy i think, not that it matters
 for _, splash in ipairs(additionalSplashes) do table.insert(totalSplashes, splash) end
-log(#totalSplashes)
 '''
 position = "at"
 target = "preload/splashes.lua"

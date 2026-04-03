@@ -1094,6 +1094,30 @@ return {
 		default = true,
 		off = false
 	},
+	["editorKeybind reset window positions"] = {
+		type = "key",
+		name = "[internal] editorKeybind reset window positions",
+		default = { { { ["key:lctrl"] = true }, "key:r" }, { { ["key:rctrl"] = true }, "key:r" } },
+		off = { { { ["key:lctrl"] = true }, "key:r" }, { { ["key:rctrl"] = true }, "key:r" } }
+	},
+	["editorKeybind jump to event position"] = {
+		type = "key",
+		name = "[internal] editorKeybind jump to event position",
+		default = { { {}, "key:f" } },
+		off = { { {}, "key:f" } }
+	},
+	["editorKeybind speedmod UP"] = {
+		type = "key",
+		name = "[internal] editorKeybind speedmod UP",
+		default = { { { ["key:lshift"] = true }, "key:]" }, { { ["key:rshift"] = true }, "key:]" } },
+		off = { { { ["key:lshift"] = true }, "key:]" }, { { ["key:rshift"] = true }, "key:]" } }
+	},
+	["editorKeybind speedmod DOWN"] = {
+		type = "key",
+		name = "[internal] editorKeybind speedmod DOWN",
+		default = { { { ["key:lshift"] = true }, "key:[" }, { { ["key:rshift"] = true }, "key:[" } },
+		off = { { { ["key:lshift"] = true }, "key:[" }, { { ["key:rshift"] = true }, "key:[" } }
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
