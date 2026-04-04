@@ -934,21 +934,21 @@ return {
 		type = "key",
 		name = "Select All Hotkey",
 		tooltips = { long = "Hotkey to select all events (default: ctrl + a)", short = "Select all events" },
-		default = { { { ["key:lctrl"] = true }, "key:a" }, { { ["key:rctrl"] = true }, "key:a" } },
+		default = { { { ["bind:ctrl"] = true }, "key:a" } },
 		off = {}
 	},
 	undoMultiple = {
 		type = "key",
 		name = "Undo Hotkey",
 		tooltips = { long = "Hotkey to undo (default: ctrl + z)", short = "Undo multiple changes" },
-		default = { { { ["key:lctrl"] = true }, "key:z" }, { { ["key:rctrl"] = true }, "key:z" } },
+		default = { { { ["bind:ctrl"] = true }, "key:z" } },
 		off = {}
 	},
 	redoMultiple = {
 		type = "key",
 		name = "Redo Hotkey",
 		tooltips = { long = "Hotkey to redo (default: ctrl + shift + z)", short = "Redo multiple changes" },
-		default = { { { ["key:lctrl"] = true, ["key:lshift"] = true }, "key:z" }, { { ["key:rctrl"] = true, ["key:rshift"] = true }, "key:z" }, { { ["key:lctrl"] = true, ["key:rshift"] = true }, "key:z" }, { { ["key:rctrl"] = true, ["key:lshift"] = true }, "key:z" } },
+		default = { { { ["bind:ctrl"] = true, ["bind:shift"] = true }, "key:z" } },
 		off = {}
 	},
 	undoSingle = {
@@ -962,7 +962,7 @@ return {
 		type = "key",
 		name = "Redo Single Hotkey",
 		tooltips = { long = "Hotkey to redo a single change (default: shift + z)", short = "Redo single change" },
-		default = { { { ["key:lshift"] = true }, "key:z" }, { { ["key:rshift"] = true }, "key:z" } },
+		default = { { { ["bind:shift"] = true }, "key:z" } },
 		off = {}
 	},
 	hideMenus = {
@@ -1097,8 +1097,8 @@ return {
 	["editorKeybind reset window positions"] = {
 		type = "key",
 		name = "[internal] editorKeybind reset window positions",
-		default = { { { ["key:lctrl"] = true }, "key:r" }, { { ["key:rctrl"] = true }, "key:r" } },
-		off = { { { ["key:lctrl"] = true }, "key:r" }, { { ["key:rctrl"] = true }, "key:r" } }
+		default = { { { ["bind:ctrl"] = true }, "key:r" } },
+		off = { { { ["bind:ctrl"] = true }, "key:r" } }
 	},
 	["editorKeybind jump to event position"] = {
 		type = "key",
@@ -1109,14 +1109,26 @@ return {
 	["editorKeybind speedmod UP"] = {
 		type = "key",
 		name = "[internal] editorKeybind speedmod UP",
-		default = { { { ["key:lshift"] = true }, "key:]" }, { { ["key:rshift"] = true }, "key:]" } },
-		off = { { { ["key:lshift"] = true }, "key:]" }, { { ["key:rshift"] = true }, "key:]" } }
+		default = { { { ["bind:shift"] = true }, "key:]" } },
+		off = { { { ["bind:shift"] = true }, "key:]" } }
 	},
 	["editorKeybind speedmod DOWN"] = {
 		type = "key",
 		name = "[internal] editorKeybind speedmod DOWN",
-		default = { { { ["key:lshift"] = true }, "key:[" }, { { ["key:rshift"] = true }, "key:[" } },
-		off = { { { ["key:lshift"] = true }, "key:[" }, { { ["key:rshift"] = true }, "key:[" } }
+		default = { { { ["bind:shift"] = true }, "key:[" } },
+		off = { { { ["bind:shift"] = true }, "key:[" } }
+	},
+	["hardCodedEditorKeybind jump to previous section"] = {
+		type = "key",
+		name = "[internal] hardCodedEditorKeybind jump to previous section",
+		default = { { { ["bind:alt"] = true }, "bind:move_left" } },
+		off = { { { ["bind:alt"] = true }, "bind:move_left" } }
+	},
+	["hardCodedEditorKeybind jump to next section"] = {
+		type = "key",
+		name = "[internal] hardCodedEditorKeybind jump to next section",
+		default = { { { ["bind:alt"] = true }, "bind:move_right" } },
+		off = { { { ["bind:alt"] = true }, "bind:move_right" } }
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

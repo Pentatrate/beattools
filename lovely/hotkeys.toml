@@ -108,3 +108,24 @@ payload = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) an
 position = "at"
 target = "states/Editor.lua"
 times = 1
+
+# Custom keybinds rerouting ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# hardCodedEditorKeybind jump to previous section
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if maininput:pressed('move_left') and maininput:down('alt') then'''
+payload = '''if utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind jump to previous section", false) then'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# hardCodedEditorKeybind jump to next section
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''elseif maininput:pressed('move_right') and maininput:down('alt') then'''
+payload = '''elseif utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind jump to next section", false) then'''
+position = "at"
+target = "states/Editor.lua"
+times = 1

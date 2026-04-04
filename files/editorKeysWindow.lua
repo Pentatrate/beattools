@@ -53,14 +53,19 @@ function editorKeysWindow.imgui(text)
 	split("Esc", "keyboardMenu", "back", false)
 	split("S", "keyboardEditor", "save", false)
 
-	split("P", "keyboardEditor", "play")
+	split("P", "keyboardEditor", "play", false)
 	split("Shift + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "shift", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
 	split("Ctrl + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "ctrl", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
 
 	split("F", mods.beattools, "editorKeybind jump to event position", true)
 	split("Ctrl + R", mods.beattools, "editorKeybind reset window positions", true)
+
 	split("Shift + ]", mods.beattools, "editorKeybind speedmod UP", true)
 	split("Shift + [", mods.beattools, "editorKeybind speedmod DOWN", true)
+
+	split("Alt + Left/Right", nil, nil, nil, "Alt + Left - Jump to next/previous section##0\nAlt + Right")
+	split("Alt + Left", mods.beattools, "hardCodedEditorKeybind jump to previous section", true)
+	split("Alt + Right", mods.beattools, "hardCodedEditorKeybind jump to next section", true)
 
 	for i, part in ipairs(splits) do
 		if part.type == "text" then
