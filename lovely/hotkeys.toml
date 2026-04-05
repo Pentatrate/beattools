@@ -99,17 +99,93 @@ position = "after"
 target = "states/Editor.lua"
 times = 1
 
-# Prevent ctrl hotkey overlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Prevent hotkey + arrows/click overlap ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# click
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+-- Stops items being placed while ALT is held.
+
+if maininput:down('alt') then
+'''
+payload = '''
+-- Stops items being placed while ALT is held.
+
+-- Penta: prevent keybinds overlap of placing events with:
+-- alt select
+-- show navigation wheel
+if
+	maininput:down('alt') or
+	utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind show navigation wheel", true)
+then
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# arrows
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) then'''
-payload = '''if (self.deltaTimeCooldown <= 0) and (not maininput:down('alt')) and ((not mods.beattools.config.jumpEvents) or (not maininput:down("ctrl"))) then'''
+payload = '''
+-- Penta: prevent keybinds overlap of moving events via arrow keys with:
+-- move to previous (event)
+-- move to next (event)
+-- jump to previous section
+-- jump to next section
+if
+	self.deltaTimeCooldown <= 0 and
+	not maininput:down('alt') and
+	not (mods.beattools.config.jumpEvents and maininput:down("ctrl")) and
+	not utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind jump to previous section", true) and
+	not utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind jump to next section", true)
+then
+'''
 position = "at"
 target = "states/Editor.lua"
 times = 1
 
 # Custom keybinds rerouting ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# hardCodedEditorKeybind show navigation wheel
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+if maininput:down('alt') then
+	local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat = self:findBookmarkBeats()
+'''
+payload = '''
+if utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind show navigation wheel", true) then
+	local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat = self:findBookmarkBeats()
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+--draw player
+if not maininput:down('alt') then
+'''
+payload = '''
+--draw player
+if not utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind show navigation wheel", true) then
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if maininput:down('alt') or (self.currentlyDragging == "timelineSlider") then'''
+payload = '''if utilitools.keybinds.mod.pressed(mods.beattools, "hardCodedEditorKeybind show navigation wheel", true) or (self.currentlyDragging == "timelineSlider") then'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
 # hardCodedEditorKeybind jump to previous section
 [[patches]]
 [patches.pattern]

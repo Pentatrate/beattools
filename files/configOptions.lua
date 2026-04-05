@@ -1118,6 +1118,12 @@ return {
 		default = { { { ["bind:shift"] = true }, "key:[" } },
 		off = { { { ["bind:shift"] = true }, "key:[" } }
 	},
+	["hardCodedEditorKeybind show navigation wheel"] = {
+		type = "key",
+		name = "[internal] hardCodedEditorKeybind show navigation wheel",
+		default = { { { }, "bind:alt" } },
+		off = { { { }, "bind:alt" } }
+	},
 	["hardCodedEditorKeybind jump to previous section"] = {
 		type = "key",
 		name = "[internal] hardCodedEditorKeybind jump to previous section",
@@ -1129,6 +1135,13 @@ return {
 		name = "[internal] hardCodedEditorKeybind jump to next section",
 		default = { { { ["bind:alt"] = true }, "bind:move_right" } },
 		off = { { { ["bind:alt"] = true }, "bind:move_right" } }
+	},
+	ctrlSelectKey = {
+		type = "key",
+		name = "Ctrl Select Hotkey",
+		tooltips = { short = "Ctrl select events" },
+		default = { { { ["bind:ctrl"] = true }, "bind:mouse1" } },
+		off = {}
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)

@@ -48,7 +48,7 @@ match_indent = true
 pattern = '''self.lastClickX, self.lastClickY = mouse.rx, mouse.ry'''
 payload = '''
 self.lastSelected = self.selectedEvent or true
-self.ctrlSelectPending = mods.beattools.config.ctrlSelect and maininput:down("ctrl")
+self.ctrlSelectPending = mods.beattools.config.ctrlSelect and utilitools.keybinds.mod.pressed(mods.beattools, "ctrlSelectKey", false)
 '''
 position = "after"
 target = "states/Editor.lua"
@@ -62,7 +62,7 @@ function st:SelectEvent()
 '''
 payload = '''
 function st:SelectEvent()
-	if not mods.beattools.config.ctrlSelect or not maininput:down("ctrl") then self:clearMultiselectVars() end
+	if not mods.beattools.config.ctrlSelect or not utilitools.keybinds.mod.pressed(mods.beattools, "ctrlSelectKey", false) then self:clearMultiselectVars() end
 '''
 position = "at"
 target = "states/Editor.lua"
@@ -74,7 +74,7 @@ pattern = '''if maininput:down("ctrl") then'''
 payload = '''
 if mods.beattools.config.ctrlSelect and self.ctrlSelectPending then
 	self:beattoolsCtrlSelect(self.level.events[self.overlappingEvents[1]])
-elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and maininput:down("ctrl")) then
+elseif (mods.beattools.config.ctrlSelect and maininput:down("c")) or (not mods.beattools.config.ctrlSelect and utilitools.keybinds.mod.pressed(mods.beattools, "ctrlSelectKey", false)) then
 '''
 position = "at"
 target = "states/Editor.lua"

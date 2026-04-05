@@ -436,8 +436,8 @@ function eventVisuals.drawEvents()
 		for time, angles in pairs(utilitools.files.beattools.eventStacking.gameplayStack) do
 			if time >= cs.editorBeat and time <= cs.editorBeat + cs.drawDistance then
 				for angle, _ in pairs(angles) do
-					local pos = cs:getPosition(angle, time)
-					love.graphics.draw(sprites.editor.stackingNotes, pos[1], pos[2], 0, 1, 1, 11, 11)
+					local pos = cs:getPosition(angle, time, false)
+					love.graphics.draw(sprites.editor.stackingNotes, helpers.round(pos[1]), helpers.round(pos[2]), 0, 1, 1, 11, 11)
 				end
 			end
 		end

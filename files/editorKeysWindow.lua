@@ -2,6 +2,15 @@ local editorKeysWindow = {}
 
 function editorKeysWindow.imgui(text)
 	local splits = { { type = "text", text = text } }
+	local function replace(id, pattern, replaceText)
+		-- for some reason gsub doesnt work??? im confungled
+		local matchStart, matchEnd = splits[1].text:find(pattern, 1, true)
+		if matchStart then
+			splits[1].text = splits[1].text:sub(1, matchStart - 1) .. replaceText .. splits[1].text:sub(matchEnd + 1)
+		else
+			splits[1].text = "REPLACING FAILED: " .. id .. "\n" .. splits[1].text
+		end
+	end
 	local function split(pattern, category, keyId, modded, replaceText)
 		local fullPattern = "\n" .. pattern .. " - "
 		local i = 1
@@ -47,9 +56,17 @@ function editorKeysWindow.imgui(text)
 			i = i + 1
 		end
 	end
+	-- replacing text
+	replace("jump to next/previous section", "\nAlt + Left/Right - Jump to next/previous section\n", "\nAlt + Left - Jump to previous section\nAlt + Right - Jump to next section\n")
+	replace("ctrl click", "\nAlt + LMB + drag - Multi select events (alternate)\n  Selects events only in the highlighted area\n", "\nAlt + LMB + drag - Multi select events (alternate)\n  Selects events only in the highlighted area\nCtrl (modded) -  + LMB on an event - Ctrl select events\n  Add/remove events to/from the selection one by one\n")
 
-	split("Ctrl + LMB", nil, nil, nil, (mod.config.ctrlSelect and utilitools.keybinds.text.generate("controltable", "c", false, true) or utilitools.keybinds.text.generate("keyboardEditor", "modifier", false, true)) .. " + LMB")
+	-- inserting keybind text
+	split("Ctrl + LMB", nil, nil, nil, (mod.config.ctrlSelect and utilitools.keybinds.text.generate("controltable", "c", false, true) or utilitools.keybinds.text.generate("keyboardEditor", "modifier", false, true)) .. " + LMB on an event")
 
+	-- inserting modded keybinds
+	split("Ctrl (modded)", mods.beattools, "ctrlSelectKey", true)
+
+	-- inserting editor keybinds
 	split("Esc", "keyboardMenu", "back", false)
 	split("S", "keyboardEditor", "save", false)
 
@@ -57,13 +74,15 @@ function editorKeysWindow.imgui(text)
 	split("Shift + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "shift", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
 	split("Ctrl + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "ctrl", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
 
+	-- inserting custom editor keybinds
 	split("F", mods.beattools, "editorKeybind jump to event position", true)
 	split("Ctrl + R", mods.beattools, "editorKeybind reset window positions", true)
 
 	split("Shift + ]", mods.beattools, "editorKeybind speedmod UP", true)
 	split("Shift + [", mods.beattools, "editorKeybind speedmod DOWN", true)
 
-	split("Alt + Left/Right", nil, nil, nil, "Alt + Left - Jump to next/previous section##0\nAlt + Right")
+	-- inserting hard coded editor keybinds
+	split("Hold Alt", mods.beattools, "hardCodedEditorKeybind show navigation wheel", true)
 	split("Alt + Left", mods.beattools, "hardCodedEditorKeybind jump to previous section", true)
 	split("Alt + Right", mods.beattools, "hardCodedEditorKeybind jump to next section", true)
 
