@@ -54,12 +54,8 @@ log(splashes[#splashes])
 payload = '''
 table.insert(splashes,"There are "..(#splashes+1).." vanilla splashes! Collect them all!")
 log(splashes[#splashes])
-table.insert(additionalSplashes, "There are " .. (#additionalSplashes + 2) .. " modded splashes! Collect them all!")
+table.insert(additionalSplashes, "There are " .. (#additionalSplashes + 2) .. " beattools modded splashes! Collect them all!")
 log(additionalSplashes[#additionalSplashes])
-table.insert(additionalSplashes, "There are " .. (#splashes + #additionalSplashes + 1) .. " total splashes! Collect them all!")
-log(additionalSplashes[#additionalSplashes])
-local totalSplashes = { unpack(splashes) } -- should be faster then helpers.copy i think, not that it matters
-for _, splash in ipairs(additionalSplashes) do table.insert(totalSplashes, splash) end
 '''
 position = "at"
 target = "preload/splashes.lua"
@@ -73,8 +69,15 @@ payload = '''
 if num and (num < 1 or num % 1 ~= 0) then num = nil end -- idiot check
 local splash
 if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-	if num and num > #splashes + #additionalSplashes then num = nil end
-	splash = totalSplashes[num or math.random(#totalSplashes)]
+	if num and num > #splashes + #additionalSplashes + 1 then num = nil end
+	num = num or math.random(#splashes + #additionalSplashes + 1)
+	if num == 1 then
+		splash = "There are " .. (#splashes + #additionalSplashes + 1) .. " total splashes! Collect them all!"
+	elseif num <= #splashes + 1 then
+		splash = splashes[num - 1]
+	else
+		splash = additionalSplashes[num - 1 - #splashes]
+	end
 else
 	if num and num > #splashes then num = nil end
 	splash = splashes[num or math.random(#splashes)]
