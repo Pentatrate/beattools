@@ -1,6 +1,10 @@
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
+if beattools and beattools.test then
+	imgui.Text(tostring(beattools.test))
+end
+
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
 		configHelpers.treeNode("Menu Options", function()

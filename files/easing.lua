@@ -114,7 +114,7 @@ local easing = {
 			default = function(different) return { enabled = different == 1, newWidth = 70, newAngle = 0 } end
 		},
 		bookmark = {
-			different = false, parallel = false, duration = false, start = false,
+			different = false, parallel = false, duration = false, start = false, noLevel = true,
 			params = { name = true, description = true, r = true, g = true, b = true },
 			default = function(different) return { name = "Start", description = "", r = 0, g = 0, b = 0 } end
 		},
@@ -399,12 +399,12 @@ end
 function easing.getEase(eventId, different, time, order, index)
 	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
 	if not arr or not track or not time then modwarn(mod, "Invalid input") return end
-	if cs.level and cs.level.properties and cs.level.properties.loadBeat and time < cs.level.properties.loadBeat then
+	if not track.noLevel and cs.level and cs.level.properties and cs.level.properties.loadBeat and time < cs.level.properties.loadBeat then
 		time = cs.level.properties.loadBeat
 		order = nil
 		index = nil
 	end
-	if cs.level and cs.level.properties and cs.level.properties.startingBeat and time < cs.level.properties.startingBeat then
+	if not track.noLevel and cs.level and cs.level.properties and cs.level.properties.startingBeat and time < cs.level.properties.startingBeat then
 		time = cs.level.properties.startingBeat
 		order = nil
 		index = nil

@@ -1034,7 +1034,7 @@ return {
 	},
 	loadBeatColor = {
 		type = "color",
-		name = "Start Beat Color",
+		name = "Load Beat Color",
 		tooltips = { short = "Color used for the load beat" },
 		default = { r = 1, g = 0, b = 0 }
 	},
@@ -1061,7 +1061,7 @@ return {
 	},
 	loadBeatRing = {
 		type = "bool",
-		name = "Start Beat Ring",
+		name = "Load Beat Ring",
 		tooltips = { short = "Draw a ring for the load beat" },
 		default = true,
 		off = false

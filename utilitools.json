@@ -151,6 +151,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"betterBookmarks": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

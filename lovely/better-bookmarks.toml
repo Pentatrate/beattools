@@ -3,109 +3,119 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# Bookmark ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Bookmark dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''
-local prevBookmarkBeat = 0
-local currBookmarkBeat = 0
-'''
+pattern = '''elseif self.currentlyDragging == "timelineSlider" then'''
 payload = '''
-local prevBookmarkBeat = self.smallestBeat - (mods.beattools.config.scrollPast == 0 and 1 or mods.beattools.config.scrollPast)
-local currBookmarkBeat = prevBookmarkBeat
-local prevSectionName = "Start"
+elseif self.currentlyDragging == "timelineSlider" and mods.beattools.config.betterBookmarks then
+	-- Penta: the bookmark code is so confusing ill just write my own
+	utilitools.files.beattools.betterBookmarks.calc()
 '''
-position = "at"
+position = "before"
 target = "states/Editor.lua"
+times = 1
 
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''prevBookmarkBeat = v.time'''
-payload = '''prevSectionName = v.name'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName'''
-payload = '''return prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName = self:findBookmarkBeats()'''
-payload = '''local prevBookmarkBeat, currBookmarkBeat, nextBookmarkBeat, sectionName, prevSectionName = self:findBookmarkBeats()'''
-position = "at"
-target = "states/Editor.lua"
-
+# Bookmark angle getting ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat)'''
-payload = '''local cAngle = 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat ~= 0 and nextBookmarkBeat - currBookmarkBeat or 1)'''
+payload = '''
+local currentBookmark, count, hasPrev, prevBookmark, hasNext, nextBookmark, currentProgress
+local cAngle
+if mods.beattools.config.betterBookmarks then
+	currentBookmark, count, hasPrev, prevBookmark, hasNext, nextBookmark, currentProgress = utilitools.files.beattools.betterBookmarks.getProgress()
+	if not currentBookmark or not count or not currentProgress then
+	else
+		cAngle = 2 * math.pi * currentProgress
+	end
+end
+cAngle = cAngle or 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBookmarkBeat - currBookmarkBeat)
+'''
 position = "at"
 target = "states/Editor.lua"
 
+# Bookmark Visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''love.graphics.printf(sectionName, project.res.cx - 499, project.res.cy - 60, 1000, "center")'''
 payload = '''
-local bookmark, bookmarkC = utilitools.files.beattools.easing.getEase("bookmark", nil, cs.editorBeat, nil, nil)
-love.graphics.printf((mods.beattools.config.betterBookmarks and bookmarkC.index ~= 0 and self.editorBeat == bookmarkC.event.time and prevSectionName .. " >> " or "") .. sectionName .. (mods.beattools.config.betterBookmarks and " (" .. bookmarkC.index .. "/" .. bookmarkC.total .. ")" or ""), project.res.cx - 499, project.res.cy - 60, 1000, "center")
-if mods.beattools.config.betterBookmarks and bookmark.description ~= nil and bookmark.description ~= "" then
-	love.graphics.printf(bookmark.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
+if not mods.beattools.config.betterBookmarks or not currentBookmark or not count or not currentProgress then
+	love.graphics.printf(sectionName, project.res.cx - 499, project.res.cy - 60, 1000, "center")
+else
+	local text = (self.editorBeat == currentBookmark.time and hasPrev and prevBookmark and (prevBookmark.name .. " >> ") or "") .. currentBookmark.name .. " (" .. count.index .. "/" .. count.total .. ")"
+	love.graphics.printf(text, project.res.cx - 499, project.res.cy - 60, 1000, "center")
+	if mods.beattools.config.betterBookmarks and currentBookmark.description ~= nil and currentBookmark.description ~= "" then
+		love.graphics.printf(currentBookmark.description, project.res.cx - 499, project.res.cy + 60 - 10, 1000, "center")
+	end
 end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))'''
 payload = '''
-love.graphics.circle("fill", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat))
-if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(love.math.colorFromBytes(bookmark.r, bookmark.g, bookmark.b, 255))
+if not mods.beattools.config.betterBookmarks or not currentBookmark or not count or not currentProgress then
+else
+	love.graphics.setColor(love.math.colorFromBytes(currentBookmark.r, currentBookmark.g, currentBookmark.b, 255))
 	love.graphics.arc("line", "open", project.res.cx, project.res.cy, self:beatToRadius(self.editorBeat), 0, 2 * math.pi, 100)
 end
 '''
-position = "at"
+position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''local textWidth = love.graphics.getFont():getWidth(tostring(math.floor(self.editorBeat)))
-love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)'''
+pattern = '''
+local textWidth = love.graphics.getFont():getWidth(tostring(math.floor(self.editorBeat)))
+love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)
+'''
 payload = '''
-local beatText = tostring(math.floor(self.editorBeat))
-local easingPrevBookmarkTime = bookmarkC.index == 0 and 0 or bookmarkC.event.time
-local bookmarkBeatText = math.floor(self.editorBeat - easingPrevBookmarkTime) .. "/" .. math.floor(nextBookmarkBeat - easingPrevBookmarkTime)
-local textWidth = love.graphics.getFont():getWidth(beatText)
-local bookmarkBeatTextWidth = love.graphics.getFont():getWidth(bookmarkBeatText)
+local beatText, bookmarkBeatText
+if not mods.beattools.config.betterBookmarks or not currentBookmark or not count or not currentProgress then
+	local textWidth = love.graphics.getFont():getWidth(tostring(math.floor(self.editorBeat)))
+	love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)
+else
+	beatText = tostring(math.floor(self.editorBeat))
+	local textWidth = love.graphics.getFont():getWidth(beatText)
 
-if mods.beattools.config.betterBookmarks then
-	love.graphics.setColor(love.math.colorFromBytes(bookmark.r, bookmark.g, bookmark.b, 255))
-	love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
+	local bookmarkNextBeat = hasNext and nextBookmark and nextBookmark.time or currentBookmark.time
+	bookmarkBeatText = math.floor(self.editorBeat - currentBookmark.time) .. "/" .. math.floor(bookmarkNextBeat - currentBookmark.time)
+	local bookmarkBeatTextWidth = love.graphics.getFont():getWidth(bookmarkBeatText)
+
+	if mods.beattools.config.betterBookmarks then
+		love.graphics.setColor(love.math.colorFromBytes(currentBookmark.r, currentBookmark.g, currentBookmark.b, 255))
+		love.graphics.draw(sprites.editor.bookmarkicon, project.res.cx - bookmarkBeatTextWidth / 2 - 5.5, project.res.cy - 5 + 11)
+	else
+		love.graphics.draw(sprites.editor.beaticon, project.res.cx - textWidth / 2 - 5.5, project.res.cy - 5)
+	end
 end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''love.graphics.printf(math.floor(self.editorBeat), project.res.cx - 18.5, project.res.cy - 7, 50, "center")'''
 payload = '''
-love.graphics.printf(beatText, project.res.cx - 18.5, project.res.cy - 7, 50, "center")
-if mods.beattools.config.betterBookmarks then love.graphics.printf(bookmarkBeatText, project.res.cx - 18.5, project.res.cy - 7 + 11, 50, "center") end
+if not mods.beattools.config.betterBookmarks or not currentBookmark or not count or not currentProgress then
+	love.graphics.printf(math.floor(self.editorBeat), project.res.cx - 18.5, project.res.cy - 7, 50, "center")
+else
+	love.graphics.printf(beatText, project.res.cx - 18.5, project.res.cy - 7, 50, "center")
+	love.graphics.printf(bookmarkBeatText, project.res.cx - 18.5, project.res.cy - 7 + 11, 50, "center")
+end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
