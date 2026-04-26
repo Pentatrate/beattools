@@ -1,9 +1,9 @@
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
-if beattools and beattools.test then
+--[[ if beattools and beattools.test then
 	imgui.Text(tostring(beattools.test))
-end
+end ]]
 
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
@@ -116,6 +116,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("testKey")
 			configHelpers.input("testKey2")
 			configHelpers.input("testKey3")
+			imgui.Separator()
+			configHelpers.input("tooly")
 			imgui.Separator()
 			local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
 			if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
@@ -392,6 +394,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.doc("editor_features_adjustments")
 				configHelpers.input("dragThreshhold")
 				configHelpers.input("rememberMultiselectDelta")
+				configHelpers.input("copyCaching")
 				imgui.Separator()
 				configHelpers.input("roundSelectedTimes")
 				configHelpers.input("autoFixSides")

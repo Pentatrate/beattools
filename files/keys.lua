@@ -17,8 +17,11 @@ return {
 		-- local e = utilitools.internet.cache["https://api.github.com/repos/Pentatrate/test-dummy/releases"].body
 		-- modlog(mod, e, type(e))
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
-		modlog(mod, "e")
-		modlog(mod, savedata.utilitools.bindings)
+		-- modlog(mod, "e")
+		-- modlog(mod, savedata.utilitools.bindings)
+
+		local tooly = utilitools.files.beattools.tooly
+		beattools.test = tooly.getRangesBetween()
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

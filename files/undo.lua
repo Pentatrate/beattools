@@ -227,7 +227,7 @@ undo.pairs = function(list)
 	return beattools.moremetamethods.pairs(list)
 end
 undo.insert = function(list, pos, value)
-	if value == nil then
+	if value == nil and list then
 		value = pos
 		pos = #list + 1
 	end

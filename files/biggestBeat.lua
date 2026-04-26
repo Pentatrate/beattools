@@ -188,7 +188,7 @@ end
 function biggestBeat.drawAboveBeatLines()
 	if mod.config.multiselectRings and not biggestBeat.multiselectMin and biggestBeat.multiselectMax and biggestBeat.drawMultiselect then
 		love.graphics.setLineWidth(3)
-		love.graphics.setColor(love.math.colorFromBytes(0, 255, 0, 255))
+		love.graphics.setColor(mods.beattools.config.multiselectColor.r, mods.beattools.config.multiselectColor.g, mods.beattools.config.multiselectColor.b, 1)
 
 		if cs.multiselectStartAngle and cs.multiselectEndAngle and math.abs(cs.multiselectEndAngle - cs.multiselectStartAngle) < 360 then
 			love.graphics.arc("line", "open", project.res.cx, project.res.cy, biggestBeat.multiselectMax - 1.5, math.rad(cs.multiselectStartAngle - 90), math.rad(cs.multiselectEndAngle - 90))
@@ -201,17 +201,88 @@ function biggestBeat.drawAboveBeatLines()
 end
 
 function biggestBeat.drawMultiAngles()
-	if not (mod.config.multiselectRings and biggestBeat.multiselectMin and biggestBeat.multiselectMax) then return end
-	love.graphics.setLineWidth(2)
-	love.graphics.setColor(love.math.colorFromBytes(0, 255, 0, 255))
+	(function()
+		if not (mod.config.multiselectRings and biggestBeat.multiselectMin and biggestBeat.multiselectMax) then return end
 
-	local pos1 = helpers.rotate(biggestBeat.multiselectMin, cs.multiselectStartAngle, project.res.cx, project.res.cy)
-	local pos2 = helpers.rotate(biggestBeat.multiselectMax, cs.multiselectStartAngle, project.res.cx, project.res.cy)
-	love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+		love.graphics.setLineWidth(2)
+		love.graphics.setColor(mods.beattools.config.multiselectColor.r, mods.beattools.config.multiselectColor.g, mods.beattools.config.multiselectColor.b, 1)
 
-	pos1 = helpers.rotate(biggestBeat.multiselectMin, cs.multiselectEndAngle, project.res.cx, project.res.cy)
-	pos2 = helpers.rotate(biggestBeat.multiselectMax, cs.multiselectEndAngle, project.res.cx, project.res.cy)
-	love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+		local pos1 = helpers.rotate(biggestBeat.multiselectMin, cs.multiselectStartAngle, project.res.cx, project.res.cy)
+		local pos2 = helpers.rotate(biggestBeat.multiselectMax, cs.multiselectStartAngle, project.res.cx, project.res.cy)
+		love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+
+		pos1 = helpers.rotate(biggestBeat.multiselectMin, cs.multiselectEndAngle, project.res.cx, project.res.cy)
+		pos2 = helpers.rotate(biggestBeat.multiselectMax, cs.multiselectEndAngle, project.res.cx, project.res.cy)
+		love.graphics.line(pos1[1], pos1[2], pos2[1], pos2[2])
+	end)()
+
+
+
+	if not beattools.test or not beattools.test.timedRanges then return end
+	if mod.config.test == -1 then
+		love.graphics.setColor(love.math.colorFromBytes(0, 0, 128, 255))
+		for time, ranges in pairs(beattools.test.timedRanges) do
+			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
+				if not ranges then
+					love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
+				else
+					local tooly = utilitools.files.beattools.tooly
+					for _, range in ipairs(ranges) do
+						local width = tooly.getWidth(range)
+						love.graphics.arc("line", "open", project.res.cx, project.res.cy, cs:beatToRadius(time), math.rad(range[1] - 90), math.rad(range[1] + width - 90))
+					end
+				end
+			end
+		end
+		love.graphics.setColor(love.math.colorFromBytes(255, 0, 0))
+		for time, _ in pairs(beattools.test.impossibleRanges) do
+			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
+				love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
+			end
+		end
+	end
+
+	local intersection = utilitools.files.beattools.intersection
+	local oldSize = love.graphics.getPointSize()
+	love.graphics.setPointSize(2)
+	local pointAccuracy = 1 / 16 / 16
+	local function drawTunnels(tunnels, pastel)
+		local function drawFunc(func, i)
+			for t = func.startTime + pointAccuracy, func.endTime + pointAccuracy, pointAccuracy do
+				local time = helpers.clamp(t, math.min(func.startTime + pointAccuracy, func.endTime), func.endTime)
+				local prevTime = helpers.clamp(t - pointAccuracy, func.startTime, func.endTime)
+				if time ~= prevTime and cs.editorBeat <= time and prevTime <= cs.editorBeat + cs.drawDistance then
+					local prevAngle = intersection.useFunc(func, prevTime) + i
+					local prevPos = cs:getPosition(prevAngle, prevTime)
+					local angle = intersection.useFunc(func, time) + i
+					local pos = cs:getPosition(angle, time)
+					love.graphics.line(prevPos[1], prevPos[2], pos[1], pos[2])
+				end
+			end
+		end
+		for i, tunnel in pairs(tunnels) do
+			local max = math.min(#tunnels, 8)
+			love.graphics.setColor(utilitools.color.hsvToRgb(((i - 1) % max) / max * 360, pastel and 0.25 or 1, pastel and 0.5 or 1))
+			if intersection.isTimeOverlapping(tunnel, { startTime = cs.editorBeat, endTime = cs.editorBeat + cs.drawDistance }) then
+				for _, a in ipairs({ "a1", "a2" }) do
+					local funcs = tunnel[a]
+					for _, func in ipairs(funcs) do
+						if intersection.isTimeOverlapping(func, { startTime = cs.editorBeat, endTime = cs.editorBeat + cs.drawDistance }) then
+							drawFunc(func, i)
+						end
+					end
+				end
+			end
+		end
+	end
+	if beattools.test.tunnels then
+		local tunnelsToDraw = mod.config.test and mod.config.test ~= -1 and beattools.test.allTunnels and beattools.test.allTunnels[mod.config.test] or beattools.test.tunnels
+		drawTunnels(tunnelsToDraw, false)
+	end
+	if mod.config.test == -1 and beattools.test.antiTunnels then
+		drawTunnels(beattools.test.antiTunnels, true)
+	end
+	love.graphics.setPointSize(oldSize)
 end
 
 return biggestBeat

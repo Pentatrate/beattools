@@ -19,6 +19,7 @@ for i = 1, 8 do
 		self.p.paddles[i].enabled = i == 1
 		self.p.paddles[i].paddleSize = 70
 		self.p.paddles[i].baseAngle = 0
+		self.p.paddles[i].paddleWidth = 11
 	end
 end
 '''

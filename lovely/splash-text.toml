@@ -36,6 +36,7 @@ local additionalSplashes = {
 	"19,742 bytes!",
 	"Don't Hold Back!",
 	"Embrace the Spiral!",
+	"sevcon these blocks",
 	-- Pentatrate
 	"since i have an autoupdating system in place, adding even more splash text is no problem at all"
 }

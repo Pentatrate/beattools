@@ -1,0 +1,18 @@
+[manifest]
+dump_lua = true
+priority = 1
+version = "1.0.0"
+
+# Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''prof.push("player update")'''
+payload = '''
+if beattools.test and beattools.test.timedRanges then
+	local tooly = utilitools.files.beattools.tooly
+	tooly.play(beattools.test, cs.cBeat)
+end
+'''
+position = "after"
+target = "obj/Player.lua"

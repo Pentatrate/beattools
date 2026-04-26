@@ -5,7 +5,7 @@
 			"versions": [
 				[
 					">=",
-					"1.2.37"
+					"1.2.41"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."
@@ -153,6 +153,16 @@
 			"call": true
 		},
 		"betterBookmarks": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"tooly": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"intersection": {
 			"extension": "lua",
 			"load": true,
 			"call": true

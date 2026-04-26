@@ -109,9 +109,9 @@ local easing = {
 			end
 		},
 		paddles = {
-			different = "paddle", parallel = true, duration = { newWidth = true, newAngle = true }, start = false,
-			params = { newWidth = true, newAngle = true, enabled = true },
-			default = function(different) return { enabled = different == 1, newWidth = 70, newAngle = 0 } end
+			different = "paddle", parallel = true, duration = { newWidth = true, newAngle = true, newHeight = true }, start = false,
+			params = { newWidth = true, newAngle = true, newHeight = true, enabled = true },
+			default = function(different) return { enabled = different == 1, newWidth = 70, newAngle = 0, newHeight = 11 } end
 		},
 		bookmark = {
 			different = false, parallel = false, duration = false, start = false, noLevel = true,
@@ -127,6 +127,11 @@ local easing = {
 			different = false, parallel = false, duration = false, start = false,
 			params = { newname = true },
 			default = function(different) return { newname = nil } end
+		},
+		setBPM = {
+			different = false, parallel = false, duration = false, start = false,
+			params = { bpm = true },
+			default = function(different) return { bpm = 100 } end
 		}
 	},
 	convert = {
@@ -190,7 +195,13 @@ local easing = {
 			end,
 			convert = function(event, different, parallel) return { value = event[({ ["vfx.noteParticles.block"] = "block", ["vfx.noteParticles.miss"] = "miss", ["vfx.noteParticles.mine"] = "mine", ["vfx.noteParticles.mineHold"] = "mineHold", ["vfx.noteParticles.mineHoldHit"] = "mineHoldHit", ["vfx.noteParticles.mineHoldEnd"] = "mineHoldEnd", ["vfx.noteParticles.side"] = "side" })[different]] } end,
 			params = { block = true, miss = true, mine = true, mineHold = true, mineHoldHit = true, mineHoldEnd = true, side = true }
-		}
+		},
+		play = {
+			type = "setBPM",
+			different = false, -- function(event) return { event.bpm } end, -- same as setBPM event, no need to specify
+			convert = false, -- function(event, different, parallel) return { bpm = event.bpm } end, -- same as setBPM event, no need to specify
+			params = false, -- { bpm = true } -- same as setBPM event, no need to specify
+		},
 	},
 	list = {},
 	cache = {},
@@ -283,7 +294,7 @@ function easing.getArr(event, k, fakeDifferent)
 	local type = convert and convert.type or event.type
 	local track = easing.track[type]
 	if not track then if fakeDifferent then modwarn(mod, "No track: ", type, event.type, event, k, fakeDifferent) end return end
-	if track.different and not (fakeDifferent or event[track.different] or convert and convert.different) then --[[ modwarn(mod, "No different: ", event, k, fakeDifferent) ]] return end
+	if track.different and not (fakeDifferent or event[track.different] ~= nil or convert and convert.different) then --[[ modwarn(mod, "No different: ", event, k, fakeDifferent) ]] return end
 
 	local keyCheck
 	if not k then keyCheck = true
@@ -309,42 +320,13 @@ function easing.getArr(event, k, fakeDifferent)
 	for _, different in ipairs(differents) do
 		local arr = init(easing.list[type], different)
 		for parallel, _ in pairs(track.parallel and track.params or { ["_"] = true }) do
-			if fakeDifferent or not track.parallel or ((convert and convert.convert and convert.convert(event, different, parallel) or event)[parallel] and (not k or not track.params[k] or parallel == k)) then
-				tables[parallel] = tables[parallel] or {}
+			if fakeDifferent or not track.parallel or ((convert and convert.convert and convert.convert(event, different, parallel) or event)[parallel] ~= nil and (not k or not track.params[k] or parallel == k)) then
+				tables[parallel] = tables[parallel] == nil and {} or tables[parallel]
 				table.insert(tables[parallel], init(arr, parallel))
 			end
 		end
 	end
 	return tables, track, convert
-	--[[ if type == "paddles" and (event.paddle == 0 or fakeDifferent == 0) then
-		for i = 1, 8 do
-			init(arr, i)
-		end
-
-		local arr2 = {}
-		for param2, _ in pairs(track.params) do
-			if fakeDifferent or (event[param2] and (not k or not track.params[k] or param2 == k)) then
-				arr2[param2] = {}
-				for i = 1, 8 do
-					table.insert(arr2[param2], init(arr[i], param2))
-				end
-			end
-		end
-		return arr2, track
-	else
-		arr = init(arr, different)
-		if track.parallel then
-			local arr2 = {}
-			for param2, _ in pairs(track.params) do
-				if fakeDifferent or (event[param2] and (not k or not track.params[k] or param2 == k)) then
-					arr2[param2] = { init(arr, param2) }
-				end
-			end
-			return arr2, track
-		else
-			return { ["_"] = { init(arr, "_") } }, track
-		end
-	end ]]
 end
 
 function easing.cacheEvent(event, remove, k)
@@ -471,7 +453,7 @@ function easing.getEase(eventId, different, time, order, index)
 				end
 
 				if track.duration and track.duration[param] and event.duration and event.duration ~= 0 then
-					if track.start and track.start[param] and event[track.start[param]] then
+					if track.start and track.start[param] and event[track.start[param]] ~= nil then
 						-- start cannot be parallel
 						prevValues[param] = event[track.start[param]]
 					elseif list[i - 1] then

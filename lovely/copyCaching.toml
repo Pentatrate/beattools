@@ -1,0 +1,46 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Copy caching ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.copy = nil
+self.copySize = nil
+'''
+payload = '''
+if mods.beattools.config.copyCaching then
+	self.copy = mods.beattools.config.copyCache.copy
+	self.copySize = mods.beattools.config.copyCache.copySize
+	self.multiselectCopyStartAngle = mods.beattools.config.copyCache.multiselectCopyStartAngle
+	self.multiselectCopyEndAngle = mods.beattools.config.copyCache.multiselectCopyEndAngle
+else
+	self.copy = nil
+	self.copySize = nil
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+end,
+'copy',
+'''
+payload = '''
+	mods.beattools.config.copyCache = {}
+	mods.beattools.config.copyCache.copy = self.copy
+	mods.beattools.config.copyCache.copySize = self.copySize
+	mods.beattools.config.copyCache.multiselectCopyStartAngle = self.multiselectCopyStartAngle
+	mods.beattools.config.copyCache.multiselectCopyEndAngle = self.multiselectCopyEndAngle
+	modlog(mods.beattools, "copy", mods.beattools.config.copyCache, mods.beattools.config.copyCache.copy, mods.beattools.config.copyCache.copySize, mods.beattools.config.copyCache.multiselectCopyStartAngle, mods.beattools.config.copyCache.multiselectCopyEndAngle)
+'''
+position = "before"
+target = "states/Editor.lua"
+times = 1

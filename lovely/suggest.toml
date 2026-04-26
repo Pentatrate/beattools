@@ -9,9 +9,7 @@ version = "1.0.0"
 match_indent = true
 pattern = '''
 imgui.InputText(label, numptr, 9999)
-if imgui.IsItemDeactivated() then
-	event[propertyName] = ffi.string(numptr)
-end
+event[propertyName] = ffi.string(numptr)
 '''
 payload = '''
 if event.type == "ease" and propertyName == "var" then

@@ -1,7 +1,8 @@
 return function(window_flag, inputFlag)
-	helpers.SetNextWindowPos(750, 420, window_flag)
-	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Bookmarks", nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
+	if mod.config.bookmarkList then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		mod.config.bookmarkList = imgui.Begin("Bookmarks", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
 		if not (utilitools.files.beattools.easing.list.bookmark and utilitools.files.beattools.easing.list.bookmark["_"] and utilitools.files.beattools.easing.list.bookmark["_"]["_"]) then imgui.End() return end
 		local _, count = utilitools.files.beattools.easing.getEase("bookmark", nil, cs.editorBeat, nil, nil)
 		for i, bookmark in ipairs(utilitools.files.beattools.easing.list.bookmark["_"]["_"]) do

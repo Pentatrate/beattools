@@ -96,9 +96,10 @@ local function summary(changes)
 	end
 end
 return function(window_flag, inputFlag)
-	helpers.SetNextWindowPos(750, 400, window_flag)
-	helpers.SetNextWindowSize(200, 320, window_flag)
-	if imgui.Begin("Undo History", nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
+	if mod.config.undoHistory then
+		helpers.SetNextWindowPos(750, 400, window_flag)
+		helpers.SetNextWindowSize(200, 320, window_flag)
+		mod.config.undoHistory = imgui.Begin("Undo History", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
 		if imgui.BeginTabBar("beattoolsUndo") then
 			local first
 			local changes = {}

@@ -8,16 +8,17 @@ local function calc(math)
 end
 
 return function(window_flag, inputFlag)
-	helpers.SetNextWindowPos(750, 400, window_flag)
-	helpers.SetNextWindowSize(200, 320, window_flag)
-	if imgui.Begin("Calculate", false, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
+	if mod.config.editorCalculator then
+		helpers.SetNextWindowPos(750, 400, window_flag)
+		helpers.SetNextWindowSize(200, 320, window_flag)
+		mod.config.editorCalculator = imgui.Begin("Calculate", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
 		local saveToHistory = false
-		imgui.TextWrapped(mods.beattools.config.calculator.output)
+		imgui.TextWrapped(mod.config.calculator.output)
 		if imgui.IsItemClicked(1) then -- right click
-			utilitools.string.toClipboard(mods.beattools.config.calculator.output)
+			utilitools.string.toClipboard(mod.config.calculator.output)
 		end
 
-		local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator", mods.beattools.config.calculator.input, "", nil, nil, nil)
+		local newInput = utilitools.imguiHelpers.inputMultiline("##beattoolsCalculator", mod.config.calculator.input, "", nil, nil, nil)
 
 		if imgui.BeginTabBar("beattoolsCalculator") then
 			if imgui.BeginTabItem("Number Pad##beattoolsCalculator") then
@@ -50,7 +51,7 @@ return function(window_flag, inputFlag)
 			end
 			if imgui.BeginTabItem("History##beattoolsCalculator") then
 				if imgui.Button("Save to history") then saveToHistory = true end
-				for i, v in ipairs(mods.beattools.config.calculator.history) do
+				for i, v in ipairs(mod.config.calculator.history) do
 					imgui.Separator()
 					imgui.TextDisabled(v.input)
 					if imgui.Selectable_Bool(v.output, false) then
@@ -68,25 +69,25 @@ return function(window_flag, inputFlag)
 			end
 		end
 
-		if mods.beattools.config.calculator.input ~= newInput then
+		if mod.config.calculator.input ~= newInput then
 			if newInput == "" then
-				mods.beattools.config.calculator.output = "-"
+				mod.config.calculator.output = "-"
 			else
 				local success, result = calc(newInput)
 				if success then
-					mods.beattools.config.calculator.output = result
+					mod.config.calculator.output = result
 				end
 			end
-			mods.beattools.config.calculator.input = newInput
+			mod.config.calculator.input = newInput
 		end
 		if saveToHistory then
-			local lastEntry = mods.beattools.config.calculator.history[#mods.beattools.config.calculator.history]
-			if lastEntry.input ~= mods.beattools.config.calculator.input or lastEntry.output ~= mods.beattools.config.calculator.output then
-				table.insert(mods.beattools.config.calculator.history, {
-					input = mods.beattools.config.calculator.input, output = mods.beattools.config.calculator.output
+			local lastEntry = mod.config.calculator.history[#mod.config.calculator.history]
+			if lastEntry.input ~= mod.config.calculator.input or lastEntry.output ~= mod.config.calculator.output then
+				table.insert(mod.config.calculator.history, {
+					input = mod.config.calculator.input, output = mod.config.calculator.output
 				})
-				while #mods.beattools.config.calculator.history > 20 do
-					table.remove(mods.beattools.config.calculator.history, 1)
+				while #mod.config.calculator.history > 20 do
+					table.remove(mod.config.calculator.history, 1)
 				end
 			end
 		end

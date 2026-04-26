@@ -291,9 +291,10 @@ local function innerImgui()
 end
 
 return function(window_flag, inputFlag)
-	helpers.SetNextWindowPos(750, 420, window_flag)
-	helpers.SetNextWindowSize(200, 300, window_flag)
-	if imgui.Begin("Event Groups##beattoolsEventGroups", nil, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0)) then
+	if mod.config.showEventGroups then
+		helpers.SetNextWindowPos(750, 420, window_flag)
+		helpers.SetNextWindowSize(200, 300, window_flag)
+		mod.config.showEventGroups = imgui.Begin("Event Groups##beattoolsEventGroups", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
 		innerImgui()
 		imgui.End()
 	end

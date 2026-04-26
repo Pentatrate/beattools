@@ -283,7 +283,7 @@ function eventGroups.eventCustomGroup(event)
 		if event.beattoolsCustomEventGroups then event.beattoolsCustomEventGroups = nil end
 		return
 	end
-	if imgui.TreeNode_Str("Event Groups##beattoolsSelectedEventGroups") then
+	utilitools.imguiHelpers.treeNode("Event Groups##beattoolsSelectedEventGroups", function()
 		local hasAllCustomGroups = true
 		for groupName, _ in pairs(eventGroups.custom) do
 			if not (event.beattoolsCustomEventGroups and event.beattoolsCustomEventGroups[groupName]) then
@@ -325,8 +325,7 @@ function eventGroups.eventCustomGroup(event)
 				event.beattoolsCustomEventGroups = nil
 			end
 		end
-		imgui.TreePop()
-	end
+	end)
 	imgui.Separator()
 end
 

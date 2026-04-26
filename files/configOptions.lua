@@ -1143,6 +1143,28 @@ return {
 		default = { { { ["bind:ctrl"] = true }, "bind:mouse1" } },
 		off = {}
 	},
+	tooly = {
+		type = "bool",
+		name = "Beatsolver",
+		tooltips = { short = "Solves beats and blocks for you\n(Tasbot for levels)\n(AKA: Tooly, Beatblockbot)" },
+		default = false,
+		off = false
+	},
+	copyCaching = {
+		type = "bool",
+		name = "Save Copied Events",
+		tooltips = { short = "Saved copied events between editor sessions" },
+		default = true,
+		off = false
+	},
+	test = {
+		type = "sliderInt",
+		name = "TEST",
+		tooltips = { short = "test" },
+		default = -1,
+		min  = -1,
+		max = 3
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1278,5 +1300,10 @@ return {
 		type = "hidden",
 		name = "[internal] beatSnap",
 		default = 16
+	},
+	copyCache = {
+		type = "hidden",
+		name = "[internal] copyCache",
+		default = {}
 	}
 }

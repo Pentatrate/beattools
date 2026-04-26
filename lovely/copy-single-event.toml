@@ -13,22 +13,19 @@ end,
 'copy',
 '''
 payload = '''
-		self.copySingle = false
-	elseif mods.beattools.config.copySingle and self.selectedEvent then
-		self.copy = helpers.copy({ self.selectedEvent })
-		self.copy[1].time = 0
-		self.copySize = 0
+	self.copySingle = false
+elseif mods.beattools.config.copySingle and self.selectedEvent then
+	self.copy = helpers.copy({ self.selectedEvent })
+	self.copy[1].time = 0
+	self.copySize = 0
 
-		self.multiselectCopyStartAngle = 0
-		self.multiselectCopyEndAngle = 360
+	self.multiselectCopyStartAngle = 0
+	self.multiselectCopyEndAngle = 360
 
-		self.p:hurtPulse()
-		self.copySingle = true
-	end
-end,
-'copy',
+	self.p:hurtPulse()
+	self.copySingle = true
 '''
-position = "at"
+position = "before"
 target = "states/Editor.lua"
 
 [[patches]]
