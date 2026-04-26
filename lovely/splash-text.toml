@@ -42,7 +42,12 @@ local additionalSplashes = {
 	"since i have an autoupdating system in place, adding even more splash text is no problem at all",
 	"Sponsored by Penta's Beattools!"
 }
--- splashes = { unpack(splashes), unpack(additionalSplashes) }
+
+_G.beattools = beattools or {}
+beattools.splashes = beattools.splashes or {}
+beattools.splashes.total = splashes
+beattools.splashes.regular = helpers.copy(splashes)
+beattools.splashes.additional = additionalSplashes
 '''
 position = "before"
 target = "preload/splashes.lua"
@@ -50,22 +55,68 @@ target = "preload/splashes.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = '''log(splashes[#splashes])'''
+payload = '''
+-- +1 for this splash, +1 for the real totals splash
+table.insert(additionalSplashes, "There are " .. (#additionalSplashes + 2) .. " beattools modded splashes! Collect them all!")
+log(additionalSplashes[#additionalSplashes])
+
+beattools.splashes.added = helpers.copy(splashes)
+'''
+position = "after"
+target = "preload/splashes.lua"
+
+# Adds splashes to splash selector ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''for i = 1, 3 do'''
+payload = '''beattools.splashes.rg_nods = helpers.copy(rg_nods)'''
+position = "before"
+target = "preload/splashes.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''
-table.insert(splashes,"There are "..
-	-- +1 for this one being added right now
-	-- +1 for the shiny splash in splashes.gen
-	(#splashes + 2).." splashes! Collect them all!")
-log(splashes[#splashes])
+local cranky = {}
+if savedata.aprilFools.noCranky then
+	--crankless
+	cranky = {
 '''
 payload = '''
-table.insert(splashes,"There are "..
-	-- +1 for this one being added right now
-	-- +1 for the shiny splash in splashes.gen
-	(#splashes + 2).." vanilla splashes! Collect them all!")
-log(splashes[#splashes])
+	--crankless
+	local crankless = {
+'''
+position = "at"
+target = "preload/splashes.lua"
 
-table.insert(additionalSplashes, "There are " .. (#additionalSplashes + 1) .. " beattools modded splashes! Collect them all!")
-log(additionalSplashes[#additionalSplashes])
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+else
+	--crankful
+	cranky = {
+'''
+payload = '''
+	--crankful
+	local crankful = {
+'''
+position = "at"
+target = "preload/splashes.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+end
+for i,v in ipairs(cranky) do
+'''
+payload = '''
+beattools.splashes.crankless = crankless
+beattools.splashes.crankful = crankful
+for i,v in ipairs(savedata.aprilFools.noCranky and crankless or crankful) do
 '''
 position = "at"
 target = "preload/splashes.lua"
@@ -74,24 +125,63 @@ target = "preload/splashes.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''local splash = splashes[num or math.random(#splashes)]'''
+pattern = '''if type(num) ~= "number" then num = nil end'''
 payload = '''
-if num and (num < 1 or num % 1 ~= 0) then num = nil end -- idiot check
 local splash
-if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-	if num and num > #splashes + #additionalSplashes + 1 then num = nil end
-	num = num or math.random(#splashes + #additionalSplashes + 1)
-	if num == 1 then
-		splash = "There are " .. (#splashes + #additionalSplashes + 1) .. " total splashes! Collect them all!"
-	elseif num <= #splashes + 1 then
-		splash = splashes[num - 1]
-	else
-		splash = additionalSplashes[num - 1 - #splashes]
-	end
-else
-	if num and num > #splashes then num = nil end
-	splash = splashes[num or math.random(#splashes)]
+if type(num) == "string" then
+	splash = num
+elseif type(num) ~= "number" then
+	num = nil
 end
 '''
 position = "at"
 target = "preload/splashes.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local splash = splashes[num or math.random(#splashes)]
+
+if math.random(1, 8192) == 1 then
+'''
+payload = '''
+if type(num) ~= "string" and num ~= 1 then
+	-- num == 1: shiny
+	-- num == 2: real total splashes
+	-- num <= #splashes + 2: regular + cranky status splashes
+	-- num <= #splashes + #additionalSplashes + 2: additional splashes
+	if num and (num < 2 or num % 1 ~= 0) then num = nil end -- idiot check
+	if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+		if num and num > #splashes + #additionalSplashes + 2 then num = nil end
+		num = num or math.random(#splashes + #additionalSplashes + 2)
+		if num == 2 then
+			-- +1 for this splash, +1 for the shiny splash, and idk, but its seems ive missed one, ill leave it at 2 though
+			splash = "There are actually " .. (#splashes + #additionalSplashes + 2) .. " total modded and vanilla splashes! Collect them all!"
+		elseif num <= #splashes + 2 then
+			splash = splashes[num - 2]
+		else
+			splash = additionalSplashes[num - 2 - #splashes]
+		end
+	else
+		if num and num > #splashes + 1 then num = nil end
+		splash = splashes[num or math.random(#splashes)]
+	end
+end
+if type(num) ~= "string" and (math.random(1, 8192) == 1 or num == 1) then
+'''
+position = "at"
+target = "preload/splashes.lua"
+
+# Splash selector ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+love.graphics.print(version, project.res.cx * 2 - fonts.digitalDisco:getWidth(version) - 10 ,6 + self.logoY )
+color()'''
+payload = '''
+utilitools.files.beattools.splashes.imgui()
+'''
+position = "at"
+target = "states/Menu.lua"

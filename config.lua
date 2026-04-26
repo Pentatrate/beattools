@@ -195,6 +195,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			imgui.BeginDisabled()
 			configHelpers.input("levelSelectShowIncompatible")
 			imgui.EndDisabled()
+			imgui.Separator()
+			configHelpers.input("splashTextWindow")
 		end)
 		configHelpers.treeNode("Features", function()
 			configHelpers.doc("levelSelect_features")

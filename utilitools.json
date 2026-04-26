@@ -166,6 +166,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"splashes": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,
