@@ -1169,9 +1169,8 @@ return {
 		type = "bool",
 		name = "Splash Text Window",
 		tooltips = { short = "Shows a window to set the current splash text" },
-		default = -1,
-		min  = -1,
-		max = 3
+		default = true,
+		off = false
 	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
