@@ -7,11 +7,11 @@ return function(window_flag, inputFlag)
 			local _, count = utilitools.files.beattools.easing.getEase("bookmark", nil, cs.editorBeat, nil, nil)
 			for i, bookmark in ipairs(utilitools.files.beattools.easing.list.bookmark["_"]["_"]) do
 				if i ~= 1 then imgui.Separator() end
-				imgui.ColorButton("", imgui.ImVec4_Float(love.math.colorFromBytes(bookmark.event.r or 0, bookmark.event.g or 0, bookmark.event.b or 0, 255)), 2^1, imgui.ImVec2_Float(20, 20))
+				imgui.ColorButton("##beattoolsBookmarkList" .. i, imgui.ImVec4_Float(love.math.colorFromBytes(bookmark.event.r or 0, bookmark.event.g or 0, bookmark.event.b or 0, 255)), 2^1, imgui.ImVec2_Float(20, 20))
 				imgui.SameLine()
 				local name = "Unnamed Bookmark"
 				if bookmark.event.name and bookmark.event.name ~= "" then name = bookmark.event.name end
-				if imgui.Selectable_Bool(name .. " (Time: " .. (helpers.round(bookmark.event.time * 1e3) / 1e3) .. ")", count.index == i) then
+				if imgui.Selectable_Bool(name .. " (Time: " .. (helpers.round(bookmark.event.time * 1e3) / 1e3) .. ")##beattoolsBookmarkList" .. i, count.index == i) then
 					cs.editorBeat = bookmark.event.time
 					cs:noSelection()
 					cs.selectedEvent = cs.level.events[utilitools.files.beattools.easing.getIndex(bookmark.event)]
