@@ -67,6 +67,7 @@ return function(window_flag, inputFlag)
 				imgui.TextWrapped("Newlines possible\n+ - * / ^ symbols\nmath.sin( / .cos( etc.\nmath.floor( / .ceil( etc.\nhelpers.round(")
 				imgui.EndTabItem("Lua Syntax##beattoolsCalculator")
 			end
+			imgui.EndTabBar()
 		end
 
 		if mod.config.calculator.input ~= newInput then

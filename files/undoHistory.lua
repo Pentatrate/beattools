@@ -126,6 +126,7 @@ return function(window_flag, inputFlag)
 				end
 				imgui.EndTabItem("History##beattoolsUndo")
 			end
+			imgui.EndTabBar()
 		end
 
 		imgui.End()
