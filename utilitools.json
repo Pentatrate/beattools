@@ -1,11 +1,10 @@
 {
-	"short": "BT",
 	"dependencies": {
 		"utilitools": {
 			"versions": [
 				[
 					">=",
-					"1.2.41"
+					"1.2.43"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."

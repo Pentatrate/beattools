@@ -1163,7 +1163,7 @@ return {
 		tooltips = { short = "test" },
 		default = -1,
 		min  = -1,
-		max = 3
+		max = 80
 	},
 	splashTextWindow = {
 		type = "bool",
@@ -1311,6 +1311,11 @@ return {
 	copyCache = {
 		type = "hidden",
 		name = "[internal] copyCache",
+		default = {}
+	},
+	searches = {
+		type = "hidden",
+		name = "[internal] searches",
 		default = {}
 	}
 }

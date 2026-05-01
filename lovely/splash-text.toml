@@ -40,7 +40,12 @@ local additionalSplashes = {
 	"[font=terminal]I THINK IVE RUN TOO FAR\nI COLLAPSE BY THE[font=main] bed\n[font=main][rotateY=3.2]ZZZ...",
 	-- Pentatrate
 	"since i have an autoupdating system in place, adding even more splash text is no problem at all",
-	"Sponsored by Penta's Beattools!"
+	"Sponsored by [rotateY=1]Penta's Beattools[rotateY=0]!",
+	"Sponsored by [rotateY=1]Beattools[rotateY=0]!",
+	"Sponsored by [rotateY=1]Utilitools[rotateY=0]!",
+	"This collab is sponsored by Penta's Beattools. Have you ever been in need of things the editor just won't provide ? Well, with Penta's Beattools, many things, such as a particle generator, a bpm corrector, and many more become available to you !\nClick the download link in the description and use code \"WHENP16FL7\" to get 50% off on your first purchase !", -- originally from whenpigfly
+	"We won't let the devs take us for fools:\nthis is clearly sponsored by Penta's Beattools.", -- originally from K4kadu
+	"Self-advertising is my forte\n- Penta"
 }
 
 _G.beattools = beattools or {}

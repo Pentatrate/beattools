@@ -156,9 +156,8 @@ function intersection.validateFunctions(funcs, fullEvaluation)
 		if prevFunc then
 			local prevVal = intersection.useFunc(prevFunc, prevFunc.endTime)
 			local nextVal = intersection.useFunc(func, func.startTime)
-			local diff = math.abs(nextVal - prevVal) % 360
-			if diff > 180 then diff = math.abs(diff - 360) end
-			if prevFunc.endTime ~= func.startTime or (fullEvaluation and diff > 0.01) then
+			local diff = math.abs(nextVal - prevVal)
+			if prevFunc.endTime ~= func.startTime or (fullEvaluation and diff > 1e-9) then
 				if prevFunc.endTime == func.startTime then
 					modwarn(mod, "NOT GLUED", i, func.startTime, prevVal, nextVal, math.abs(nextVal - prevVal), prevFunc, func)
 				end
@@ -188,7 +187,7 @@ function intersection.glueFuncsTogether(funcs)
 			local nexVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nexVal - prevVal) % 360
 			if diff > 180 then diff = math.abs(diff - 360) end
-			if prevFunc.endTime ~= func.startTime or (true and diff > 0.01) then
+			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-9) then
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, prevVal, nexVal, math.abs(nexVal - prevVal), funcs)
 				return false
 			end
@@ -442,15 +441,18 @@ function intersection.getLowest(func)
 	return math.min(unpack(candidates))
 end
 
-function intersection.intersectPerpetually(func) -- for intersecting with the x-axis in the use case of only having numbers in [0, 360[ (without 360)
+function intersection.intersectPerpetually(func, printing) -- for intersecting with the x-axis in the use case of only having numbers in [0, 360[ (without 360)
 	local lowest = intersection.getLowest(func)
 	local highest =  intersection.getHighest(func)
 	lowest, highest = lowest + (lowest % 360 == 0 and 0 or 360) - lowest % 360, highest - highest % 360
+	lowest = (lowest + 180) - (lowest + 180) % 360
+	if printing then modlog(mod, "printing", lowest, highest, lowest > highest) end
 	if lowest > highest then
 		return {} -- no intersections
 	else
 		local intersections = {}
 		for i = lowest, highest, 360 do
+			if printing then modlog(mod, "DOINT ITTTTTTTT", i) end
 			local func2 = intersection.subtractFunction(func, { a0 = i }, true)
 			local newIntersections = intersection.intersect(func2)
 			if newIntersections then
@@ -468,18 +470,28 @@ end
 function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 	-- both funcs are continuous in their domain
 	-- they are not neccessarily differentiable
+	-- a single func within the funcs is differentiable though
 	local returnRoots = {}
 	local fullOverlap = {}
-	local lowest
+	local lowest, highest
 	for _, func1 in ipairs(funcs1) do
 		for _, func2 in ipairs(funcs2) do
 			if intersection.isTimeOverlapping(func1, func2) then
 				local func = intersection.subtractFunction(func1, func2, true)
 				if getLowest then
-					local low = intersection.getLowest(func)
+					local low, high = intersection.getLowest(func), intersection.getHighest(func)
 					if not lowest or lowest > low then lowest = low end
+					if not highest or highest > high then highest = high end
 				else
-					local roots = intersection.intersectPerpetually(func)
+					local printing
+					if 2.25 < func.startTime and func.endTime < 2.35 then
+						local startV = intersection.useFunc(func, func.startTime) % 360
+						local endV = intersection.useFunc(func, func.endTime) % 360
+						local diff = math.abs(endV - startV) % 360
+						modlog(mod, startV, endV, diff, func)
+						printing = diff > 270
+					end
+					local roots = intersection.intersectPerpetually(func, printing)
 					if roots then
 						for _, root in ipairs(roots) do
 							table.insert(returnRoots, root)
@@ -498,7 +510,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 				else
 					local diff = math.abs(intersection.useFunc(func1, time) - intersection.useFunc(func2, time)) % 360
 					if diff > 180 then diff = math.abs(diff - 360) end
-					if diff <= 0.01 then
+					if diff <= 1e-9 then
 						table.insert(returnRoots, time)
 					end
 				end
@@ -506,7 +518,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 		end
 	end
 	if getLowest then
-		return lowest
+		return lowest, highest
 	end
 	returnRoots = intersection.noDuplicates(returnRoots)
 	return returnRoots, fullOverlap

@@ -252,9 +252,9 @@ function biggestBeat.drawMultiAngles()
 				local time = helpers.clamp(t, math.min(func.startTime + pointAccuracy, func.endTime), func.endTime)
 				local prevTime = helpers.clamp(t - pointAccuracy, func.startTime, func.endTime)
 				if time ~= prevTime and cs.editorBeat <= time and prevTime <= cs.editorBeat + cs.drawDistance then
-					local prevAngle = intersection.useFunc(func, prevTime) + i
+					local prevAngle = intersection.useFunc(func, prevTime) + i * 0.01
 					local prevPos = cs:getPosition(prevAngle, prevTime)
-					local angle = intersection.useFunc(func, time) + i
+					local angle = intersection.useFunc(func, time) + i * 0.01
 					local pos = cs:getPosition(angle, time)
 					love.graphics.line(prevPos[1], prevPos[2], pos[1], pos[2])
 				end
