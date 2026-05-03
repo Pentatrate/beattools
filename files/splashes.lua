@@ -89,8 +89,8 @@ function splashes.imgui()
 			insertSplashes(beattools.splashes.additional, "More Splashes (Beattools)")
 			insertSplashes(beattools.splashes.total, "Other Modded Splashes (likely ExtraStuff)")
 
-			insertSplash("There are actually " .. (#beattools.splashes.total + #beattools.splashes.additional + 2) .. " total modded and vanilla splashes! Collect them all!", "More Splashes (Beattools)", false, 1)
-			insertSplash("[colour=2]You found the shiny splash text!", "Otherwise Added Splashes", true, 2)
+			insertSplash("There are actually " .. (#beattools.splashes.total + #beattools.splashes.additional + 2) .. " total modded and vanilla splashes! Collect them all!", "More Splashes (Beattools)", false, 2)
+			insertSplash("[colour=2]You found the shiny splash text!", "Otherwise Added Splashes", true, 1)
 
 			for category, array in pairs(beattools.splashes.categoriesSorted) do
 				table.sort(array, function(a, b)

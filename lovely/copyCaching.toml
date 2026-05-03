@@ -39,7 +39,6 @@ payload = '''
 	mods.beattools.config.copyCache.copySize = self.copySize
 	mods.beattools.config.copyCache.multiselectCopyStartAngle = self.multiselectCopyStartAngle
 	mods.beattools.config.copyCache.multiselectCopyEndAngle = self.multiselectCopyEndAngle
-	modlog(mods.beattools, "copy", mods.beattools.config.copyCache, mods.beattools.config.copyCache.copy, mods.beattools.config.copyCache.copySize, mods.beattools.config.copyCache.multiselectCopyStartAngle, mods.beattools.config.copyCache.multiselectCopyEndAngle)
 '''
 position = "before"
 target = "states/Editor.lua"

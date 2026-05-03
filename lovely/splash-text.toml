@@ -45,7 +45,33 @@ local additionalSplashes = {
 	"Sponsored by [rotateY=1]Utilitools[rotateY=0]!",
 	"This collab is sponsored by Penta's Beattools. Have you ever been in need of things the editor just won't provide ? Well, with Penta's Beattools, many things, such as a particle generator, a bpm corrector, and many more become available to you !\nClick the download link in the description and use code \"WHENP16FL7\" to get 50% off on your first purchase !", -- originally from whenpigfly
 	"We won't let the devs take us for fools:\nthis is clearly sponsored by Penta's Beattools.", -- originally from K4kadu
-	"Self-advertising is my forte\n- Penta"
+	"Self-advertising is my forte\n- Penta",
+	"Oh I'm beating it.\nOh I'm beating it.\nI'm beating my block right now.\nOh I'm beating it.\nOh I'm beating it.\nI'm beating my block right now.",
+	"Oh I'm blowing it.\nOh I'm blowing it.\nI'm blowing my fuse right now.\nOh I'm blowing it.\nOh I'm blowing it.\nI'm blowing my fuse right now.",
+	"How do you spell \"Nitteuk\"?",
+	"Disqualify Bliss",
+	"Bliss knows the best way to prepare for a tournament",
+	"Are you watching reels?", -- Bliss watched reels in prep for BBT 2025 and lost because of it, who would have thought
+	"Hydrogen _Play_ vs coughing Tunne",
+	"Update your Beattools, dammit!",
+	"Our BEATBLOCK had a saying:\n\"When something Crashes,\nit's usually the Beattools\"",
+	"Is it yummy?",
+	"Is it done?",
+	"I crave progress",
+	"Elite ball knowledge",
+	"No elite ball knowledge",
+	"Want to see penta's balls?\n[offset=50][font=undocrash]Disclaimer: Penta's balls is a shader",
+	"\"I have too much decency to be a rich brown color[font=undocrash] (edited)[font=digitalDisco]\ni need not look like a turd\"\n - Mio, looking like a turd",
+	"Hows the logic going", -- I'm still not done :'c
+	"What the fuck is a drogen",
+	"(drogen is german and literally translates to drugs)\n(thats why kak replied in german with straße, which literally translates to road)",
+	"\"she shade my balls till I'm penta ?\"\n- Cyt",
+	"Shrek in beatblock?",
+	"\"I theoretically went to bed around 3 hours ago\"\n- Kakadu",
+	"Jumpbeats!",
+	"Dshambbeets",
+	"Solve your skill issue with a skill solution!",
+	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously"
 }
 
 _G.beattools = beattools or {}

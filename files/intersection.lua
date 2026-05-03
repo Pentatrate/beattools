@@ -140,6 +140,7 @@ function intersection.useFuncs(funcs, time)
 			return intersection.useFunc(func, time)
 		end
 	end
+	modwarn(mod, "NOT IN TIME", funcs, time)
 end
 function intersection.derive(func)
 	local func2 = helpers.copy(func)
@@ -157,12 +158,12 @@ function intersection.validateFunctions(funcs, fullEvaluation)
 			local prevVal = intersection.useFunc(prevFunc, prevFunc.endTime)
 			local nextVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nextVal - prevVal)
-			if prevFunc.endTime ~= func.startTime or (fullEvaluation and diff > 1e-9) then
-				if prevFunc.endTime == func.startTime then
-					modwarn(mod, "NOT GLUED", i, func.startTime, prevVal, nextVal, math.abs(nextVal - prevVal), prevFunc, func)
+			if prevFunc.endTime ~= func.startTime or (fullEvaluation and diff > 1e-4) then
+				--[[ if prevFunc.endTime == func.startTime then
+					-- modwarn(mod, "NOT GLUED", i, func.startTime, prevVal, nextVal, math.abs(nextVal - prevVal), prevFunc, func)
 				end
-				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, math.abs(nexVal - prevVal), funcs)
-				return false, prevFunc.endTime ~= func.startTime and "prev endTime ~= current startTime" or "not glued"
+				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, math.abs(nexVal - prevVal), funcs) ]]
+				return false, prevFunc.endTime ~= func.startTime and utilitools.string.concat("prev endTime ~= current startTime", prevFunc.endTime, func.startTime) or utilitools.string.concat("not glued", "time", func.startTime, "vals", prevVal, nextVal, "diff", math.abs(nextVal - prevVal))
 			end
 		end
 	end
@@ -187,7 +188,7 @@ function intersection.glueFuncsTogether(funcs)
 			local nexVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nexVal - prevVal) % 360
 			if diff > 180 then diff = math.abs(diff - 360) end
-			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-9) then
+			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-6) then
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, prevVal, nexVal, math.abs(nexVal - prevVal), funcs)
 				return false
 			end
@@ -197,15 +198,26 @@ function intersection.glueFuncsTogether(funcs)
 	while funcs[i] do
 		local func1 = funcs[i]
 
-		local j = 1
+		local j = i + 1
 		while funcs[j] do
 			local func2 = funcs[j]
 
-			if func1 ~= func2 and intersection.isTimeOverlapping(func1, func2, true) and intersection.functionIdentical(func1, func2) then
-				func1.startTime = math.min(func1.startTime, func2.startTime)
-				func1.endTime = math.max(func1.endTime, func2.endTime)
-				table.remove(funcs, j)
-				j = j - 1
+			if func1 ~= func2 then
+				if intersection.isTimeOverlapping(func1, func2, true) and intersection.functionIdentical(func1, func2) then
+					func1.startTime = math.min(func1.startTime, func2.startTime)
+					func1.endTime = math.max(func1.endTime, func2.endTime)
+					table.remove(funcs, j)
+					j = j - 1
+				else
+					local val1, val2 = intersection.useFunc(func1, func1.endTime), intersection.useFunc(func2, func2.startTime)
+					local diff = val1 - val2 + 180
+					diff = diff - diff % 360
+					if func1.endTime == func2.startTime and diff ~= 0 then
+						func2 = intersection.addFunction(func2, { startTime = func2.startTime, endTime = func2.endTime, a0 = diff })
+						funcs[j] = func2
+					end
+					break
+				end
 			end
 
 			j = j + 1
@@ -425,27 +437,51 @@ function intersection.intersect(func)
 	end
 end
 
-function intersection.getCriticalPoints(func)
+function intersection.getCriticalTimes(func)
 	local derivative = intersection.derive(func)
-	local candidates = intersection.intersect(derivative) or {} -- if all intersect then just say none do
-	table.insert(candidates, intersection.useFunc(func, func.startTime))
-	table.insert(candidates, intersection.useFunc(func, func.endTime))
-	return intersection.noDuplicates(candidates)
+	local times = intersection.intersect(derivative) or {} -- if all intersect then just say none do
+	table.insert(times, func.startTime)
+	table.insert(times, func.endTime)
+	local final, values = {}, {}
+	times = intersection.noDuplicates(times)
+	for _, time in ipairs(times) do
+		if intersection.inTime(func, time) then
+			table.insert(final, time)
+			table.insert(values, intersection.useFunc(func, time))
+		end
+	end
+	return final, values
 end
 function intersection.getHighest(func)
-	local candidates = intersection.getCriticalPoints(func)
-	return math.max(unpack(candidates))
+	local _, values = intersection.getCriticalTimes(func)
+	return math.max(unpack(values))
 end
 function intersection.getLowest(func)
-	local candidates = intersection.getCriticalPoints(func)
-	return math.min(unpack(candidates))
+	local _, values = intersection.getCriticalTimes(func)
+	return math.min(unpack(values))
+end
+function intersection.getLowestFuncs(funcs)
+	local lowest
+	for _, func in ipairs(funcs) do
+		local low = intersection.getLowest(func)
+		lowest = lowest and math.min(lowest, low) or low
+	end
+	return lowest
+end
+function intersection.getHighestFuncs(funcs)
+	local highest
+	for _, func in ipairs(funcs) do
+		local high = intersection.getHighest(func)
+		highest = highest and math.max(highest, high) or high
+	end
+	return highest
 end
 
 function intersection.intersectPerpetually(func, printing) -- for intersecting with the x-axis in the use case of only having numbers in [0, 360[ (without 360)
 	local lowest = intersection.getLowest(func)
 	local highest =  intersection.getHighest(func)
-	lowest, highest = lowest + (lowest % 360 == 0 and 0 or 360) - lowest % 360, highest - highest % 360
-	lowest = (lowest + 180) - (lowest + 180) % 360
+	lowest, highest = lowest + (lowest % 360 == 0 and 0 or 360) - lowest % 360 + 180, highest - highest % 360
+	lowest = lowest - lowest % 360
 	if printing then modlog(mod, "printing", lowest, highest, lowest > highest) end
 	if lowest > highest then
 		return {} -- no intersections
@@ -507,10 +543,11 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 				if getLowest then
 					local low = intersection.useFunc(func1, time) - intersection.useFunc(func2, time)
 					if not lowest or lowest > low then lowest = low end
+					if not highest or highest < low then highest = low end
 				else
 					local diff = math.abs(intersection.useFunc(func1, time) - intersection.useFunc(func2, time)) % 360
 					if diff > 180 then diff = math.abs(diff - 360) end
-					if diff <= 1e-9 then
+					if diff <= 1e-6 then
 						table.insert(returnRoots, time)
 					end
 				end
@@ -524,7 +561,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 	return returnRoots, fullOverlap
 end
 
-function intersection.getFunction(time, duration, startVal, endVal, ease, secondTime) -- secondTime in prep for out eases
+function intersection.getFunction(time, duration, startVal, endVal, ease, secondTime)
 	ease = ease or "linear"
 	if not flux.easing[ease] and not secondTime then ease = "linear" end
 	local func = { startTime = math.min(time, time + duration), endTime = math.max(time, time + duration) }
@@ -548,8 +585,9 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 					funcs,
 					intersection.getFunction(
 						time + i - step, step,
-						startVal + flux.easing[ease](helpers.clamp((i - step) / duration, 0, 1)) * d,
-						startVal + flux.easing[ease](helpers.clamp(i / duration, 0, 1)) * d
+						i == step and startVal or (startVal + flux.easing[ease](helpers.clamp((i - step) / duration, 0, 1)) * d),
+						i == duration and endVal or (startVal + flux.easing[ease](helpers.clamp(i / duration, 0, 1)) * d),
+						"linear"
 					)[1]
 				)
 			end
@@ -561,11 +599,12 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 				funcs,
 				intersection.getFunction(
 					time + duration - delta, delta,
-					startVal + flux.easing[ease]((duration - delta) / duration) * d,
+					delta == duration and startVal or (startVal + flux.easing[ease]((duration - delta) / duration) * d),
 					endVal
 				)[1]
 			)
 		end
+		modlog(mod, intersection.useFuncs(funcs, time) - startVal, intersection.useFuncs(funcs, time + duration) - endVal)
 		return funcs
 	elseif ease:sub(1, #"inOut") == "inOut" then
 		local ease2 = ease:sub(#"inOut" + 1, #"inOut" + 1):lower() .. ease:sub(#"inOut" + 2)
@@ -692,13 +731,9 @@ function intersection.addFunction(func1, func2, allowCutoff)
 	return funcA
 end
 function intersection.subtractFunction(func1, func2, allowCutoff)
-	local funcB = helpers.copy(func2)
-	for i = 0, 5 do
-		if funcB["a" .. i] then
-			funcB["a" .. i] = -funcB["a" .. i]
-		end
-	end
-	return intersection.addFunction(func1, funcB, allowCutoff)
+	func2 = helpers.copy(func2)
+	intersection.multiplyFunction(func2, -1)
+	return intersection.addFunction(func1, func2, allowCutoff)
 end
 function intersection.addFunctions(funcs1, funcs2)
 	if not (intersection.validateFunctions(funcs1) and intersection.validateFunctions(funcs2)) then
@@ -788,6 +823,25 @@ function intersection.addFunctions(funcs1, funcs2)
 		modwarn(mod, "INVALID ADDITIONS", resultFuncs, funcs1, funcs2, i, j)
 	end
 	return resultFuncs
+end
+function intersection.subtractFunctions(funcs1, funcs2)
+	funcs2 = helpers.copy(funcs2)
+	intersection.multiplyFunctions(funcs2, -1)
+	return intersection.addFunctions(funcs1, funcs2)
+end
+function intersection.multiplyFunction(func, mult)
+	for i = 0, 5 do
+		if func["a" .. i] then
+			func["a" .. i] = func["a" .. i] * mult
+		end
+	end
+	return func
+end
+function intersection.multiplyFunctions(funcs, mult)
+	for _, func in ipairs(funcs) do
+		intersection.multiplyFunction(func, mult)
+	end
+	return funcs
 end
 
 return intersection

@@ -246,20 +246,20 @@ function biggestBeat.drawMultiAngles()
 	local oldSize = love.graphics.getPointSize()
 	love.graphics.setPointSize(2)
 	local pointAccuracy = 1 / 16 / 16
-	local function drawTunnels(tunnels, pastel)
-		local function drawFunc(func, i)
-			for t = func.startTime + pointAccuracy, func.endTime + pointAccuracy, pointAccuracy do
-				local time = helpers.clamp(t, math.min(func.startTime + pointAccuracy, func.endTime), func.endTime)
-				local prevTime = helpers.clamp(t - pointAccuracy, func.startTime, func.endTime)
-				if time ~= prevTime and cs.editorBeat <= time and prevTime <= cs.editorBeat + cs.drawDistance then
-					local prevAngle = intersection.useFunc(func, prevTime) + i * 0.01
-					local prevPos = cs:getPosition(prevAngle, prevTime)
-					local angle = intersection.useFunc(func, time) + i * 0.01
-					local pos = cs:getPosition(angle, time)
-					love.graphics.line(prevPos[1], prevPos[2], pos[1], pos[2])
-				end
+	local function drawFunc(func, i)
+		for t = func.startTime + pointAccuracy, func.endTime + pointAccuracy, pointAccuracy do
+			local time = helpers.clamp(t, math.min(func.startTime + pointAccuracy, func.endTime), func.endTime)
+			local prevTime = helpers.clamp(t - pointAccuracy, func.startTime, func.endTime)
+			if time ~= prevTime and cs.editorBeat <= time and prevTime <= cs.editorBeat + cs.drawDistance then
+				local prevAngle = intersection.useFunc(func, prevTime) + i * 0.01
+				local prevPos = cs:getPosition(prevAngle, prevTime)
+				local angle = intersection.useFunc(func, time) + i * 0.01
+				local pos = cs:getPosition(angle, time)
+				love.graphics.line(prevPos[1], prevPos[2], pos[1], pos[2])
 			end
 		end
+	end
+	local function drawTunnels(tunnels, pastel)
 		for i, tunnel in pairs(tunnels) do
 			local max = math.min(#tunnels, 8)
 			love.graphics.setColor(utilitools.color.hsvToRgb(((i - 1) % max) / max * 360, pastel and 0.25 or 1, pastel and 0.5 or 1))
@@ -281,6 +281,14 @@ function biggestBeat.drawMultiAngles()
 	end
 	if mod.config.test == -1 and beattools.test.antiTunnels then
 		drawTunnels(beattools.test.antiTunnels, true)
+	end
+	if mod.config.test == -1 and utilitools.files.beattools.tooly.data and utilitools.files.beattools.tooly.data.path then
+		love.graphics.setColor(1, 0, 0)
+		for _, func in ipairs(utilitools.files.beattools.tooly.data.path.path) do
+			if intersection.isTimeOverlapping(func, { startTime = cs.editorBeat, endTime = cs.editorBeat + cs.drawDistance }) then
+				drawFunc(func, 0)
+			end
+		end
 	end
 	love.graphics.setPointSize(oldSize)
 end
