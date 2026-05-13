@@ -1,17 +1,7 @@
 --[[
 TODO:
-minehold:
-- sine
-- expo
-- circ
-- elastic
-- back
-- squaredCirc
-- bounce
-
+minehold crashes
 angle ease sequences
-retime
-
 minehold tail ease sequences
 better holds
 better sides
@@ -414,6 +404,7 @@ function tooly.getTunnelForBaseEvent(event) -- minehold
 			true
 		)
 	}
+	tooly.validateTunnels({ tunnel })
 	return tunnel
 end
 function tooly.sortTunnel(tunnel)
@@ -532,7 +523,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 			if i + 1 > endCount.newWidth.index or not list[i + 1] or list[i + 1].event.time ~= ease.time then
 				if time < ease.time then
 					-- the paddle width before the ease
-					local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+					local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, ease.time, ease.order, utilitools.files.beattools.easing.getIndex(ease) - 1)
 					local add = { { startTime = time, endTime = ease.time, a0 = -(360 - value.newWidth) / 2 } }
 					tunnels = tooly.addFuncsToTunnels(tunnels, add, true)
 					add[1].a0 = -add[1].a0
@@ -548,7 +539,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 						splitTunnels(ease.time)
 						startValue = ease.start
 					else
-						local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, ease.time, ease.order, utilitools.files.beattools.easing.getIndex(ease) - 1)
+						local value = list[i - 1] and list[i - 1].event.time + (list[i - 1].event.duration or 0) <= ease.time and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, ease.time, ease.order, utilitools.files.beattools.easing.getIndex(ease) - 1)
 						startValue = value.newWidth
 					end
 					if startValue ~= ease.newWidth then
@@ -575,7 +566,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 		end
 		if time < globalEnd then
 			-- the paddle width after the eases
-			local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+			local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
 			local add = { { startTime = time, endTime = globalEnd, a0 = -(360 - value.newWidth) / 2 } }
 			tunnels = tooly.addFuncsToTunnels(tunnels, add, true)
 			add[1].a0 = -add[1].a0
@@ -598,7 +589,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 			if i + 1 > endCount.newAngle.index or not list[i + 1] or list[i + 1].event.time ~= ease.time then
 				if time < ease.time then
 					-- the paddle width before the ease
-					local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+					local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
 					local add = { { startTime = time, endTime = ease.time, a0 = value.newAngle } }
 					tunnels = tooly.addFuncsToTunnels(tunnels, add)
 					time = ease.time
@@ -612,7 +603,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 						splitTunnels(ease.time)
 						startValue = ease.start
 					else
-						local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+						local value = list[i - 1] and list[i - 1].event.time + (list[i - 1].event.duration or 0) <= ease.time and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, ease.time, ease.order, utilitools.files.beattools.easing.getIndex(ease) - 1)
 						startValue = value.newAngle
 					end
 					if startValue ~= ease.newAngle then
@@ -635,7 +626,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 		end
 		if time < globalEnd then
 			-- the paddle width after the eases
-			local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+			local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
 			local add = { { startTime = time, endTime = globalEnd, a0 = value.newAngle } }
 			tunnels = tooly.addFuncsToTunnels(tunnels, add)
 			time = globalEnd
@@ -659,7 +650,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 			if i + 1 > endCount2.index or not list[i + 1] or list[i + 1].event.time ~= ease.time then
 				if time < ease.time then
 					-- the paddle width before the ease
-					local value, count = utilitools.files.beattools.easing.getEase("ease", "objectRotation", time, nil, nil)
+					local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("ease", "objectRotation", time, nil, nil)
 					local add = { { startTime = time, endTime = ease.time, a0 = value.value } }
 					tunnels = tooly.addFuncsToTunnels(tunnels, add)
 					time = ease.time
@@ -673,7 +664,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 						splitTunnels(ease.time)
 						startValue = ease.start
 					else
-						local value, count = utilitools.files.beattools.easing.getEase("ease", "objectRotation", time, nil, nil)
+						local value = list[i - 1] and list[i - 1].event.time + (list[i - 1].event.duration or 0) <= ease.time and list[i - 1].event or utilitools.files.beattools.easing.getEase("ease", "objectRotation", ease.time, ease.order, utilitools.files.beattools.easing.getIndex(ease) - 1)
 						startValue = value.value
 					end
 					if startValue ~= ease.value then
@@ -696,7 +687,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 		end
 		if time < globalEnd then
 			-- the paddle width after the eases
-			local value, count = utilitools.files.beattools.easing.getEase("ease", "objectRotation", time, nil, nil)
+			local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("ease", "objectRotation", time, nil, nil)
 			local add = { { startTime = time, endTime = globalEnd, a0 = value.value } }
 			tunnels = tooly.addFuncsToTunnels(tunnels, add)
 			time = globalEnd
@@ -716,7 +707,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 			if i + 1 > endCount.enabled.index or not list[i + 1] or list[i + 1].event.time ~= ease.time then
 				if time < ease.time then
 					-- the paddle width before the ease
-					local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+					local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
 					if value.enabled ~= ease.enabled then
 						if not value.enabled then
 							doCutTunnels(time, ease.time)
@@ -729,7 +720,7 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 		end
 		if time < globalEnd then
 			-- the paddle width after the eases
-			local value, count = utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
+			local value = list[i - 1] and list[i - 1].event or utilitools.files.beattools.easing.getEase("paddles", paddleId, time, nil, nil)
 			if not value.enabled then
 				doCutTunnels(time, globalEnd)
 			end
@@ -738,6 +729,8 @@ function tooly.getTunnelsForEventAndPaddle(event, paddleId)
 	end
 
 	tooly.sortTunnels(tunnels)
+
+	tooly.validateTunnels(tunnels)
 
 	return tunnels
 end
@@ -781,7 +774,7 @@ function tooly.validateTunnels(tunnels)
 				local temp = intersection.subtractFunctions(tunnel.a2, tunnel.a1)
 				local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
 				local diff = lowest and highest and highest - lowest
-				validated = not lowest or not highest or not (diff <= -1e-4 and diff > 360 + 1e-4)
+				validated = not lowest or not highest or not (diff <= -1e-9 and diff > 360 + 1e-9)
 				if not validated then reason = utilitools.string.concat("lower than 0", diff, highest, lowest) end
 			end
 			if not validated then
@@ -827,7 +820,7 @@ function tooly.glueTunnelsTogether(tunnels) -- mutates the tunnels directly
 				local val2A, val2B = intersection.useFuncs(tunnelA.a2, tunnelA.endTime), intersection.useFuncs(tunnelB.a2, tunnelA.endTime)
 				local diff2 = math.abs(val2A - val2B) % 360
 				if diff2 > 180 then diff2 = math.abs(diff2 - 360) end
-				if diff1 <= 1e-4 and diff2 <= 1e-4 then
+				if diff1 <= 1e-9 and diff2 <= 1e-9 then
 					local diff = val1A - val1B
 					diff = (diff + 180) - (diff + 180) % 360
 					tunnelB.a1 = intersection.addFunctions(tunnelB.a1, { { startTime = tunnelB.startTime, endTime = tunnelB.endTime, a0 = diff } })
@@ -884,10 +877,6 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 		if onlyOverlap then return {} end
 		return { tunnel1, tunnel2 }
 	end
-
-	-- modlog(mod, "tunnel indexxxxxxxxxxxxxxxx", tooly.currentTunnelIndex)
-	-- tooly.data.allTunnels[tooly.currentTunnelIndex] = { helpers.copy(tunnel1), helpers.copy(tunnel2) }
-	-- tooly.currentTunnelIndex = tooly.currentTunnelIndex + 1
 
 	tunnel1 = helpers.copy(tunnel1)
 	tunnel2 = helpers.copy(tunnel2)
@@ -1043,10 +1032,6 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 			mergeTunnelSection(times[i - 1], time)
 		end
 	end
-
-	-- modlog(mod, "tunnel index", tooly.currentTunnelIndex, times)
-	-- tooly.data.allTunnels[tooly.currentTunnelIndex] = helpers.copy(tunnels)
-	-- tooly.currentTunnelIndex = tooly.currentTunnelIndex + 1
 
 	tooly.glueTunnelsTogether(tunnels)
 
@@ -1401,7 +1386,7 @@ function tooly.getRangesBetween()
 
 	-- actual start
 
-	local maxTime = 1e9--167.5
+	local maxTime = 1e9 -- 181 -- 167.5
 	if tooly.allEvents and #tooly.allEvents > 0 then -- tunnels
 		startProgress("tunnels", #tooly.allEvents, 0.05)
 		tooly.currentTunnelIndex = 0
@@ -1443,9 +1428,9 @@ function tooly.getRangesBetween()
 			local function checkRanges(time, overrideTime)
 				local ranges = tooly.getRangesForTime(time, tooly.data.tunnels, tooly.data.antiTunnels)
 				local rangesTunnel = tooly.tunnelGetRange(tunnel, overrideTime or time)
-				if math.abs(rangesTunnel[1][1] - rangesTunnel[1][2]) <= 2 * 1e-4 then
-					rangesTunnel[1][1] = rangesTunnel[1][1] - 1e-4
-					rangesTunnel[1][2] = rangesTunnel[1][2] + 1e-4
+				if math.abs(rangesTunnel[1][1] - rangesTunnel[1][2]) <= 2 * 1e-9 then
+					rangesTunnel[1][1] = rangesTunnel[1][1] - 1e-9
+					rangesTunnel[1][2] = rangesTunnel[1][2] + 1e-9
 				end
 				local result = tooly.overlapRanges(ranges, rangesTunnel, false)
 				return (result and (#result ~= 0 or false)) or (not result and true)
@@ -1453,13 +1438,13 @@ function tooly.getRangesBetween()
 
 			local diff = math.abs(intersection.useFuncs(tunnel.a1, tunnel.startTime) - intersection.useFuncs(tunnel.a2, tunnel.startTime)) % 360
 			if diff > 180 then diff = math.abs(diff - 360) end
-			if diff <= 1e-4 then
+			if diff <= 1e-9 then
 				success = checkRanges(tunnel.startTime - 1e-2, tunnel.startTime)
 			end
 			if success then
 				diff = math.abs(intersection.useFuncs(tunnel.a1, tunnel.endTime) - intersection.useFuncs(tunnel.a2, tunnel.endTime)) % 360
 				if diff > 180 then diff = math.abs(diff - 360) end
-				if diff <= 1e-4 then
+				if diff <= 1e-9 then
 					success = checkRanges(tunnel.endTime + 1e-2, tunnel.endTime)
 				end
 			end
@@ -1490,9 +1475,9 @@ function tooly.getRangesBetween()
 				table.remove(tooly.data.tunnels, i)
 				tooly.data.antiTunnels = tooly.data.antiTunnels or {}
 				tunnel.a1, tunnel.a2 = intersection.addFunctions(tunnel.a2,
-					{ { startTime = tunnel.startTime, endTime = tunnel.endTime, a0 = 1e-4 --[[ + 0.001 ]] } }
+					{ { startTime = tunnel.startTime, endTime = tunnel.endTime, a0 = 1e-9 --[[ + 0.001 ]] } }
 				), intersection.addFunctions(tunnel.a1,
-					{ { startTime = tunnel.startTime, endTime = tunnel.endTime, a0 = -1e-4 --[[ + 0.001 ]] } }
+					{ { startTime = tunnel.startTime, endTime = tunnel.endTime, a0 = -1e-9 --[[ + 0.001 ]] } }
 				)
 				table.insert(tooly.data.antiTunnels, tunnel)
 				restart = true
@@ -1648,6 +1633,7 @@ function tooly.getRangesBetween()
 				)
 			end
 			local function sortRanges()
+				if not ranges[1] then modwarn(mod, "IMPOSSIBLE", prevAngle, ranges) return prevAngle end
 				table.sort(ranges, function(a, b)
 					if tooly.getWidth(a) == tooly.getWidth(b) then
 						return getRangeDistance(a) < getRangeDistance(b)
@@ -1660,82 +1646,106 @@ function tooly.getRangesBetween()
 			if i ~= 1 then
 				local prevTime = tooly.data.times[i - 1]
 				local duration = time - prevTime
-				local inTunnels = {}
-				if tooly.data.tunnels then
-					for _, tunnel in ipairs(tooly.data.tunnels) do
-						if intersection.inTime(tunnel, prevTime) and intersection.inTime(tunnel, time) then
-							local tunnelPrevRanges = tooly.tunnelGetRange(tunnel, prevTime)
-							local tunnelNextRanges = tooly.tunnelGetRange(tunnel, time)
-							if tunnelPrevRanges and #tunnelPrevRanges >= 1 and tooly.inRange(prevAngle % 360, tunnelPrevRanges[1]) then
-								table.insert(inTunnels, tunnel)
-								if tunnelNextRanges then
-									if ranges then
-										ranges = tooly.overlapRanges(ranges, tunnelNextRanges, false)
-									else
-										ranges = tunnelNextRanges
+				if duration > 1e-9 then
+					local inTunnels = {}
+					if tooly.data.tunnels then
+						for _, tunnel in ipairs(tooly.data.tunnels) do
+							if intersection.inTime(tunnel, prevTime) and intersection.inTime(tunnel, time) then
+								local tunnelPrevRanges = tooly.tunnelGetRange(tunnel, prevTime)
+								local tunnelNextRanges = tooly.tunnelGetRange(tunnel, time)
+								if tunnelPrevRanges and #tunnelPrevRanges >= 1 and tooly.inRange(prevAngle % 360, tunnelPrevRanges[1]) then
+									table.insert(inTunnels, tunnel)
+									if tunnelNextRanges then
+										if ranges then
+											ranges = tooly.overlapRanges(ranges, tunnelNextRanges, false)
+										else
+											ranges = tunnelNextRanges
+										end
 									end
 								end
 							end
 						end
 					end
-				end
-				local nextAngle = sortRanges()
-				nextAngle = tooly.setForClosestDelta(prevAngle, nextAngle)
+					local nextAngle = sortRanges()
+					nextAngle = tooly.setForClosestDelta(prevAngle, nextAngle)
 
-				local path = intersection.getFunction(prevTime, duration, prevAngle, nextAngle, "inOutQuad")
+					local path = intersection.getFunction(prevTime, duration, prevAngle, nextAngle, "inOutQuad")
+					local valid, reason = intersection.validateFunctions(path, true, true)
+					if not valid then
+						modlog(mod, reason, prevTime, duration, prevAngle, nextAngle)
+					end
 
-				local overwritten = false
-				for _, tunnel in ipairs(inTunnels) do
-					for _, v in ipairs({ "a1", "a2" }) do
-						local tunnel2 = { a1 = helpers.copy(tunnel.a1), a2 = helpers.copy(tunnel.a2)}
-						tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, time, nil)
-						tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, nil, prevTime)
-						tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, time, nil)
-						tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, nil, prevTime)
+					local overwritten = false
+					for _, tunnel in ipairs(inTunnels) do
+						if intersection.isTimeOverlapping({ startTime = prevTime, endTime = time }, tunnel) then
+							for _, v in ipairs({ "a1", "a2" }) do
+								local tunnel2 = helpers.copy(tunnel)
+								tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, time, nil)
+								tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, nil, prevTime)
+								tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, time, nil)
+								tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, nil, prevTime)
+								tunnel2.startTime = prevTime
+								tunnel2.endTime = time
 
-						local temp = intersection.subtractFunctions(path, tunnel2[v])
-						local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
-						local intersectionTimes = intersection.intersectPerpetuallyMultiple(path, tunnel2[v])
-						local lowest2, highest2 = lowest - lowest % 360, highest - highest % 360
-						if lowest2 ~= highest2 or (intersectionTimes and #intersectionTimes > 0) then
-							path = intersection.subtractFunctions(tunnel2.a2, tunnel2.a1)
-							local diff0 = helpers.copy(path)
-							local lowest3 = intersection.getLowestFuncs(path)
-							local lowest4 = lowest3 - lowest3 % 360
-							if lowest4 ~= 0 then
-								local step = lowest4 / math.abs(lowest4)
-								for _ = lowest4 / 360, step, -step do
-									path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = -360 * step } })
+								tooly.validateTunnels({ tunnel2 })
+
+								local temp = intersection.subtractFunctions(path, tunnel2[v])
+								local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
+								local intersectionTimes = intersection.intersectPerpetuallyMultiple(path, tunnel2[v])
+								local lowest2, highest2 = lowest - lowest % 360, highest - highest % 360
+								if lowest2 ~= highest2 or (intersectionTimes and #intersectionTimes > 0) then
+									path = intersection.subtractFunctions(tunnel2.a2, tunnel2.a1)
+									local lowest3 = intersection.getLowestFuncs(path)
+									local lowest4 = lowest3 - lowest3 % 360
+									if lowest4 ~= 0 then
+										local step = lowest4 / math.abs(lowest4)
+										for _ = lowest4 / 360, step, -step do
+											path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = -360 * step } })
+										end
+									end
+									path = intersection.addFunctions(intersection.multiplyFunctions(path, 0.5), tunnel2.a1)
+
+									local prevAngle2 = intersection.useFuncs(path, prevTime)
+									local diff = tooly.getClosestDelta(prevAngle2, prevAngle)
+									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, diff, 0, "linear"))
+
+									local nextAngle2 = intersection.useFuncs(path, time)
+									diff = tooly.getClosestDelta(nextAngle2, nextAngle)
+									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, 0, diff, "linear"))
+
+									prevAngle2 = intersection.useFuncs(path, prevTime)
+									diff = prevAngle - prevAngle2
+									diff = diff + 180
+									diff = diff - diff % 360
+									path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = diff } })
+
+									nextAngle2 = intersection.useFuncs(path, time)
+									diff = nextAngle2 - nextAngle
+									diff = diff + 180
+									diff = diff - diff % 360
+									nextAngle = nextAngle + diff
+
+									overwritten = true
+									break
 								end
 							end
-							path = intersection.addFunctions(intersection.multiplyFunctions(path, 0.5), tunnel2.a1)
-
-							local prevAngle2 = intersection.useFuncs(path, prevTime)
-							local diff1 = tooly.getClosestDelta(prevAngle2, prevAngle)
-							path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, diff1, diff1, "linear"))
-
-							local nextAngle2 = intersection.useFuncs(path, time)
-							local diff2 = tooly.getClosestDelta(nextAngle2, nextAngle)
-							path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, 0, diff2, "linear"))
-							overwritten = true
-							break
+							if overwritten then break end
 						end
 					end
-					if overwritten then break end
-				end
 
 
-				if path then
-					for _, func in ipairs(path) do
-						table.insert(tooly.data.path.path, func)
+					if path then
+						for _, func in ipairs(path) do
+							table.insert(tooly.data.path.path, func)
+						end
+					else
+						modwarn(mod, "NO PATH")
 					end
-				else
-					modwarn(mod, "NO PATH")
+
+					prevAngle = nextAngle
+
+					tooly.data.path.endTime = time
 				end
-
-				prevAngle = nextAngle
-
-				tooly.data.path.endTime = time
 			else
 				prevAngle = 0
 				prevAngle = sortRanges()
@@ -1747,7 +1757,7 @@ function tooly.getRangesBetween()
 
 		intersection.glueFuncsTogether(tooly.data.path.path)
 
-		local valid, reason = intersection.validateFunctions(tooly.data.path.path, true)
+		local valid, reason = intersection.validateFunctions(tooly.data.path.path, true, true)
 		if not valid then
 			modlog(mod, reason)
 		end

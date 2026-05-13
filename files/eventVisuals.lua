@@ -41,6 +41,16 @@ end
 
 local globalAlpha = 1
 
+function eventVisuals.isBeattoolsEvent(eventType)
+	return eventType:sub(1, #"beattoolsEvent;") == "beattoolsEvent;"
+end
+function eventVisuals.getEventType(eventType)
+	if eventVisuals.isBeattoolsEvent(eventType) then
+		local start = eventType:find(";") or 1
+		eventType = eventType:sub(start + 1, (eventType:find(";", start + 1) or 0) - 1)
+	end
+	return eventType
+end
 local function isVisible(x, y, low, high)
 	y = y or x
 	low = low or cs.editorBeat
@@ -51,10 +61,10 @@ local function inBounds(pos, width)
 	return isVisible(pos[1], nil, -width, 600 + width) and isVisible(pos[2], nil, -width, 360 + width)
 end
 local function beattoolsSameEasing(event, selected)
-	if not (mod.config.markSameEasing and selected and event ~= selected and event.type == selected.type) then return false end
+	if not (mod.config.markSameEasing and selected and event ~= selected and eventVisuals.getEventType(event.type) == selected.type) then return false end
 	local paramForType = { ease = "var", setColor = "color", deco = "id" }
-	if paramForType[event.type] == nil then return false end
-	return event[paramForType[event.type]] == selected[paramForType[event.type]]
+	if paramForType[eventVisuals.getEventType(event.type)] == nil then return false end
+	return event[paramForType[eventVisuals.getEventType(event.type)]] == selected[paramForType[eventVisuals.getEventType(event.type)]]
 end
 
 function eventVisuals.init()
@@ -79,8 +89,8 @@ function eventVisuals.cacheEvent(event, remove)
 	end
 
 	local duration = event.duration or 0
-	local bounces = event.type == "bounce" and (event.bounces or 1) * (event.delay or 1) or 0
-	local repeated = eventVisuals.hasRepeat[event.type] and (event.repeats or 0) * (event.repeatDelay or 1) or 0
+	local bounces = eventVisuals.getEventType(event.type) == "bounce" and (event.bounces or 1) * (event.delay or 1) or 0
+	local repeated = eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and (event.repeats or 0) * (event.repeatDelay or 1) or 0
 
 	for i = eventVisuals.getTime(event.time), eventVisuals.getTime(event.time + duration + bounces + repeated), eventVisuals.step do
 		add(i)
@@ -157,7 +167,7 @@ function eventVisuals.drawDuration(event, beattoolsLayer)
 		return
 	end
 
-	for i = 0, (eventVisuals.hasRepeat[event.type] and event.repeats and event.repeats > 0 and event.repeatDelay ~= 0 and event.repeats) or 0 do
+	for i = 0, (eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and event.repeats and event.repeats > 0 and event.repeatDelay ~= 0 and event.repeats) or 0 do
 		local time = event.time + i * (event.repeatDelay or 1)
 		if isVisible(time, time + event.duration) then
 			local pos1 = cs:getPosition(event.angle, math.max(time, cs.editorBeat))
@@ -175,7 +185,7 @@ function eventVisuals.drawRepeat(event, beattoolsLayer)
 	end
 
 	local sprite = (beattoolsLayer == "repeatMarker" and sprites.editor.repeatMarker) or (beattoolsLayer == "sameEasingRepeatMarker" and sprites.editor.repeatMarkerSameEasing) or sprites.editor.repeatMarkerSelected
-	local repeating = eventVisuals.hasRepeat[event.type] and event.repeats and event.repeats > 0 and (not event.repeatDelay or event.repeatDelay >= 0)
+	local repeating = eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and event.repeats and event.repeats > 0 and (not event.repeatDelay or event.repeatDelay >= 0)
 
 	if not repeating then startStack(event) end
 	for i = repeating and 1 or 0, repeating and event.repeats or 0 do
@@ -200,11 +210,13 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	end
 	alpha = alpha or 1
 
-	local eventDraw = Event.editorDraw[event.type] or sprites.editor.genericevent
+	local eventDraw = Event.editorDraw[eventVisuals.getEventType(event.type)] or sprites.editor.genericevent
 	local function drawEvent(pos)
 		setColor(1, 1, 1, 1)
 		if type(eventDraw) == "function" then
-			eventDraw(event, cs.editorBeat, cs.editorBeat + cs.drawDistance)
+			local event2 = helpers.copy(event)
+			event2.type = eventVisuals.getEventType(event.type)
+			eventDraw(event2, cs.editorBeat, cs.editorBeat + cs.drawDistance)
 			color.r, color.g, color.b, color.a = love.graphics.getColor()
 		else
 			pos = pos or cs:getPosition(event.angle, event.time)
@@ -313,7 +325,7 @@ function eventVisuals.drawEvents()
 		end
 	end
 	for _, v in pairs(eventsToDraw) do
-		if Event.info[v.type] and utilitools.files.beattools.eventGroups.eventVisibility(v) ~= "hide" then
+		if Event.info[eventVisuals.getEventType(v.type)] and utilitools.files.beattools.eventGroups.eventVisibility(v) ~= "hide" then
 			local visibility = utilitools.files.beattools.eventGroups.eventVisibility(v)
 			local selected = v == cs.selectedEvent or selectedEvents[tostring(v)] or (mod.config.fakeRepeat and cs.selectedEvent and cs.selectedEvent.beattoolsRepeatParent and v.beattoolsRepeatChild == cs.selectedEvent.beattoolsRepeatParent)
 			local sameEase = selected or beattoolsSameEasing(v, cs.selectedEvent)
@@ -330,7 +342,7 @@ function eventVisuals.drawEvents()
 					end
 				end
 			end
-			local repeating = eventVisuals.hasRepeat[v.type] and v.repeats and v.repeats > 0 and (not v.repeatDelay or v.repeatDelay >= 0) and v.time + v.repeats * (v.repeatDelay or 1)
+			local repeating = eventVisuals.hasRepeat[eventVisuals.getEventType(v.type)] and v.repeats and v.repeats > 0 and (not v.repeatDelay or v.repeatDelay >= 0) and v.time + v.repeats * (v.repeatDelay or 1)
 
 			local function addTo(list)
 				list[visibility] = list[visibility] or {}
@@ -343,7 +355,7 @@ function eventVisuals.drawEvents()
 				return mod.config[k] == "on" and not selected
 			end
 
-			if not eventVisuals.holds[v.type] and v.duration and v.duration > 0 and isVisible(v.time, (repeating or v.time) + v.duration) then
+			if not eventVisuals.holds[eventVisuals.getEventType(v.type)] and v.duration and v.duration > 0 and isVisible(v.time, (repeating or v.time) + v.duration) then
 				if checkMarkerSelected("showDuration") then
 					addTo(layerSelectedDuration)
 				elseif checkMarker("showDuration") then
@@ -374,7 +386,7 @@ function eventVisuals.drawEvents()
 					end
 				end
 			else
-				if Event.checkActiveRange[v.type](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
+				if Event.checkActiveRange[eventVisuals.getEventType(v.type)](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
 					if selected then -- cannot be child, must be selected parent
 						addTo(layerSelected)
 						if v.endAngle and checkMarkerSelected("markEndAnglePosition") and isVisible(v.time) then
@@ -483,12 +495,12 @@ function eventVisuals.drawEvents()
 	-- copied from her mod "Stream Generator" (help by Nittneuk) for compatibility
 	if sgen and sgen.previewEvents ~= {} then
 		for i, v in ipairs(sgen.previewEvents) do -- draw preview events
-			if Event.info[v.type] and Event.checkActiveRange[v.type](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
+			if Event.info[eventVisuals.getEventType(v.type)] and Event.checkActiveRange[eventVisuals.getEventType(v.type)](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
 				love.graphics.setColor(1,1,1,1) -- maybe give the user an alpha slider?
 				local pos = cs:getPosition(v.angle, v.time)
 				pos[1], pos[2] = helpers.round(pos[1]), helpers.round(pos[2])
-				local sprite = sgen.sprites[v.type]
-				local rotation = v.type == "side" and v.angle*0.01745329 or 0
+				local sprite = sgen.sprites[eventVisuals.getEventType(v.type)]
+				local rotation = eventVisuals.getEventType(v.type) == "side" and v.angle*0.01745329 or 0
 				love.graphics.draw(sprite, pos[1], pos[2], rotation, 1, 1, 10, 10)
 				if v.tap then
 					love.graphics.draw(sgen.sprites.tap, pos[1], pos[2], 0, 1, 1, 19, 19)

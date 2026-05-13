@@ -276,8 +276,10 @@ function biggestBeat.drawMultiAngles()
 		end
 	end
 	if beattools.test.tunnels then
-		local tunnelsToDraw = mod.config.test and mod.config.test ~= -1 and beattools.test.allTunnels and beattools.test.allTunnels[mod.config.test] or beattools.test.tunnels
-		drawTunnels(tunnelsToDraw, false)
+		local tunnelsToDraw = mod.config.test == -1 and beattools.test.tunnels or (mod.config.test and beattools.test.allTunnels and beattools.test.allTunnels[mod.config.test])
+		if tunnelsToDraw then
+			drawTunnels(tunnelsToDraw, false)
+		end
 	end
 	if mod.config.test == -1 and beattools.test.antiTunnels then
 		drawTunnels(beattools.test.antiTunnels, true)

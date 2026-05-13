@@ -1163,7 +1163,7 @@ return {
 		tooltips = { short = "test" },
 		default = -1,
 		min  = -1,
-		max = 80
+		max = 5
 	},
 	splashTextWindow = {
 		type = "bool",

@@ -148,22 +148,23 @@ function intersection.derive(func)
 	return func2
 end
 
-function intersection.validateFunctions(funcs, fullEvaluation)
+function intersection.validateFunctions(funcs, fullEvaluation, lessStrict)
 	for i, func in ipairs(funcs) do
 		if func.startTime and func.startTime == func.endTime then
-			return false
+			return false, utilitools.string.concat("durationless", func.startTime, func.endTime)
 		end
 		local prevFunc = funcs[i - 1]
 		if prevFunc then
 			local prevVal = intersection.useFunc(prevFunc, prevFunc.endTime)
 			local nextVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nextVal - prevVal)
-			if prevFunc.endTime ~= func.startTime or (fullEvaluation and diff > 1e-4) then
+			local timeDiff = math.abs(prevFunc.endTime - func.startTime)
+			if timeDiff > 1e-9 or (fullEvaluation and diff > (lessStrict and 1e-5 or 1e-9)) then
 				--[[ if prevFunc.endTime == func.startTime then
 					-- modwarn(mod, "NOT GLUED", i, func.startTime, prevVal, nextVal, math.abs(nextVal - prevVal), prevFunc, func)
 				end
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, math.abs(nexVal - prevVal), funcs) ]]
-				return false, prevFunc.endTime ~= func.startTime and utilitools.string.concat("prev endTime ~= current startTime", prevFunc.endTime, func.startTime) or utilitools.string.concat("not glued", "time", func.startTime, "vals", prevVal, nextVal, "diff", math.abs(nextVal - prevVal))
+				return false, timeDiff > 1e-9 and utilitools.string.concat("prev endTime ~= current startTime", prevFunc.endTime, func.startTime) or utilitools.string.concat("not glued", "time", func.startTime, "vals", prevVal, nextVal, "diff", math.abs(nextVal - prevVal))
 			end
 		end
 	end
@@ -188,7 +189,7 @@ function intersection.glueFuncsTogether(funcs)
 			local nexVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nexVal - prevVal) % 360
 			if diff > 180 then diff = math.abs(diff - 360) end
-			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-6) then
+			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-9) then
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, prevVal, nexVal, math.abs(nexVal - prevVal), funcs)
 				return false
 			end
@@ -477,18 +478,16 @@ function intersection.getHighestFuncs(funcs)
 	return highest
 end
 
-function intersection.intersectPerpetually(func, printing) -- for intersecting with the x-axis in the use case of only having numbers in [0, 360[ (without 360)
+function intersection.intersectPerpetually(func) -- for intersecting with the x-axis in the use case of only having numbers in [0, 360[ (without 360)
 	local lowest = intersection.getLowest(func)
 	local highest =  intersection.getHighest(func)
 	lowest, highest = lowest + (lowest % 360 == 0 and 0 or 360) - lowest % 360 + 180, highest - highest % 360
 	lowest = lowest - lowest % 360
-	if printing then modlog(mod, "printing", lowest, highest, lowest > highest) end
 	if lowest > highest then
 		return {} -- no intersections
 	else
 		local intersections = {}
 		for i = lowest, highest, 360 do
-			if printing then modlog(mod, "DOINT ITTTTTTTT", i) end
 			local func2 = intersection.subtractFunction(func, { a0 = i }, true)
 			local newIntersections = intersection.intersect(func2)
 			if newIntersections then
@@ -519,15 +518,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 					if not lowest or lowest > low then lowest = low end
 					if not highest or highest > high then highest = high end
 				else
-					local printing
-					if 2.25 < func.startTime and func.endTime < 2.35 then
-						local startV = intersection.useFunc(func, func.startTime) % 360
-						local endV = intersection.useFunc(func, func.endTime) % 360
-						local diff = math.abs(endV - startV) % 360
-						modlog(mod, startV, endV, diff, func)
-						printing = diff > 270
-					end
-					local roots = intersection.intersectPerpetually(func, printing)
+					local roots = intersection.intersectPerpetually(func)
 					if roots then
 						for _, root in ipairs(roots) do
 							table.insert(returnRoots, root)
@@ -547,7 +538,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 				else
 					local diff = math.abs(intersection.useFunc(func1, time) - intersection.useFunc(func2, time)) % 360
 					if diff > 180 then diff = math.abs(diff - 360) end
-					if diff <= 1e-6 then
+					if diff <= 1e-9 then
 						table.insert(returnRoots, time)
 					end
 				end
@@ -574,7 +565,7 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 		func.a1 = (endVal - startVal) / duration
 		func.a0 = startVal - func.a1 * time
 		return { func }
-	elseif not secondTime and not ({ inQuad = true, outQuad = true, inOutQuad = true, inCubic = true, outCubic = true, inOutCubic = true, inQuart = true, outQuart = true, inOutQuart = true, inBack = true, outBack = true, inOutBack = true })[ease] then
+	elseif not secondTime and not ({ inQuad = true, outQuad = true, inOutQuad = true, inCubic = true, outCubic = true, inOutCubic = true, inQuart = true, outQuart = true, inOutQuart = true --[[ , inBack = true, outBack = true, inOutBack = true ]] })[ease] then
 		-- modwarn(mod, "intersection.getFunction: approximating", time, duration, startVal, endVal, ease)
 		local d = endVal - startVal
 		local funcs = {}
@@ -604,7 +595,9 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 				)[1]
 			)
 		end
-		modlog(mod, intersection.useFuncs(funcs, time) - startVal, intersection.useFuncs(funcs, time + duration) - endVal)
+		if math.abs(intersection.useFuncs(funcs, time) - startVal) > 1e-9 or math.abs(intersection.useFuncs(funcs, time + duration) - endVal) > 1e-9 then
+			modlog(mod, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", intersection.useFuncs(funcs, time) - startVal, intersection.useFuncs(funcs, time + duration) - endVal)
+		end
 		return funcs
 	elseif ease:sub(1, #"inOut") == "inOut" then
 		local ease2 = ease:sub(#"inOut" + 1, #"inOut" + 1):lower() .. ease:sub(#"inOut" + 2)
@@ -653,7 +646,7 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 		func.a1 = func.a4 * -4 * (time ^ 3)
 		func.a0 = func.a4 * 1 * (time ^ 4) + startVal
 		return { func }
-	--[[ elseif ease == "quint" then -- quintic not really feasable to solve, so we approximate it
+	elseif ease == "quint" then -- quintic not really feasable to solve, so we approximate it
 		-- a(x - b)⁵ + c = ax⁵ - 5abx⁴ + 10ab²x³ - 10ab³x² + 5ab⁴x - ab⁵ + c
 		local d = endVal - startVal
 		-- a*duration⁵ = d <=> a = d / duration⁵
@@ -663,8 +656,8 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 		func.a2 = func.a5 * -10 * (time ^ 3)
 		func.a1 = func.a5 * 5 * (time ^ 4)
 		func.a0 = func.a5 * -1 * (time ^ 5) + startVal
-		return { func } ]]
-	elseif ease == "back" then
+		return { func }
+	elseif ease == "back" then -- back is a bit inaccurate (+/- 1e-8), so we approximate it. i might come back later though
 		local d = endVal - startVal
 		-- p * p * (2.7 * p - 1.7) -- flux
 		-- 2.7(m(x - time))³ - 1.7(m(x - time))²
@@ -686,6 +679,7 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 			func.a2 = -8.1 * d * m * m * m * time - 1.7 * d * m * m
 			func.a1 = 8.1 * d * m * m * m * time * time + 3.4 * d * m * m * time
 			func.a0 = -2.7 * d * m * m * m * time * time * time - 1.7 * d * m * m * time * time + startVal
+			modlog(mod, "back easing", intersection.useFunc(func, time) - startVal, intersection.useFunc(func, time + duration) - endVal)
 		else
 			-- a(x - b)³ + c = ax³ - 3abx² + 3ab²x - ab³ + c
 
@@ -736,9 +730,10 @@ function intersection.subtractFunction(func1, func2, allowCutoff)
 	return intersection.addFunction(func1, func2, allowCutoff)
 end
 function intersection.addFunctions(funcs1, funcs2)
-	if not (intersection.validateFunctions(funcs1) and intersection.validateFunctions(funcs2)) then
-		modwarn(mod, "INVALID FUNCS", funcs1, funcs2)
-		return {}
+	local valid1, reason1 = intersection.validateFunctions(funcs1)
+	local valid2, reason2 = intersection.validateFunctions(funcs2)
+	if not (valid1 and valid2) then
+		modwarn(mod, "INVALID FUNCS", valid1, valid2, tostring(reason1), tostring(reason2), funcs1, funcs2)
 	end
 	if not funcs1 or #funcs1 == 0 then
 		modwarn(mod, "funcs1 is empty")

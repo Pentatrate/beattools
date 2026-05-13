@@ -23,7 +23,7 @@ if true then
 		if mods.beattools.config.editorMenu then
 			helpers.SetNextWindowPos(750, 420, window_flag)
 			helpers.SetNextWindowSize(200, 300, window_flag)
-			mods.beattools.config.editorMenu = imgui.Begin("Beattools", mods.beattools.config.editorMenu or nil, inputFlag)
+			mods.beattools.config.editorMenu = imgui.Begin("Beattools", mods.beattools.config.editorMenu or nil, (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
 
 			if mods.beattools.config.colorPreview then
 				local bgColor, bgColorC = utilitools.files.beattools.easing.getEase("ease", "bgColor", cs.editorBeat, nil, nil)

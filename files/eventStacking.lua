@@ -30,7 +30,11 @@ function eventStacking.getType(event)
 	elseif type(event) == "string" then
 		eventType = event
 	end
-	if not Event.info[eventType] then modwarn(mod, "eventStacking.getType: Invalid event type: ", event) return "func" end
+	eventType = utilitools.files.beattools.eventVisuals.getEventType(eventType)
+	if not Event.info[eventType] then
+		modwarn(mod, "eventStacking.getType: Invalid event type: ", event)
+		return "func"
+	end
 	if Event.editorDraw[eventType] == nil then return "img" end -- genericevent
 	return Event.info[eventType].storeInChart and not chartTypeExceptions[eventType] and "func" or "img"
 end

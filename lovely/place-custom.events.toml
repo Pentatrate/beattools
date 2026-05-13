@@ -11,11 +11,12 @@ version = "1.0.0"
 match_indent = true
 pattern = '''if self.placeEvent ~= '' and Event.info[self.placeEvent] then'''
 payload = '''
-if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
+if self.placeEvent:sub(1, #"beattoolsEvent;") == "beattoolsEvent;" then
 	local placingEvent = { time = self.cursorBeat, angle = self.cursorAngle }
+	local i = 0
 	for w in self.placeEvent:gmatch("[^;]+") do
-		if w ~= "beattoolsEvent" then
-			if w:match(",") == nil then
+		if i ~= 0 then
+			if i == 1 then
 				placingEvent.type = w
 			else
 				local temp = {}
@@ -32,6 +33,7 @@ if self.placeEvent ~= '' and self.placeEvent:match("beattoolsEvent;") then
 				placingEvent[temp[1]] = temp[2]
 			end
 		end
+		i = i + 1
 	end
 	if Event.info[placingEvent.type] then
 		table.insert(self.level.events, placingEvent)

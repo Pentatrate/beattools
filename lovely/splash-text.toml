@@ -71,7 +71,8 @@ local additionalSplashes = {
 	"Jumpbeats!",
 	"Dshambbeets",
 	"Solve your skill issue with a skill solution!",
-	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously"
+	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
+	"Beattools is incompatible with Beatblock" -- originally from thatguytheman
 }
 
 _G.beattools = beattools or {}

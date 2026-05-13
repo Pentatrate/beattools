@@ -705,6 +705,13 @@ local function beams()
 end
 -- grid()
 -- boxes()
-utilitools.try(mod, beams)
+-- utilitools.try(mod, beams)
 
 -- add alpha dither on beams
+
+local str = ""
+for i = 1, 256 do
+	local r1, r2 = (math.random() - 0.5) * 0.8, (math.random() - 0.5) * 0.8
+	str = str .. "\n\tvec3(" .. tostring(r1) .. (r1 == 0 and ".0" or "") .. ", " .. tostring(r2) .. (r2 == 0 and ".0" or "") .. ", " .. tostring(i + 1) .. ".0),"
+end
+modlog(mod, str)
