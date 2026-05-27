@@ -1,0 +1,22 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Random Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''[^\S\n]*helpers\.SetNextWindowPos\([^\S\n]*?(?<param1>\d+)[^\S\n]*?,[^\S\n]*?(?<param2>\d+)[^\S\n]*?,[^\S\n]*?(?<param3>[\w"'_ ]+?)[^\S\n]*?\)[^\S\n]*?\n(?<indent>\s+)helpers\.SetNextWindowSize\([^\S\n]*?(?<param5>\d+)[^\S\n]*?,[^\S\n]*?(?<param6>\d+)[^\S\n]*?,[^\S\n]*?(?<param7>[\w"'_ ]+?)[^\S\n]*?\)'''
+payload = '''
+if mods.beattools.config.randomizeWindows ~= "off" and beattools.randomizeWindows then
+	local sx, sy = math.random(100, 400), math.random(100, 400)
+	helpers.SetNextWindowPos(math.random(0, 1200 - sx), math.random(0, 720 - sy), "ImGuiCond_Always")
+	helpers.SetNextWindowSize(sx, sy, "ImGuiCond_Always")
+else
+	helpers.SetNextWindowPos( $param1 , $param2 , $param3 )
+	helpers.SetNextWindowSize( $param5 , $param6 , $param7 )
+end
+'''
+position = "at"
+target = "states/Editor.lua"

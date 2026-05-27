@@ -116,7 +116,7 @@ function betterBookmarks.calc()
 	local mX = mouse.rx - project.res.cx
 	local mY = mouse.ry - project.res.cy
 	local mouseProgress = (0.5 + math.atan2(-mX, mY) / (2 * math.pi)) % 1
-	if math.min(mouseProgress, 1 - mouseProgress) * 360 < 10 then
+	if math.min(mouseProgress, 1 - mouseProgress) * 360 < mod.config.betterBookmarkSnap then
 		mouseProgress = 0
 	end
 

@@ -1,0 +1,45 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Permanent Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader))\)'''
+payload = '''$rest , nil, (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader), ?\w+)\)'''
+payload = '''$rest , (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''(?<rest>imgui\.Begin\(("[^\n]*?"|'[^\n]*?'|self.errorHeader), ?\w+), ?inputFlag\)'''
+payload = '''$rest , (inputFlag or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mods.beattools.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))'''
+position = "at"
+target = "states/Editor.lua"
+
+# Permanent Menus ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Code from K4kadu, modified
+[[patches]]
+[patches.pattern]
+target = "lib/imguihelper.lua"
+pattern = '''
+imgui.DockSpace(imgui.GetID_Str("DockSpace"), imgui.ImVec2_Float(0.0, 0.0),
+    imgui.ImGuiDockNodeFlags_PassthruCentralNode,
+    nil)
+'''
+position = "at"
+payload = '''
+imgui.DockSpace(imgui.GetID_Str("DockSpace"), imgui.ImVec2_Float(0.0, 0.0), imgui.ImGuiDockNodeFlags_PassthruCentralNode + (mods.beattools.config.stopImGuiResize and imgui.ImGuiDockNodeFlags_NoResize or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiDockNodeFlags_NoUndocking or 0), nil)
+'''
+match_indent = true

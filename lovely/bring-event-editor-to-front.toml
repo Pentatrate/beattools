@@ -30,5 +30,3 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
-#SetNextWindowFocus
-#imgui.Begin("Event Editor",nil)

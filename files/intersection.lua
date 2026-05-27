@@ -159,12 +159,12 @@ function intersection.validateFunctions(funcs, fullEvaluation, lessStrict)
 			local nextVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nextVal - prevVal)
 			local timeDiff = math.abs(prevFunc.endTime - func.startTime)
-			if timeDiff > 1e-9 or (fullEvaluation and diff > (lessStrict and 1e-5 or 1e-9)) then
+			if timeDiff > 1e-8 or (fullEvaluation and diff > (lessStrict and 1e-5 or 1e-8)) then
 				--[[ if prevFunc.endTime == func.startTime then
 					-- modwarn(mod, "NOT GLUED", i, func.startTime, prevVal, nextVal, math.abs(nextVal - prevVal), prevFunc, func)
 				end
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, math.abs(nexVal - prevVal), funcs) ]]
-				return false, timeDiff > 1e-9 and utilitools.string.concat("prev endTime ~= current startTime", prevFunc.endTime, func.startTime) or utilitools.string.concat("not glued", "time", func.startTime, "vals", prevVal, nextVal, "diff", math.abs(nextVal - prevVal))
+				return false, timeDiff > 1e-8 and utilitools.string.concat("prev endTime ~= current startTime", prevFunc.endTime, func.startTime) or utilitools.string.concat("not glued", "time", func.startTime, "vals", prevVal, nextVal, "diff", math.abs(nextVal - prevVal))
 			end
 		end
 	end
@@ -189,7 +189,7 @@ function intersection.glueFuncsTogether(funcs)
 			local nexVal = intersection.useFunc(func, func.startTime)
 			local diff = math.abs(nexVal - prevVal) % 360
 			if diff > 180 then diff = math.abs(diff - 360) end
-			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-9) then
+			if prevFunc.endTime ~= func.startTime or (true and diff > 1e-8) then
 				-- modwarn(mod, "NOT VALID", i, prevFunc.endTime, func.startTime, prevVal, nexVal, math.abs(nexVal - prevVal), funcs)
 				return false
 			end
@@ -538,7 +538,7 @@ function intersection.intersectPerpetuallyMultiple(funcs1, funcs2, getLowest)
 				else
 					local diff = math.abs(intersection.useFunc(func1, time) - intersection.useFunc(func2, time)) % 360
 					if diff > 180 then diff = math.abs(diff - 360) end
-					if diff <= 1e-9 then
+					if diff <= 1e-8 then
 						table.insert(returnRoots, time)
 					end
 				end
@@ -595,7 +595,7 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 				)[1]
 			)
 		end
-		if math.abs(intersection.useFuncs(funcs, time) - startVal) > 1e-9 or math.abs(intersection.useFuncs(funcs, time + duration) - endVal) > 1e-9 then
+		if math.abs(intersection.useFuncs(funcs, time) - startVal) > 1e-8 or math.abs(intersection.useFuncs(funcs, time + duration) - endVal) > 1e-8 then
 			modlog(mod, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", intersection.useFuncs(funcs, time) - startVal, intersection.useFuncs(funcs, time + duration) - endVal)
 		end
 		return funcs

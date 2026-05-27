@@ -268,6 +268,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				end
 				imgui.Separator()
 				configHelpers.input("betterBookmarks")
+				configHelpers.input("betterBookmarkSnap")
 				imgui.Separator()
 				configHelpers.input("zoomMin")
 				configHelpers.input("zoomMax")

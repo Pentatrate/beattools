@@ -1172,6 +1172,12 @@ return {
 		default = true,
 		off = false
 	},
+	betterBookmarkSnap = {
+		type = "int",
+		name = "Alt Wheel Snap",
+		tooltips = { short = "Amount of Degrees to snap" },
+		default = 10
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

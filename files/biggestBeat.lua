@@ -219,29 +219,6 @@ function biggestBeat.drawMultiAngles()
 
 
 	if not beattools.test or not beattools.test.timedRanges then return end
-	if mod.config.test == -1 then
-		love.graphics.setColor(love.math.colorFromBytes(0, 0, 128, 255))
-		for time, ranges in pairs(beattools.test.timedRanges) do
-			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
-				if not ranges then
-					love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
-				else
-					local tooly = utilitools.files.beattools.tooly
-					for _, range in ipairs(ranges) do
-						local width = tooly.getWidth(range)
-						love.graphics.arc("line", "open", project.res.cx, project.res.cy, cs:beatToRadius(time), math.rad(range[1] - 90), math.rad(range[1] + width - 90))
-					end
-				end
-			end
-		end
-		love.graphics.setColor(love.math.colorFromBytes(255, 0, 0))
-		for time, _ in pairs(beattools.test.impossibleRanges) do
-			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
-				love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
-			end
-		end
-	end
-
 	local intersection = utilitools.files.beattools.intersection
 	local oldSize = love.graphics.getPointSize()
 	love.graphics.setPointSize(2)
@@ -251,9 +228,9 @@ function biggestBeat.drawMultiAngles()
 			local time = helpers.clamp(t, math.min(func.startTime + pointAccuracy, func.endTime), func.endTime)
 			local prevTime = helpers.clamp(t - pointAccuracy, func.startTime, func.endTime)
 			if time ~= prevTime and cs.editorBeat <= time and prevTime <= cs.editorBeat + cs.drawDistance then
-				local prevAngle = intersection.useFunc(func, prevTime) + i * 0.01
+				local prevAngle = intersection.useFunc(func, prevTime) -- + i * 0.01
 				local prevPos = cs:getPosition(prevAngle, prevTime)
-				local angle = intersection.useFunc(func, time) + i * 0.01
+				local angle = intersection.useFunc(func, time) -- + i * 0.01
 				local pos = cs:getPosition(angle, time)
 				love.graphics.line(prevPos[1], prevPos[2], pos[1], pos[2])
 			end
@@ -283,6 +260,28 @@ function biggestBeat.drawMultiAngles()
 	end
 	if mod.config.test == -1 and beattools.test.antiTunnels then
 		drawTunnels(beattools.test.antiTunnels, true)
+	end
+	if mod.config.test == -1 then
+		love.graphics.setColor(love.math.colorFromBytes(0, 0, 128, 255))
+		for time, ranges in pairs(beattools.test.timedRanges) do
+			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
+				if not ranges then
+					love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
+				else
+					local tooly = utilitools.files.beattools.tooly
+					for _, range in ipairs(ranges) do
+						local width = tooly.getWidth(range)
+						love.graphics.arc("line", "open", project.res.cx, project.res.cy, cs:beatToRadius(time), math.rad(range[1] - 90), math.rad(range[1] + width - 90))
+					end
+				end
+			end
+		end
+		love.graphics.setColor(love.math.colorFromBytes(255, 0, 0))
+		for time, _ in pairs(beattools.test.impossibleRanges) do
+			if cs.editorBeat <= time and time <= cs.editorBeat + cs.drawDistance then
+				love.graphics.circle("line", project.res.cx, project.res.cy, cs:beatToRadius(time))
+			end
+		end
 	end
 	if mod.config.test == -1 and utilitools.files.beattools.tooly.data and utilitools.files.beattools.tooly.data.path then
 		love.graphics.setColor(1, 0, 0)
