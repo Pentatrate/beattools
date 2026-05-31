@@ -9,9 +9,9 @@ version = "1.0.0"
 match_indent = true
 pattern = '''Event.property(event,'string', 'easeSequence', 'Ease sequence to use, if any', {optional = true, default = ''})'''
 payload = '''
-if mods.beattools.config.sillyNisenenGimmick then
+if event.type == "bounce" and mods.beattools.config.sillyNisenenGimmick then
 	Event.property(event, "bool", "sillyNisenenGimmick", "Randomizes angles for bounces\nOverrides rotation with a high value", { optional = true, default = true })
 end
 '''
 position = "after"
-target = "levelformat/events/Notes/bounce.lua"
+target = "obj/GameManager.lua"

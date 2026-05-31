@@ -38,6 +38,7 @@ local additionalSplashes = {
 	"Embrace the Spiral!",
 	"sevcon these blocks",
 	"[font=terminal]I THINK IVE RUN TOO FAR\nI COLLAPSE BY THE[font=main] bed\n[font=main][rotateY=3.2]ZZZ...",
+
 	-- Pentatrate
 	"since i have an autoupdating system in place, adding even more splash text is no problem at all",
 	"Sponsored by [rotateY=1]Penta's Beattools[rotateY=0]!",
@@ -72,7 +73,10 @@ local additionalSplashes = {
 	"Dshambbeets",
 	"Solve your skill issue with a skill solution!",
 	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
-	"Beattools is incompatible with Beatblock" -- originally from thatguytheman
+	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
+
+	-- the goober AKA pies of lies
+	"craftable with 8 bees and a cranky!"
 }
 
 _G.beattools = beattools or {}

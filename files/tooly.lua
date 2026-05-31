@@ -752,7 +752,15 @@ function tooly.tunnelGetRange(tunnel, time) -- returns ranges, not range, since 
 	if a2 - a1 >= 360 then
 		return -- all possible
 	end ]]
-	return { { a1 % 360, a2 % 360 } }
+	if a2 < a1 then
+		a2 = a1
+	end
+	local ranges = { { a1 % 360, a2 % 360 } }
+	--[[ if math.abs(ranges[1][1] - ranges[1][2]) <= 2 * 1e-4 then
+		ranges[1][1] = ranges[1][1] - 1e-4
+		ranges[1][2] = ranges[1][2] + 1e-4
+	end ]]
+	return ranges
 end
 function tooly.validateTunnels(tunnels)
 	local intersection = utilitools.files.beattools.intersection
@@ -779,8 +787,13 @@ function tooly.validateTunnels(tunnels)
 				local temp = intersection.subtractFunctions(tunnel.a2, tunnel.a1)
 				local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
 				local diff = lowest and highest and highest - lowest
-				validated = not lowest or not highest or not (diff <= -1e-8 and diff > 360 + 1e-8)
-				if not validated then reason = utilitools.string.concat("lower than 0", diff, highest, lowest) end
+				validated = not lowest or not highest or not (lowest <= -1e-8 or highest > 360 + 1e-8)
+				if validated then
+					validated = not lowest or not highest or not (diff <= -1e-8 or diff > 360 + 1e-8)
+					if not validated then reason = utilitools.string.concat("lower than 0", diff, highest, lowest) end
+				else
+					reason = utilitools.string.concat("overlapping", highest, lowest)
+				end
 			end
 			if not validated then
 				totalValid = false
@@ -793,6 +806,18 @@ function tooly.validateTunnels(tunnels)
 
 	return totalValid
 end
+function tooly.rectifyTunnels(tunnels)
+	local intersection = utilitools.files.beattools.intersection
+	for _, tunnelA in ipairs(tunnels) do
+		local val1, val2 = intersection.useFuncs(tunnelA.a1, tunnelA.startTime), intersection.useFuncs(tunnelA.a2, tunnelA.startTime)
+		local valDiff = val1 - val2
+		valDiff = valDiff - valDiff % 360
+		if valDiff ~= 0 then
+			tunnelA.a2 = intersection.addFunctions(tunnelA.a2, { { startTime = tunnelA.startTime, endTime = tunnelA.endTime, a0 = valDiff } })
+			modlog(mod, "AHHHHH", valDiff)
+		end
+	end
+end
 function tooly.glueTunnelsTogether(tunnels) -- mutates the tunnels directly
 	local intersection = utilitools.files.beattools.intersection
 
@@ -802,18 +827,6 @@ function tooly.glueTunnelsTogether(tunnels) -- mutates the tunnels directly
 	while tunnels[i] do
 		local tunnelA = tunnels[i]
 
-		local val1, val2 = intersection.useFuncs(tunnelA.a1, tunnelA.startTime)
-		val1 = -(val1 - val1 % 360)
-		if val1 ~= 0 then
-			tunnelA.a1 = intersection.addFunctions(tunnelA.a1, { { startTime = tunnelA.startTime, endTime = tunnelA.endTime, a0 = val1 } })
-		end
-		val1, val2 = intersection.useFuncs(tunnelA.a1, tunnelA.startTime), intersection.useFuncs(tunnelA.a2, tunnelA.startTime)
-		local valDiff = val1 - val2
-		valDiff = valDiff - valDiff % 360
-		if valDiff ~= 0 then
-			tunnelA.a2 = intersection.addFunctions(tunnelA.a2, { { startTime = tunnelA.startTime, endTime = tunnelA.endTime, a0 = valDiff } })
-		end
-
 		local j = 1
 		while tunnels[j] do
 			local tunnelB  = tunnels[j]
@@ -822,9 +835,11 @@ function tooly.glueTunnelsTogether(tunnels) -- mutates the tunnels directly
 				local val1A, val1B = intersection.useFuncs(tunnelA.a1, tunnelA.endTime), intersection.useFuncs(tunnelB.a1, tunnelA.endTime)
 				local diff1 = math.abs(val1A - val1B) % 360
 				if diff1 > 180 then diff1 = math.abs(diff1 - 360) end
+
 				local val2A, val2B = intersection.useFuncs(tunnelA.a2, tunnelA.endTime), intersection.useFuncs(tunnelB.a2, tunnelA.endTime)
 				local diff2 = math.abs(val2A - val2B) % 360
 				if diff2 > 180 then diff2 = math.abs(diff2 - 360) end
+
 				if diff1 <= 1e-8 and diff2 <= 1e-8 then
 					local diff = val1A - val1B
 					diff = (diff + 180) - (diff + 180) % 360
@@ -849,6 +864,17 @@ function tooly.glueTunnelsTogether(tunnels) -- mutates the tunnels directly
 		end
 
 		i = i + 1
+	end
+
+	for _, tunnelA in ipairs(tunnels) do
+		local val1
+		val1 = intersection.useFuncs(tunnelA.a1, tunnelA.startTime)
+		val1 = -(val1 - val1 % 360)
+		if val1 ~= 0 then
+			tunnelA.a1 = intersection.addFunctions(tunnelA.a1, { { startTime = tunnelA.startTime, endTime = tunnelA.endTime, a0 = val1 } })
+			tunnelA.a2 = intersection.addFunctions(tunnelA.a2, { { startTime = tunnelA.startTime, endTime = tunnelA.endTime, a0 = val1 } })
+			modlog(mod, "EHHHHHHHHHHHHHHHHH")
+		end
 	end
 
 	return tunnels
@@ -876,7 +902,7 @@ function tooly.tunnelOverlapping(tunnel1, tunnel2)
 
 	return returnValue
 end
-function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
+function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no longer splits the tunnels
 	local intersection = utilitools.files.beattools.intersection
 	if not intersection.isTimeOverlapping(tunnel1, tunnel2) then
 		if onlyOverlap then return {} end
@@ -913,13 +939,15 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 		local ranges1 = tooly.tunnelGetRange(tunnel1, between)
 		local ranges2 = tooly.tunnelGetRange(tunnel2, between)
 		local function doAddTunnel(tunnel)
-			tunnel = helpers.copy(tunnel)
+			table.insert(tunnels, tunnel)
+			-- deprecated due to the mergeTunnels function splitting the tunnels beforehand
+			--[[ tunnel = helpers.copy(tunnel)
 			local addTunnels = { tunnel }
 			addTunnels = tooly.cutTunnels(addTunnels, time, nil)
 			addTunnels = tooly.cutTunnels(addTunnels, nil, prevTime)
 			for _, addTunnel in ipairs(addTunnels) do
 				table.insert(tunnels, addTunnel)
-			end
+			end ]]
 		end
 		if not ranges1 or not ranges2 then
 			if not ranges1 and not ranges2 then
@@ -945,23 +973,24 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 			local a1, a2 = range1[1], range1[2]
 			local b1, b2 = range2[1], range2[2]
 
-			local addTunnels1 = { tunnel1 }
+			-- also deprecated due to the mergeTunnels function already splitting the tunnels beforehand
+			--[[ local addTunnels1 = { tunnel1 }
 			local addTunnels2 = { tunnel2 }
 
 			addTunnels1 = tooly.cutTunnels(addTunnels1, nil, prevTime)
 			addTunnels1 = tooly.cutTunnels(addTunnels1, time, nil)
 
 			addTunnels2 = tooly.cutTunnels(addTunnels2, nil, prevTime)
-			addTunnels2 = tooly.cutTunnels(addTunnels2, time, nil)
+			addTunnels2 = tooly.cutTunnels(addTunnels2, time, nil) ]]
 
-			local addTunnel1 = addTunnels1[1]
-			local addTunnel2 = addTunnels2[1]
+			local addTunnel1 = helpers.copy(tunnel1) -- addTunnels1[1]
+			local addTunnel2 = helpers.copy(tunnel2) -- addTunnels2[1]
 
 			-- time to copy paste the code from the ranges merging hehe
 			if totallyOverlapping then
 				if a1 == b1 and a2 == b2 then
 					-- return { { a1, a2 } }
-					table.insert(tunnels, addTunnel1)
+					doAddTunnel(addTunnel1)
 				elseif aInB and bInA then
 					--[[ if canBeEither then
 						return -- all angles allowed
@@ -970,8 +999,8 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 					end ]]
 					if not canBeEither then
 						addTunnel1.a2, addTunnel2.a2 = addTunnel2.a2, addTunnel1.a2
-						table.insert(tunnels, addTunnel1)
-						table.insert(tunnels, addTunnel2)
+						doAddTunnel(addTunnel1)
+						doAddTunnel(addTunnel2)
 					end
 				elseif aInB then
 					--[[ if canBeEither then
@@ -980,9 +1009,9 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 						return { { a1, a2 } }
 					end ]]
 					if canBeEither then
-						table.insert(tunnels, addTunnel2)
+						doAddTunnel(addTunnel2)
 					else
-						table.insert(tunnels, addTunnel1)
+						doAddTunnel(addTunnel1)
 					end
 				else -- bInA
 					--[[ if canBeEither then
@@ -991,9 +1020,9 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 						return { { b1, b2 } }
 					end ]]
 					if canBeEither then
-						table.insert(tunnels, addTunnel1)
+						doAddTunnel(addTunnel1)
 					else
-						table.insert(tunnels, addTunnel2)
+						doAddTunnel(addTunnel2)
 					end
 				end
 			elseif partiallyOverlapping then
@@ -1012,7 +1041,7 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 				else
 					-- nothing
 				end
-				table.insert(tunnels, addTunnel1)
+				doAddTunnel(addTunnel1)
 			else
 				--[[ if canBeEither then
 					return { { a1, a2 }, { b1, b2 } }
@@ -1020,8 +1049,8 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap)
 					return {} -- level is impossible (in most cases)
 				end ]]
 				if canBeEither then
-					table.insert(tunnels, addTunnel1)
-					table.insert(tunnels, addTunnel2)
+					doAddTunnel(addTunnel1)
+					doAddTunnel(addTunnel2)
 				else
 					-- turns out this is not that bad when it happens, hmmmm
 					-- modwarn(mod, "LEVEL IS IMPOSSIBLE", prevTime, time, tooly.currentTunnelIndex, range1, range2)
@@ -1396,8 +1425,10 @@ function tooly.getRangesBetween()
 
 	-- actual start
 
-	local minTime -- = 239 -- 217 -- 199
-	local maxTime -- = 239 -- 217 -- 196 -- 181 -- 167.5
+	-- 157 193 260 320 331
+
+	local minTime = 136
+	local maxTime = 160
 	if tooly.allEvents and #tooly.allEvents > 0 then -- tunnels
 		startProgress("tunnels", #tooly.allEvents, 0.05)
 		tooly.currentTunnelIndex = 0
@@ -1444,10 +1475,6 @@ function tooly.getRangesBetween()
 					ranges = tooly.getRangesForTime(time, tooly.data.tunnels, tooly.data.antiTunnels)
 				end
 				local rangesTunnel = tooly.tunnelGetRange(tunnel, time)
-				if math.abs(rangesTunnel[1][1] - rangesTunnel[1][2]) <= 2 * 1e-4 then
-					rangesTunnel[1][1] = rangesTunnel[1][1] - 1e-4
-					rangesTunnel[1][2] = rangesTunnel[1][2] + 1e-4
-				end
 				local result = tooly.overlapRanges(ranges, rangesTunnel, false)
 				if not result or #result ~= 0 then
 					if notTunnel then
