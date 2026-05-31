@@ -157,6 +157,18 @@ for i,v in ipairs(savedata.aprilFools.noCranky and crankless or crankful) do
 position = "at"
 target = "preload/splashes.lua"
 
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''for _,v in ipairs(datespecific) do'''
+payload = '''
+local datespecific2 = {}
+for _, v in pairs(datespecific) do table.insert(datespecific2, v.text) end
+beattools.splashes.datespecific = datespecific2
+'''
+position = "before"
+target = "preload/splashes.lua"
+
 # Adds splashes to randomiser ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
