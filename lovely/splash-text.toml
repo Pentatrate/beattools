@@ -76,7 +76,21 @@ local additionalSplashes = {
 	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
 
 	-- the goober AKA pies of lies
-	"craftable with 8 bees and a cranky!"
+	"craftable with 8 bees and a cranky!",
+
+	-- ayka47 AKA aykarain
+[[
+[offset=-150]what is this a reference to
+[offset=-167]i meant the bees part
+[offset][font=terminalTall]cranky is the t
+[offset=150][font=rsUI]I didn't know cranky was on hrt
+[offset][font=terminalTall]?
+[offset=238][font=rsUI]mrrrow
+[offset=-148][font]i didnt know hrt was cranky
+[offset=-88]i didnt know i could become cranky with hrt
+[offset][font=terminalTall]which one do you want
+[offset=-158][font]i want to get cranky hrt
+]]
 }
 
 _G.beattools = beattools or {}
@@ -102,59 +116,30 @@ beattools.splashes.added = helpers.copy(splashes)
 position = "after"
 target = "preload/splashes.lua"
 
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''-- BiomanticBeast'''
+payload = '''
+{
+	text = "Happy birthday, Pentatrate!",
+	month = 6, day = 14,
+	priority = math.huge, chance = 1 -- Yes, I am that petty
+},
+'''
+position = "before"
+target = "preload/splashes.lua"
+
 # Adds splashes to splash selector ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''for i = 1, 3 do'''
-payload = '''beattools.splashes.rg_nods = helpers.copy(rg_nods)'''
-position = "before"
-target = "preload/splashes.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-local cranky = {}
-if savedata.aprilFools.noCranky then
-	--crankless
-	cranky = {
-'''
-payload = '''
-	--crankless
-	local crankless = {
-'''
-position = "at"
-target = "preload/splashes.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-else
-	--crankful
-	cranky = {
-'''
-payload = '''
-	--crankful
-	local crankful = {
-'''
-position = "at"
-target = "preload/splashes.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-end
-for i,v in ipairs(cranky) do
-'''
+pattern = '''for i,v in ipairs(savedata.aprilFools.noCranky and crankless or crankful) do'''
 payload = '''
 beattools.splashes.crankless = crankless
 beattools.splashes.crankful = crankful
-for i,v in ipairs(savedata.aprilFools.noCranky and crankless or crankful) do
 '''
-position = "at"
+position = "before"
 target = "preload/splashes.lua"
 
 [[patches]]
@@ -173,50 +158,86 @@ target = "preload/splashes.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''if type(num) ~= "number" then num = nil end'''
+pattern = '''
+if type(num) ~= "number" then num = nil end
+
+local splash
+if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
+	splash = splashes.dateSpecific
+else
+	splash = splashes[num or math.random(#splashes)]
+end
+
+
+
+if math.random(1, 8192) == 1 then
+	splash = "[colour=2]You found the shiny splash text!"
+'''
 payload = '''
 local splash
 if type(num) == "string" then
 	splash = num
-elseif type(num) ~= "number" then
-	num = nil
-end
-'''
-position = "at"
-target = "preload/splashes.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-local splash = splashes[num or math.random(#splashes)]
-
-if math.random(1, 8192) == 1 then
-'''
-payload = '''
-if type(num) ~= "string" and num ~= 1 then
-	-- num == 1: shiny
-	-- num == 2: real total splashes
-	-- num <= #splashes + 2: regular + cranky status splashes
-	-- num <= #splashes + #additionalSplashes + 2: additional splashes
-	if num and (num < 2 or num % 1 ~= 0) then num = nil end -- idiot check
-	if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-		if num and num > #splashes + #additionalSplashes + 2 then num = nil end
-		num = num or math.random(#splashes + #additionalSplashes + 2)
-		if num == 2 then
-			-- +1 for this splash, +1 for the shiny splash, and idk, but its seems ive missed one, ill leave it at 2 though
-			splash = "There are actually " .. (#splashes + #additionalSplashes + 2) .. " total modded and vanilla splashes! Collect them all!"
-		elseif num <= #splashes + 2 then
-			splash = splashes[num - 2]
-		else
-			splash = additionalSplashes[num - 2 - #splashes]
-		end
-	else
-		if num and num > #splashes + 1 then num = nil end
-		splash = splashes[num or math.random(#splashes)]
+else
+	if type(num) ~= "number" then
+		num = nil
 	end
-end
-if type(num) ~= "string" and (math.random(1, 8192) == 1 or num == 1) then
+
+	if num and num ~= 1 then
+		-- num == 1: shiny
+		-- num == 2: real total splashes
+		-- num <= #splashes + 2: regular + cranky status splashes
+		-- num <= #splashes + #additionalSplashes + 2: additional splashes
+
+		if (num <= 1 or num % 1 ~= 0) then
+			num = nil -- idiot check
+		else
+			if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+				if num and num > #splashes + #additionalSplashes + 2 then num = nil end
+			else
+				if num and num > #splashes + 1 then num = nil end
+			end
+		end
+
+		if num then
+			if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+				if num == 2 then
+					splash = "There are actually " .. (
+
+						-- the base splashes,
+						#splashes
+						-- +1 for this one being added right now
+						-- +1 for the shiny splash in splashes.gen
+						+ 2
+						-- include the date specifics
+						+ #datespecific
+						-- add both cranky AND nocranky in
+						+ #crankless + #crankful
+
+						-- Beattools Splashes
+						+ #additionalSplashes
+
+					) .. " total modded and vanilla splashes! Collect them all!"
+				elseif num <= #splashes + 2 then
+					splash = splashes[num - 2]
+				else
+					splash = additionalSplashes[num - 2 - #splashes]
+				end
+			else
+				splash = splashes[num - 1]
+			end
+		end
+	end
+
+	if not splash then
+		if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
+			splash = splashes.dateSpecific
+		else
+			splash = splashes[math.random(#splashes)]
+		end
+		if (math.random(1, 8192) == 1 or num == 1) then
+			splash = "[colour=2]You found the shiny splash text!"
+		end
+	end
 '''
 position = "at"
 target = "preload/splashes.lua"

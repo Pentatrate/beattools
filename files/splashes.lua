@@ -25,24 +25,25 @@ function splashes.imgui()
 			beattools.splashes.totalCategories = {}
 
 			local function getVanilla(splash)
-				for _, splash2 in ipairs(beattools.splashes.added) do
-					if splash == splash2 then
-						return true
+				if beattools.splashes.added then
+					for _, splash2 in ipairs(beattools.splashes.added) do
+						if splash == splash2 then
+							return true
+						end
 					end
 				end
-				for _, splash2 in ipairs(beattools.splashes.crankless) do
-					if splash == splash2 then
-						return true
+				if beattools.splashes.crankless then
+					for _, splash2 in ipairs(beattools.splashes.crankless) do
+						if splash == splash2 then
+							return true
+						end
 					end
 				end
-				for _, splash2 in ipairs(beattools.splashes.crankful) do
-					if splash == splash2 then
-						return true
-					end
-				end
-				for _, splash2 in ipairs(beattools.splashes.rg_nods) do
-					if splash == splash2 then
-						return true
+				if beattools.splashes.crankful then
+					for _, splash2 in ipairs(beattools.splashes.crankful) do
+						if splash == splash2 then
+							return true
+						end
 					end
 				end
 				return false
@@ -76,6 +77,7 @@ function splashes.imgui()
 				table.insert(beattools.splashes.categoriesSorted[category], splash)
 			end
 			local function insertSplashes(table, category, forceVanilla, forceIndex)
+				if not table then modlog(mod, "No splashes for", category, forceVanilla, forceIndex) return end
 				for _, splash in ipairs(table) do
 					insertSplash(splash, category, forceVanilla, forceIndex)
 				end
@@ -84,7 +86,6 @@ function splashes.imgui()
 			insertSplashes(beattools.splashes.regular, "Regular Splashes")
 			insertSplashes(beattools.splashes.crankless, "Crankless Splashes")
 			insertSplashes(beattools.splashes.crankful, "Crankful Splashes")
-			insertSplashes(beattools.splashes.rg_nods, "Rhythm Game Nods")
 			insertSplashes(beattools.splashes.datespecific, "Time Specific Splashes")
 			insertSplashes(beattools.splashes.added, "Otherwise Added Splashes")
 			insertSplashes(beattools.splashes.additional, "More Splashes (Beattools)")
