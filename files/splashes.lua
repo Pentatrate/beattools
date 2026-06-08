@@ -91,7 +91,22 @@ function splashes.imgui()
 			insertSplashes(beattools.splashes.additional, "More Splashes (Beattools)")
 			insertSplashes(beattools.splashes.total, "Other Modded Splashes (likely ExtraStuff)")
 
-			insertSplash("There are actually " .. (#beattools.splashes.total + #beattools.splashes.additional + 2) .. " total modded and vanilla splashes! Collect them all!", "More Splashes (Beattools)", false, 2)
+			insertSplash("There are actually " .. (
+
+				-- the base splashes,
+				#splashes
+				-- +1 for this one being added right now
+				-- +1 for the shiny splash in splashes.gen
+				+ 2
+				-- include the date specifics
+				+ #beattools.splashes.datespecific
+				-- add both cranky AND nocranky in (one has beed added to splashes already)
+				+ (savedata.aprilFools.noCranky and #beattools.splashes.crankful or #beattools.splashes.crankless)
+
+				-- Beattools Splashes
+				+ #beattools.splashes.additional
+
+			) .. " total modded and vanilla splashes! Collect them all!", "More Splashes (Beattools)", false, 2)
 			insertSplash("[colour=2]You found the shiny splash text!", "Otherwise Added Splashes", true, 1)
 
 			for category, array in pairs(beattools.splashes.categoriesSorted) do

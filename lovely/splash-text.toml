@@ -116,11 +116,30 @@ beattools.splashes.added = helpers.copy(splashes)
 position = "after"
 target = "preload/splashes.lua"
 
+# Birthdays and date stuff ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''text = "Happy birthday, yeetyote!",'''
+payload = '''text = "Happy birthday, {yeetyote|Gotchfutchian}!",'''
+position = "at"
+target = "preload/splashes.lua"
+
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''-- BiomanticBeast'''
 payload = '''
+{
+	text = "Merry {chrysler|crisis}!",
+	month = 12, day = 25,
+	birthday = true
+},
+{
+	text = "Happy birthday, aykarain!",
+	month = 4, day = 28,
+	birthday = true
+},
 {
 	text = "Happy birthday, Pentatrate!",
 	month = 6, day = 14,
@@ -210,8 +229,8 @@ else
 						+ 2
 						-- include the date specifics
 						+ #datespecific
-						-- add both cranky AND nocranky in
-						+ #crankless + #crankful
+						-- add both cranky AND nocranky in (one has beed added to splashes already)
+						+ (savedata.aprilFools.noCranky and #crankful or #crankless)
 
 						-- Beattools Splashes
 						+ #additionalSplashes
