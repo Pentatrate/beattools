@@ -74,6 +74,7 @@ local additionalSplashes = {
 	"Solve your skill issue with a skill solution!",
 	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
 	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
+	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn'tlike it when i say that"
 
 	-- the goober AKA pies of lies
 	"craftable with 8 bees and a cranky!",
@@ -90,7 +91,21 @@ local additionalSplashes = {
 [offset=-88]i didnt know i could become cranky with hrt
 [offset][font=terminalTall]which one do you want
 [offset=-158][font]i want to get cranky hrt
-]]
+]],
+
+	-- rhymeswithpie
+	"WHAT DOES THE CAT REACT MEAN?????",
+	"It's april fools guys trust me",
+	"No scammer is alone responsible for a single stepping stone along the spiral of progress. Attack the beast. Break the crypto.",
+	"#mod-ideas -> Splash Text: The Splashening",
+	"Also try Beatblock (Vanilla)",
+	"Also try Beatblock (Demo (Modded))",
+
+	-- thatguytheman
+	"yoru",
+	"夜", -- cerdef
+	"she empress on my nose ring till I flow",
+	"sponsored by tung tung tung sahur"
 }
 
 _G.beattools = beattools or {}
@@ -130,6 +145,7 @@ target = "preload/splashes.lua"
 match_indent = true
 pattern = '''-- BiomanticBeast'''
 payload = '''
+-- Beattols Birthday PPL
 {
 	text = "Merry {chrysler|crisis}!",
 	month = 12, day = 25,
@@ -144,6 +160,11 @@ payload = '''
 	text = "Happy birthday, Pentatrate!",
 	month = 6, day = 14,
 	priority = math.huge, chance = 1 -- Yes, I am that petty
+},
+{
+	text = "Happy birthday, ThatGuyTheMan!",
+	month = 10, day = 2,
+	birthday = true
 },
 '''
 position = "before"
@@ -216,46 +237,55 @@ else
 				if num and num > #splashes + 1 then num = nil end
 			end
 		end
-
-		if num then
-			if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-				if num == 2 then
-					splash = "There are actually " .. (
-
-						-- the base splashes,
-						#splashes
-						-- +1 for this one being added right now
-						-- +1 for the shiny splash in splashes.gen
-						+ 2
-						-- include the date specifics
-						+ #datespecific
-						-- add both cranky AND nocranky in (one has beed added to splashes already)
-						+ (savedata.aprilFools.noCranky and #crankful or #crankless)
-
-						-- Beattools Splashes
-						+ #additionalSplashes
-
-					) .. " total modded and vanilla splashes! Collect them all!"
-				elseif num <= #splashes + 2 then
-					splash = splashes[num - 2]
-				else
-					splash = additionalSplashes[num - 2 - #splashes]
-				end
-			else
-				splash = splashes[num - 1]
-			end
-		end
 	end
 
-	if not splash then
+	if not num then -- generate random if unset
+		local additional = mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes
+
 		if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
 			splash = splashes.dateSpecific
 		else
-			splash = splashes[math.random(#splashes)]
+			if not additional or math.random() < #splashes / (#splashes + #additionalSplashes + 1) then
+				num = math.random(#splashes) + 2
+			else
+				num = #splashes + 2 + math.random(#additionalSplashes) + 1
+				if num == #splashes + 2 + #additionalSplashes + 1 then
+					num = 2 -- real total splashes
+				end
+			end
 		end
-		if (math.random(1, 8192) == 1 or num == 1) then
-			splash = "[colour=2]You found the shiny splash text!"
+		if math.random(1, 8192) == 1 then
+			num = 1 -- shiny splash
 		end
+	end
+
+	if num == 1 then
+		splash = "[colour=2]You found the shiny splash text!"
+	elseif mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+		if num == 2 then
+			splash = "There are actually " .. (
+
+				-- the base splashes,
+				#splashes
+				-- +1 for this one being added right now
+				-- +1 for the shiny splash in splashes.gen
+				+ 2
+				-- include the date specifics
+				+ #datespecific
+				-- add both cranky AND nocranky in (one has beed added to splashes already)
+				+ (savedata.aprilFools.noCranky and #crankful or #crankless)
+
+				-- Beattools Splashes
+				+ #additionalSplashes
+
+			) .. " total modded and vanilla splashes! Collect them all!"
+		elseif num <= #splashes + 2 then
+			splash = splashes[num - 2]
+		else
+			splash = additionalSplashes[num - 2 - #splashes]
+		end
+	else
+		splash = splashes[num - 1]
 	end
 '''
 position = "at"

@@ -187,33 +187,53 @@ undo.newChangeSub = function()
 	undo.index = undo.index + 1
 end
 
-undo.areSimilar = function (list1, list2, dontRepeat)
+undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
 	dontRepeat = dontRepeat or {}
 	dontRepeat[tostring(list1)] = true
 	dontRepeat[tostring(list2)] = true
+	path = path or "base"
+
+	local reason = doReason and (doReason == 1 and {} or "") or nil
+
+	local function addReason(add)
+		if doReason then
+			if doReason == 1 then
+				table.insert(reason, add)
+			elseif doReason == 2 then
+				modlog(mod, add)
+			else
+				reason = add
+			end
+		end
+	end
+
 	local function compare(list3, list4)
+		local valid = true
+
 		if type(list3) ~= "table" or type(list4) ~= "table" then
-			modlog(mod, "expected table: " .. tostring(list3) .. ", " .. tostring(list4))
+			addReason("[" .. path .. "] expected table: " .. tostring(list3) .. ", " .. tostring(list4))
 			return false
 		end
 		for k, v in pairs(list3) do
 			if undo.keyTracked(k) then
 				if type(list4[k]) ~= type(v) then
-					modlog(mod, "different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+					addReason("[" .. path .. "] different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 					return false
 				elseif type(v) == "table" and not dontRepeat[tostring(v)] and not dontRepeat[tostring(list4[k])] then
-					if not undo.areSimilar(v, list4[k]) then return false end
+					if not undo.areSimilar(v, list4[k], dontRepeat, doReason, path .. "." .. tostring(k)) then
+						if doReason ~= 1 then return false else valid = false end
+					end
 				else
 					if list4[k] ~= v then
-						modlog(mod, "different: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
-						return false
+						addReason("[" .. path .. "] different: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+						if doReason ~= 1 then return false else valid = false end
 					end
 				end
 			end
 		end
-		return true
+		return valid
 	end
-	return compare(list1, list2) and compare(list2, list1)
+	return compare(list1, list2) and compare(list2, list1), reason
 end
 undo.setParams = function(event, params)
 	for k, v in pairs(event) do event[k] = nil end
@@ -509,7 +529,7 @@ undo.keybind = function(doUndo, doMultiple)
 		success = false
 
 		local function reAdd(action, data)
-			if not undo.areSimilar(data.ref, data.event) then
+			if not undo.areSimilar(data.ref, data.event, nil, 2) then
 				modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. tostring(action))
 				undo.setParams(data.ref, data.event)
 			end
@@ -527,7 +547,7 @@ undo.keybind = function(doUndo, doMultiple)
 		local function reRemove(action, data)
 			if cs.level.events[data.index] then
 				if cs.level.events[data.index] == data.ref then
-					if not undo.areSimilar(cs.level.events[data.index], data.event) then
+					if not undo.areSimilar(cs.level.events[data.index], data.event, nil, 2) then
 						modlog(mod, "EVENT PARAMS DO NOT MATCH: " .. tostring(action))
 						undo.setParams(data.ref, data.event)
 					end
@@ -577,7 +597,7 @@ undo.keybind = function(doUndo, doMultiple)
 							end
 							cs.level.events[i] = change.events[i].ref
 						end
-						if not undo.areSimilar(cs.level.events[i], change.events[i].event) then
+						if not undo.areSimilar(cs.level.events[i], change.events[i].event, nil, 2) then
 							modlog(mod, "EVENT PARAMS DO NOT MATCH: lazy recreate")
 							if cs.level.events[i].beattoolsRepeatParent or cs.level.events[i].beattoolsRepeatChild then
 								changedFakeRepeat = true

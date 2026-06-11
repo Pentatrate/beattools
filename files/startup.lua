@@ -34,3 +34,5 @@ beattools.stacking = beattools.stacking or { stacking = false, x = 0, y = 0 }
 function beattools.rgb2hex(r, g, b) return ("%02X%02X%02X"):format(r, g, b) end
 
 utilitools.files.beattools.undo.firstTime()
+
+modlog(mod, "GAME VERSION", _G.version)

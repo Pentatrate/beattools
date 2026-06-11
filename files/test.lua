@@ -703,15 +703,121 @@ local function beams()
 	dpf.saveJson(cLevel .. "tags/generated.json", events)
 	love.filesystem.forceSaveInSource(false)
 end
+
 -- grid()
 -- boxes()
 -- utilitools.try(mod, beams)
 
 -- add alpha dither on beams
 
+-- VELOCITY
+
+--[[
 local str = ""
 for i = 1, 256 do
 	local r1, r2 = (math.random() - 0.5) * 0.8, (math.random() - 0.5) * 0.8
 	str = str .. "\n\tvec3(" .. tostring(r1) .. (r1 == 0 and ".0" or "") .. ", " .. tostring(r2) .. (r2 == 0 and ".0" or "") .. ", " .. tostring(i + 1) .. ".0),"
 end
 modlog(mod, str)
+]]
+
+local function compareWithTag()
+	modlog(mod, "STARTING")
+	local orig = dpf.loadJson(cLevel .. "tags/original.json")
+	local new = cs.level.events
+	if not new or not orig then modwarn(mod, "FAILED") return end
+
+	local usedEvents = {}
+	local usedEases = {}
+
+	local foundEvents = {}
+	local foundEvents2 = {}
+
+	local notFoundAmount = 0
+	local notFoundAmount2 = 0
+
+	local addedAmount = 0
+	local usedAddedAmount = 0
+
+	local changedAmount = 0
+	local angleChanged = 0
+
+	local function found(event, event2, text)
+		foundEvents[tostring(event)] = true
+		foundEvents2[tostring(event2)] = true
+		local check, reason = utilitools.files.beattools.undo.areSimilar(event, event2, nil, 1)
+		if not check then
+			changedAmount = changedAmount + 1
+			modlog(mod, event.time, event.angle, event.type, table.concat(reason, ", "), text)
+		end
+	end
+	local function search(event, compare, text)
+		for _, event2 in ipairs(new) do
+			if not foundEvents2[tostring(event2)] then
+				local valid = true
+				if compare then
+					for _, check in ipairs(compare) do
+						if event[check] ~= event2[check] then
+							valid = false break
+						end
+					end
+				else
+					valid = utilitools.files.beattools.undo.areSimilar(event, event2)
+				end
+				if valid then found(event, event2, text) return false end
+			end
+		end
+		return true
+	end
+	for _, event in ipairs(orig) do
+		usedEvents[event.type] = true
+		if event.type == "ease" or event.type == "setBoolean" then
+			usedEases[event.var] = true
+		end
+
+		if search(event) then
+			if search(event, { "type", "time", "angle", "var" }, "CHANGED") then
+				if search(event, { "type", "time", "var" }, "CHANGED ANGLE") then
+					modlog(mod, event.time, event.angle, event.type, event.var, "MISSING")
+				else
+					angleChanged = angleChanged + 1
+				end
+			end
+		end
+
+		if not foundEvents[tostring(event)] then
+			notFoundAmount = notFoundAmount + 1
+		end
+	end
+	for _, event2 in ipairs(new) do
+		if not foundEvents2[tostring(event2)] then
+			notFoundAmount2 = notFoundAmount2 + 1
+			if (event2.type == "ease" or event2.type == "setBoolean") then
+				if usedEases[event2.var] then
+					modlog(mod, event2.time, event2.angle, event2.type, event2.var, "ADDED EASE")
+					usedAddedAmount = usedAddedAmount + 1
+				end
+			else
+				if usedEvents[event2.type] then
+					modlog(mod, event2.time, event2.angle, event2.type, "ADDED EVENT")
+					addedAmount = addedAmount + 1
+				end
+			end
+		end
+	end
+	modlog(mod,
+		"\nCOMPARING",
+		"\n\tMISSING", notFoundAmount,
+		"\n\t ADDED ", notFoundAmount2,
+		"\n\t\tEVENTS", addedAmount, "added events with event types that already exist in the original",
+		"\n\t\tEASES ", usedAddedAmount, "added events that ease eases from the original",
+		"\n\tCHANGED", changedAmount,
+		"\n\t\tANGLE", angleChanged, "existing events where the angle was changed",
+
+		"\nORIGINAL:",
+		"\n\tEVENTS", table.concat(utilitools.table.keysToValues(usedEvents), ", "),
+		"\n\tEASES ", table.concat(utilitools.table.keysToValues(usedEases), ", ")
+	)
+end
+
+compareWithTag()
