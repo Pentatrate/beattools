@@ -1,0 +1,13 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Pop out ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''error(string.format("%s at line %d col %d", msg, line_count, col_count))'''
+payload = '''error(string.format("%s at line %d col %d: %s", msg, line_count, col_count, str))'''
+position = "at"
+target = "lib/json.lua"

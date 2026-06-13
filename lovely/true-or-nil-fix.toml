@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
-priority = -1 # run before menus-beattools.toml
-version = "1.0.0" 
+dump_lua = true
+priority = 0 # run before imgui-resize.toml
+version = "1.0.0"
 
 # True or nil fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

@@ -94,7 +94,7 @@ function splashes.imgui()
 			insertSplash("There are actually " .. (
 
 				-- the base splashes,
-				#splashes
+				#beattools.splashes.total
 				-- +1 for this one being added right now
 				-- +1 for the shiny splash in splashes.gen
 				+ 2

@@ -1178,6 +1178,13 @@ return {
 		tooltips = { short = "Amount of Degrees to snap" },
 		default = 10
 	},
+	textPopOut = {
+		type = "bool",
+		name = "Text Input Popup",
+		tooltips = { short = "For text inputs with a large amount of text, opens a autoresizing moveable popup to see more text" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

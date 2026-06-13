@@ -786,7 +786,7 @@ function tooly.validateTunnels(tunnels)
 				local temp = intersection.subtractFunctions(tunnel.a2, tunnel.a1)
 				local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
 				local diff = lowest and highest and highest - lowest
-				validated = not lowest or not highest or not (lowest <= -1e-8 or highest > 720 + 1e-8)
+				validated = not lowest or not highest or not (lowest <= -1e-8 or highest > 360 + 1e-8)
 				if validated then
 					validated = not lowest or not highest or not (diff <= -1e-8 or diff > 360 + 1e-8)
 					if not validated then reason = utilitools.string.concat("lower than 0", diff, highest, lowest) end
@@ -943,8 +943,10 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no lon
 	local startOverlap, endOverlap = intersection.getOverlappingTime(tunnel1, tunnel2)
 
 	local times = { startOverlap, endOverlap }
+	-- modlog(mod, "new", tooly.currentTunnelIndex, times)
 	local function getIntersections(funcs1, funcs2, text)
 		local returnRoots, fullOverlap = intersection.intersectPerpetuallyMultiple(funcs1, funcs2)
+		-- modlog(mod, returnRoots, text)
 		for _, time in ipairs(returnRoots) do
 			table.insert(times, time)
 		end
@@ -967,15 +969,15 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no lon
 		local ranges1 = tooly.tunnelGetRange(tunnel1, between)
 		local ranges2 = tooly.tunnelGetRange(tunnel2, between)
 		local function doAddTunnel(tunnel)
-			table.insert(tunnels, helpers.copy(tunnel))
+			-- table.insert(tunnels, helpers.copy(tunnel))
 			-- deprecated due to the mergeTunnels function splitting the tunnels beforehand
-			--[[ tunnel = helpers.copy(tunnel)
+			tunnel = helpers.copy(tunnel)
 			local addTunnels = { tunnel }
 			addTunnels = tooly.cutTunnels(addTunnels, time, nil)
 			addTunnels = tooly.cutTunnels(addTunnels, nil, prevTime)
 			for _, addTunnel in ipairs(addTunnels) do
 				table.insert(tunnels, addTunnel)
-			end ]]
+			end
 		end
 		if not ranges1 or not ranges2 then
 			if not ranges1 and not ranges2 then
@@ -1002,17 +1004,17 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no lon
 			local b1, b2 = range2[1], range2[2]
 
 			-- also deprecated due to the mergeTunnels function already splitting the tunnels beforehand
-			--[[ local addTunnels1 = { tunnel1 }
+			local addTunnels1 = { tunnel1 }
 			local addTunnels2 = { tunnel2 }
 
 			addTunnels1 = tooly.cutTunnels(addTunnels1, nil, prevTime)
 			addTunnels1 = tooly.cutTunnels(addTunnels1, time, nil)
 
 			addTunnels2 = tooly.cutTunnels(addTunnels2, nil, prevTime)
-			addTunnels2 = tooly.cutTunnels(addTunnels2, time, nil) ]]
+			addTunnels2 = tooly.cutTunnels(addTunnels2, time, nil)
 
-			local addTunnel1 = helpers.copy(tunnel1) -- addTunnels1[1]
-			local addTunnel2 = helpers.copy(tunnel2) -- addTunnels2[1]
+			local addTunnel1 = addTunnels1[1] -- helpers.copy(tunnel1)
+			local addTunnel2 = addTunnels2[1] -- helpers.copy(tunnel2)
 
 			-- time to copy paste the code from the ranges merging hehe
 			if totallyOverlapping then
@@ -1031,7 +1033,7 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no lon
 						tooly.rectifyTunnel(addTunnel2)
 						doAddTunnel(addTunnel1)
 						doAddTunnel(addTunnel2)
-						modlog(mod, "add swapped", tooly.currentTunnelIndex, between, "ranges", range1, range2, "overlap", totallyOverlapping, partiallyOverlapping, "range in", aInB, bInA, "point in", a1InB, a2InB, b1InA, b2InA, "points", a1, a2, b1, b2, "more", isBetween(a2, b1, b2))
+						-- modlog(mod, "add swapped", tooly.currentTunnelIndex, between, prevTime, time, "ranges", range1, range2, "overlap", totallyOverlapping, partiallyOverlapping, "range in", aInB, bInA, "point in", a1InB, a2InB, b1InA, b2InA, "points", a1, a2, b1, b2, "more", isBetween(a2, b1, b2), "times", times)
 					end
 				elseif aInB then
 					--[[ if canBeEither then
@@ -1100,6 +1102,11 @@ function tooly.mergeTunnel(tunnel1, tunnel2, canBeEither, onlyOverlap) -- no lon
 	end
 
 	tooly.glueTunnelsTogether(tunnels)
+
+	-- tooly.validateTunnels(tunnels)
+
+	-- tooly.data.allTunnels[tooly.currentTunnelIndex] = helpers.copy(tunnels)
+	-- tooly.currentTunnelIndex = tooly.currentTunnelIndex + 1
 
 	return tunnels
 end
@@ -1209,14 +1216,14 @@ function tooly.mergeTunnels(tunnels1, tunnels2, canBeEither)
 	local i = 1
 	local startTotalAmount = #totalTunnels
 	while #totalTunnels > 0 do
-		modlog(mod, i, #totalTunnels)
-		if i > 20 then modwarn(mod, "STACK OVERFLOW 1", tooly.currentTunnelIndex, i, #totalTunnels, startTotalAmount) return end
+		-- modlog(mod, i, #totalTunnels)
+		if i > 1e4 then modwarn(mod, "STACK OVERFLOW 1", tooly.currentTunnelIndex, i, #totalTunnels, startTotalAmount) return end
 
 		local tunnelToCompare = table.remove(totalTunnels)
 		local remainingTunnels = {}
 		local j = 1
 		while tunnelToCompare ~= true and #totalTunnels > 0 do
-			if j > 20 then modwarn(mod, "STACK OVERFLOW 2", tooly.currentTunnelIndex, j) return end
+			if j > 1e4 then modwarn(mod, "STACK OVERFLOW 2", tooly.currentTunnelIndex, j) return end
 
 			local singleCompare = tooly.mergeTunnel(tunnelToCompare, table.remove(totalTunnels), true)
 			if not singleCompare then -- should be impossible
@@ -1234,7 +1241,7 @@ function tooly.mergeTunnels(tunnels1, tunnels2, canBeEither)
 				end
 			end
 
-			modlog(mod, "\t\tj", j, singleCompare and #singleCompare or -1, #totalTunnels, #remainingTunnels, tunnelToCompare == true)
+			-- modlog(mod, "\t\tj", j, singleCompare and #singleCompare or -1, #totalTunnels, #remainingTunnels, tunnelToCompare == true)
 
 			j = j + 1
 		end
@@ -1245,7 +1252,7 @@ function tooly.mergeTunnels(tunnels1, tunnels2, canBeEither)
 
 		i = i + 1
 	end
-	modlog(mod, i, #totalTunnels)
+	-- modlog(mod, i, #totalTunnels)
 
 	tooly.glueTunnelsTogether(finalTunnels)
 
@@ -1467,7 +1474,7 @@ function tooly.getRangesBetween()
 	-- 157 193 260 320 331
 
 	local minTime -- = 136
-	local maxTime = 30 -- = 160
+	local maxTime -- = 30 -- = 160
 	if tooly.allEvents and #tooly.allEvents > 0 then -- tunnels
 		startProgress("tunnels", #tooly.allEvents, 0.05)
 		tooly.currentTunnelIndex = 0

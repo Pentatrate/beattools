@@ -1,0 +1,61 @@
+[manifest]
+dump_lua = true
+priority = -2 ## run before imgui-scale-fix (the mod)
+version = "1.0.0"
+
+# Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''event[propertyName] = ffi.string(numptr)'''
+payload = '''
+if event.type == "ease" and propertyName == "var" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), beattools.easeList.eases)
+end
+if event.type == "setBoolean" and propertyName == "var" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), beattools.easeList.bools)
+end
+'''
+position = "after"
+target = "obj/GameManager.lua"
+
+# Pop out ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''return ffi.string(buffer)'''
+payload = '''return utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(buffer))'''
+position = "at"
+target = "lib/imguihelper.lua"
+
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+imgui.InputTextMultiline(label, buffer, size)
+return utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(buffer))
+'''
+payload = '''
+imgui.InputTextMultiline(label, buffer, size)
+return utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(buffer), true)
+'''
+position = "at"
+target = "lib/imguihelper.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''event[propertyName] = ffi.string(numptr)'''
+payload = '''event[propertyName] = utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(numptr), propertyType == "multiline")'''
+position = "at"
+target = "obj/GameManager.lua"
+
+# Math parsor is not worth it and not easy to establish compat with
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''local newPropertyValue = ffi.string(numptr)'''
+# payload = '''local newPropertyValue = utilitools.files.beattools.imguiPopOut.imgui("##"..imguiUniqueName, ffi.string(numptr))'''
+# position = "at"
+# target = "obj/GameManager.lua"

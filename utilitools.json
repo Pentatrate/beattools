@@ -4,7 +4,7 @@
 			"versions": [
 				[
 					">=",
-					"1.2.43"
+					"1.2.46"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."
@@ -167,6 +167,11 @@
 			"call": true
 		},
 		"splashes": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"imguiPopOut": {
 			"extension": "lua",
 			"load": true,
 			"call": true

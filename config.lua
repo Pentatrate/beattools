@@ -285,6 +285,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("focusEventEditor")
 				imgui.Separator()
+				configHelpers.input("textPopOut")
+				imgui.Separator()
 				configHelpers.input("easeList")
 				configHelpers.input("bookmarkList")
 				configHelpers.input("showEventGroups")

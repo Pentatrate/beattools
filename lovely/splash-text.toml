@@ -74,12 +74,34 @@ local additionalSplashes = {
 	"Solve your skill issue with a skill solution!",
 	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
 	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
-	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn'tlike it when i say that",
+	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn't like it when i say that",
 
 	-- the goober AKA pies of lies
 	"craftable with 8 bees and a cranky!",
 
+	-- rhymeswithpie
+	"WHAT DOES THE CAT REACT MEAN?????",
+	"No scammer is alone responsible for a single stepping stone along the spiral of progress. Attack the beast. Break the crypto.",
+	"#mod-ideas -> Splash Text: The Splashening",
+	"Also try Beatblock (Vanilla)",
+	"Also try Beatblock (Demo (Modded))",
+	"A pattern is a common arrangement of numbers with only one solution. Learning patterns is important because thinking wastes time. The two most famous patterns are 1-2-1 and 1-2-2-1. You should memorise these immediately.",
+	"In minesweeper, onechording is a technique where you can safely dig any tile adjacent to a one if the one has only one neighbor",
+
+	-- thatguytheman
+	"yoru",
+	"夜", -- cerdef
+	"she empress on my nose ring till I flow",
+	"sponsored by tung tung tung sahur",
+
+	-- miguelreal the idea
+	"Also try exploding in real life!",
+
 	-- ayka47 AKA aykarain
+	"When sweeping mines, you should probably bring a broom.",
+	"PENTAS BEATTOOLS",
+	"🌸THIS GAME IS SPONSERED BY PENTA'S BEATTOOLS🌸",
+	"~WITH THE INTENT TO ENHANCE~",
 [[
 [offset=-150]what is this a reference to
 [offset=-167]i meant the bees part
@@ -91,21 +113,7 @@ local additionalSplashes = {
 [offset=-88]i didnt know i could become cranky with hrt
 [offset][font=terminalTall]which one do you want
 [offset=-158][font]i want to get cranky hrt
-]],
-
-	-- rhymeswithpie
-	"WHAT DOES THE CAT REACT MEAN?????",
-	"It's april fools guys trust me",
-	"No scammer is alone responsible for a single stepping stone along the spiral of progress. Attack the beast. Break the crypto.",
-	"#mod-ideas -> Splash Text: The Splashening",
-	"Also try Beatblock (Vanilla)",
-	"Also try Beatblock (Demo (Modded))",
-
-	-- thatguytheman
-	"yoru",
-	"夜", -- cerdef
-	"she empress on my nose ring till I flow",
-	"sponsored by tung tung tung sahur"
+]]
 }
 
 _G.beattools = beattools or {}
@@ -145,12 +153,22 @@ target = "preload/splashes.lua"
 match_indent = true
 pattern = '''-- BiomanticBeast'''
 payload = '''
--- Beattols Birthday PPL
+{
+	text = "It's april fools guys trust me",
+	month = 3, day = 31,
+	birthday = true
+},
+{
+	text = "It's april fools guys trust me",
+	month = 4, day = 2,
+	birthday = true
+},
 {
 	text = "Merry {chrysler|crisis}!",
 	month = 12, day = 25,
 	birthday = true
 },
+-- Beattools Birthday PPL
 {
 	text = "Happy birthday, aykarain!",
 	month = 4, day = 28,

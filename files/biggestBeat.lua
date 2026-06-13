@@ -220,8 +220,8 @@ function biggestBeat.drawMultiAngles()
 
 	if not beattools.test or not beattools.test.timedRanges then return end
 	local intersection = utilitools.files.beattools.intersection
-	local oldSize = love.graphics.getPointSize()
-	love.graphics.setPointSize(2)
+	local oldSize = love.graphics.getLineWidth()
+	love.graphics.setLineWidth(2)
 	local pointAccuracy = 1 / 16 / 16
 	local function drawFunc(func, i)
 		for t = func.startTime + pointAccuracy, func.endTime + pointAccuracy, pointAccuracy do
@@ -242,6 +242,11 @@ function biggestBeat.drawMultiAngles()
 			love.graphics.setColor(utilitools.color.hsvToRgb(((i - 1) % max) / max * 360, pastel and 0.25 or 1, pastel and 0.5 or 1))
 			if intersection.isTimeOverlapping(tunnel, { startTime = cs.editorBeat, endTime = cs.editorBeat + cs.drawDistance }) then
 				for _, a in ipairs({ "a1", "a2" }) do
+					if a == "a1" then
+						love.graphics.setLineWidth(3)
+					else
+						love.graphics.setLineWidth(2)
+					end
 					local funcs = tunnel[a]
 					for _, func in ipairs(funcs) do
 						if intersection.isTimeOverlapping(func, { startTime = cs.editorBeat, endTime = cs.editorBeat + cs.drawDistance }) then
@@ -291,7 +296,7 @@ function biggestBeat.drawMultiAngles()
 			end
 		end
 	end
-	love.graphics.setPointSize(oldSize)
+	love.graphics.setLineWidth(oldSize)
 end
 
 return biggestBeat

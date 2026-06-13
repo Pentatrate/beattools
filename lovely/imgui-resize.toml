@@ -1,6 +1,6 @@
 [manifest]
 dump_lua = true
-priority = 0
+priority = 1 # run after true-or-nil-fix.toml
 version = "1.0.0"
 
 # Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
