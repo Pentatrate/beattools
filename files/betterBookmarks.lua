@@ -59,9 +59,7 @@ function betterBookmarks.setBookmark(bookmarkList, count, smallestBeat, biggestB
 end
 
 function betterBookmarks.getStaticData()
-	if not (utilitools.files.beattools.easing.list.bookmark and utilitools.files.beattools.easing.list.bookmark["_"] and utilitools.files.beattools.easing.list.bookmark["_"]["_"]) then return end
-
-	local bookmarkList = utilitools.files.beattools.easing.list.bookmark["_"]["_"]
+	local bookmarkList = utilitools.files.beattools.easing.list.bookmark and utilitools.files.beattools.easing.list.bookmark["_"] and utilitools.files.beattools.easing.list.bookmark["_"]["_"] and utilitools.files.beattools.easing.list.bookmark["_"]["_"] or nil
 	local smallestBeat = (utilitools.files.beattools.biggestBeat.min or 0) - mods.beattools.config.scrollPast
 	local biggestBeat = (utilitools.files.beattools.biggestBeat.max or 0) + mods.beattools.config.scrollPast
 
@@ -69,7 +67,6 @@ function betterBookmarks.getStaticData()
 end
 function betterBookmarks.getBookmarkData()
 	local bookmarkList, smallestBeat, biggestBeat = betterBookmarks.getStaticData()
-	if not bookmarkList then return end
 
 	local time = cs.editorBeat
 	time = math.max(time, smallestBeat)
@@ -78,6 +75,14 @@ function betterBookmarks.getBookmarkData()
 	-- get last bookmark of the current beat
 	local currentBookmark, count = utilitools.files.beattools.easing.getEase("bookmark", nil, time, nil, nil)
 	count = helpers.copy(count)
+
+	if not bookmarkList then
+		return bookmarkList, smallestBeat, biggestBeat, time, currentBookmark, count, nil, nil, nil, nil,
+			biggestBeat - smallestBeat ~= 0 and (
+				(time - smallestBeat) / (biggestBeat - smallestBeat)
+			) or (betterBookmarks.lastBookmark.time == currentBookmark.time and betterBookmarks.lastProgress or 0) -- two bookmarks on the same beat
+	end
+
 	local hasPrev, prevBookmark, hasNext, nextBookmark
 	currentBookmark, count, hasPrev, prevBookmark, hasNext, nextBookmark = betterBookmarks.setBookmark(bookmarkList, count, smallestBeat, biggestBeat, count.index, false)
 
@@ -110,7 +115,6 @@ function betterBookmarks.calc()
 	-- :crankless:
 
 	local bookmarkList, smallestBeat, biggestBeat, time, currentBookmark, count, hasPrev, prevBookmark, hasNext, nextBookmark, currentProgress = betterBookmarks.getBookmarkData()
-	if not bookmarkList or not currentBookmark or not count or not currentProgress then return end
 
 	-- get mouse progress
 	local mX = mouse.rx - project.res.cx
@@ -118,6 +122,21 @@ function betterBookmarks.calc()
 	local mouseProgress = (0.5 + math.atan2(-mX, mY) / (2 * math.pi)) % 1
 	if math.min(mouseProgress, 1 - mouseProgress) * 360 < mod.config.betterBookmarkSnap then
 		mouseProgress = 0
+	end
+
+	if not bookmarkList or not currentBookmark or not count or not currentProgress then
+		if not bookmarkList then
+			modlog(mod, "failed", bookmarkList, currentBookmark, count, currentProgress, "s")
+
+			-- set the beat
+			cs.editorBeat = smallestBeat + (biggestBeat - smallestBeat) * mouseProgress
+
+			-- saving values for next frame
+			betterBookmarks.lastProgress = mouseProgress
+			betterBookmarks.lastIndex = count.index
+			betterBookmarks.lastBookmark = currentBookmark
+		end
+		return
 	end
 
 	-- finally we check if a flip has happened
