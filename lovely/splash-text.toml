@@ -87,12 +87,14 @@ local additionalSplashes = {
 	"Also try Beatblock (Demo (Modded))",
 	"A pattern is a common arrangement of numbers with only one solution. Learning patterns is important because thinking wastes time. The two most famous patterns are 1-2-1 and 1-2-2-1. You should memorise these immediately.",
 	"In minesweeper, onechording is a technique where you can safely dig any tile adjacent to a one if the one has only one neighbor",
+	"oh god. oh fuck",
 
 	-- thatguytheman
 	"yoru",
 	"夜", -- cerdef
 	"she empress on my nose ring till I flow",
 	"sponsored by tung tung tung sahur",
+	"who the fuck is Mawl",
 
 	-- miguelreal the idea
 	"Also try exploding in real life!",
@@ -102,6 +104,7 @@ local additionalSplashes = {
 	"PENTAS BEATTOOLS",
 	"🌸THIS GAME IS SPONSERED BY PENTA'S BEATTOOLS🌸",
 	"~WITH THE INTENT TO ENHANCE~",
+	"BEATMINE *explodes*",
 [[
 [offset=-150]what is this a reference to
 [offset=-167]i meant the bees part
@@ -277,33 +280,35 @@ else
 		end
 	end
 
-	if num == 1 then
-		splash = "[colour=2]You found the shiny splash text!"
-	elseif mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-		if num == 2 then
-			splash = "There are actually " .. (
+	if not splash then
+		if num == 1 then
+			splash = "[colour=2]You found the shiny splash text!"
+		elseif mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
+			if num == 2 then
+				splash = "There are actually " .. (
 
-				-- the base splashes,
-				#splashes
-				-- +1 for this one being added right now
-				-- +1 for the shiny splash in splashes.gen
-				+ 2
-				-- include the date specifics
-				+ #datespecific
-				-- add both cranky AND nocranky in (one has beed added to splashes already)
-				+ (savedata.aprilFools.noCranky and #crankful or #crankless)
+					-- the base splashes,
+					#splashes
+					-- +1 for this one being added right now
+					-- +1 for the shiny splash in splashes.gen
+					+ 2
+					-- include the date specifics
+					+ #datespecific
+					-- add both cranky AND nocranky in (one has beed added to splashes already)
+					+ (savedata.aprilFools.noCranky and #crankful or #crankless)
 
-				-- Beattools Splashes
-				+ #additionalSplashes
+					-- Beattools Splashes
+					+ #additionalSplashes
 
-			) .. " total modded and vanilla splashes! Collect them all!"
-		elseif num <= #splashes + 2 then
-			splash = splashes[num - 2]
+				) .. " total modded and vanilla splashes! Collect them all!"
+			elseif num <= #splashes + 2 then
+				splash = splashes[num - 2]
+			else
+				splash = additionalSplashes[num - 2 - #splashes]
+			end
 		else
-			splash = additionalSplashes[num - 2 - #splashes]
+			splash = splashes[num - 1]
 		end
-	else
-		splash = splashes[num - 1]
 	end
 '''
 position = "at"

@@ -4,6 +4,8 @@ angle ease sequences
 minehold tail ease sequences
 better holds
 better sides
+
+ease modes
 ]]
 
 local tooly = {
