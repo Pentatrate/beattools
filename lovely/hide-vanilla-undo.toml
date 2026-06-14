@@ -1,0 +1,33 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Window disabling option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Begin("Undo/Redo")'''
+payload = '''mods.beattools.config.hideVanillaUndo = not imgui.Begin("Undo/Redo", true)'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# Window disabling logic ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''helpers.SetNextWindowPos(600,630,window_flag)'''
+payload = '''if not mods.beattools.config.hideVanillaUndo then'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''helpers.SetNextWindowPos(0, 630, window_flag)'''
+payload = '''end'''
+position = "before"
+target = "states/Editor.lua"
+times = 1

@@ -1185,6 +1185,13 @@ return {
 		default = true,
 		off = false
 	},
+	hideVanillaUndo = {
+		type = "bool",
+		name = "Hide Vanilla Undo",
+		tooltips = { short = "Hide the vanilla undo/redo window" },
+		default = false,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

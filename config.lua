@@ -292,6 +292,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.input("showEventGroups")
 				configHelpers.input("editorCalculator")
 				configHelpers.input("undoHistory")
+				configHelpers.input("hideVanillaUndo")
 			end)
 			configHelpers.treeNode("Tracking", function()
 				configHelpers.doc("editor_visuals_tracking")
