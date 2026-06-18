@@ -820,4 +820,4 @@ local function compareWithTag()
 	)
 end
 
-compareWithTag()
+-- compareWithTag()

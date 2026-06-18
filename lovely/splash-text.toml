@@ -187,6 +187,11 @@ payload = '''
 	month = 10, day = 2,
 	birthday = true
 },
+{
+	text = "Happy birthday, Unity!",
+	month = 10, day = 10,
+	birthday = true
+},
 '''
 position = "before"
 target = "preload/splashes.lua"

@@ -788,12 +788,12 @@ function tooly.validateTunnels(tunnels)
 				local temp = intersection.subtractFunctions(tunnel.a2, tunnel.a1)
 				local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
 				local diff = lowest and highest and highest - lowest
-				validated = not lowest or not highest or not (lowest <= -1e-8 or highest > 360 + 1e-8)
+				validated = not lowest or not highest or not (diff <= -1e-8 or diff > 360 + 1e-8)
 				if validated then
-					validated = not lowest or not highest or not (diff <= -1e-8 or diff > 360 + 1e-8)
-					if not validated then reason = utilitools.string.concat("lower than 0", diff, highest, lowest) end
+					validated = not lowest or not highest or not (lowest <= -1e-8 or lowest > 360 + 1e-8)
+					if not validated then reason = utilitools.string.concat("overlapping", diff, lowest, highest, intersection.useFuncs(tunnel.a1, tunnel.startTime), intersection.useFuncs(tunnel.a2, tunnel.startTime)) end
 				else
-					reason = utilitools.string.concat("overlapping", diff, lowest, highest, intersection.useFuncs(tunnel.a1, tunnel.startTime), intersection.useFuncs(tunnel.a2, tunnel.startTime))
+					reason = utilitools.string.concat("diff is invalid", diff, lowest, highest, intersection.useFuncs(tunnel.a1, tunnel.startTime), intersection.useFuncs(tunnel.a2, tunnel.startTime))
 				end
 			end
 			if not validated then
@@ -1779,52 +1779,64 @@ function tooly.getRangesBetween()
 					local overwritten = false
 					for _, tunnel in ipairs(inTunnels) do
 						if intersection.isTimeOverlapping({ startTime = prevTime, endTime = time }, tunnel) then
+							local tunnel2 = helpers.copy(tunnel)
+							tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, time, nil)
+							tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, nil, prevTime)
+							tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, time, nil)
+							tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, nil, prevTime)
+							tunnel2.startTime = prevTime
+							tunnel2.endTime = time
+
+							tooly.validateTunnels({ tunnel2 })
+
+							local tunnelDiff = intersection.subtractFunctions(tunnel2.a2, tunnel2.a1)
+							local tunnelDiffLowest, tunnelDiffHighest = intersection.getLowestFuncs(tunnelDiff), intersection.getHighestFuncs(tunnelDiff)
+
 							for _, v in ipairs({ "a1", "a2" }) do
-								local tunnel2 = helpers.copy(tunnel)
-								tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, time, nil)
-								tunnel2.a1 = intersection.cutOutFromFuncs(tunnel2.a1, nil, prevTime)
-								tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, time, nil)
-								tunnel2.a2 = intersection.cutOutFromFuncs(tunnel2.a2, nil, prevTime)
-								tunnel2.startTime = prevTime
-								tunnel2.endTime = time
+								local pathDiff = intersection.subtractFunctions(path, tunnel2[v])
 
-								tooly.validateTunnels({ tunnel2 })
-
-								local temp = intersection.subtractFunctions(path, tunnel2[v])
-								local lowest, highest = intersection.getLowestFuncs(temp), intersection.getHighestFuncs(temp)
+								local diffLowest, diffHighest = intersection.getLowestFuncs(pathDiff), intersection.getHighestFuncs(pathDiff)
 								local intersectionTimes = intersection.intersectPerpetuallyMultiple(path, tunnel2[v])
-								local lowest2, highest2 = lowest - lowest % 360, highest - highest % 360
-								if lowest2 ~= highest2 or (intersectionTimes and #intersectionTimes > 0) then
+
+								local diffLowestSnapped, diffHighestSnapped = diffLowest - diffLowest % 360, diffHighest - diffHighest % 360
+								local diffLowestMod, diffHighestMod = diffLowest % 360, diffHighest % 360
+
+								local tunnelStartVal, tunnelEndVal = intersection.useFuncs(tunnel2[v], prevTime), intersection.useFuncs(tunnel2[v], time)
+								local diffStart, diffEnd = prevAngle - tunnelStartVal, nextAngle - tunnelEndVal
+								diffStart, diffEnd = diffStart - diffStart % 360, diffEnd - diffEnd % 360
+								local diffMin = math.max(math.min(diffStart, diffEnd), tunnelDiffLowest / 4)
+
+								if diffLowestSnapped ~= diffHighestSnapped or (intersectionTimes and #intersectionTimes > 0) or diffLowestMod < diffMin then
 									path = intersection.subtractFunctions(tunnel2.a2, tunnel2.a1)
-									local lowest3 = intersection.getLowestFuncs(path)
-									local lowest4 = lowest3 - lowest3 % 360
-									if lowest4 ~= 0 then
-										local step = lowest4 / math.abs(lowest4)
-										for _ = lowest4 / 360, step, -step do
+									local pathLowest = intersection.getLowestFuncs(path)
+									local pathLowestSnapped = pathLowest - pathLowest % 360
+									if pathLowestSnapped ~= 0 then
+										local step = pathLowestSnapped / math.abs(pathLowestSnapped)
+										for _ = pathLowestSnapped / 360, step, -step do
 											path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = -360 * step } })
 										end
 									end
 									path = intersection.addFunctions(intersection.multiplyFunctions(path, 0.5), tunnel2.a1)
 
-									local prevAngle2 = intersection.useFuncs(path, prevTime)
-									local diff = tooly.getClosestDelta(prevAngle2, prevAngle)
-									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, diff, 0, "linear"))
+									local newPrevAngle = intersection.useFuncs(path, prevTime)
+									local diffPrevAngle = tooly.getClosestDelta(newPrevAngle, prevAngle)
+									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, diffPrevAngle, 0, "linear"))
 
-									local nextAngle2 = intersection.useFuncs(path, time)
-									diff = tooly.getClosestDelta(nextAngle2, nextAngle)
-									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, 0, diff, "linear"))
+									local newNextAngle = intersection.useFuncs(path, time)
+									diffPrevAngle = tooly.getClosestDelta(newNextAngle, nextAngle)
+									path = intersection.addFunctions(path, intersection.getFunction(prevTime, duration, 0, diffPrevAngle, "linear"))
 
-									prevAngle2 = intersection.useFuncs(path, prevTime)
-									diff = prevAngle - prevAngle2
-									diff = diff + 180
-									diff = diff - diff % 360
-									path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = diff } })
+									newPrevAngle = intersection.useFuncs(path, prevTime)
+									diffPrevAngle = prevAngle - newPrevAngle
+									diffPrevAngle = diffPrevAngle + 180
+									diffPrevAngle = diffPrevAngle - diffPrevAngle % 360
+									path = intersection.addFunctions(path, { { startTime = prevTime, endTime = time, a0 = diffPrevAngle } })
 
-									nextAngle2 = intersection.useFuncs(path, time)
-									diff = nextAngle2 - nextAngle
-									diff = diff + 180
-									diff = diff - diff % 360
-									nextAngle = nextAngle + diff
+									newNextAngle = intersection.useFuncs(path, time)
+									diffPrevAngle = newNextAngle - nextAngle
+									diffPrevAngle = diffPrevAngle + 180
+									diffPrevAngle = diffPrevAngle - diffPrevAngle % 360
+									nextAngle = nextAngle + diffPrevAngle
 
 									overwritten = true
 									break
