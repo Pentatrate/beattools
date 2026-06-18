@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"beatblock-plus": {
-			"versions": [["<", "2.0.0"]],
+			"versions": [[">=", "2.0.0"]],
 			"reason": "You need to update this mod."
 		},
 		"utilitools": {
