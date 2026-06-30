@@ -212,6 +212,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	alpha = alpha or 1
 
 	local eventDraw = Event.editorDraw[eventVisuals.getEventType(event.type)] or sprites.editor.genericevent
+	local isNote = beattoolsLayer == "note" or (beattoolsLayer == "selected" and utilitools.files.beattools.eventStacking.getType(event) == "func")
 	local function drawEvent(pos)
 		setColor(1, 1, 1, 1)
 		if type(eventDraw) == "function" then
@@ -225,7 +226,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 	end
 
-	if alpha ~= 1 or beattoolsLayer == "note" then
+	if alpha ~= 1 or isNote then
 		love.graphics.setCanvas(canv)
 		love.graphics.clear()
 	end
@@ -267,6 +268,48 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			eventVisuals.drawParam(event, pos)
 		end
 	end
+	if utilitools.files.beattools.eventStacking.getType(event) == "func" and mod.config.displayEndAngle and event.endAngle then
+		utilitools.files.beattools.undo.undoing = true
+		utilitools.files.beattools.undo.fakeRepeating = true
+		event.angle = beattoolsTemp2
+		utilitools.files.beattools.undo.undoing = false
+		utilitools.files.beattools.undo.fakeRepeating = false
+	end
+
+	if alpha ~= 1 or isNote then
+		if isNote then
+			setColor(1, 1, 1, 1)
+			love.graphics.setCanvas(canv2)
+			love.graphics.clear()
+
+			shuv.showBadColors = true
+			shuv.updatepal()
+			shuv.drawWithPalette(function()
+				love.graphics.draw(canv)
+			end, {
+				[0] = { r = mod.config.noteWhiteColor.r * 255, g = mod.config.noteWhiteColor.g * 255, b = mod.config.noteWhiteColor.b * 255},
+				[1] = { r = mod.config.noteBlackColor.r * 255, g = mod.config.noteBlackColor.g * 255, b = mod.config.noteBlackColor.b * 255},
+				[2] = {r=127,g=127,b=127},
+				[3] = {r=191,g=191,b=191},
+				[4] = {r=0,g=0,b=0},
+				[5] = {r=0,g=0,b=0},
+				[6] = {r=0,g=0,b=0},
+				[7] = {r=0,g=0,b=0},
+			})
+			shuv.showBadColors = false
+			shuv.updatepal()
+
+			setColor(1, 1, 1, alpha)
+			love.graphics.setCanvas(cs.canv)
+			love.graphics.draw(canv2)
+		else
+			setColor(1, 1, 1, alpha)
+			love.graphics.setCanvas(cs.canv)
+			love.graphics.draw(canv)
+		end
+		setColor(1, 1, 1, 1)
+	end
+
 	if not event.isCursor and beattoolsLayer == "selected" then
 		local time = event.time
 		local angle = event.angle
@@ -292,53 +335,8 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			end
 		end
 	end
-	endStack()
-	if utilitools.files.beattools.eventStacking.getType(event) == "func" and mod.config.displayEndAngle and event.endAngle then
-		utilitools.files.beattools.undo.undoing = true
-		utilitools.files.beattools.undo.fakeRepeating = true
-		event.angle = beattoolsTemp2
-		utilitools.files.beattools.undo.undoing = false
-		utilitools.files.beattools.undo.fakeRepeating = false
-	end
 
-	if alpha ~= 1 or beattoolsLayer == "note" then
-		local function drawShuv()
-			shuv.showBadColors = true
-			shuv.updatepal()
-			shuv.drawWithPalette(function()
-				love.graphics.draw(canv)
-			end, {
-				[0] = { r = mod.config.noteWhiteColor.r * 255, g = mod.config.noteWhiteColor.g * 255, b = mod.config.noteWhiteColor.b * 255},
-				[1] = { r = mod.config.noteBlackColor.r * 255, g = mod.config.noteBlackColor.g * 255, b = mod.config.noteBlackColor.b * 255},
-				[2] = {r=127,g=127,b=127},
-				[3] = {r=191,g=191,b=191},
-				[4] = {r=0,g=0,b=0},
-				[5] = {r=0,g=0,b=0},
-				[6] = {r=0,g=0,b=0},
-				[7] = {r=0,g=0,b=0},
-			})
-			shuv.showBadColors = false
-			shuv.updatepal()
-		end
-		if alpha ~= 1 or beattoolsLayer == "note" then
-			setColor(1, 1, 1, 1)
-			love.graphics.setCanvas(canv2)
-			love.graphics.clear()
-			drawShuv()
-			setColor(1, 1, 1, alpha)
-			love.graphics.setCanvas(cs.canv)
-			love.graphics.draw(canv2)
-		elseif beattoolsLayer == "note" then
-			setColor(1, 1, 1, 1)
-			love.graphics.setCanvas(cs.canv)
-			drawShuv()
-		else
-			setColor(1, 1, 1, alpha)
-			love.graphics.setCanvas(cs.canv)
-			love.graphics.draw(canv)
-		end
-		setColor(1, 1, 1, 1)
-	end
+	endStack()
 end
 
 function eventVisuals.drawEvents()

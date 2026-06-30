@@ -54,7 +54,7 @@ function eventStacking.cacheEvent(event, remove, _k, dontCheck)
 	if not dontCheck then
 		local visibility, type = utilitools.files.beattools.eventGroups.eventVisibility(event, true)
 		if type ~= 1 then
-			modlog(mod, "refused " .. tostring(event.type) .. " " .. tostring(visibility) .. " " .. tostring(type))
+			modwarn(mod, "refused " .. tostring(event.type) .. " " .. tostring(visibility) .. " " .. tostring(type))
 			return
 		end
 	end

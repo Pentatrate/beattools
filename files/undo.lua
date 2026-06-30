@@ -108,7 +108,8 @@ undo = {
 		eventVisuals = true,
 		eventStacking = true,
 		easing = true,
-		biggestBeat = true
+		biggestBeat = true,
+		eventGroups = true
 	}
 }
 

@@ -227,7 +227,7 @@ function eventGroups.eventVisibility(event)
 					utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
 				else
 					utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-					utilitools.files.beattools.eventStacking.cacheEvent(event, true)
+					utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, true)
 				end
 			end
 			eventGroups.eventCache[tostring(event)].visibility = visibility
@@ -269,7 +269,7 @@ function eventGroups.eventVisibility(event)
 				utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
 			else
 				utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-				utilitools.files.beattools.eventStacking.cacheEvent(event, true)
+				utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, true)
 			end
 		end
 	end
@@ -444,6 +444,18 @@ function eventGroups.updateEventVisibilities(group, moveDown)
 			modlog(mod, "invalid group wtf " .. tostring(group.name) .. " " .. tostring(group.index) .. " " .. tostring(eventCache.group.name) .. " " .. tostring(eventCache.group.index))
 		end
 		eventGroups.eventVisibility(event)
+	end
+end
+
+function eventGroups.cacheEvent(event, remove, _k)
+	if remove and eventGroups.eventCache[tostring(event)] then
+		for groupName, group in pairs(eventGroups.groups) do
+			local groupCache = eventGroups.groupCache[groupName]
+			groupCache[tostring(event)] = nil
+		end
+		event.beattoolsCustomEventGroups = nil
+
+		eventGroups.eventCache[tostring(event)] = nil
 	end
 end
 
