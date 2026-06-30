@@ -283,80 +283,101 @@ end
 local function holdBetween(time, low, high)
 	return time >= low and time <= high
 end
+function tooly.checkEventTime(time, type, eventTime, duration, bounces, delay)
+	if not (tooly.supported[type] and not (tooly.side[type] and tooly.noSides)) then return false end
+
+	local inTime = math.abs(eventTime - time) < tooly.merge
+	if not inTime then
+		if tooly.hold[type] then
+			inTime = holdBetween(time, eventTime, eventTime + duration)
+		elseif tooly.bounce[type] then
+			inTime = (helpers.round((time - eventTime) / delay * tooly.round) / tooly.round) % 1 == 0 and eventTime < time and time <= eventTime + bounces * delay
+		elseif tooly.side[type] then
+			inTime = math.abs(eventTime - tooly.msToBeat(eventTime, 100) - time) < tooly.merge
+			if not inTime and tooly.sidesAfter then
+				inTime = eventTime + tooly.msToBeat(eventTime, 50) == time
+			end
+		end
+	end
+
+	return inTime
+end
+function tooly.getEventMoreRanges(time, tunnels, antiTunnels, type, eventTime, angle, angle2, duration, holdEase, delay, rotation)
+	local eventAngle = angle % 360
+	local moreRanges
+
+	if tooly.hold[type] then
+		if duration == 0 then
+			local a1, a2 = angle, angle2
+			local width = math.abs(a2 - a1)
+			if tooly.mine[type] then
+				if width % 360 ~= 0 then -- not magic minehold, has hitbox
+					if width >= 360 then
+						moreRanges = {}
+					else
+						a1, a2 = math.min(a1, a2), math.max(a1, a2)
+						moreRanges = tooly.getRangesForEvent(time, a1 % 360, a2 % 360, true, false, false, false)
+					end
+				end
+			else
+				moreRanges = tooly.overlapRanges(
+					tooly.getRangesForEvent(time, eventAngle, nil, false, false, false, false),
+					tooly.getRangesForEvent(time, angle2 % 360, nil, false, false, false, true),
+					false
+				)
+			end
+		elseif eventTime == time then
+			moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, tooly.mine[type], false, false, false)
+		elseif eventTime + duration == time then
+			moreRanges = tooly.getRangesForEvent(time, angle2 % 360, nil, tooly.mine[type], false, false, tooly.lenient[type])
+		elseif not (tooly.lenient[type] and ((tooly.holdLeniency or tooly.holdLeniencyBeats(time) >= eventTime + duration - time) or math.min(time % 0.5, 0.5 - (time % 0.5)) >= tooly.merge)) then
+			-- hacky fix for hold leniency, have to improve later
+			local angle3 = helpers.interpolate(angle, angle2, helpers.clamp((time - eventTime) / duration, 0, 1), holdEase) % 360
+			moreRanges = tooly.getRangesForEvent(time, angle3, nil, tooly.mine[type], false, false, tooly.lenient[type])
+		end
+	elseif tooly.bounce[type] then
+		if time == eventTime then
+			moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, false, false, false, false)
+		else
+			local i = (time - eventTime) / delay
+			moreRanges = tooly.getRangesForEvent(time, (eventAngle + rotation * i) % 360, nil, false, false, false, false)
+		end
+	elseif tooly.side[type] then
+		if math.abs(eventTime - tooly.msToBeat(eventTime, 100) - time) < tooly.merge then
+			moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, true, true, false, false)
+		else
+			moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, false, true, false, false)
+		end
+	else
+		moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, tooly.mine[type], false, tooly.inverse[type], false)
+	end
+
+	return moreRanges
+end
 function tooly.getRangesForTime(time, tunnels, antiTunnels)
 	local ranges = tooly.tunnelsGetRanges(tunnels, antiTunnels, time)
 	local eventVisuals = utilitools.files.beattools.eventVisuals
 	local timeStepped
 
 	local function checkEvent(event)
-		if tooly.supported[event.type] and not (tooly.side[event.type] and tooly.noSides) then
-			local eventTime = event.time
-			local inTime = math.abs(eventTime - time) < tooly.merge
-			if not inTime then
-				if tooly.hold[event.type] then
-					inTime = holdBetween(time, eventTime, eventTime + event.duration)
-				elseif tooly.bounce[event.type] then
-					inTime = (helpers.round((time - eventTime) / event.delay * tooly.round) / tooly.round) % 1 == 0 and eventTime < time and time <= eventTime + event.bounces * event.delay
-				elseif tooly.side[event.type] then
-					inTime = math.abs(eventTime - tooly.msToBeat(eventTime, 100) - time) < tooly.merge
-					if not inTime and tooly.sidesAfter then
-						inTime = eventTime + tooly.msToBeat(eventTime, 50) == time
-					end
-				end
-			end
+		local type = event.type
+		local eventTime = event.time
+		local angle = event.endAngle or event.angle
 
-			if inTime then
-				local eventAngle = (event.endAngle or event.angle) % 360
-				local moreRanges
+		local angle2 = event.angle2
+		local duration = event.duration
+		local holdEase = event.holdEase
 
-				if tooly.hold[event.type] then
-					if event.duration == 0 then
-						local a1, a2 = (event.endAngle or event.angle), event.angle2
-						local width = math.abs(a2 - a1)
-						if tooly.mine[event.type] then
-							if width % 360 ~= 0 then -- not magic minehold, has hitbox
-								if width >= 360 then
-									moreRanges = {}
-								else
-									a1, a2 = math.min(a1, a2), math.max(a1, a2)
-									moreRanges = tooly.getRangesForEvent(time, a1 % 360, a2 % 360, true, false, false, false)
-								end
-							end
-						else
-							moreRanges = tooly.overlapRanges(
-								tooly.getRangesForEvent(time, eventAngle, nil, false, false, false, false),
-								tooly.getRangesForEvent(time, event.angle2 % 360, nil, false, false, false, true),
-								false
-							)
-						end
-					elseif eventTime == time then
-						moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, tooly.mine[event.type], false, false, false)
-					elseif eventTime + event.duration == time then
-						moreRanges = tooly.getRangesForEvent(time, event.angle2 % 360, nil, tooly.mine[event.type], false, false, tooly.lenient[event.type])
-					elseif not (tooly.lenient[event.type] and ((tooly.holdLeniency or tooly.holdLeniencyBeats(time) >= eventTime + event.duration - time) or math.min(time % 0.5, 0.5 - (time % 0.5)) >= tooly.merge)) then
-						-- hacky fix for hold leniency, have to improve later
-						local angle = (eventAngle + (event.angle2 - (event.endAngle or event.angle)) * (flux.easing[event.holdEase] or flux.easing["linear"])((time - eventTime) / event.duration)) % 360
-						moreRanges = tooly.getRangesForEvent(time, angle, nil, tooly.mine[event.type], false, false, tooly.lenient[event.type])
-					end
-				elseif tooly.bounce[event.type] then
-					if time == eventTime then
-						moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, false, false, false, false)
-					else
-						local i = (time - eventTime) / event.delay
-						moreRanges = tooly.getRangesForEvent(time, (eventAngle + event.rotation * i) % 360, nil, false, false, false, false)
-					end
-				elseif tooly.side[event.type] then
-					if math.abs(eventTime - tooly.msToBeat(eventTime, 100) - time) < tooly.merge then
-						moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, true, true, false, false)
-					else
-						moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, false, true, false, false)
-					end
-				else
-					moreRanges = tooly.getRangesForEvent(time, eventAngle, nil, tooly.mine[event.type], false, tooly.inverse[event.type], false)
-				end
+		local bounces = event.bounces
+		local delay = event.delay
+		local rotation = event.rotation
 
-				ranges = tooly.overlapRanges(ranges, moreRanges, false)
-			end
+		local check = tooly.checkEventTime(time, type, eventTime, duration, bounces, delay)
+
+		if check then
+			local moreRanges = tooly.getEventMoreRanges(time, tunnels, antiTunnels, type, eventTime, angle, angle2, duration, holdEase, delay, rotation)
+
+			ranges = tooly.overlapRanges(ranges, moreRanges, false)
 		end
 	end
 	for i = -1, 1 do
@@ -1364,7 +1385,7 @@ end
 
 
 
-function tooly.getRangesBetween()
+function tooly.calculatePath()
 	tooly.alreadyInvalid = {}
 	tooly.eventCache = {}
 

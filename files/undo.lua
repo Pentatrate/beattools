@@ -315,7 +315,7 @@ undo.insert = function(list, pos, value)
 	return true
 end
 undo.remove = function(list, pos)
-	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
+	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events and list[pos] then
 		local returnValue
 		if utilitools.files.beattools.undo.fakeRepeating or list[pos].beattoolsRepeatChild == nil then
 			if

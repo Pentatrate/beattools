@@ -3,16 +3,158 @@ dump_lua = true
 priority = 1
 version = "1.0.0"
 
-# Suggest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Tooly plays ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''prof.push("player update")'''
 payload = '''
-if beattools.test and beattools.test.timedRanges then
+if mods.beattools.config.tooly and beattools.test and beattools.test.timedRanges then
 	local tooly = utilitools.files.beattools.tooly
 	tooly.play(beattools.test, cs.cBeat)
 end
 '''
 position = "after"
 target = "obj/Player.lua"
+
+# Tooly adapts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/Player.lua"
+pattern = '''prof.push("player update")'''
+position = "after"
+payload = '''
+if mods.beattools.config.tooly and beattools.test and beattools.test.timedRanges and cs.cBeat and false then
+	local function checkHit(time)
+		return time - cs.cBeat <= 0
+	end
+	for _, v in ipairs(entities) do
+		if v.hb then
+			local type = event.type
+			local eventTime = event.time
+			local angle = event.endAngle or event.angle
+
+			local angle2 = event.angle2
+			local duration = event.duration
+			local holdEase = event.holdEase
+
+			local bounces = event.bounces
+			local delay = event.delay
+			local rotation = event.rotation
+
+			if v.name == "block" and not v.hitYet then
+				if checkHit(v.hb) then
+				end
+				-- v.angle
+			elseif v.name == "hold" and v.duration and (not v.hitYet or v.started) then
+				if v.duration == 0 then
+				else
+					local holdEnd = v.hb + v.duration
+					local stepSize = math.max((v.leniencyFrames + cs.extraHoldLeniency) / 60, 0.001)
+					local startAngle = v.startAngle or v.angle
+					local beat = v.hb
+					while beat < holdEnd do
+						local t = (beat - v.hb) / v.duration
+						-- helpers.interpolate(startAngle, v.angle2 + (v.tesAngle or 0), t, v.holdEase)
+						beat = beat + stepSize
+					end
+					considerNote(v.angle, v.hb, "basic")
+					considerNote(v.angle2 + (v.tesAngle or 0), holdEnd, "basic")
+				end
+			elseif v.name == "bounce" and not v.hitYet then
+				-- v.endAngle
+			elseif v.name == "mine" and not v.hitYet then
+				-- v.angle
+			elseif v.name == "mineHold" and v.duration and (not v.hitYet or (v.hb < cs.cBeat and not ((v.hb + v.duration) < cs.cBeat))) then
+				local holdEnd = v.hb + v.duration
+				--local stepSize = 0.005
+				local startAngle = v.startAngle or v.angle
+				if v.duration == 0 then
+					local a1 = v.angle
+					local a2 = v.angle2 + (v.tesAngle or 0)
+					local halfPaddle = smallestPaddle/2
+					local step = math.max(halfPaddle - 1, 1)
+
+					local arcDiff = a2 - a1
+					local steps = math.ceil(math.abs(arcDiff) / step)
+					for i = 0, steps do
+						local t = steps > 0 and (i / steps) or 0
+						local ang = (a1 + arcDiff * t) % 360
+						considerNote(ang % 360, v.hb, "mines")
+					end
+				else
+					--im going to kill myself
+					--i know im going to have to do this unless penta finishes tooly which is more likely then me finishing bonky
+					--who im i kidding penta is definately finishing tooly before i finish bonky he already got mineholds down pretty much in like a 3 days since saying he was... WHAT ITS BEEN ONLY 3 DAYS?
+				end
+			elseif v.name == "side" and not v.sideHitYet then
+				-- v.angle
+			end
+		end
+	end
+end
+'''
+match_indent = true
+
+# Auto taps ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "obj/GameManager.lua"
+pattern = '''elseif savedata.options.accessibility.taps == 'auto' then'''
+position = "before"
+payload = '''
+elseif mods.beattools.config.tooly and (cs.name == "Game" or cs.name == "Editor") then
+	if cs.cBeat >= t.beat then
+		hitTap = true
+		t.hit = true
+		self:addToScore(t.score)
+		table.insert(cs.tapTiming,0)
+	end
+'''
+match_indent = true
+
+# Dont save ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''sdfunc.save()'''
+position = "at"
+payload = '''
+if not mods.beattools.config.tooly then
+	sdfunc.save()
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''self.playedLevelsJson[saveName] = {'''
+position = "before"
+payload = '''
+if not mods.beattools.config.tooly then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''self.zoomIn = 1'''
+position = "before"
+payload = '''
+end
+'''
+match_indent = true
+
+# No hidden level transition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "states/Results.lua"
+pattern = '''self:changeToHidden()'''
+position = "at"
+payload = '''
+if not mods.beattools.config.tooly then
+	self:changeToHidden()
+end
+'''
+match_indent = true

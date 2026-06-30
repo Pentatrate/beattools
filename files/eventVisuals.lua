@@ -16,6 +16,7 @@ local eventVisuals = {
 }
 
 local canv = love.graphics.newCanvas(project.res.x, project.res.y)
+local canv2 = love.graphics.newCanvas(project.res.x, project.res.y)
 
 local color = { r = 1, g = 1, b = 1, a = 1 }
 local function setColor(r, g, b, a)
@@ -224,7 +225,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 	end
 
-	if alpha ~= 1 then
+	if alpha ~= 1 or beattoolsLayer == "note" then
 		love.graphics.setCanvas(canv)
 		love.graphics.clear()
 	end
@@ -300,10 +301,43 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		utilitools.files.beattools.undo.fakeRepeating = false
 	end
 
-	if alpha ~= 1 then
-		love.graphics.setCanvas(cs.canv)
-		setColor(1, 1, 1, alpha)
-		love.graphics.draw(canv)
+	if alpha ~= 1 or beattoolsLayer == "note" then
+		local function drawShuv()
+			shuv.showBadColors = true
+			shuv.updatepal()
+			shuv.drawWithPalette(function()
+				love.graphics.draw(canv)
+			end, {
+				[0] = { r = mod.config.noteWhiteColor.r * 255, g = mod.config.noteWhiteColor.g * 255, b = mod.config.noteWhiteColor.b * 255},
+				[1] = { r = mod.config.noteBlackColor.r * 255, g = mod.config.noteBlackColor.g * 255, b = mod.config.noteBlackColor.b * 255},
+				[2] = {r=127,g=127,b=127},
+				[3] = {r=191,g=191,b=191},
+				[4] = {r=0,g=0,b=0},
+				[5] = {r=0,g=0,b=0},
+				[6] = {r=0,g=0,b=0},
+				[7] = {r=0,g=0,b=0},
+			})
+			shuv.showBadColors = false
+			shuv.updatepal()
+		end
+		if alpha ~= 1 or beattoolsLayer == "note" then
+			setColor(1, 1, 1, 1)
+			love.graphics.setCanvas(canv2)
+			love.graphics.clear()
+			drawShuv()
+			setColor(1, 1, 1, alpha)
+			love.graphics.setCanvas(cs.canv)
+			love.graphics.draw(canv2)
+		elseif beattoolsLayer == "note" then
+			setColor(1, 1, 1, 1)
+			love.graphics.setCanvas(cs.canv)
+			drawShuv()
+		else
+			setColor(1, 1, 1, alpha)
+			love.graphics.setCanvas(cs.canv)
+			love.graphics.draw(canv)
+		end
+		setColor(1, 1, 1, 1)
 	end
 end
 
@@ -346,7 +380,8 @@ function eventVisuals.drawEvents()
 
 			local function addTo(list)
 				list[visibility] = list[visibility] or {}
-				list[visibility][tostring(v)] = v
+				-- list[visibility][tostring(v)] = v
+				table.insert(list[visibility], v)
 			end
 			local function checkMarkerSelected(k)
 				return mod.config[k] ~= "off" and selected
@@ -423,16 +458,19 @@ function eventVisuals.drawEvents()
 	love.graphics.setCanvas(cs.canv)
 	color.r, color.g, color.b, color.a = love.graphics.getColor()
 
-	local function drawLayer(table, layer, drawColor, alphaOverride)
+	local function drawLayer(array, layer, drawColor, alphaOverride)
 		local function drawVisibility(visibility)
-			if not table[visibility] then return end
+			if not array[visibility] then return end
 			if drawColor then
 				local alpha = 1
 				local t = { transparent = mod.config.alphaTransparent, ghost = mod.config.alphaGhost }
 				if t[visibility] then alpha = t[visibility] end
 				setColor(drawColor.r, drawColor.g, drawColor.b, (alphaOverride or drawColor.a or 1) * alpha)
 			end
-			for _, v in pairs(table[visibility]) do
+			table.sort(array[visibility], function(a, b)
+				return utilitools.files.beattools.eventStacking.getIndex(a) < utilitools.files.beattools.eventStacking.getIndex(b)
+			end)
+			for _, v in ipairs(array[visibility]) do
 				drawEventOnLayer(v, layer)
 			end
 		end

@@ -19,7 +19,7 @@ return {
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
 
 		local tooly = utilitools.files.beattools.tooly
-		beattools.test = tooly.getRangesBetween()
+		beattools.test = tooly.calculatePath()
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

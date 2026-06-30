@@ -1192,6 +1192,73 @@ return {
 		default = false,
 		off = false
 	},
+	compareWindow = {
+		type = "bool",
+		name = "Merge Manager Window",
+		tooltips = { short = "Made for the velocity collab\nHelps with merging parts that have events in common, bc they are built on the same gameplay file" },
+		default = false,
+		off = false
+	},
+	noteWhiteColor = {
+		type = "color",
+		name = "Note White Color",
+		tooltips = { short = "White color for the notes" },
+		default = { r = 1, g = 1, b = 1 }
+	},
+	noteBlackColor = {
+		type = "color",
+		name = "Note Black Color",
+		tooltips = { short = "Black color for the notes" },
+		default = { r = 0, g = 0, b = 0 }
+	},
+	playerWhiteColor = {
+		type = "color",
+		name = "Player White Color",
+		tooltips = { short = "White color for the player" },
+		default = { r = 1, g = 1, b = 1 }
+	},
+	playerBlackColor = {
+		type = "color",
+		name = "Player Black Color",
+		tooltips = { short = "Black color for the player" },
+		default = { r = 0, g = 0, b = 0 }
+	},
+	playerRedColor = {
+		type = "color",
+		name = "Player Red Color",
+		tooltips = { short = "Red color for the player" },
+		default = { r = 1, g = 0, b = 0 }
+	},
+	playerBlueColor = {
+		type = "color",
+		name = "Player Blue Color",
+		tooltips = { short = "Blue color for the player" },
+		default = { r = 0, g = 0, b = 1 }
+	},
+	playerGreenColor = {
+		type = "color",
+		name = "Player Green Color",
+		tooltips = { short = "Green color for the player" },
+		default = { r = 0, g = 1, b = 0 }
+	},
+	playerYellowColor = {
+		type = "color",
+		name = "Player Yellow Color",
+		tooltips = { short = "Yellow color for the player" },
+		default = { r = 1, g = 1, b = 0 }
+	},
+	playerPinkColor = {
+		type = "color",
+		name = "Player Pink Color",
+		tooltips = { short = "Pink color for the player" },
+		default = { r = 1, g = 0, b = 1 }
+	},
+	playerLightBlueColor = {
+		type = "color",
+		name = "Player Light Blue Color",
+		tooltips = { short = "Light Blue color for the player" },
+		default = { r = 0, g = 1, b = 1 }
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

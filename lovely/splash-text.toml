@@ -75,6 +75,8 @@ local additionalSplashes = {
 	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
 	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
 	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn't like it when i say that",
+	"wuh",
+	"(ive tested all fonts in my editor guide, none of them support thunbsup)",
 
 	-- the goober AKA pies of lies
 	"craftable with 8 bees and a cranky!",
@@ -95,9 +97,16 @@ local additionalSplashes = {
 	"she empress on my nose ring till I flow",
 	"sponsored by tung tung tung sahur",
 	"who the fuck is Mawl",
+	"bleefy chinglestrough",
+	"make that a splash text",
 
 	-- miguelreal the idea
 	"Also try exploding in real life!",
+
+	-- unity
+	"clamasmgdhs thechs: 5)3ghe splandushengin", -- Penta: no f:sexwords:king clue what drove unity to do this
+	"why so serious",
+	":thumbsup:", -- thumbsup, i dont think any font supports the emote version currently 👍
 
 	-- ayka47 AKA aykarain
 	"When sweeping mines, you should probably bring a broom.",
@@ -105,6 +114,10 @@ local additionalSplashes = {
 	"🌸THIS GAME IS SPONSERED BY PENTA'S BEATTOOLS🌸",
 	"~WITH THE INTENT TO ENHANCE~",
 	"BEATMINE *explodes*",
+	"Splash Text: The Splashening", -- and unity
+	"Slash Tech: The Slashening",
+	"mace hats are slash tech",
+	"do you beat blocks or make beats blocked",
 [[
 [offset=-150]what is this a reference to
 [offset=-167]i meant the bees part

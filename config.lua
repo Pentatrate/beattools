@@ -1,9 +1,6 @@
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
---[[ if beattools and beattools.test then
-	imgui.Text(tostring(beattools.test))
-end ]]
 
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
@@ -118,7 +115,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("testKey3")
 			imgui.Separator()
 			configHelpers.input("tooly")
-			imgui.Separator()
+			configHelpers.input("compareWindow")
+			--[[ imgui.Separator()
 			local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
 			if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
 				if hasCombo then
@@ -141,8 +139,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			if hasCombo then
 				configHelpers.input("minCombo")
 				configHelpers.input("maxCombo")
-			end
-			mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
+			end ]]
+			-- mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
 		end)
 		configHelpers.treeNode("Jokes", function()
 			configHelpers.treeNode("Professor Gearshift", function()
@@ -261,6 +259,16 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.input("editorBgColor")
 				configHelpers.input("editorSnapColor")
 				configHelpers.input("editorBlackColor")
+				configHelpers.input("noteWhiteColor")
+				configHelpers.input("noteBlackColor")
+				configHelpers.input("playerWhiteColor")
+				configHelpers.input("playerBlackColor")
+				configHelpers.input("playerRedColor")
+				configHelpers.input("playerBlueColor")
+				configHelpers.input("playerGreenColor")
+				configHelpers.input("playerYellowColor")
+				configHelpers.input("playerPinkColor")
+				configHelpers.input("playerLightBlueColor")
 				imgui.Separator()
 				configHelpers.input("whiteSelected")
 				if mod.config.whiteSelected ~= "off" then

@@ -576,8 +576,8 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 					funcs,
 					intersection.getFunction(
 						time + i - step, step,
-						i == step and startVal or (startVal + flux.easing[ease](helpers.clamp((i - step) / duration, 0, 1)) * d),
-						i == duration and endVal or (startVal + flux.easing[ease](helpers.clamp(i / duration, 0, 1)) * d),
+						i == step and startVal or helpers.interpolate(startVal, endVal, helpers.clamp((i - step) / duration, 0, 1), ease),
+						i == duration and endVal or helpers.interpolate(startVal, endVal, helpers.clamp(i / duration, 0, 1), ease),
 						"linear"
 					)[1]
 				)
@@ -590,7 +590,7 @@ function intersection.getFunction(time, duration, startVal, endVal, ease, second
 				funcs,
 				intersection.getFunction(
 					time + duration - delta, delta,
-					delta == duration and startVal or (startVal + flux.easing[ease]((duration - delta) / duration) * d),
+					delta == duration and startVal or helpers.interpolate(startVal, endVal, helpers.clamp((duration - delta) / duration, 0, 1), ease),
 					endVal
 				)[1]
 			)

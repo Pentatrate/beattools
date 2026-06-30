@@ -149,6 +149,9 @@ if true then
 	if mods.beattools.config.undoHistory and utilitools.files.beattools.undoHistory then
 		utilitools.files.beattools.undoHistory(window_flag, inputFlag)
 	end
+	if mods.beattools.config.compareWindow and utilitools.files.beattools.compare then
+		utilitools.files.beattools.compare.window(window_flag, inputFlag)
+	end
 end
 '''
 position = "before"

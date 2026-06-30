@@ -167,7 +167,7 @@ local easing = {
 				return t
 			end,
 			convert = function(event, different, parallel) return { value = event[({ bgColor = "color", voidColor = "voidColor" })[different]] } end,
-			params = { color = true, bgColor = true }
+			params = { color = true, voidColor = true }
 		},
 		noise = {
 			type = "ease",
@@ -452,7 +452,7 @@ function easing.getEase(eventId, different, time, order, index)
 					count.event = originalEvent
 				end
 
-				if track.duration and track.duration[param] and event.duration and event.duration ~= 0 then
+				if track.duration and track.duration[param] and event.duration and event.duration ~= 0 and time < event.time + event.duration then
 					if track.start and track.start[param] and event[track.start[param]] ~= nil then
 						-- start cannot be parallel
 						prevValues[param] = event[track.start[param]]
@@ -464,9 +464,7 @@ function easing.getEase(eventId, different, time, order, index)
 
 					if type(event[param]) == "number" and type(prevValues[param]) == "number" then
 						local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
-						completion = (flux.easing[event.ease] or flux.easing["linear"])(completion)
-						local diff = event[param] - prevValues[param]
-						values[param] = prevValues[param] + diff * completion
+						values[param] = helpers.interpolate(prevValues[param], event[param], completion, event.ease)
 					else
 						values[param] = event[param]
 						modwarn(mod, "[" .. parallel .. "] [" .. param .. "] NaN " .. values[param])
