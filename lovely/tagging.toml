@@ -1,0 +1,71 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Autofocus tag input ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.changeToTagDialogue = true'''
+payload = '''self.firstTimeTagDialogue = true'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.newTagName = helpers.InputText("Tag name", self.newTagName, 9999)'''
+payload = '''
+if self.firstTimeTagDialogue then
+	self.firstTimeTagDialogue = false
+	imgui.SetKeyboardFocusHere()
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+
+# Tag single tag ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local tagEvents = helpers.copy(self.multiselect.events)'''
+payload = '''local tagEvents = helpers.copy(self.multiselect and self.multiselect.events or { self.selectedEvent })'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
+payload = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.cmd:executeNew(cmd.RemoveMultiple,self.multiselect.events)'''
+payload = '''self:deleteSelectedEvent()'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.cmd:endGroup("Make tag "..self.newTagName)
+self.multiselect.events = {}
+'''
+payload = '''self.cmd:endGroup("Make tag "..self.newTagName)'''
+position = "at"
+target = "states/Editor.lua"
+
+# Stop tag window when single event deselected ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if self.changeToTagDialogue and (not self.multiselect) then'''
+payload = '''if self.changeToTagDialogue and (not (self.multiselect or self.selectedEvent)) then'''
+position = "at"
+target = "states/Editor.lua"

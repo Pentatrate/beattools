@@ -451,7 +451,9 @@ function eventGroups.cacheEvent(event, remove, _k)
 	if remove and eventGroups.eventCache[tostring(event)] then
 		for groupName, group in pairs(eventGroups.groups) do
 			local groupCache = eventGroups.groupCache[groupName]
-			groupCache[tostring(event)] = nil
+			if groupCache then
+				groupCache[tostring(event)] = nil
+			end
 		end
 		event.beattoolsCustomEventGroups = nil
 

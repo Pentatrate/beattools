@@ -4,8 +4,6 @@ utilitools.files.beattools.undo.init()
 utilitools.files.beattools.ctrlSelect.init(st)
 
 -- will want to overhaul the code below soon
-
-local beattoolsTime = 0
 beattools.angleSnap = 4
 
 beattoolsRecordPosition = false -- record position

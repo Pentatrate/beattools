@@ -1,0 +1,24 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Auto fix sides ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
+payload = '''
+if mods.beattools.config.autoFixSides and v.type == "side" then
+	local prev = v.endAngle or v.angle
+	local after = prev % 360
+	if after ~= prev then
+		v[v.endAngle and "endAngle" or "angle"] = after
+		if v.endAngle then
+			v.angle = v.angle + (after - prev)
+		end
+	end
+end
+'''
+position = "after"
+target = "states/Editor.lua"

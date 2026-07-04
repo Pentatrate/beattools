@@ -1,0 +1,44 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if floor ~= false then'''
+payload = '''if beattools.stacking.stacking then pos[1], pos[2] = pos[1] + beattools.stacking.x, pos[2] + beattools.stacking.y end'''
+position = "before"
+target = "states/Editor.lua"
+
+# Making the seletion hitbox offset as well ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+if helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
+payload = '''
+if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }
+'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
+payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
+payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
+position = "at"
+target = "states/Editor.lua"

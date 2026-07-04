@@ -1,0 +1,40 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Remove help marker ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+pattern = '''(imgui.SameLine\(\)[\n\s]+)?helpers\.imguiHelpMarker'''
+payload = '''utilitools.imguiHelpers.tooltip'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''(?:bgData|(?:self\.(?:level\.(?:metadata|properties)|variant?)))\.\w+ = helpers\.Input(?:Text|Int|Float)\((?<label>['"][\w\s#]+['"])'''
+payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
+position = "before"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''bgData\.\w+Channel\.r, bgData\.\w+Channel\.g, bgData\.\w+Channel\.b = helpers\.imguiColor\((?:[\n\s\t]*)?(?<label>['"]\w+ channel['"])'''
+payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
+position = "before"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''##float(?<keep>\w+['"] --\[\[Penta's RegEx Marker\]\])'''
+payload = '''$keep'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.regex]
+pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) --\[\[Penta's RegEx Marker\]\]'''
+payload = '''$keep , not mods.beattools.config.hideHelpMarkers'''
+position = "at"
+target = "states/Editor.lua"

@@ -5,7 +5,7 @@ version = "1.0.0"
 
 # hell.
 
-# End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# End angle setting fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -28,4 +28,13 @@ if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle 
 end
 '''
 position = "before"
+target = "states/Editor.lua"
+
+# End angle drawing fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.regex]
+pattern = '''(?<func>self:getPosition)\((?<param>[^\n]+?)\.angle,'''
+payload = '''
+self:getPosition((mods.beattools.config.displayEndAngle and $param.endAngle or $param.angle),'''
+position = "at"
 target = "states/Editor.lua"

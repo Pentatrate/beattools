@@ -1,0 +1,79 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Editor Colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''  color(cs.voidColor)'''
+payload = '''
+	love.graphics.setFont(fonts.main)
+	if self.editMode then
+		love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
+	else
+		color(cs.voidColor)
+	end
+'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''color('black')'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''color()'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
+position = "at"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''color('white')'''
+payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
+position = "at"
+target = "states/Editor.lua"
+
+# Player colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''em.draw()'''
+payload = '''
+local canv = love.graphics.newCanvas(project.res.x, project.res.y)
+love.graphics.setCanvas(canv)
+love.graphics.clear()
+em.draw()
+love.graphics.setCanvas(self.canv)
+shuv.drawWithPalette(function()
+	love.graphics.draw(canv)
+end, {
+	[0] = { r = mods.beattools.config.playerWhiteColor.r * 255, g = mods.beattools.config.playerWhiteColor.g * 255, b = mods.beattools.config.playerWhiteColor.b * 255 },
+	[1] = { r = mods.beattools.config.playerBlackColor.r * 255, g = mods.beattools.config.playerBlackColor.g * 255, b = mods.beattools.config.playerBlackColor.b * 255 },
+	[2] = { r = mods.beattools.config.playerRedColor.r * 255, g = mods.beattools.config.playerRedColor.g * 255, b = mods.beattools.config.playerRedColor.b * 255 },
+	[3] = { r = mods.beattools.config.playerBlueColor.r * 255, g = mods.beattools.config.playerBlueColor.g * 255, b = mods.beattools.config.playerBlueColor.b * 255 },
+	[4] = { r = mods.beattools.config.playerGreenColor.r * 255, g = mods.beattools.config.playerGreenColor.g * 255, b = mods.beattools.config.playerGreenColor.b * 255 },
+	[5] = { r = mods.beattools.config.playerYellowColor.r * 255, g = mods.beattools.config.playerYellowColor.g * 255, b = mods.beattools.config.playerYellowColor.b * 255 },
+	[6] = { r = mods.beattools.config.playerPinkColor.r * 255, g = mods.beattools.config.playerPinkColor.g * 255, b = mods.beattools.config.playerPinkColor.b * 255 },
+	[7] = { r = mods.beattools.config.playerLightBlueColor.r * 255, g = mods.beattools.config.playerLightBlueColor.g * 255, b = mods.beattools.config.playerLightBlueColor.b * 255 },
+})
+'''
+position = "at"
+target = "states/Editor.lua"

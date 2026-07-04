@@ -9,6 +9,19 @@ version = "1.0.0"
 match_indent = true
 pattern = '''if imgui.Button('Delete event') then'''
 payload = '''
+if self.selectedEvent and mods.beattools.config.roundSelectedTimes then self.selectedEvent.time = helpers.round(self.selectedEvent.time * 1e3) / 1e3 end
+if self.selectedEvent and mods.beattools.config.fakeRepeat and not utilitools.files.beattools.eventVisuals.hasRepeat[self.selectedEvent.type] then
+	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
+	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
+		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
+	else self.selectedEvent.repeatDelay = nil end
+	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
+		utilitools.prompts.confirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
+			utilitools.files.beattools.fakeRepeat.update(self.selectedEvent, true)
+		end)
+	end
+	imgui.Separator()
+end
 if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
 	if beattools.easeList.unsorted.all[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
 		local ease, count = utilitools.files.beattools.easing.getEase("ease", self.selectedEvent.var, cs.editorBeat, nil, nil)
@@ -34,22 +47,9 @@ if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.c
 	end
 	imgui.Separator()
 end
-if self.selectedEvent and mods.beattools.config.fakeRepeat and not utilitools.files.beattools.eventVisuals.hasRepeat[self.selectedEvent.type] then
-	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
-	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
-		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
-	else self.selectedEvent.repeatDelay = nil end
-	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
-		utilitools.prompts.confirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
-			utilitools.files.beattools.fakeRepeat.update(self.selectedEvent, true)
-		end)
-	end
-	imgui.Separator()
-end
 if self.selectedEvent and mods.beattools.config.showEventGroups then
 	utilitools.files.beattools.eventGroups.eventCustomGroup(self.selectedEvent)
 end
-if self.selectedEvent and mods.beattools.config.roundSelectedTimes then self.selectedEvent.time = helpers.round(self.selectedEvent.time * 1e3) / 1e3 end
 if self.selectedEvent and mods.beattools.config.untaggingButtons then
 	if imgui.Button('Change to tag') then
 		self.changeToTagDialogue = true
@@ -122,72 +122,5 @@ if mods.beattools.config.convertSingle and self.multiselect and #self.multiselec
 end
 if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then
 '''
-position = "at"
-target = "states/Editor.lua"
-
-# Autofocus tag input ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.changeToTagDialogue = true'''
-payload = '''self.firstTimeTagDialogue = true'''
-position = "after"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.newTagName = helpers.InputText("Tag name", self.newTagName, 9999)'''
-payload = '''
-if self.firstTimeTagDialogue then
-	self.firstTimeTagDialogue = false
-	imgui.SetKeyboardFocusHere()
-end
-'''
-position = "before"
-target = "states/Editor.lua"
-
-# Stop tag window when single event deselected ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if self.changeToTagDialogue and (not self.multiselect) then'''
-payload = '''if self.changeToTagDialogue and (not (self.multiselect or self.selectedEvent)) then'''
-position = "at"
-target = "states/Editor.lua"
-
-# Tag single tag ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''local tagEvents = helpers.copy(self.multiselect.events)'''
-payload = '''local tagEvents = helpers.copy(self.multiselect and self.multiselect.events or { self.selectedEvent })'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat, tag = self.newTagName, angleOffset = false })'''
-payload = '''self.cmd:executeNew(cmd.CreateEvent,{ type = 'tag', angle = 0, time = self.multiselectStartBeat or self.selectedEvent.time, tag = self.newTagName, angleOffset = false })'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.cmd:executeNew(cmd.RemoveMultiple,self.multiselect.events)'''
-payload = '''self:deleteSelectedEvent()'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-self.cmd:endGroup("Make tag "..self.newTagName)
-self.multiselect.events = {}
-'''
-payload = '''self.cmd:endGroup("Make tag "..self.newTagName)'''
 position = "at"
 target = "states/Editor.lua"

@@ -1,3 +1,8 @@
+--[[
+TODO
+- check decos hidden
+- check for ease modes
+]]
 local compare = {
 	orig = {},
 	origStats = {},
@@ -9,7 +14,7 @@ local compare = {
 	new2Index = 1
 }
 
-if beattools.test and beattools.test.compare then
+if beattools and beattools.test and beattools.test.compare then
 	modlog(mod, "compare: loading from cache")
 	compare = beattools.test.compare
 end
@@ -59,7 +64,8 @@ function compare.getNextChange(new2)
 	return smallestIndex, remainingChanges
 end
 function compare.showChanges(new2)
-	local changes = compare["new" .. (new2 and "2" or "1") .. "Stats"].total
+	local newStats = compare["new" .. (new2 and "2" or "1") .. "Stats"]
+	local changes = newStats.total
 	if not changes then return end
 	local index = compare["new" .. (new2 and "2" or "1") .. "Index"]
 	local change = changes[index]
@@ -75,24 +81,24 @@ function compare.showChanges(new2)
 			if imgui.Button("Jump to next change") then jumpToNext() end
 		else
 			local temp = change.event2 or change.event
-			imgui.Text(utilitools.string.concat(index, change.text, "\n", temp.time, change.withinTime, temp.angle, "\n", utilitools.string.concat(temp.type, temp.var), change.reason and "\n" .. table.concat(change.reason, ",\n") or nil))
+			imgui.Text(utilitools.string.concat(index, change.text, "\n", temp.time, change.withinTime, temp.angle, "\n", utilitools.string.concat(utilitools.string.concat(temp.type, temp.var), temp.id), change.reason and "\n" .. table.concat(change.reason, ",\n") or nil))
 			if imgui.Button("JUMP") then
 				cs.editorBeat = temp.time
 			end
 			imgui.SameLine()
 			if imgui.Button("ORIG") then
 				change.resolved = "ORIG"
-				local function orig(array)
-					function eventIndex(event)
-						if event == nil then return -1 end
+				local function orig(array, event2)
+					function eventIndex()
+						if event2 == nil then return -1 end
 						for i, v in ipairs(array) do
-							if v == event then return i end
+							if v == event2 then return i end
 						end
 						return -1
 					end
 					local i = -1
 					if change.event2 then
-						i = eventIndex(change.event2)
+						i = eventIndex()
 					end
 					if i == -1 then
 						i = #array + 1
@@ -103,13 +109,20 @@ function compare.showChanges(new2)
 						table.insert(array, i, change.event)
 					end
 				end
-				orig(cs.level.events)
-				orig(compare["new" .. (new2 and "2" or "1")])
+				orig(cs.level.events, newStats.map.linkedNew[tostring(change.event2)])
+				orig(compare["new" .. (new2 and "2" or "1")], change.event2)
 				jumpToNext()
 			end
 			imgui.SameLine()
 			if imgui.Button("NEW") then
 				change.resolved = "NEW"
+				jumpToNext()
+			end
+			imgui.SameLine()
+			if imgui.Button("ALL NEW") then
+				for _, change in ipairs(changes) do
+					if not change.resolved then change.resolved = "NEW" end
+				end
 				jumpToNext()
 			end
 		end
@@ -246,15 +259,18 @@ function compare.compare(new2)
 		set = {
 			newEases = {},
 			origEventsMatched = {}, newEventsMatched = {},
+			decoIds = {}, decoSprites = {}
 		},
 		setConverted = {},
 		map = {
 			newEasesMin = {}, newEasesMax = {},
 			newIndex = {},
+			linkedNew = {},
 			missing = {}, added = {},
 			origTypeAdded = {}, origEaseAdded = {}, outsideAdded = {},
 			changed = {}, changed2 = {}, angleChanged = {}, outsideChanged = {},
 			changedText = {}, changedReason = {},
+			decoLastHide = {}
 		},
 		mapConverted = {},
 		total = {},
@@ -318,6 +334,7 @@ function compare.compare(new2)
 	end
 	for i, event2 in ipairs(new) do
 		newStats.map.newIndex[tostring(event2)] = i
+		newStats.map.linkedNew[tostring(event2)] = cs.level.events[i]
 		if not newStats.set.newEventsMatched[tostring(event2)] then
 			newStats.map.added[tostring(event2)] = event2
 			if not inTime(event2) then
@@ -341,10 +358,17 @@ function compare.compare(new2)
 					end
 					newStats.set.newEases[event2.var] = true
 				end
-			else
-				if compare.origStats.set.origEventTypes[event2.type] then
-					newStats.map.origTypeAdded[tostring(event2)] = event2
+			elseif event2.type == "deco" then
+				newStats.set.decoIds[event2.id] = true
+				if event2.sprite then
+					newStats.set.decoSprites[event2.sprite] = true
 				end
+				local lastHide = newStats.map.decoLastHide[event2.id]
+				if event2.hide ~= nil and (not lastHide or lastHide.time < event2.time or (lastHide.time == event2.time and (lastHide.order or 0) <= (event2.order or 0))) then
+					newStats.map.decoLastHide[event2.id] = event2
+				end
+			elseif compare.origStats.set.origEventTypes[event2.type] then
+				newStats.map.origTypeAdded[tostring(event2)] = event2
 			end
 		end
 	end
@@ -362,7 +386,7 @@ function compare.compare(new2)
 	end
 
 	local function setColor(event2, r, g, b)
-		cs.level.events[newStats.map.newIndex[tostring(event2)]].editorOutline = { r = r, g = g, b = b }
+		newStats.map.linkedNew[tostring(event2)].editorOutline = { r = r, g = g, b = b }
 	end
 
 	for _, event in ipairs(newStats.mapConverted.missing) do
@@ -403,11 +427,28 @@ function compare.compare(new2)
 		addToTotal(newStats.map.changed[tostring(event2)], event2, newStats.map.changedText[tostring(event2)], newStats.map.changedReason[tostring(event2)])
 	end
 
+	for _, decoId in ipairs(newStats.setConverted.decoIds) do
+		local event2 = newStats.map.decoLastHide[decoId]
+		if not event2 or event2.hide ~= true then
+			local _, time = compare.getPartBounds(part)
+			local newEvent = {
+				type = "deco",
+				time = time,
+				angle = 0,
+				id = decoId,
+				hide = true
+			}
+			table.insert(new, newEvent)
+			table.insert(cs.level.events, newEvent)
+			addToTotal(nil, newEvent, "DECO UNHIDDEN")
+		end
+	end
+
 	local function printChange(index)
 		local change = newStats.total[index]
 		if change.resolved then modlog(mod, "resolved") return end
 		local temp = change.event2 or change.event
-		modlog(mod, index, change.text, temp.time, change.withinTime, temp.angle, utilitools.string.concat(temp.type, temp.var), change.reason and table.concat(change.reason, ", ") or nil)
+		modlog(mod, index, change.text, temp.time, change.withinTime, temp.angle, utilitools.string.concat(utilitools.string.concat(temp.type, temp.var), temp.id), change.reason and table.concat(change.reason, ", ") or nil)
 	end
 
 	for i = 1, #newStats.total do printChange(i) end
@@ -428,7 +469,9 @@ function compare.compare(new2)
 		"\n\t\tOUTSIDE", #newStats.mapConverted.outsideChanged, "changed events outside the beatrange of the dedicated part",
 
 		"\nNEW",
-		"\n\tEASES ", table.concat(newStats.setConverted.newEases, ", ")
+		"\n\t   EASES    ", table.concat(newStats.setConverted.newEases, ", "),
+		"\n\t  DECO IDS  ", table.concat(newStats.setConverted.decoIds, ", "),
+		"\n\tDECO SPRITES", table.concat(newStats.setConverted.decoSprites, ", ")
 	)
 
 	compare["new" .. (new2 and "2" or "1")] = new
@@ -471,6 +514,16 @@ function compare.checkMerge()
 	end
 	for _, event1 in ipairs(compare.new1Stats.mapConverted.changed) do
 		checkEvent(event1)
+	end
+	for _, id in ipairs(compare.new1Stats.setConverted.decoIds) do
+		if compare.new2Stats.set.decoIds[id] then
+			modlog(mod, "DECO ID", id)
+		end
+	end
+	for _, sprite in ipairs(compare.new1Stats.setConverted.decoSprites) do
+		if compare.new2Stats.set.decoSprites[sprite] then
+			modlog(mod, "DECO SPRITE", sprite)
+		end
 	end
 	modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
 end

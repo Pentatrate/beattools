@@ -3,42 +3,6 @@ dump_lua = true
 priority = -2147483643 # -2147483647 + 4
 version = "1.0.0"
 
-# Player colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''em.draw()'''
-payload = '''
-local canv = love.graphics.newCanvas(project.res.x, project.res.y)
-love.graphics.setCanvas(canv)
-love.graphics.clear()
-em.draw()
-love.graphics.setCanvas(self.canv)
-shuv.drawWithPalette(function()
-	love.graphics.draw(canv)
-end, {
-	[0] = { r = mods.beattools.config.playerWhiteColor.r * 255, g = mods.beattools.config.playerWhiteColor.g * 255, b = mods.beattools.config.playerWhiteColor.b * 255 },
-	[1] = { r = mods.beattools.config.playerBlackColor.r * 255, g = mods.beattools.config.playerBlackColor.g * 255, b = mods.beattools.config.playerBlackColor.b * 255 },
-	[2] = { r = mods.beattools.config.playerRedColor.r * 255, g = mods.beattools.config.playerRedColor.g * 255, b = mods.beattools.config.playerRedColor.b * 255 },
-	[3] = { r = mods.beattools.config.playerBlueColor.r * 255, g = mods.beattools.config.playerBlueColor.g * 255, b = mods.beattools.config.playerBlueColor.b * 255 },
-	[4] = { r = mods.beattools.config.playerGreenColor.r * 255, g = mods.beattools.config.playerGreenColor.g * 255, b = mods.beattools.config.playerGreenColor.b * 255 },
-	[5] = { r = mods.beattools.config.playerYellowColor.r * 255, g = mods.beattools.config.playerYellowColor.g * 255, b = mods.beattools.config.playerYellowColor.b * 255 },
-	[6] = { r = mods.beattools.config.playerPinkColor.r * 255, g = mods.beattools.config.playerPinkColor.g * 255, b = mods.beattools.config.playerPinkColor.b * 255 },
-	[7] = { r = mods.beattools.config.playerLightBlueColor.r * 255, g = mods.beattools.config.playerLightBlueColor.g * 255, b = mods.beattools.config.playerLightBlueColor.b * 255 },
-})
-'''
-position = "at"
-target = "states/Editor.lua"
-
-# Rerouting to beattools event visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if floor ~= false then'''
-payload = '''if beattools.stacking.stacking then pos[1], pos[2] = pos[1] + beattools.stacking.x, pos[2] + beattools.stacking.y end'''
-position = "before"
-target = "states/Editor.lua"
-
 # Rerouting to beattools event visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

@@ -55,3 +55,11 @@ pattern = 'log("made entity ".. name .." from " ..fname)'
 payload = '-- log("made entity ".. name .." from " ..fname)'
 position = "at"
 target = "lib/entityman.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''print('id is ' .. id)'''
+payload = '''-- print('id is ' .. id)'''
+position = "at"
+target = "levelformat/events/Vfx/Deco/deco.lua"

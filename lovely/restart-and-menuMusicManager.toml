@@ -3,9 +3,25 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# more menuMusicManager in angle-beat-snap-saving.toml and a-run-after-beattools.toml
-
 # Menumusicmanager in editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.lastEditorBeat = 0'''
+payload = '''
+self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
+if not self.menuMusicManager then
+	self.menuMusicManager = em.init("MenuMusicManager")
+	self.menuMusicManager:play()
+	if not (mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic) then
+		self.menuMusicManager:stop()
+	end
+end
+
+'''
+position = "before"
+target = "states/Editor.lua"
+
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -17,6 +33,26 @@ if self.menuMusicManager then
 	cs.menuMusicManager = self.menuMusicManager
 	if not mods.beattools.config.menuMusicInEditor then self.menuMusicManager.music:play() end
 end
+'''
+position = "after"
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''st:setUpdate(function(self, dt)'''
+payload = '''
+	if self.menuMusicManager then
+		self.menuMusicManager:update(dt)
+		if self.beattoolsMenuMusicInEditorOn ~= mods.beattools.config.menuMusicInEditor then
+			if mods.beattools.config.menuMusicInEditor then
+				self.menuMusicManager.music:play()
+			else
+				self.menuMusicManager:stop()
+			end
+		end
+		self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
+	end
 '''
 position = "after"
 target = "states/Editor.lua"
@@ -72,7 +108,7 @@ pattern = '''function st:stopLevel()'''
 payload = '''
 function st:stopLevel(dontUnmute)
 	beattools.playerSprite = "><"
-	beattools.lastSpriteChange = beattoolsTime
+	beattools.lastSpriteChange = love.timer.getTime()
 	if not dontUnmute and self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then
 		self.menuMusicManager:forceUnmute()
 	end

@@ -9,13 +9,14 @@ function stopwatch.set()
 end
 function stopwatch.get(reset)
 	local last = stopwatch.last
-	if reset then stopwatch.last = love.timer.getTime() end
-	return utilitools.number.round(love.timer.getTime() - last, stopwatch.rounding)
+	local time = love.timer.getTime()
+	if reset then stopwatch.last = time end
+	return utilitools.number.round(time - last, stopwatch.rounding)
 end
 function stopwatch.time(message)
 	local last = stopwatch.last
 	stopwatch.last = love.timer.getTime()
-	modlog(mod, tostring(message) .. " | Time: " .. tostring(utilitools.number.round(love.timer.getTime(), stopwatch.rounding)) .. " (" .. tostring(utilitools.number.round(love.timer.getTime() - last, stopwatch.rounding)) .. ")")
+	modlog(mod, tostring(message) .. " | Time: " .. tostring(utilitools.number.round(stopwatch.last, stopwatch.rounding)) .. " (" .. tostring(utilitools.number.round(stopwatch.last - last, stopwatch.rounding)) .. ")")
 end
 
 return stopwatch

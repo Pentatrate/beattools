@@ -176,9 +176,9 @@ undo.inject = function()
 end
 
 undo.newChangePre = function()
-	if #undo.changes > undo.index then
+	--[[ if #undo.changes > undo.index then
 		-- modlog(mod, "overwriting change history")
-	end
+	end ]]
 	while #undo.changes > undo.index do
 		table.remove(undo.changes)
 	end

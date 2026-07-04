@@ -3,54 +3,28 @@ dump_lua = true
 priority = 2147483643 # 2147483647 - 4
 version = "1.0.0"
 
-# Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.copy]
-position = "prepend"
-sources = ["prepend/beattools.lua"]
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''local st = Gamestate:new('Editor')'''
-payload = ''''''
-position = "at"
-target = "states/Editor.lua"
-
 # Update self ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''st:setUpdate(function(self, dt)'''
 payload = '''
-	if self.menuMusicManager then
-		self.menuMusicManager:update(dt)
-		if self.beattoolsMenuMusicInEditorOn ~= mods.beattools.config.menuMusicInEditor then
-			if mods.beattools.config.menuMusicInEditor then
-				self.menuMusicManager.music:play()
-			else
-				self.menuMusicManager:stop()
-			end
-		end
-		self.beattoolsMenuMusicInEditorOn = mods.beattools.config.menuMusicInEditor
-	end
-	beattoolsTime = beattoolsTime + dt
 	if self.editMode then
+		local timeNow = love.timer.getTime()
 		--[[if beattools.playerSprite == "idle" then
-			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 8 - 0.1 then
+			if timeNow - beattools.lastSpriteChange > 8 - 0.1 then
 				beattools.playerSprite = "closed"
-				beattools.lastSpriteChange = beattoolsTime
+				beattools.lastSpriteChange = timeNow
 			end
 		elseif beattools.playerSprite == "closed" then
-			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 0.1 then
+			if timeNow - beattools.lastSpriteChange > 0.1 then
 				beattools.playerSprite = "idle"
-				beattools.lastSpriteChange = beattoolsTime
+				beattools.lastSpriteChange = timeNow
 			end
 		else]]if beattools.playerSprite == "><" then
-			if (beattoolsTime - beattools.lastSpriteChange) / 60 > 1 then
+			if timeNow - beattools.lastSpriteChange > 1 then
 				beattools.playerSprite = "idle"
-				beattools.lastSpriteChange = beattoolsTime
+				beattools.lastSpriteChange = timeNow
 			end
 		end
 		local currentSprite
@@ -72,10 +46,10 @@ payload = '''
 					if love.filesystem.exists(filename) then
 						local modTime = love.filesystem.getInfo(cLevel .. spriteName, "file").modtime
 						if beattoolsPlayerSpriteChanged[spriteName] ~= modTime then
-							beattoolsLastSpriteModified = beattoolsTime
+							beattoolsLastSpriteModified = timeNow
 							beattoolsPlayerSpriteChanged[spriteName] = modTime
 						end
-						if cs.p.spr[spriteName] == nil or (beattoolsTime - beattoolsLastSpriteModified) / 60 > 1 then
+						if cs.p.spr[spriteName] == nil or timeNow - beattoolsLastSpriteModified > 1 then
 							cs.p.spr[spriteName] = love.graphics.newImage(filename)
 						end
 					end
@@ -88,7 +62,7 @@ payload = '''
 				end
 			end
 			if not forcedSprite then
-				--[[if mods.beattools.config.livelyCranky and beattoolsTime - ((#beattoolsChangeList > 0 and beattoolsChangeList[#beattoolsChangeList].time) or 0) > 60 * 60 then
+				--[[if mods.beattools.config.livelyCranky and timeNow - ((#beattoolsChangeList > 0 and beattoolsChangeList[#beattoolsChangeList].time) or 0) > 60 then
 					self.p.forceSprite = "sleep"
 				else]]if mods.beattools.config.livelyCranky then
 					self.p.forceSprite = beattools.playerSprite
@@ -100,42 +74,6 @@ payload = '''
 	end
 '''
 position = "after"
-target = "states/Editor.lua"
-
-# Remove help marker ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.regex]
-pattern = '''(imgui.SameLine\(\)[\n\s]+)?helpers\.imguiHelpMarker'''
-payload = '''utilitools.imguiHelpers.tooltip'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''(?:bgData|(?:self\.(?:level\.(?:metadata|properties)|variant?)))\.\w+ = helpers\.Input(?:Text|Int|Float)\((?<label>['"][\w\s#]+['"])'''
-payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''bgData\.\w+Channel\.r, bgData\.\w+Channel\.g, bgData\.\w+Channel\.b = helpers\.imguiColor\((?:[\n\s\t]*)?(?<label>['"]\w+ channel['"])'''
-payload = '''if mods.beattools.config.fullSize then utilitools.imguiHelpers.setWidth( $label --[[Penta's RegEx Marker]]) end '''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''##float(?<keep>\w+['"] --\[\[Penta's RegEx Marker\]\])'''
-payload = '''$keep'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''(?<keep>(Charter|offset|Speed|beat)['"]) --\[\[Penta's RegEx Marker\]\]'''
-payload = '''$keep , not mods.beattools.config.hideHelpMarkers'''
-position = "at"
 target = "states/Editor.lua"
 
 # Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -178,57 +116,6 @@ end
 position = "at"
 target = "states/Editor.lua"
 
-# Update biggest beat ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''self.smallestBeat = math.min(self.smallestBeat, v.time)'''
-payload = '''
-if mods.beattools.config.autoFixSides and v.type == "side" then
-	local prev = v.endAngle or v.angle
-	local after = prev % 360
-	if after ~= prev then
-		v[v.endAngle and "endAngle" or "angle"] = after
-		if v.endAngle then
-			v.angle = v.angle + (after - prev)
-		end
-	end
-end
-'''
-position = "after"
-target = "states/Editor.lua"
-
-# Making the seletion hitbox offset as well ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-if helpers.collide(
-	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
-	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
-payload = '''
-if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
-	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
-	{ x = pos[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }
-'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
-payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.regex]
-pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
-payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
-position = "at"
-target = "states/Editor.lua"
-
 # Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
 # [patches.pattern]
@@ -241,89 +128,3 @@ target = "states/Editor.lua"
 # '''
 # position = "after"
 # target = "obj/LevelManager.lua"
-
-# End angle fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.regex]
-pattern = '''(?<func>self:getPosition)\((?<param>[^\n]+?)\.angle,'''
-payload = '''
-self:getPosition((mods.beattools.config.displayEndAngle and $param.endAngle or $param.angle),'''
-position = "at"
-target = "states/Editor.lua"
-
-# Editor Colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''  color(cs.voidColor)'''
-payload = '''
-	love.graphics.setFont(fonts.main)
-	if self.editMode then
-		love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)
-	else
-		color(cs.voidColor)
-	end
-'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
-payload = '''love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''color('black')'''
-payload = '''love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''color()'''
-payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
-position = "at"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''color('white')'''
-payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
-position = "at"
-target = "states/Editor.lua"
-
-# Text deco inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-local function editorDraw(event)
-	local pos = cs:getPosition(event.angle,event.time)
-
-	love.graphics.draw(sprites.editor.events.textdeco,pos[1],pos[2],0,1,1,8,8)
-end
-'''
-payload = '''local editorDraw = sprites.editor.events.textdeco'''
-position = "at"
-target = "levelformat/events/Vfx/textdeco.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''
-local function editorDraw(event)
-	local pos = cs:getPosition(event.angle,event.time)
-
-	love.graphics.draw(sprites.editor.events.advancetextdeco,pos[1],pos[2],0,1,1,8,8)
-end
-'''
-payload = '''local editorDraw = sprites.editor.events.advancetextdeco'''
-position = "at"
-target = "levelformat/events/Vfx/advancetextdeco.lua"

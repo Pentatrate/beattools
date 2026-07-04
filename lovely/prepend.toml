@@ -1,0 +1,19 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Prepend ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.copy]
+position = "prepend"
+sources = ["prepend/beattools.lua"]
+target = "states/Editor.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local st = Gamestate:new('Editor')'''
+payload = ''''''
+position = "at"
+target = "states/Editor.lua"

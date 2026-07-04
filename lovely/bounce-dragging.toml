@@ -47,11 +47,9 @@ payload = '''
 for _, v in ipairs(bounceSelection) do
 	if v[1] == self.overlappingEvents[1] then
 		self.bounceSelected = v[2]
-		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and (beattoolsTime - prevBounceSelectTime) / 60 <= 0.5 then
+		self.bounceSelectTime = love.timer.getTime()
+		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and self.bounceSelectTime - prevBounceSelectTime <= 0.5 then
 			modlog(mods.beattools, "Double clicked bounce")
-			self.bounceSelectTime = -1
-		else
-			self.bounceSelectTime = beattoolsTime
 		end
 		break
 	end
