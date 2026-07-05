@@ -26,7 +26,7 @@ function imguiPopOut.imgui(label, value, multiline)
 
 	if (itemHovered and necessary) or (love.timer.getTime() - imguiPopOut.lastHovered < imguiPopOut.hoverTime and label == imguiPopOut.lastLabel) then
 		if love.timer.getTime() - imguiPopOut.lastHovered >= imguiPopOut.hoverTime then
-			if mods["imgui-scale-fix"].enabled then
+			if mods["imgui-scale-fix"] and mods["imgui-scale-fix"].enabled then
 				imguiPopOut.x = imgui.GetIO().MousePos.x
 				imguiPopOut.y = imgui.GetIO().MousePos.y
 			else
