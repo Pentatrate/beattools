@@ -1,3 +1,4 @@
+if not utilitools then imgui.Text("Utilitools is disabled") return end
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
