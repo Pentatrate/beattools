@@ -213,7 +213,7 @@ target = "preload/splashes.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''for i,v in ipairs(savedata.aprilFools.noCranky and crankless or crankful) do'''
+pattern = '''for i,v in ipairs(savedata.options.aprilFools.noCranky and crankless or crankful) do'''
 payload = '''
 beattools.splashes.crankless = crankless
 beattools.splashes.crankful = crankful
@@ -229,6 +229,8 @@ payload = '''
 local datespecific2 = {}
 for _, v in pairs(datespecific) do table.insert(datespecific2, v.text) end
 beattools.splashes.datespecific = datespecific2
+
+beattools.splashes.specialConditionLib = specialCondition
 '''
 position = "before"
 target = "preload/splashes.lua"
@@ -244,10 +246,26 @@ local splash
 if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
 	splash = splashes.dateSpecific
 else
-	splash = splashes[num or math.random(#splashes)]
+	local pool = {}
+
+	for index, value in ipairs(splashes) do
+		table.insert(pool, value)
+	end
+	-- special condition ones (not date based)
+	for _, value in pairs(specialCondition) do
+		if value.cond() then
+			if value.init ~= nil then
+				value.init(value)
+			end
+			if value.render ~= nil then
+				table.insert(pool, value)
+			else
+				table.insert(pool, value.text)
+			end
+		end
+	end
+	splash = pool[num or math.random(#pool)]
 end
-
-
 
 if math.random(1, 8192) == 1 then
 	splash = "[colour=2]You found the shiny splash text!"
@@ -261,19 +279,35 @@ else
 		num = nil
 	end
 
+	local pool = {}
+	-- special condition ones (not date based)
+	for _, value in pairs(specialCondition) do
+		if value.cond() then
+			if value.init ~= nil then
+				value.init(value)
+			end
+			if value.render ~= nil then
+				table.insert(pool, value)
+			else
+				table.insert(pool, value.text)
+			end
+		end
+	end
+
 	if num and num ~= 1 then
 		-- num == 1: shiny
 		-- num == 2: real total splashes
 		-- num <= #splashes + 2: regular + cranky status splashes
+		-- num <= #splashes + #pool + 2
 		-- num <= #splashes + #additionalSplashes + 2: additional splashes
 
 		if (num <= 1 or num % 1 ~= 0) then
 			num = nil -- idiot check
 		else
 			if mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes then
-				if num and num > #splashes + #additionalSplashes + 2 then num = nil end
+				if num and num > #splashes + #pool + #additionalSplashes + 2 then num = nil end
 			else
-				if num and num > #splashes + 1 then num = nil end
+				if num and num > #splashes + #pool + 1 then num = nil end
 			end
 		end
 	end
@@ -284,11 +318,11 @@ else
 		if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
 			splash = splashes.dateSpecific
 		else
-			if not additional or math.random() < #splashes / (#splashes + #additionalSplashes + 1) then
-				num = math.random(#splashes) + 2
+			if not additional or math.random() < (#splashes + #pool) / (#splashes + #pool + #additionalSplashes + 1) then
+				num = math.random(#splashes + #pool) + 2
 			else
-				num = #splashes + 2 + math.random(#additionalSplashes) + 1
-				if num == #splashes + 2 + #additionalSplashes + 1 then
+				num = #splashes + #pool + 2 + math.random(#additionalSplashes) + 1
+				if num == #splashes + #pool + 2 + #additionalSplashes + 1 then
 					num = 2 -- real total splashes
 				end
 			end
@@ -312,8 +346,9 @@ else
 					+ 2
 					-- include the date specifics
 					+ #datespecific
+					+ #specialCondition
 					-- add both cranky AND nocranky in (one has beed added to splashes already)
-					+ (savedata.aprilFools.noCranky and #crankful or #crankless)
+					+ (savedata.options.aprilFools.noCranky and #crankful or #crankless)
 
 					-- Beattools Splashes
 					+ #additionalSplashes
@@ -321,8 +356,10 @@ else
 				) .. " total modded and vanilla splashes! Collect them all!"
 			elseif num <= #splashes + 2 then
 				splash = splashes[num - 2]
+			elseif num <= #splashes + #pool + 2 then
+				splash = pool[num - 2 - #splashes]
 			else
-				splash = additionalSplashes[num - 2 - #splashes]
+				splash = additionalSplashes[num - 2 - #splashes - #pool]
 			end
 		else
 			splash = splashes[num - 1]

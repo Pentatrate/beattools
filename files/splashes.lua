@@ -2,7 +2,7 @@ local realSplashes = splashes
 local splashes = {}
 
 function splashes.imgui()
-	if mod.config.splashTextWindow and beattools.splashes and cs.name == "Menu" and TheFunnyIsActivated and savedata.aprilFools.titleSplash and realSplashes then
+	if mod.config.splashTextWindow and beattools.splashes and cs.name == "Menu" and TheFunnyIsActivated and savedata.options.aprilFools.titleSplash and realSplashes then
 		helpers.SetNextWindowPos(298,35,'ImGuiCond_FirstUseEver')
 		helpers.SetNextWindowSize(616,650,'ImGuiCond_FirstUseEver')
 		mod.config.splashTextWindow = imgui.Begin("Splash Texts##beattools", true)
@@ -24,31 +24,41 @@ function splashes.imgui()
 			beattools.splashes.totalCache = {}
 			beattools.splashes.totalCategories = {}
 
+			beattools.splashes.specialCondition = {}
+			beattools.splashes.specialCondition2 = {}
+
+			-- special condition ones (not date based)
+			for _, value in pairs(beattools.splashes.specialConditionLib) do
+				if value.cond() then
+					if value.init ~= nil then
+						value.init(value)
+					end
+					table.insert(beattools.splashes.specialCondition, value.text)
+					if beattools.splashes.specialCondition2[value.text] then
+						modlog(mod, "[splashes] Duplicate special splash", value.text, beattools.splashes.specialCondition2[value.text], #beattools.splashes.specialCondition)
+					end
+					beattools.splashes.specialCondition2[value.text] = #beattools.splashes.specialCondition
+				end
+			end
+
 			local function getVanilla(splash)
-				if beattools.splashes.added then
-					for _, splash2 in ipairs(beattools.splashes.added) do
-						if splash == splash2 then
-							return true
-						end
-					end
-				end
-				if beattools.splashes.crankless then
-					for _, splash2 in ipairs(beattools.splashes.crankless) do
-						if splash == splash2 then
-							return true
-						end
-					end
-				end
-				if beattools.splashes.crankful then
-					for _, splash2 in ipairs(beattools.splashes.crankful) do
-						if splash == splash2 then
-							return true
+				local vanilla = { "added", "crankless", "crankful", "specialCondition" }
+				for _, k in ipairs(vanilla) do
+					local tbl = beattools.splashes[k]
+					if tbl then
+						for _, splash2 in ipairs(tbl) do
+							if splash == splash2 then
+								return true
+							end
 						end
 					end
 				end
 				return false
 			end
 			local function getIndex(splash)
+				if beattools.splashes.specialCondition2[splash] then
+					return beattools.splashes.specialCondition2[splash] + 2 + #beattools.splashes.total
+				end
 				for i, splash2 in ipairs(beattools.splashes.total) do
 					if splash == splash2 then
 						return i + 2
@@ -56,7 +66,7 @@ function splashes.imgui()
 				end
 				for i, splash2 in ipairs(beattools.splashes.additional) do
 					if splash == splash2 then
-						return i + 2 + #beattools.splashes.total
+						return i + 2 + #beattools.splashes.total + #beattools.splashes.specialCondition
 					end
 				end
 			end
@@ -87,6 +97,7 @@ function splashes.imgui()
 			insertSplashes(beattools.splashes.crankless, "Crankless Splashes")
 			insertSplashes(beattools.splashes.crankful, "Crankful Splashes")
 			insertSplashes(beattools.splashes.datespecific, "Time Specific Splashes")
+			insertSplashes(beattools.splashes.specialCondition, "Special Splashes")
 			insertSplashes(beattools.splashes.added, "Otherwise Added Splashes")
 			insertSplashes(beattools.splashes.additional, "More Splashes (Beattools)")
 			insertSplashes(beattools.splashes.total, "Other Modded Splashes (likely ExtraStuff)")
@@ -100,8 +111,9 @@ function splashes.imgui()
 				+ 2
 				-- include the date specifics
 				+ #beattools.splashes.datespecific
+				+ #beattools.splashes.specialCondition
 				-- add both cranky AND nocranky in (one has beed added to splashes already)
-				+ (savedata.aprilFools.noCranky and #beattools.splashes.crankful or #beattools.splashes.crankless)
+				+ (savedata.options.aprilFools.noCranky and #beattools.splashes.crankful or #beattools.splashes.crankless)
 
 				-- Beattools Splashes
 				+ #beattools.splashes.additional
@@ -130,7 +142,7 @@ function splashes.imgui()
 				local data = beattools.splashes.categories[category][splash]
 				local index = data.index
 				if not mod.config.moreSplashes and index then
-					if index > 2 + #beattools.splashes.total or index < 2 then
+					if index > 2 + #beattools.splashes.total + #beattools.splashes.specialCondition or index < 2 then
 						index = nil
 					else
 						index = index - 1
