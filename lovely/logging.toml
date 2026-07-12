@@ -59,7 +59,15 @@ target = "lib/entityman.lua"
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''print('id is ' .. id)'''
-payload = '''-- print('id is ' .. id)'''
+pattern = "print('id is ' .. id)"
+payload = "-- print('id is ' .. id)"
 position = "at"
 target = "levelformat/events/Vfx/Deco/deco.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = 'log("lovebpm end")'
+payload = '-- log("lovebpm end")'
+position = "at"
+target = "lib/lovebpm.lua"

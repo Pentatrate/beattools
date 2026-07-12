@@ -31,7 +31,7 @@ local function innerImgui()
 	end
 	if imgui.Button("Remove##beattoolsEventGroupsRemove") then
 		cs.level.properties.beattools = nil
-		utilitools.files.beattools.eventGroups.init()
+		eventGroups.init()
 		return
 	end
 	imgui.SameLine()
@@ -150,8 +150,24 @@ local function innerImgui()
 			}
 		}
 		eventGroups.process()
-		utilitools.files.beattools.eventGroups.init()
+		eventGroups.init()
 		return
+	end
+	if not eventGroups.groups["new group"] then
+		imgui.SameLine()
+		if imgui.Button("Add##beattoolsEventGroupsPreset") then
+			table.insert(
+				cs.level.properties.beattools.eventGroups,
+				{
+					events = "custom",
+					name = "new group",
+					visibility = " - "
+				}
+			)
+			eventGroups.process()
+			eventGroups.init()
+			return
+		end
 	end
 	eventGroups.officialLayers()
 	for i = 1, #groups do
@@ -160,12 +176,26 @@ local function innerImgui()
 		imgui.AlignTextToFramePadding()
 		if imgui.Selectable_Bool(tostring(group.name), group.events == "custom", imgui.ImGuiSelectableFlags_AllowOverlap) and not eventGroups.permanent[group.name] then
 			eventGroups.newEventType = ""
+			eventGroups.newGroupName = group.name
 			utilitools.prompts.custom({
 				title = "Event Groups > " .. group.name,
 				func = function ()
-					eventGroups.newEventType = utilitools.imguiHelpers.inputText("##beattoolsEventGroupsInputGroup", eventGroups.newEventType, "", "Click away or press enter to add an event type\nThis will convert custom groups to normal ones", nil, nil)
-					eventGroups.newEventType = utilitools.suggest.suggest(eventGroups.newEventType, eventGroups.eventNames)
+					eventGroups.newGroupName = utilitools.imguiHelpers.inputText("Rename##beattoolsEventGroupsInputGroupName", eventGroups.newGroupName, group.name, "Click away or press enter to set the group name", nil, nil)
 					local deactivated = imgui.IsItemDeactivated()
+					if deactivated then
+						if eventGroups.newGroupName ~= "" and not eventGroups.groups[eventGroups.newGroupName] then
+							eventGroups.newGroupName = eventGroups.newGroupName:lower()
+							group.name = eventGroups.newGroupName
+							eventGroups.process()
+							eventGroups.init()
+						end
+						eventGroups.newGroupName = group.name
+					end
+					imgui.Separator()
+					imgui.Text("Add Event Type")
+					eventGroups.newEventType = utilitools.imguiHelpers.inputText("##beattoolsEventGroupsInputGroup", eventGroups.newEventType, "", "Click away or press enter to add an event type\nThe event must be capitalised correctly\nPress tab to autocomplete\nThis will convert custom groups to normal ones", nil, nil)
+					eventGroups.newEventType = utilitools.suggest.suggest(eventGroups.newEventType, eventGroups.eventNames)
+					deactivated = imgui.IsItemDeactivated()
 					if imgui.IsItemActive() then
 						local cursorPos = imgui.GetCursorScreenPos()
 						imgui.SetCursorScreenPos(imgui.ImVec2_Float(0, 0))
@@ -184,7 +214,6 @@ local function innerImgui()
 							return
 						end
 					end
-					imgui.Separator()
 					if imgui.Button("Delete##beattoolsEventGroupsDeleteGroup") then
 						if group.events == "custom" then
 							eventGroups.custom[group.name] = nil

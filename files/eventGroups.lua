@@ -10,6 +10,7 @@ local eventGroups = {
 	eventNames = {},
 	eventMap = {},
 	newEventType = "",
+	newGroupName = "",
 	officialGameplay = {},
 	officialVfx = {},
 	permanent = { all = true, chart = true, level = true }
