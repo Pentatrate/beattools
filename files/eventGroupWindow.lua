@@ -185,6 +185,12 @@ local function innerImgui()
 					if deactivated then
 						if eventGroups.newGroupName ~= "" and not eventGroups.groups[eventGroups.newGroupName] then
 							eventGroups.newGroupName = eventGroups.newGroupName:lower()
+							for _, event in ipairs(cs.level.events) do
+								if event.beattoolsCustomEventGroups and event.beattoolsCustomEventGroups[group.name] then
+									event.beattoolsCustomEventGroups[group.name] = nil
+									event.beattoolsCustomEventGroups[eventGroups.newGroupName] = true
+								end
+							end
 							group.name = eventGroups.newGroupName
 							eventGroups.process()
 							eventGroups.init()

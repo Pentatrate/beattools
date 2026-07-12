@@ -135,6 +135,7 @@ function eventGroups.process()
 
 	eventGroups.indices = { [0] = { events = {} } }
 	eventGroups.groups = {}
+	eventGroups.custom = {}
 	local index = 0
 	local i = 1
 	while i <= #groups do
