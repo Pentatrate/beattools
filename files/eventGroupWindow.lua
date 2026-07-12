@@ -191,6 +191,7 @@ local function innerImgui()
 						end
 						eventGroups.newGroupName = group.name
 					end
+					group.pinned = utilitools.imguiHelpers.inputBool("Pinned##beattoolsEventGroupsPinned", group.pinned, false, "Pin this group as a slider\nIt will no longer be allowed to not have a visibility") or nil
 					imgui.Separator()
 					imgui.Text("Add Event Type")
 					eventGroups.newEventType = utilitools.imguiHelpers.inputText("##beattoolsEventGroupsInputGroup", eventGroups.newEventType, "", "Click away or press enter to add an event type\nThe event must be capitalised correctly\nPress tab to autocomplete\nThis will convert custom groups to normal ones", nil, nil)
@@ -301,7 +302,7 @@ local function innerImgui()
 			end
 		end
 		local t = group.visibility
-		group.visibility = utilitools.imguiHelpers.inputCombo("##beattoolsEventGroupsCombo" .. i, group.visibility, group.events == "all" and "show" or " - ", "Visibility for group " .. group.name, nil, group.events == "all" and { "show", "transparent", "ghost", "hide" } or { " - ", "show", "transparent", "ghost", "hide" }, {})
+		group.visibility = utilitools.imguiHelpers.inputCombo("##beattoolsEventGroupsCombo" .. i, group.visibility, (group.events == "all" or group.pinned) and "show" or " - ", "Visibility for group " .. group.name, nil, (group.events == "all" or group.pinned) and { "show", "transparent", "ghost", "hide" } or { " - ", "show", "transparent", "ghost", "hide" }, {})
 		if t ~= group.visibility then
 			if group.name == "all" then
 				if eventGroups.groups.chart.visibility ~= " - " then

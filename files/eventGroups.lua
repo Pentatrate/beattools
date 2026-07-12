@@ -370,7 +370,7 @@ function eventGroups.officialLayers()
 	cs.layers.gameplay = utilitools.imguiHelpers.inputSliderInt("Chart##BeattoolsGameplayLayer", cs.layers.gameplay, 1, nil, nil, 1, 4, layerStateNames[cs.layers.gameplay])
 	cs.layers.vfx = utilitools.imguiHelpers.inputSliderInt("Level##beattoolsVfxLayer", cs.layers.vfx, 1, nil, nil, 1, 4, layerStateNames[cs.layers.vfx])
 
-	if cs.layers.gameplay ~= 1 or cs.layers.vfx ~= 1 or not utilitools.files.beattools.eventGroups.noGroups() then
+	if not utilitools.files.beattools.eventGroups.noGroups() then
 		if eventGroups.invalidGroups() then
 			eventGroups.initMinimal()
 		end
@@ -396,6 +396,20 @@ function eventGroups.officialLayers()
 
 		updateVisibility("chart", "gameplay")
 		updateVisibility("level", "vfx")
+
+		for _, group in ipairs(cs.level.properties.beattools.eventGroups) do
+			if not eventGroups.permanent[group.name] and group.pinned then
+				local split = utilitools.string.split(group.name, " ")
+				local capitalisedSplit = {}
+				for i, s in ipairs(split) do capitalisedSplit[i] = utilitools.string.capitalise(s) end
+				local capitalised = table.concat(capitalisedSplit, " ")
+				local prev = group.visibility
+				group.visibility = layerStateNames[utilitools.imguiHelpers.inputSliderInt(capitalised .. "##Beattools" .. capitalised .. "Layer", layerStateIndices[group.visibility] or 1, 1, nil, nil, 1, 4, group.visibility)]
+				if prev ~= group.visibility then
+					eventGroups.updateEventVisibilities(group)
+				end
+			end
+		end
 	end
 end
 

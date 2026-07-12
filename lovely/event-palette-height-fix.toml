@@ -19,9 +19,16 @@ local imguiStyle = imgui.GetStyle()
 local separatorHeight = imguiStyle.ItemSpacing.y
 local imguiInputHeight = imguiStyle.ItemSpacing.y + imgui.GetFontSize() + imguiStyle.FramePadding.y * 2
 local separatorAmount = 2
-local imguiInputAmount = 3
+local imguiInputAmount = 4
 if mods["devonly-events"] and mods["devonly-events"].enabled then
 	imguiInputAmount = imguiInputAmount + 1
+end
+if cs.level and cs.level.properties and cs.level.properties.beattools and cs.level.properties.beattools.eventGroups then
+	for _, group in ipairs(cs.level.properties.beattools.eventGroups) do
+		if not utilitools.files.beattools.eventGroups.permanent[group.name] and group.pinned then
+			imguiInputAmount = imguiInputAmount + 1
+		end
+	end
 end
 size.y = size.y - (imguiInputHeight * imguiInputAmount + separatorHeight * separatorAmount)
 if imgui.BeginListBox("##palette", size) then
