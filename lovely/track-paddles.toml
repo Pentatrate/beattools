@@ -15,6 +15,7 @@ for i = 1, 8 do
 		self.p.paddles[i].enabled = paddle.enabled
 		self.p.paddles[i].paddleSize = paddle.newWidth
 		self.p.paddles[i].baseAngle = paddle.newAngle
+		self.p.paddles[i].paddleWidth = 11
 	else
 		self.p.paddles[i].enabled = i == 1
 		self.p.paddles[i].paddleSize = 70

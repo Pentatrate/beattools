@@ -20,11 +20,9 @@ match_indent = true
 pattern = '''if imgui.Button('Delete event') then'''
 payload = '''
 if self.selectedEvent and beattoolsTemp1 == nil and self.selectedEvent.endAngle == 0 then
-	utilitools.files.beattools.undo.undoing = true
-	utilitools.files.beattools.undo.fakeRepeating = true
-	self.selectedEvent.endAngle = self.selectedEvent.angle
-	utilitools.files.beattools.undo.undoing = false
-	utilitools.files.beattools.undo.fakeRepeating = false
+	utilitools.files.beattools.undo.dontTrack(function()
+		self.selectedEvent.endAngle = self.selectedEvent.angle
+	end)
 end
 '''
 position = "before"

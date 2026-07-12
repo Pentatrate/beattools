@@ -38,3 +38,15 @@ utilitools.files.beattools.undo.update()
 '''
 position = "before"
 target = "states/Editor.lua"
+
+# Undo true or nil ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local enabled = true'''
+payload = '''
+utilitools.files.beattools.undo.undoing = true
+utilitools.files.beattools.undo.fakeRepeating = true
+'''
+position = "after"
+target = "obj/GameManager.lua"

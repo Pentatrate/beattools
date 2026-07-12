@@ -235,11 +235,9 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	startStack(event)
 	if utilitools.files.beattools.eventStacking.getType(event) == "func" then
 		if mod.config.displayEndAngle and event.endAngle then
-			utilitools.files.beattools.undo.undoing = true
-			utilitools.files.beattools.undo.fakeRepeating = true
-			event.angle = event.endAngle
-			utilitools.files.beattools.undo.undoing = false
-			utilitools.files.beattools.undo.fakeRepeating = false
+			utilitools.files.beattools.undo.dontTrack(function()
+				event.angle = event.endAngle
+			end)
 		end
 
 		drawEvent()
@@ -269,11 +267,9 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 	end
 	if utilitools.files.beattools.eventStacking.getType(event) == "func" and mod.config.displayEndAngle and event.endAngle then
-		utilitools.files.beattools.undo.undoing = true
-		utilitools.files.beattools.undo.fakeRepeating = true
-		event.angle = beattoolsTemp2
-		utilitools.files.beattools.undo.undoing = false
-		utilitools.files.beattools.undo.fakeRepeating = false
+		utilitools.files.beattools.undo.dontTrack(function()
+			event.angle = beattoolsTemp2
+		end)
 	end
 
 	if alpha ~= 1 or isNote then

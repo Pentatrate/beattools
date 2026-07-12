@@ -113,6 +113,15 @@ undo = {
 	}
 }
 
+function undo.dontTrack(func)
+	if type(func) ~= "function" then return end
+	undo.undoing = true
+	undo.fakeRepeating = true
+	func()
+	undo.undoing = false
+	undo.fakeRepeating = false
+end
+
 undo.link = function(event, remove, k)
 	for file, _ in pairs(undo.linkFiles) do
 		if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
@@ -253,7 +262,7 @@ undo.insert = function(list, pos, value)
 		pos = #list + 1
 	end
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
-		if utilitools.files.beattools.undo.fakeRepeating or value.beattoolsRepeatChild == nil then
+		if undo.fakeRepeating or value.beattoolsRepeatChild == nil then
 			if getmetatable(value) == nil or not getmetatable(value).beattoolsUndoInject then
 				undo.meta(value)
 			end
@@ -303,7 +312,7 @@ undo.insert = function(list, pos, value)
 			beattools.moremetamethods.insert(list, pos, value)
 			undo.link(value)
 
-			if not utilitools.files.beattools.undo.fakeRepeating then
+			if not undo.fakeRepeating then
 				utilitools.files.beattools.fakeRepeat.update(value)
 			end
 			cs:updateBiggestBeat()
@@ -318,7 +327,7 @@ end
 undo.remove = function(list, pos)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events and list[pos] then
 		local returnValue
-		if utilitools.files.beattools.undo.fakeRepeating or list[pos].beattoolsRepeatChild == nil then
+		if undo.fakeRepeating or list[pos].beattoolsRepeatChild == nil then
 			if
 				undo.changes[undo.index + 1] and
 				undo.changes[undo.index + 1].type == "remove" and
@@ -371,9 +380,9 @@ undo.remove = function(list, pos)
 	return true
 end
 undo.change = function(t, k, v, hidden)
-	if not utilitools.files.beattools.undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and hidden[k] ~= v then
+	if not undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and hidden[k] ~= v then
 		if undo.keyTracked(k) then
-			if utilitools.files.beattools.undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
+			if undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
 				if undo.events[tostring(t)] == nil then modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
 				if
 					undo.changes[undo.index + 1] and
@@ -418,13 +427,13 @@ undo.change = function(t, k, v, hidden)
 					undo.newChangeSub()
 				end
 
-				local temp = not utilitools.files.beattools.undo.fakeRepeating and (k == "time" and v - hidden[k] or v)
+				local temp = not undo.fakeRepeating and (k == "time" and v - hidden[k] or v)
 
 				undo.link(t, true, k)
 				hidden[k] = v
 				undo.link(t, nil, k)
 
-				if not utilitools.files.beattools.undo.fakeRepeating then
+				if not undo.fakeRepeating then
 					utilitools.files.beattools.fakeRepeat.update(t, false, k, temp)
 				end
 				if undo.keyTracked(k) then
@@ -444,14 +453,14 @@ undo.firstTime = function()
 	if beattools.moremetamethods.pairs == nil then
 		beattools.moremetamethods.pairs = pairs
 		_G.pairs = function(...)
-			return utilitools.files.beattools.undo.pairs(...)
+			return undo.pairs(...)
 		end
 	end
 	if beattools.moremetamethods.insert == nil then
 		beattools.moremetamethods.insert = table.insert
 		---@diagnostic disable-next-line: duplicate-set-field
 		table.insert = function(...)
-			if utilitools.files.beattools.undo.insert(...) then
+			if undo.insert(...) then
 				beattools.moremetamethods.insert(...)
 			end
 		end
@@ -460,7 +469,7 @@ undo.firstTime = function()
 		beattools.moremetamethods.remove = table.remove
 		---@diagnostic disable-next-line: duplicate-set-field
 		table.remove = function(...)
-			local override, returnValue = utilitools.files.beattools.undo.remove(...)
+			local override, returnValue = undo.remove(...)
 			if override then
 				return beattools.moremetamethods.remove(...)
 			else
@@ -515,8 +524,8 @@ undo.update = function()
 end
 
 undo.keybind = function(doUndo, doMultiple)
-	if utilitools.files.beattools.undo.index < 0 then utilitools.files.beattools.undo.index = 0 end
-	if utilitools.files.beattools.undo.index > #utilitools.files.beattools.undo.changes then utilitools.files.beattools.undo.index = #utilitools.files.beattools.undo.changes end
+	if undo.index < 0 then undo.index = 0 end
+	if undo.index > #undo.changes then undo.index = #undo.changes end
 	local hasChanged = false
 	if doUndo == nil then doUndo = not maininput:down("shift") end
 	if doMultiple == nil then doMultiple = maininput:down("ctrl") end

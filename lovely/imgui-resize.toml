@@ -57,8 +57,6 @@ pattern = '''local enabled = true'''
 payload = '''
 local label = mods.beattools.config.shortenParams and mods.beattools.config.keysWhiteList[imguiUniqueName] ~= true and mods.beattools.config.keysWhiteList[imguiUniqueName] or (((propertyType == 'decimal') or (propertyType == 'int')) and propertyName or imguiUniqueName)
 local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)
-utilitools.files.beattools.undo.undoing = true
-utilitools.files.beattools.undo.fakeRepeating = true
 '''
 position = "after"
 target = "obj/GameManager.lua"
