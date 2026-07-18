@@ -11,3 +11,16 @@ pattern = '''self:leave()'''
 payload = '''utilitools.config.save(mods.beattools)'''
 position = "before"
 target = "states/Editor.lua"
+
+# Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = '''v.play_onBeat = nil'''
+# payload = '''
+# -- Penta:
+# -- here's where i would remove parameters i didnt want save in the level files
+# -- IF I HAD SOME!!! :(   /ref
+# '''
+# position = "after"
+# target = "obj/LevelManager.lua"

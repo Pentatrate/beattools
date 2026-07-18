@@ -31,3 +31,47 @@ end
 payload = '''local editorDraw = sprites.editor.events.advancetextdeco'''
 position = "at"
 target = "levelformat/events/Vfx/advancetextdeco.lua"
+
+# Bookmark inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local function editorDraw(event)
+	local pos = cs:getPosition(event.angle,event.time)
+
+	love.graphics.draw(sprites.editor.events.bookmark,pos[1],pos[2],0,1,1,8,8)
+end
+'''
+payload = '''local editorDraw = sprites.editor.events.bookmark'''
+position = "at"
+target = "levelformat/events/Editor/bookmark.lua"
+
+# Comment inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local function editorDraw(event)
+	local pos = cs:getPosition(event.angle,event.time)
+	love.graphics.draw(sprites.editor.events.comment,pos[1],pos[2],0,1,1,8,8)
+end
+'''
+payload = '''local editorDraw = sprites.editor.events.comment'''
+position = "at"
+target = "levelformat/events/Editor/comment.lua"
+
+# Extratap inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local function editorDraw(event)
+	local pos = cs:getPosition(event.angle,event.time)
+
+	love.graphics.draw(sprites.editor.events.extratap,pos[1],pos[2],0,1,1,8,8)
+end
+'''
+payload = '''local editorDraw = sprites.editor.events.extratap'''
+position = "at"
+target = "levelformat/events/Notes/extraTap.lua"

@@ -21,26 +21,32 @@ return {
 		-- untag single tag
 		if maininput:down("shift") and (not maininput:down("ctrl")) then
 			if cs.selectedEvent then
-				cs:beattoolsUntag({ cs.selectedEvent })
+				utilitools.files.beattools.tag.untagEvent(cs.selectedEvent)
 			elseif cs.multiselect then
-				cs:beattoolsUntag(cs.multiselect.events)
+				utilitools.files.beattools.tag.untagEvents(cs.multiselect.events)
 			end
 		end
 		-- untag same tags
 		if maininput:down("ctrl") and (not maininput:down("shift")) then
 			if cs.selectedEvent then
-				if mods.beattools.config.ignoreUntagPrompt then cs:beattoolsUntag({ cs.selectedEvent.tag }) return end
+				if mods.beattools.config.ignoreUntagPrompt then
+					utilitools.files.beattools.tag.untagTagName(cs.selectedEvent.tag)
+					return
+				end
 				utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. cs.selectedEvent.tag .. "\"!", function ()
-					cs:beattoolsUntag({ cs.selectedEvent.tag })
+					utilitools.files.beattools.tag.untagTagName(cs.selectedEvent.tag)
 				end)
 			elseif cs.multiselect then
-				local tempEvents = {}
+				local tagNames = {}
 				for i, v in ipairs(cs.multiselect.events) do
-					if v.type == "tag" then table.insert(tempEvents, v.tag) end
+					if v.type == "tag" then table.insert(tagNames, v.tag) end
 				end
-				if mods.beattools.config.ignoreUntagPrompt then cs:beattoolsUntag(tempEvents) return end
+				if mods.beattools.config.ignoreUntagPrompt then
+					utilitools.files.beattools.tag.untagTagNames(tagNames)
+					return
+				end
 				utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
-					cs:beattoolsUntag(tempEvents)
+					utilitools.files.beattools.tag.untagTagNames(tagNames)
 				end)
 			end
 		end

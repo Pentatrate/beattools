@@ -22,7 +22,7 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and not utilitools.fi
 	end
 	imgui.Separator()
 end
-if self.selectedEvent and self.selectedEvent.type == "ease" and mods.beattools.config.easeCurrentValues then
+if self.selectedEvent and mods.beattools.config.easeCurrentValues and self.selectedEvent.type == "ease" then
 	if beattools.easeList.unsorted.all[self.selectedEvent.var] ~= nil and self.selectedEvent.var ~= "outline" then
 		local ease, count = utilitools.files.beattools.easing.getEase("ease", self.selectedEvent.var, cs.editorBeat, nil, nil)
 		local ease2, count2 = utilitools.files.beattools.easing.getEase("ease", self.selectedEvent.var, self.selectedEvent.time, self.selectedEvent.order, utilitools.files.beattools.easing.getIndex(self.selectedEvent) - 1)
@@ -59,68 +59,20 @@ if self.selectedEvent and mods.beattools.config.untaggingButtons then
 end
 if self.selectedEvent and mods.beattools.config.untaggingButtons and self.selectedEvent.type == "tag" then
 	if imgui.Button("Untag") then
-		self:beattoolsUntag({ self.selectedEvent })
+		utilitools.files.beattools.tag.untagEvent(self.selectedEvent)
 	end
 	imgui.SameLine()
 	if imgui.Button("Untag same tag name") then
-		utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
-			self:beattoolsUntag({ self.selectedEvent.tag })
-		end)
-	end
-	imgui.Separator()
-end
-'''
-position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''Event.property(event,'decimal','repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(),optional = true, default = 1})'''
-payload = '''
-if event.repeats and event.repeats > 0 then
-	Event.property(event, 'decimal', 'repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(), default = 1})
-else event.repeatDelay = nil end
-'''
-position = "at"
-target = "levelformat/events/Vfx/ease.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if imgui.Button('Delete selected events') then'''
-payload = '''
-if mods.beattools.config.untaggingButtons then
-	if imgui.Button("Untag") then
-		self:beattoolsUntag(self.multiselect.events)
-	end
-	imgui.SameLine()
-	if imgui.Button("Untag same tag name") then
-		local tempEvents = {}
-		for i, v in ipairs(self.multiselect.events) do
-			if v.type == "tag" then table.insert(tempEvents, v.tag) end
+		if mods.beattools.config.ignoreUntagPrompt then
+			utilitools.files.beattools.tag.untagTagName(self.selectedEvent.tag)
+		else
+			utilitools.prompts.confirm("Continuing will untag all tags with the tag name \"" .. self.selectedEvent.tag .. "\"!", function ()
+				utilitools.files.beattools.tag.untagTagName(self.selectedEvent.tag)
+			end)
 		end
-		utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
-			self:beattoolsUntag(tempEvents)
-		end)
 	end
 	imgui.Separator()
 end
 '''
 position = "before"
-target = "states/Editor.lua"
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if #self.multiselect.events == 0 and #self.markers == 0 then'''
-payload = '''
-if mods.beattools.config.convertSingle and self.multiselect and #self.multiselect.events == 1 and #self.markers == 0 then
-	local event = self.multiselect.events[1]
-	self:noSelection()
-	self.selectedEvent = event
-end
-if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 then
-'''
-position = "at"
 target = "states/Editor.lua"

@@ -179,6 +179,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"tag": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

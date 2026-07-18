@@ -1,0 +1,34 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Multiselect untagging buttons ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if imgui.Button('Delete selected events') then'''
+payload = '''
+if mods.beattools.config.untaggingButtons then
+	if imgui.Button("Untag") then
+		utilitools.files.beattools.tag.untagEvents(self.multiselect.events)
+	end
+	imgui.SameLine()
+	if imgui.Button("Untag same tag name") then
+		local tagNames = {}
+		for i, v in ipairs(self.multiselect.events) do
+			if v.type == "tag" then table.insert(tagNames, v.tag) end
+		end
+		if mods.beattools.config.ignoreUntagPrompt then
+			utilitools.files.beattools.tag.untagTagNames(tagNames)
+		else
+			utilitools.prompts.confirm("Continuing will untag all tags with the same name as those in the selection!", function ()
+				utilitools.files.beattools.tag.untagTagNames(tagNames)
+			end)
+		end
+	end
+	imgui.Separator()
+end
+'''
+position = "before"
+target = "states/Editor.lua"

@@ -18,8 +18,10 @@ return {
 		-- modlog(mod, e, type(e))
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
 
-		local tooly = utilitools.files.beattools.tooly
-		beattools.test = tooly.calculatePath()
+		-- local tooly = utilitools.files.beattools.tooly
+		-- beattools.test = tooly.calculatePath()
+
+		utilitools.files.beattools.tag.getList()
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

@@ -15,6 +15,9 @@ end
 if event.type == "setBoolean" and propertyName == "var" then
 	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), beattools.easeList.bools)
 end
+if event.type == "tag" and propertyName == "tag" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), utilitools.files.beattools.tag.getList())
+end
 '''
 position = "after"
 target = "obj/GameManager.lua"

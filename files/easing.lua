@@ -400,8 +400,11 @@ function easing.getEase(eventId, different, time, order, index)
 	end
 	if easing.access[keys] then
 		local cached = easing.cache[easing.access[keys] - easing.index]
-		if not cached then modwarn(mod, "No cache? ", eventId, different, time, order, index) end
-		return cached.values, cached.count
+		if not cached then
+			modwarn(mod, "No cache? ", eventId, different, time, order, index)
+		else
+			return cached.values, cached.count
+		end
 	end
 
 	local values = track.default(different)

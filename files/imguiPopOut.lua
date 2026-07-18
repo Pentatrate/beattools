@@ -5,11 +5,9 @@ local imguiPopOut = {
 	x = nil,
 	y = nil,
 	offset = 0,
-	offset2 = 0,
 	inUse = false,
 
 	hoverTime = 0.25,
-	additionalOffset = 0.01,
 	itemPadding = 2
 }
 
@@ -34,11 +32,9 @@ function imguiPopOut.imgui(label, value, multiline)
 				imguiPopOut.y = mouse.ry * imgui.canvasScale
 			end
 
-			imguiPopOut.offset = 0 - imguiPopOut.additionalOffset
-			imguiPopOut.offset2 = -1
+			imguiPopOut.offset = 0
 			if mouse.rx > 400 then
-				imguiPopOut.offset = 1 + imguiPopOut.additionalOffset
-				imguiPopOut.offset2 = 1
+				imguiPopOut.offset = 1
 			end
 			imgui.SetNextWindowPos(imgui.ImVec2_Float(imguiPopOut.x, imguiPopOut.y), imgui.ImGuiCond_Appearing, imgui.ImVec2_Float(imguiPopOut.offset, 0.5))
 		end

@@ -109,7 +109,8 @@ undo = {
 		eventStacking = true,
 		easing = true,
 		biggestBeat = true,
-		eventGroups = true
+		eventGroups = true,
+		tag = true
 	}
 }
 

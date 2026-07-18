@@ -1,0 +1,57 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Hide repeatdelay ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''Event.property(event,'decimal','repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(),optional = true, default = 1})'''
+payload = '''
+if event.repeats and event.repeats > 0 then
+	Event.property(event, 'decimal', 'repeatDelay', 'Beats between repeats', {step = cs:getBeatStep(), default = 1})
+else event.repeatDelay = nil end
+'''
+position = "at"
+target = "levelformat/events/Vfx/ease.lua"
+
+# Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''for i, v in ipairs(tagEvents) do
+	v.time = v.time - self.multiselectStartBeat
+end'''
+payload = '''
+if mods.beattools.config.fakeRepeat then
+	for i = #tagEvents, 1, -1 do
+		local v = tagEvents[i]
+		if v.beattoolsRepeatChild ~= nil then
+			table.remove(tagEvents, i)
+		end
+	end
+end
+for i = 1, #tagEvents do
+	local v = tagEvents[i]
+	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)
+	if mods.beattools.config.fakeRepeat then
+		if v.beattoolsRepeatParent and v.repeats ~= nil and v.repeats > 0 and not utilitools.files.beattools.eventVisuals.hasRepeat[v.type] then
+			for i = 1, v.repeats do
+				local newEvent = helpers.copy(v)
+
+				newEvent.beattoolsRepeatParent, newEvent.repeats, newEvent.repeatDelay = nil, nil, nil
+				newEvent.time = v.time + i * (v.repeatDelay or 1)
+				newEvent.beattoolsRepeatChild = v.beattoolsRepeatParent
+
+				table.insert(tagEvents, 1, newEvent)
+				i = i + 1
+			end
+		else
+			v.beattoolsRepeatParent = nil
+		end
+	end
+end
+'''
+position = "at"
+target = "states/Editor.lua"

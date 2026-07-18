@@ -8,7 +8,7 @@ version = "1.0.0"
 [patches.pattern]
 match_indent = true
 pattern = '''if savedata.options.aprilFools.voicedGearshift and savedata.costumes.currentCostume == "gearshift" then'''
-payload = '''if savedata.options.aprilFools.voicedGearshift and savedata.costumes.currentCostume == "gearshift" or mods.beattools.config.alwaysGearshift then'''
+payload = '''if (savedata.options.aprilFools.voicedGearshift and savedata.costumes.currentCostume == "gearshift") or mods.beattools.config.alwaysGearshift then'''
 position = "at"
 target = "obj/Player.lua"
 times = 1
