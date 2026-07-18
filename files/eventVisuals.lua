@@ -213,7 +213,8 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 
 	local eventDraw = Event.editorDraw[eventVisuals.getEventType(event.type)] or sprites.editor.genericevent
 	local isNote = beattoolsLayer == "note" or (beattoolsLayer == "selected" and utilitools.files.beattools.eventStacking.getType(event) == "func")
-	local function drawEvent(pos)
+	local pos = cs:getPosition(event.angle, event.time)
+	local function drawEvent()
 		setColor(1, 1, 1, 1)
 		if type(eventDraw) == "function" then
 			local event2 = helpers.copy(event)
@@ -221,7 +222,6 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			eventDraw(event2, cs.editorBeat, cs.editorBeat + cs.drawDistance)
 			color.r, color.g, color.b, color.a = love.graphics.getColor()
 		else
-			pos = pos or cs:getPosition(event.angle, event.time)
 			love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
 		end
 	end
@@ -243,10 +243,9 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		drawEvent()
 	end
 	if isVisible(event.time) then
-		local pos = cs:getPosition(event.angle, event.time)
 		if inBounds(pos, 8) then
 			if utilitools.files.beattools.eventStacking.getType(event) == "img" then
-				drawEvent(pos)
+				drawEvent()
 			end
 
 			-- Code by K4kadu
@@ -270,6 +269,11 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		utilitools.files.beattools.undo.dontTrack(function()
 			event.angle = beattoolsTemp2
 		end)
+	end
+
+	if eventVisuals.getEventType(event.type) == "tag" and utilitools.files.beattools.tag.initTag(event.tag) then
+		setColor(mod.config.durationSameEasingColor.r, mod.config.durationSameEasingColor.g, mod.config.durationSameEasingColor.b, 1)
+		love.graphics.draw(sprites.editor.warning, pos[1], pos[2], 0, 1, 1, 11, 11)
 	end
 
 	if alpha ~= 1 or isNote then
@@ -319,7 +323,6 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 
 		if isVisible(time) then
-			local pos = cs:getPosition(angle, time)
 			if inBounds(pos, 11) then
 				if mod.config.whiteSelected ~= "off" then
 					setColor(mod.config.selectedBorderColor.r, mod.config.selectedBorderColor.g, mod.config.selectedBorderColor.b, mod.config.selectedBorderColor.a)

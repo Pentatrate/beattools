@@ -930,13 +930,6 @@ return {
 		default = { { {}, "key:t" } },
 		off = {}
 	},
-	selectAll = {
-		type = "key",
-		name = "Select All Hotkey",
-		tooltips = { long = "Hotkey to select all events (default: ctrl + a)", short = "Select all events" },
-		default = { { { ["bind:ctrl"] = true }, "key:a" } },
-		off = {}
-	},
 	undoMultiple = {
 		type = "key",
 		name = "Undo Hotkey",

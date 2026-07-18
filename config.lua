@@ -478,7 +478,6 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("tagSelection")
 				imgui.Separator()
-				configHelpers.input("selectAll")
 				configHelpers.input("jumpEvents")
 				imgui.Separator()
 				configHelpers.input("recordPosition")

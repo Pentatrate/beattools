@@ -51,24 +51,6 @@ return {
 			end
 		end
 	end,
-	selectAll = function()
-		cs:newMulti()
-		cs.multiselectStartBeat = nil
-		cs.multiselectEndBeat = nil
-		for i, event in ipairs(cs.level.events) do
-			table.insert(cs.multiselect.events, event)
-		end
-		for i, event in ipairs(cs.multiselect.events) do
-			cs.multiselect.eventTypes[event.type] = true
-			if cs.multiselectStartBeat == nil then cs.multiselectStartBeat, cs.multiselectEndBeat = event.time, event.time end
-			if cs.multiselectStartBeat > event.time then cs.multiselectStartBeat = event.time end
-			if cs.multiselectEndBeat < event.time then cs.multiselectEndBeat = event.time end
-		end
-		if cs.multiselectStartBeat == nil then
-			cs.multiselectStartBeat = 0
-			cs.multiselectEndBeat = 360
-		end
-	end,
 	undoSingle = function() utilitools.files.beattools.undo.keybind(true, false) end,
 	redoSingle = function() utilitools.files.beattools.undo.keybind(false, false) end,
 	undoMultiple = function() utilitools.files.beattools.undo.keybind(true, true) end,

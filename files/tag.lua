@@ -22,6 +22,12 @@ function tag.init()
 end
 function tag.cacheEvent(event, remove, k)
 	tag.clearCache()
+	if event.type == "tag" then
+		if remove then
+		else
+			tag.initTag(event.tag)
+		end
+	end
 end
 
 function tag.initTag(tagName) -- false if successful, true if failed, nil if first time or changed
