@@ -2,7 +2,6 @@ if not utilitools then imgui.Text("Utilitools is disabled") return end
 local configHelpers = utilitools.configHelpers
 configHelpers.setMod(mod)
 
-
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
 		configHelpers.treeNode("Menu Options", function()
@@ -491,3 +490,5 @@ if imgui.BeginTabBar("beattoolsConfig") then
 	end
 	imgui.EndTabBar()
 end
+
+-- configHelpers.input("testytest")

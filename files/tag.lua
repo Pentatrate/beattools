@@ -275,11 +275,21 @@ function tag.untagTagNames(tagNames)
 	end
 end
 
+function tag.itemExistsInDir(path, item) -- unused
+	local itemNames = love.filesystem.getDirectoryItems(path)
+	for _, itemName in ipairs(itemNames) do
+		if not tag.initTag(itemName) then
+			return true
+		end
+	end
+	return nil
+end
+
 function tag.getList()
 	local tagFileNames = love.filesystem.getDirectoryItems(cLevel .. "tags/")
 	local indexed = {}
 	for _, tagFileName in ipairs(tagFileNames) do
-		local tagName = tagFileName:sub(1, -6)
+		local tagName = bbp.utils.extractFileName(tagFileName)
 		if not tag.initTag(tagName) then
 			table.insert(indexed, tagName)
 		end

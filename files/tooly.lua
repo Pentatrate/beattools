@@ -1386,6 +1386,8 @@ end
 
 
 function tooly.calculatePath()
+	if not (cs.name == "Editor" and not cs.editMode) or not mod.config.tooly then return end
+	if not cs or not cs.level or not cs.level.events then return end
 	tooly.alreadyInvalid = {}
 	tooly.eventCache = {}
 

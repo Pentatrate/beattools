@@ -1252,6 +1252,12 @@ return {
 		tooltips = { short = "Light Blue color for the player" },
 		default = { r = 0, g = 1, b = 1 }
 	},
+	testytest = {
+		type = "wrapped",
+		name = "TESTYTEST",
+		tooltips = { short = "testestestestestestestestestestestest" },
+		default = ""
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

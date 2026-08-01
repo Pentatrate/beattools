@@ -178,7 +178,7 @@ undo.inject = function()
 	setmetatable(cs.level.events, {
 		__newindex = function (t, k, v)
 			modlog(mod, "newindex GAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH\nGAHHHHHHHHHHHHHHH")
-			t[k] = v
+			rawset(t, k, v)
 		end
 	})
 	undo.injectSub()
@@ -229,7 +229,7 @@ undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
 			if undo.keyTracked(k) then
 				if type(list4[k]) ~= type(v) then
 					addReason("[" .. path .. "] different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
-					return false
+					if doReason ~= 1 then return false else valid = false end
 				elseif type(v) == "table" and not dontRepeat[tostring(v)] and not dontRepeat[tostring(list4[k])] then
 					if not undo.areSimilar(v, list4[k], dontRepeat, doReason, path .. "." .. tostring(k)) then
 						if doReason ~= 1 then return false else valid = false end

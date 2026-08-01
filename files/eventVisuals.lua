@@ -213,7 +213,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 
 	local eventDraw = Event.editorDraw[eventVisuals.getEventType(event.type)] or sprites.editor.genericevent
 	local isNote = beattoolsLayer == "note" or (beattoolsLayer == "selected" and utilitools.files.beattools.eventStacking.getType(event) == "func")
-	local pos = cs:getPosition(event.angle, event.time)
+	local pos
 	local function drawEvent()
 		setColor(1, 1, 1, 1)
 		if type(eventDraw) == "function" then
@@ -233,6 +233,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 
 	local beattoolsTemp2 = event.angle
 	startStack(event)
+	pos = cs:getPosition(event.angle, event.time)
 	if utilitools.files.beattools.eventStacking.getType(event) == "func" then
 		if mod.config.displayEndAngle and event.endAngle then
 			utilitools.files.beattools.undo.dontTrack(function()

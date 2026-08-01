@@ -1,6 +1,5 @@
 --[[
 TODO
-- check decos hidden
 - check for ease modes
 ]]
 local compare = {
@@ -11,7 +10,25 @@ local compare = {
 	new1Index = 1,
 	new2 = {},
 	new2Stats = {},
-	new2Index = 1
+	new2Index = 1,
+}
+local colors = {
+	{ 255, 255, 255 },
+	{   0,   0,   0 },
+	{ 255,   0,   0 },
+	{   0, 255,   0 },
+	{   0,   0, 255 },
+	{ 255, 255,   0 },
+	{ 255,   0, 255 },
+	{   0, 255, 255 },
+
+	{ 128, 128, 128 },
+	{ 128,   0,   0 },
+	{   0, 128,   0 },
+	{   0,   0, 128 },
+	{ 128, 128,   0 },
+	{ 128,   0, 128 },
+	{   0, 128, 128 }
 }
 
 if beattools and beattools.test and beattools.test.compare then
@@ -38,13 +55,16 @@ function compare.getPart()
 			if f then
 				f = e + f - 1
 				local g = cLevel:sub(e, f)
-				return tonumber(g)
+				return tonumber(g) or "merged"
 			end
 		end
 	end
 	return 0
 end
 function compare.getPartBounds(part)
+	if part == "merged" then
+		return 260, 788
+	end
 	return compare.parts[compare.currentCollab][part - 1], compare.parts[compare.currentCollab][part]
 end
 
@@ -125,6 +145,13 @@ function compare.showChanges(new2)
 				end
 				jumpToNext()
 			end
+			imgui.SameLine()
+			if imgui.Button("10 NEW") then
+				for i = 1, 10 do
+					change.resolved = "NEW"
+					jumpToNext()
+				end
+			end
 		end
 	end
 end
@@ -166,6 +193,9 @@ function compare.window(window_flag, inputFlag)
 				if compare.new2Stats.array and not compare.getNextChange(true) then
 					if imgui.Button("CHECK MERGE") then
 						compare.checkMerge()
+					end
+					if imgui.Button("DO MERGE") then
+						compare.merge()
 					end
 				end
 			end
@@ -259,7 +289,7 @@ function compare.compare(new2)
 		set = {
 			newEases = {},
 			origEventsMatched = {}, newEventsMatched = {},
-			decoIds = {}, decoSprites = {}
+			decoIds = {}, decoSprites = {}, textdecoIds = {}
 		},
 		setConverted = {},
 		map = {
@@ -270,7 +300,7 @@ function compare.compare(new2)
 			origTypeAdded = {}, origEaseAdded = {}, outsideAdded = {},
 			changed = {}, changed2 = {}, angleChanged = {}, outsideChanged = {},
 			changedText = {}, changedReason = {},
-			decoLastHide = {}
+			decoLastHide = {}, textdecoLastHide = {}
 		},
 		mapConverted = {},
 		total = {},
@@ -280,10 +310,10 @@ function compare.compare(new2)
 	local function inTime(event)
 		return compare.inTime(event, part)
 	end
-	local function found(event, event2, text)
-		newStats.set.origEventsMatched[tostring(event)] = true
+	local function found(event1, event2, text)
+		newStats.set.origEventsMatched[tostring(event1)] = true
 		newStats.set.newEventsMatched[tostring(event2)] = true
-		local check, reason = utilitools.files.beattools.undo.areSimilar(event, event2, nil, 1)
+		local check, reason = utilitools.files.beattools.undo.areSimilar(event1, event2, nil, 1)
 		if not check then
 			if text == "CHANGED ANGLE" then
 				if #reason <= 1 then
@@ -292,30 +322,30 @@ function compare.compare(new2)
 					text = "CHANGED"
 				end
 			end
-			if not inTime(event) then
+			if not inTime(event1) then
 				text = text .. " OUTSIDE"
 				newStats.map.outsideChanged[tostring(event2)] = event2
 			end
-			newStats.map.changed[tostring(event2)] = event
+			newStats.map.changed[tostring(event2)] = event1
 			newStats.map.changed2[tostring(event2)] = event2
 			newStats.map.changedText[tostring(event2)] = text
 			newStats.map.changedReason[tostring(event2)] = reason
 		end
 	end
-	local function search(event, checks, text)
+	local function search(event1, checks, text)
 		for _, event2 in ipairs(new) do
 			if not newStats.set.newEventsMatched[tostring(event2)] then
 				local valid = true
 				if checks then
 					for _, check in ipairs(checks) do
-						if event[check] ~= event2[check] then
+						if event1[check] ~= event2[check] then
 							valid = false break
 						end
 					end
 				else
-					valid = utilitools.files.beattools.undo.areSimilar(event, event2)
+					valid = utilitools.files.beattools.undo.areSimilar(event1, event2)
 				end
-				if valid then found(event, event2, text) return false end
+				if valid then found(event1, event2, text) return false end
 			end
 		end
 		return true
@@ -367,6 +397,12 @@ function compare.compare(new2)
 				if event2.hide ~= nil and (not lastHide or lastHide.time < event2.time or (lastHide.time == event2.time and (lastHide.order or 0) <= (event2.order or 0))) then
 					newStats.map.decoLastHide[event2.id] = event2
 				end
+			elseif event2.type == "textdeco" then
+				newStats.set.textdecoIds[event2.id] = true
+				local lastHide = newStats.map.textdecoLastHide[event2.id]
+				if event2.hide ~= nil and (not lastHide or lastHide.time < event2.time or (lastHide.time == event2.time and (lastHide.order or 0) <= (event2.order or 0))) then
+					newStats.map.textdecoLastHide[event2.id] = event2
+				end
 			elseif compare.origStats.set.origEventTypes[event2.type] then
 				newStats.map.origTypeAdded[tostring(event2)] = event2
 			end
@@ -375,13 +411,13 @@ function compare.compare(new2)
 
 	compare.convert(newStats)
 
-	local function addToTotal(event, event2, text, reason)
+	local function addToTotal(event1, event2, text, reason)
 		table.insert(newStats.total, {
-			event = event,
+			event = event1,
 			event2 = event2,
 			text = text,
 			reason = reason,
-			withinTime = inTime(event2 or event)
+			withinTime = inTime(event2 or event1)
 		})
 	end
 
@@ -443,6 +479,22 @@ function compare.compare(new2)
 			addToTotal(nil, newEvent, "DECO UNHIDDEN")
 		end
 	end
+	for _, textdecoId in ipairs(newStats.setConverted.textdecoIds) do
+		local event2 = newStats.map.textdecoLastHide[textdecoId]
+		if not event2 or event2.hide ~= true then
+			local _, time = compare.getPartBounds(part)
+			local newEvent = {
+				type = "textdeco",
+				time = time,
+				angle = 0,
+				id = textdecoId,
+				hide = true
+			}
+			table.insert(new, newEvent)
+			table.insert(cs.level.events, newEvent)
+			addToTotal(nil, newEvent, "TEXTDECO UNHIDDEN")
+		end
+	end
 
 	local function printChange(index)
 		local change = newStats.total[index]
@@ -471,7 +523,8 @@ function compare.compare(new2)
 		"\nNEW",
 		"\n\t   EASES    ", table.concat(newStats.setConverted.newEases, ", "),
 		"\n\t  DECO IDS  ", table.concat(newStats.setConverted.decoIds, ", "),
-		"\n\tDECO SPRITES", table.concat(newStats.setConverted.decoSprites, ", ")
+		"\n\tDECO SPRITES", table.concat(newStats.setConverted.decoSprites, ", "),
+		"\n\tTEXTDECO IDS", table.concat(newStats.setConverted.textdecoIds, ", ")
 	)
 
 	compare["new" .. (new2 and "2" or "1")] = new
@@ -487,7 +540,7 @@ function compare.checkMerge()
 		modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
 		return false
 	end
-	if compare.new1Stats.part > compare.new2Stats.part then
+	if compare.getPartBounds(compare.new1Stats.part) > compare.getPartBounds(compare.new2Stats.part) then
 		compare.new1, compare.new2 = compare.new2, compare.new1
 		compare.new1Stats, compare.new2Stats = compare.new2Stats, compare.new1Stats
 		compare.new1Index, compare.new2Index = compare.new2Index, compare.new1Index
@@ -505,15 +558,20 @@ function compare.checkMerge()
 		end
 	end
 	local function checkEvent(event1)
-		if compare.new2Stats.map.missing[tostring(event1)] or compare.new2Stats.map.changed[tostring(event1)] then
+		if compare.new2Stats.map.missing[tostring(event1)] then
 			modlog(mod, "EVENT", event1.time, event1.angle, event1.type, event1.var)
+		end
+	end
+	local function checkEvent2(event2)
+		if compare.new2Stats.map.changed2[tostring(event2)] then
+			modlog(mod, "EVENT", event2.time, event2.angle, event2.type, event2.var)
 		end
 	end
 	for _, event1 in ipairs(compare.new1Stats.mapConverted.missing) do
 		checkEvent(event1)
 	end
-	for _, event1 in ipairs(compare.new1Stats.mapConverted.changed) do
-		checkEvent(event1)
+	for _, event2 in ipairs(compare.new1Stats.mapConverted.changed2) do
+		checkEvent2(event2)
 	end
 	for _, id in ipairs(compare.new1Stats.setConverted.decoIds) do
 		if compare.new2Stats.set.decoIds[id] then
@@ -525,7 +583,63 @@ function compare.checkMerge()
 			modlog(mod, "DECO SPRITE", sprite)
 		end
 	end
+	for _, id in ipairs(compare.new1Stats.setConverted.textdecoIds) do
+		if compare.new2Stats.set.textdecoIds[id] then
+			modlog(mod, "TEXTDECO ID", id)
+		end
+	end
 	modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
+end
+
+function compare.merge()
+	local merged = helpers.copy(compare.orig)
+	setmetatable(merged, nil)
+	function eventIndex(event)
+		if event == nil then return -1 end
+		for i, v in ipairs(merged) do
+			if utilitools.files.beattools.undo.areSimilar(v, event) then return i end
+		end
+		modwarn(mod, "compare.merge: couldnt find event", event)
+		return -1
+	end
+	local function setColor(event, r, g, b)
+		event.editorOutline = { r = r, g = g, b = b }
+	end
+	local function getColor(new2)
+		local newStats = compare["new" .. (new2 and "2" or "1") .. "Stats"]
+		if type(newStats.part) ~= "number" then
+			return
+		end
+		return unpack(colors[newStats.part % #colors + 1])
+	end
+	local function doChange(event1, event2, new2)
+		event2 = helpers.copy(event2)
+		if getColor(new2) then
+			setColor(event2, getColor(new2))
+		end
+		modlog(mod, "changed", event2.type, event2.time, event2.angle)
+		merged[eventIndex(event1)] = event2
+	end
+	local function doRemove(event1)
+		table.remove(merged, eventIndex(event1))
+	end
+	local function doAdd(event2, new2)
+		event2 = helpers.copy(event2)
+		if getColor(new2) then
+			setColor(event2, getColor(new2))
+		end
+		table.insert(merged, event2)
+	end
+	for id, event2 in ipairs(compare.new1Stats.mapConverted.changed2) do doChange(compare.new1Stats.map.changed[id], event2) end
+	for id, event2 in ipairs(compare.new2Stats.mapConverted.changed2) do doChange(compare.new1Stats.map.changed[id], event2, true) end
+
+	for _, event1 in ipairs(compare.new1Stats.mapConverted.missing) do doRemove(event1) end
+	for _, event1 in ipairs(compare.new2Stats.mapConverted.missing) do doRemove(event1) end
+
+	for _, event2 in ipairs(compare.new1Stats.mapConverted.added) do doAdd(event2) end
+	for _, event2 in ipairs(compare.new2Stats.mapConverted.added) do doAdd(event2, true) end
+
+	cs.level.events = merged
 end
 
 return compare
