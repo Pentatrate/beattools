@@ -378,6 +378,13 @@ function easing.cacheEvent(event, remove, k)
 	easing.clearCache()
 end
 
+function easing.getDefault(eventId, different)
+	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
+	if not arr or not track then modwarn(mod, "Invalid input") return end
+	local values = track.default(different)
+	return values
+end
+
 function easing.getEase(eventId, different, time, order, index)
 	local arr, track = easing.getArr({ type = eventId }, nil, different or true)
 	if not arr or not track or not time then modwarn(mod, "Invalid input") return end

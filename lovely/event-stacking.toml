@@ -1,7 +1,16 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0"
+version = "1.0.0" 
+
+# Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''pos[1],pos[2] = math.floor(pos[1]),math.floor(pos[2])'''
+payload = '''pos[1],pos[2] = helpers.round(pos[1]),helpers.round(pos[2])'''
+position = "at"
+target = "states/Editor.lua"
 
 # Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

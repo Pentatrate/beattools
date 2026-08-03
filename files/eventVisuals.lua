@@ -234,6 +234,22 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	local beattoolsTemp2 = event.angle
 	startStack(event)
 	pos = cs:getPosition(event.angle, event.time)
+	if mod.config.editorOutlines and mod.config.editorOutlineOutlines and isVisible(event.time) then
+		-- Code by K4kadu
+		-- copied from her mod "Editor Outline" for compatibility, modified for outlines
+		if event.editorOutline then
+			local thin = 9.5 + (mod.config.editorOutlineThin and -1 or 0) + (mod.config.editorOutlineInlines and 1 or 0)
+
+			-- https://www.codestudy.net/blog/formula-to-determine-perceived-brightness-of-rgb-color/#1-simplified-weighted-sum-30-59-11-rule
+			local r, g, b = love.math.colorFromBytes(event.editorOutline.r, event.editorOutline.g, event.editorOutline.b)
+			local brightness = 0.30 * r + 0.59 * g + 0.11 * b
+			local d = brightness > 0.5 and 0 or 1
+			setColor(d, d, d, 1)
+			love.graphics.setLineWidth(1)
+			love.graphics.rectangle("line", pos[1] - thin, pos[2] - thin, thin * 2, thin * 2)
+		end
+		-- Kaks code end
+	end
 	if utilitools.files.beattools.eventStacking.getType(event) == "func" then
 		if mod.config.displayEndAngle and event.endAngle then
 			utilitools.files.beattools.undo.dontTrack(function()
@@ -250,11 +266,25 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			end
 
 			-- Code by K4kadu
-			-- copied from her mod "Editor Outline" for compatibility
-			if event.editorOutline then
-				setColor(love.math.colorFromBytes(event.editorOutline.r, event.editorOutline.g, event.editorOutline.b, 255))
-				love.graphics.setLineWidth(2)
-				love.graphics.rectangle("line", pos[1] - 8, pos[2] - 8, 16, 16)
+			-- copied from her mod "Editor Outline" for compatibility, modified for outlines
+			if mod.config.editorOutlines and event.editorOutline then
+				-- https://www.codestudy.net/blog/formula-to-determine-perceived-brightness-of-rgb-color/#1-simplified-weighted-sum-30-59-11-rule
+				local r, g, b = love.math.colorFromBytes(event.editorOutline.r, event.editorOutline.g, event.editorOutline.b)
+
+				if mod.config.editorOutlineInlines then
+					local thin = 7.5
+
+					local brightness = 0.30 * r + 0.59 * g + 0.11 * b
+					local d = brightness > 0.5 and 0 or 1
+					setColor(d, d, d, 1)
+					love.graphics.setLineWidth(1)
+					love.graphics.rectangle("line", pos[1] - thin, pos[2] - thin, thin * 2, thin * 2)
+				end
+				local thin = 8 + (mod.config.editorOutlineThin and -0.5 or 0) + (mod.config.editorOutlineInlines and 1 or 0)
+
+				setColor(r, g, b, 1)
+				love.graphics.setLineWidth(mod.config.editorOutlineThin and 1 or 2)
+				love.graphics.rectangle("line", pos[1] - thin, pos[2] - thin, thin * 2, thin * 2)
 			end
 			-- Kaks code end
 

@@ -1,11 +1,21 @@
 {
 	"dependencies": {
 		"beatblock-plus": {
-			"versions": [[">=", "2.0.0"]],
+			"versions": [
+				[
+					">=",
+					"2.0.0"
+				]
+			],
 			"reason": "You need to update this mod."
 		},
 		"utilitools": {
-			"versions": [[">=", "1.2.46"]],
+			"versions": [
+				[
+					">=",
+					"1.2.46"
+				]
+			],
 			"reason": "Required API. You may need to update this mod."
 		}
 	},
@@ -181,6 +191,11 @@
 			"call": true
 		},
 		"tag": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"fakeRepeat2": {
 			"extension": "lua",
 			"load": true,
 			"call": true

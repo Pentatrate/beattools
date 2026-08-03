@@ -110,7 +110,8 @@ undo = {
 		easing = true,
 		biggestBeat = true,
 		eventGroups = true,
-		tag = true
+		tag = true,
+		fakeRepeat2 = false
 	}
 }
 
@@ -126,9 +127,25 @@ end
 undo.link = function(event, remove, k)
 	for file, _ in pairs(undo.linkFiles) do
 		if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
-			utilitools.files.beattools[file].cacheEvent(event, remove, k)
+			if utilitools.files.beattools[file].cacheEvent then
+				utilitools.files.beattools[file].cacheEvent(event, remove, k)
+			end
 		end
 	end
+end
+undo.checkLink = function(event, remove, k)
+	local deny = false
+	for file, dontDeny in pairs(undo.linkFiles) do
+		if not dontDeny then
+			if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
+				if utilitools.files.beattools[file].checkEvent then
+					local denied = utilitools.files.beattools[file].checkEvent(event, remove, k)
+					deny = deny or denied
+				end
+			end
+		end
+	end
+	return deny
 end
 
 undo.keyTracked = function(k)
@@ -137,7 +154,9 @@ end
 
 undo.init = function()
 	for file, _ in pairs(undo.linkFiles) do
-		utilitools.files.beattools[file].init()
+		if utilitools.files.beattools[file].init then
+			utilitools.files.beattools[file].init()
+		end
 	end
 	utilitools.files.beattools.eventGroups.init()
 	undo.changes = {}
@@ -384,7 +403,11 @@ undo.change = function(t, k, v, hidden)
 	if not undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and hidden[k] ~= v then
 		if undo.keyTracked(k) then
 			if undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
-				if undo.events[tostring(t)] == nil then modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!") end
+				if undo.events[tostring(t)] == nil then
+					modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!")
+					undo.injectSub()
+					-- utilitools.files.beattools.fakeRepeat.updateList()
+				end
 				if
 					undo.changes[undo.index + 1] and
 					undo.changes[undo.index + 1].type == "change" and

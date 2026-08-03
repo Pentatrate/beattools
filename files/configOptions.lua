@@ -459,7 +459,7 @@ return {
 		type = "combo",
 		name = "Quick Property",
 		tooltips = { long = "Draws one property of an event as a number on its sprite", short = "Draws numbers on events" },
-		values = { "none", "order", "speedMult" },
+		values = { "none", "order", "speedMult", "beattoolsRepeatParent" },
 		valueTooltips = {},
 		default = "order",
 		off = "none"
@@ -533,6 +533,34 @@ return {
 		name = "Stacked Notes",
 		tooltips = { short = "Mark stacked gameplay" },
 		default = true,
+		off = false
+	},
+	editorOutlines = {
+		type = "bool",
+		name = "Event Outlines",
+		tooltips = { short = "Requires the mod \"Editor Outlines\" by Kakadu" },
+		default = true,
+		off = false
+	},
+	editorOutlineOutlines = {
+		type = "bool",
+		name = "Outline Outlines",
+		tooltips = { short = "Makes difficult to see outlines more visually noticable" },
+		default = false,
+		off = false
+	},
+	editorOutlineInlines = {
+		type = "bool",
+		name = "Outline Inlines",
+		tooltips = { short = "Makes difficult to see outlines even more visually noticable" },
+		default = false,
+		off = false
+	},
+	editorOutlineThin = {
+		type = "bool",
+		name = "Thin Outlines",
+		tooltips = { short = "Makes outlines thinner" },
+		default = false,
 		off = false
 	},
 

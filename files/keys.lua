@@ -18,10 +18,28 @@ return {
 		-- modlog(mod, e, type(e))
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
 
-		local tooly = utilitools.files.beattools.tooly
-		beattools.test = tooly.calculatePath()
+		-- local tooly = utilitools.files.beattools.tooly
+		-- beattools.test = tooly.calculatePath()
 
 		-- utilitools.files.beattools.tag.getList()
+
+		-- for _, event in ipairs(cs.level.events) do
+		-- 	if event.type == "deco" and event.sprite ~= nil then
+		-- 		event.sprite = "r22/" .. event.sprite
+		-- 	end
+		-- end
+
+		-- for time, angles in pairs(utilitools.files.beattools.eventStacking.gameplayStack) do
+		-- 	for angle, _ in pairs(angles) do
+		-- 		modlog(mod, time, angle)
+		-- 	end
+		-- end
+
+		for _, event in ipairs(cs.level.events) do
+			if event.editorOutline and event.editorOutline.r == 255 and event.editorOutline.g == 0 and event.editorOutline.b == 255 then
+				event.editorOutline = { r = 255, g = 255,   b = 0 }
+			end
+		end
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

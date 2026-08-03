@@ -383,6 +383,15 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				imgui.Separator()
 				configHelpers.input("alphaTransparent", nil, nil, "%.3f")
 				configHelpers.input("alphaGhost", nil, nil, "%.3f")
+				imgui.Separator()
+				configHelpers.input("editorOutlines")
+				configHelpers.condTreeNode(
+					"Event Outlines", "editorOutlines", true, true, function()
+						configHelpers.input("editorOutlineThin")
+						configHelpers.input("editorOutlineOutlines")
+						configHelpers.input("editorOutlineInlines")
+					end
+				)
 			end)
 			configHelpers.treeNode("UI", function()
 				configHelpers.doc("editor_visuals_UI")
