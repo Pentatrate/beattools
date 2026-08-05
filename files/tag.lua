@@ -3,6 +3,7 @@ local tag = {
 	bounds = {},
 	modtime = {},
 	lastModtimeChecked = {},
+	lastModtimeChanged = {},
 
 	cache = {},
 	access = {},
@@ -49,6 +50,14 @@ function tag.initTag(tagName) -- false if successful, true if failed, nil if fir
 
 	tag.lastModtimeChecked[tagName] = love.timer.getTime()
 	if tag.events[tagName] and info.modtime == tag.modtime[tagName] then return false end
+
+	if not tag.lastModtimeChanged[tagName] or tag.lastModtimeChanged[tagName] + 2 < love.timer.getTime() then
+		tag.lastModtimeChanged[tagName] = love.timer.getTime()
+		return false
+	end
+	if not (tag.lastModtimeChanged[tagName] and tag.lastModtimeChanged[tagName] + 1 < love.timer.getTime()) then
+		return false
+	end
 
 	-- i could add more checks for invalid stuff, but it was never needed before this tag system rework anyways
 	tag.events[tagName] = dpf.loadJson(path)

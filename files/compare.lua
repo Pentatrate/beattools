@@ -39,7 +39,7 @@ if beattools and beattools.test and beattools.test.compare then
 end
 
 compare.parts = {
-	velocity = { 132, 260, 420, 596, 788, 948, 1012, 1124 }
+	velocity = { -1, 132, 260, 420, 596, 788, 948, 1012, 1124 }
 }
 compare.currentCollab = "velocity"
 
@@ -67,7 +67,7 @@ function compare.getPartBounds(part)
 	if part == "merged" then
 		return 132, 1012
 	end
-	return compare.parts[compare.currentCollab][part - 1], compare.parts[compare.currentCollab][part]
+	return compare.parts[compare.currentCollab][part], compare.parts[compare.currentCollab][part + 1]
 end
 
 function compare.getNextChange(new2)
@@ -649,7 +649,7 @@ end
 
 function compare.checkMerge()
 	modlog(mod, "STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING")
-	modlog(mod, compare.new1Stats.part, compare.new2Stats.part)
+	modlog(mod, compare.new1Stats.part, compare.new2Stats.part, compare.getPartBounds(compare.new1Stats.part), compare.getPartBounds(compare.new2Stats.part), nil)
 	if compare.new1Stats.part == compare.new2Stats.part then
 		modlog(mod, "SAME PART")
 		modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
