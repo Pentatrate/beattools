@@ -302,7 +302,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end)
 	end
 
-	if eventVisuals.getEventType(event.type) == "tag" and utilitools.files.beattools.tag.initTag(event.tag) then
+	if mod.config.invalidTags and eventVisuals.getEventType(event.type) == "tag" and utilitools.files.beattools.tag.initTag(event.tag) then
 		setColor(mod.config.durationSameEasingColor.r, mod.config.durationSameEasingColor.g, mod.config.durationSameEasingColor.b, 1)
 		love.graphics.draw(sprites.editor.warning, pos[1], pos[2], 0, 1, 1, 11, 11)
 	end

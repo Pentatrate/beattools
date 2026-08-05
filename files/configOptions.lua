@@ -1286,6 +1286,13 @@ return {
 		tooltips = { short = "testestestestestestestestestestestest" },
 		default = ""
 	},
+	invalidTags = {
+		type = "bool",
+		name = "Invalid Tags",
+		tooltips = { short = "Marks invalid tags" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
