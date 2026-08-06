@@ -1,0 +1,32 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Song select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if not v.hidden then'''
+payload = '''if not v.hidden or mods.beattools.config.unhideVariants then'''
+position = "at"
+target = "states/SongSelect.lua"
+
+# Song select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if variant.hidden then'''
+payload = '''if variant.hidden and not mods.beattools.config.unhideVariants then'''
+position = "at"
+target = "obj/Map/LevelQuark.lua"
+
+# Song select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''variant.display = 'HIDDEN VARIANT!!!'
+'''
+payload = '''if not mods.beattools.config.unhideVariants then variant.display = 'HIDDEN VARIANT!!!' end'''
+position = "at"
+target = "obj/LevelManager.lua"

@@ -205,6 +205,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.doc("levelSelect_features")
 			configHelpers.input("ignoreLoopPoints")
 			configHelpers.input("rateModLimits")
+			configHelpers.input("unhideVariants")
 			imgui.Separator()
 			imgui.BeginDisabled() configHelpers.input("levelSelectDynamicLoading") imgui.EndDisabled()
 			imgui.Separator()

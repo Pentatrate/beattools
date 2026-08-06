@@ -3,11 +3,36 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# Pop out ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Json data ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''error(string.format("%s at line %d col %d", msg, line_count, col_count))'''
-payload = '''error(string.format("%s at line %d col %d: %s", msg, line_count, col_count, str))'''
+payload = '''error(string.format("%s: %s at line %d col %d: %s", json.file or "UNKNOWN FILE", msg, line_count, col_count, str))'''
 position = "at"
 target = "lib/json.lua"
+
+# File data ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''cf = json.encode(w)'''
+payload = '''
+json.file = f
+cf = json.encode(w)
+json.file = nil
+'''
+position = "at"
+target = "lib/dpf.lua"
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''return json.decode(cf)'''
+payload = '''
+json.file = f
+local e = json.decode(cf)
+json.file = nil
+return e
+'''
+position = "at"
+target = "lib/dpf.lua"

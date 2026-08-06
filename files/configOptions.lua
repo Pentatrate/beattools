@@ -1306,6 +1306,13 @@ return {
 		tooltips = { short = "Use 0 for no limit" },
 		default = 6
 	},
+	unhideVariants = {
+		type = "bool",
+		name = "Unhide Variants",
+		tooltips = { short = "Shows hidden variants in Atom Map and Song Select" },
+		default = false,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
