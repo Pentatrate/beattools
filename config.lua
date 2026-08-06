@@ -174,6 +174,11 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				configHelpers.input("accBarColors")
 				configHelpers.input("accBarSmooth")
 			end)
+			imgui.Separator()
+			configHelpers.input("bounceCount")
+			if mod.config.bounceCount then
+				configHelpers.input("bounceCountMax")
+			end
 		end)
 		configHelpers.treeNode("Features", function()
 			configHelpers.doc("game_features")

@@ -1,0 +1,29 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Bounce Count ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''love.graphics.scale(xScale*radius,yScale*radius)'''
+payload = '''
+
+if mods.beattools.config.bounceCount then
+	local points = math.max(3, self.bounces + 2)
+	if mods.beattools.config.bounceCountMax > 3 then
+		points = math.min(points, mods.beattools.config.bounceCountMax)
+	end
+	local angleDiff = 360 / points
+	self.vertices = {}
+	for i = 0, points - 1 do
+		local angle = (i * angleDiff + angleDiff / 2) % 360
+		local p = helpers.rotate(1, angle, 0, 0)
+		table.insert(self.vertices, p[1])
+		table.insert(self.vertices, p[2])
+	end
+end
+'''
+position = "after"
+target = "obj/notes/Bounce.lua"

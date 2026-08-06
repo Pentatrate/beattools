@@ -18,8 +18,8 @@ return {
 		-- modlog(mod, e, type(e))
 		-- modlog(mod, utilitools.table.tableAmount(utilitools.internet.cache)))
 
-		local tooly = utilitools.files.beattools.tooly
-		beattools.test = tooly.calculatePath()
+		-- local tooly = utilitools.files.beattools.tooly
+		-- beattools.test = tooly.calculatePath()
 
 		-- utilitools.files.beattools.tag.getList()
 
@@ -47,6 +47,16 @@ return {
 		-- 		modlog(mod, index, change.text, temp.time, change.withinTime, temp.angle, utilitools.string.concat(utilitools.string.concat(temp.type, temp.var), temp.id), change.reason and table.concat(change.reason, ", ") or nil)
 		-- 	end
 		-- end
+		for index, change in ipairs(utilitools.files.beattools.compare.new1Stats.total) do
+			if not change.resolved then
+				local temp = change.event2 or change.event
+				-- if utilitools.files.beattools.eventStacking.getType(temp) == "func" then
+				modlog(mod, index, change.text, temp.time, change.withinTime, temp.angle, utilitools.string.concat(utilitools.string.concat(temp.type, temp.var), temp.id), change.reason and table.concat(change.reason, ", ") or nil)
+				modlog(mod, temp)
+				-- end
+				break
+			end
+		end
 	end,
 	toggleMenuMusic = function()
 		if cs.menuMusicManager then

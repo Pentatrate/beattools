@@ -1293,6 +1293,19 @@ return {
 		default = true,
 		off = false
 	},
+	bounceCount = {
+		type = "bool",
+		name = "Bounce Count",
+		tooltips = { short = "Makes bounces have their sides increase with the amount of bounces" },
+		default = false,
+		off = false
+	},
+	bounceCountMax = {
+		type = "int",
+		name = "Max Bounce Sides",
+		tooltips = { short = "Use 0 for no limit" },
+		default = 6
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

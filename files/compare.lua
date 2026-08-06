@@ -39,7 +39,7 @@ if beattools and beattools.test and beattools.test.compare then
 end
 
 compare.parts = {
-	velocity = { -1, 132, 260, 420, 596, 788, 948, 1012, 1124 }
+	velocity = { -2, 132, 260, 420, 596, 788, 948, 1012, 1124 }
 }
 compare.currentCollab = "velocity"
 
@@ -65,7 +65,7 @@ function compare.getPart()
 end
 function compare.getPartBounds(part)
 	if part == "merged" then
-		return 132, 1012
+		return -2, 1012
 	end
 	return compare.parts[compare.currentCollab][part], compare.parts[compare.currentCollab][part + 1]
 end
@@ -204,7 +204,7 @@ function compare.showChanges(new2)
 					change = changes[index]
 				end
 			end ]]
-			--[[ imgui.SameLine()
+			imgui.SameLine()
 			if imgui.Button("100 NEW") then
 				for i = 1, 100 do
 					change.resolved = "NEW"
@@ -213,7 +213,7 @@ function compare.showChanges(new2)
 					index = compare["new" .. (new2 and "2" or "1") .. "Index"]
 					change = changes[index]
 				end
-			end ]]
+			end
 		end
 	end
 end
@@ -534,6 +534,7 @@ function compare.compare(new2)
 
 	local function setColor(event2, r, g, b)
 		if not compare.updateColors then return end
+		if part == "merged" then return end
 		newStats.map.linkedNew[tostring(event2)].editorOutline = { r = r, g = g, b = b }
 	end
 
@@ -650,7 +651,7 @@ end
 function compare.checkMerge()
 	modlog(mod, "STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING")
 	modlog(mod, compare.new1Stats.part, compare.new2Stats.part, compare.getPartBounds(compare.new1Stats.part), compare.getPartBounds(compare.new2Stats.part), nil)
-	if compare.new1Stats.part == compare.new2Stats.part then
+	if compare.new1Stats.part ~= "merged" and compare.new1Stats.part == compare.new2Stats.part then
 		modlog(mod, "SAME PART")
 		modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
 		return false
@@ -660,15 +661,17 @@ function compare.checkMerge()
 		compare.new1Stats, compare.new2Stats = compare.new2Stats, compare.new1Stats
 		compare.new1Index, compare.new2Index = compare.new2Index, compare.new1Index
 	end
-	for _, ease in ipairs(compare.new1Stats.setConverted.newEases) do
-		if compare.new2Stats.set.newEases[ease] then
-			local new1 = compare.new1Stats.map.newEasesMax[ease]
-			local new2 = compare.new2Stats.map.newEasesMin[ease]
-			local new1Time = new1.time + (new1.duration or 0) + (new1.repeats or 0) * (new1.repeatDelay or 1)
-			local new2Time = new2.time
-			local overlap = new1Time > new2Time or new1.time == new2.time
-			if overlap then
-				modlog(mod, "EASE", ease, new1.time, new1Time, new2Time, overlap)
+	if not (compare.new1Stats.part == "merged" and compare.new2Stats.part == "merged") then
+		for _, ease in ipairs(compare.new1Stats.setConverted.newEases) do
+			if compare.new2Stats.set.newEases[ease] then
+				local new1 = compare.new1Stats.map.newEasesMax[ease]
+				local new2 = compare.new2Stats.map.newEasesMin[ease]
+				local new1Time = new1.time + (new1.duration or 0) + (new1.repeats or 0) * (new1.repeatDelay or 1)
+				local new2Time = new2.time
+				local overlap = new1Time > new2Time or new1.time == new2.time
+				if overlap then
+					modlog(mod, "EASE", ease, new1.time, new1Time, new2Time, overlap)
+				end
 			end
 		end
 	end
@@ -688,19 +691,21 @@ function compare.checkMerge()
 	for _, event2 in ipairs(compare.new1Stats.mapConverted.changed2) do
 		checkEvent2(event2)
 	end
-	for _, id in ipairs(compare.new1Stats.setConverted.decoIds) do
-		if compare.new2Stats.set.decoIds[id] then
-			modlog(mod, "DECO ID", id)
+	if not (compare.new1Stats.part == "merged" and compare.new2Stats.part == "merged") then
+		for _, id in ipairs(compare.new1Stats.setConverted.decoIds) do
+			if compare.new2Stats.set.decoIds[id] then
+				modlog(mod, "DECO ID", id)
+			end
 		end
-	end
-	for _, sprite in ipairs(compare.new1Stats.setConverted.decoSprites) do
-		if compare.new2Stats.set.decoSprites[sprite] then
-			modlog(mod, "DECO SPRITE", sprite)
+		for _, sprite in ipairs(compare.new1Stats.setConverted.decoSprites) do
+			if compare.new2Stats.set.decoSprites[sprite] then
+				modlog(mod, "DECO SPRITE", sprite)
+			end
 		end
-	end
-	for _, id in ipairs(compare.new1Stats.setConverted.textdecoIds) do
-		if compare.new2Stats.set.textdecoIds[id] then
-			modlog(mod, "TEXTDECO ID", id)
+		for _, id in ipairs(compare.new1Stats.setConverted.textdecoIds) do
+			if compare.new2Stats.set.textdecoIds[id] then
+				modlog(mod, "TEXTDECO ID", id)
+			end
 		end
 	end
 	modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
@@ -757,9 +762,9 @@ function compare.merge()
 
 	table.sort(toRemove, function(a, b) return a.i < b.i end)
 	for i = #toRemove, 1, -1 do
-		local check, reason = utilitools.files.beattools.undo.areSimilar(toRemove[i].event, merged[toRemove[i].i])
+		local check, reason = utilitools.files.beattools.undo.areSimilar(toRemove[i].event, merged[toRemove[i].i], nil, 1)
 		if not check then
-			modlog(mod, toRemove[i].i, reason)
+			modlog(mod, toRemove[i].i, reason --[[ , toRemove[i].event, merged[toRemove[i].i] ]] )
 		end
 		table.remove(merged, toRemove[i].i)
 	end
