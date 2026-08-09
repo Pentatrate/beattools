@@ -35,3 +35,4 @@ if imgui.BeginListBox("##palette", size) then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

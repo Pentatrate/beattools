@@ -18,3 +18,4 @@ if self.multiselect and #self.multiselect.events == 0 and #self.markers == 0 the
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

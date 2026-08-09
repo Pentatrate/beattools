@@ -18,6 +18,7 @@ pattern = '''log('loaded event "'..info.name..'" ('..info.event..eType..')')'''
 payload = '''-- log('loaded event "'..info.name..'" ('..info.event..eType..')')'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -26,6 +27,7 @@ pattern = "print(valueString)"
 payload = "print('['..tostring(environment)..'] '..valueString)"
 position = "at"
 target = "lib/logging.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -39,6 +41,7 @@ log.display.steam = 0
 '''
 position = "before"
 target = "lib/logging.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -47,6 +50,7 @@ pattern = "log('loading costume '.. name)"
 payload = "-- log('loading costume '.. name)"
 position = "at"
 target = "obj/Player.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
@@ -55,6 +59,7 @@ pattern = 'log("made entity ".. name .." from " ..fname)'
 payload = '-- log("made entity ".. name .." from " ..fname)'
 position = "at"
 target = "lib/entityman.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -63,6 +68,7 @@ pattern = "print('id is ' .. id)"
 payload = "-- print('id is ' .. id)"
 position = "at"
 target = "levelformat/events/Vfx/Deco/deco.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -71,3 +77,4 @@ pattern = 'log("lovebpm end")'
 payload = '-- log("lovebpm end")'
 position = "at"
 target = "lib/lovebpm.lua"
+times = 1

@@ -1,0 +1,114 @@
+[manifest]
+dump_lua = true
+priority = 1
+version = "1.0.0"
+
+# Hold detect ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local holdEndSelection = {}'''
+payload = ''''''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+table.insert(self.overlappingEvents, i)
+table.insert(holdEndSelection, i)
+'''
+payload = '''table.insert(self.overlappingEvents, { event = i, holdEndSelected = true })'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+for _, v in ipairs(holdEndSelection) do
+	if v == self.overlappingEvents[1] then
+		self.holdEndSelected = true
+		break
+	end
+end
+'''
+payload = '''if self.overlappingEvents[1].holdEndSelected then self.holdEndSelected = true end'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# Other detect ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''table.insert(self.overlappingEvents, i)'''
+payload = '''table.insert(self.overlappingEvents, { event = i })'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local event = helpers.copy(self.level.events[self.overlappingEvents[1]])'''
+payload = '''local event = helpers.copy(self.level.events[self.overlappingEvents[1].event])'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.selectedEvent = self.level.events[self.overlappingEvents[1]]'''
+payload = '''self.selectedEvent = self.level.events[self.overlappingEvents[1].event]'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# Overlapping window ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''Event.info[e.type].name .. ' (ID ' .. v .. ')','''
+payload = '''Event.info[e.type].name .. (v2.holdEndSelected and " End" or "") .. (v2.bounceSelected and " (Bounce " .. v2.bounceSelected .. ")" or "") .. ' (ID ' .. v .. ')','''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local e = self.level.events[v]'''
+payload = '''
+local v2 = v
+v = v2.event
+'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.selectedEvent = self.level.events[v]'''
+payload = '''
+if v2.holdEndSelected then self.holdEndSelected = true end
+if v2.bounceSelected then self.bounceSelected = v2.bounceSelected self.bounceSelectTime = 0 end
+'''
+position = "after"
+target = "states/Editor.lua"
+times = 1
+
+# Event editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''imgui.Text("Editing " .. Event.info[self.selectedEvent.type].name)'''
+payload = '''imgui.Text("Editing " .. Event.info[self.selectedEvent.type].name .. (self.holdEndSelected and " End" or "") .. (self.bounceSelected and " (Bounce " .. self.bounceSelected .. ")" or ""))'''
+position = "at"
+target = "states/Editor.lua"
+times = 1

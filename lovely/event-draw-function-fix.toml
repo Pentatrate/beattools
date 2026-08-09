@@ -17,6 +17,7 @@ end
 payload = '''local editorDraw = sprites.editor.events.textdeco'''
 position = "at"
 target = "levelformat/events/Vfx/textdeco.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -31,6 +32,7 @@ end
 payload = '''local editorDraw = sprites.editor.events.advancetextdeco'''
 position = "at"
 target = "levelformat/events/Vfx/advancetextdeco.lua"
+times = 1
 
 # Bookmark inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -46,6 +48,7 @@ end
 payload = '''local editorDraw = sprites.editor.events.bookmark'''
 position = "at"
 target = "levelformat/events/Editor/bookmark.lua"
+times = 1
 
 # Comment inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -60,6 +63,7 @@ end
 payload = '''local editorDraw = sprites.editor.events.comment'''
 position = "at"
 target = "levelformat/events/Editor/comment.lua"
+times = 1
 
 # Extratap inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -75,3 +79,4 @@ end
 payload = '''local editorDraw = sprites.editor.events.extratap'''
 position = "at"
 target = "levelformat/events/Notes/extraTap.lua"
+times = 1

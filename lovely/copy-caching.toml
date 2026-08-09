@@ -6,11 +6,11 @@ version = "1.0.0"
 # Copy caching ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-match_indent = true
+match_indent = true 
 pattern = '''
 self.copy = nil
 self.copySize = nil
-'''
+''' 
 payload = '''
 if mods.beattools.config.copyCaching then
 	self.copy = mods.beattools.config.copyCache.copy
@@ -21,25 +21,25 @@ else
 	self.copy = nil
 	self.copySize = nil
 end
-'''
-position = "at"
-target = "states/Editor.lua"
-times = 1
+''' 
+position = "at" 
+target = "states/Editor.lua" 
+times = 1 ## Locked
 
 [[patches]]
 [patches.pattern]
-match_indent = true
+match_indent = true 
 pattern = '''
 end,
 'copy',
-'''
+''' 
 payload = '''
 	mods.beattools.config.copyCache = {}
 	mods.beattools.config.copyCache.copy = self.copy
 	mods.beattools.config.copyCache.copySize = self.copySize
 	mods.beattools.config.copyCache.multiselectCopyStartAngle = self.multiselectCopyStartAngle
 	mods.beattools.config.copyCache.multiselectCopyEndAngle = self.multiselectCopyEndAngle
-'''
-position = "before"
-target = "states/Editor.lua"
-times = 1
+''' 
+position = "before" 
+target = "states/Editor.lua" 
+times = 1 ## Locked

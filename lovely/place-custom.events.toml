@@ -48,3 +48,4 @@ elseif self.placeEvent ~= '' and Event.info[self.placeEvent] then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

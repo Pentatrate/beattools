@@ -17,3 +17,4 @@ elseif bodyShape == "2p5d" then
 '''
 position = "at"
 target = "obj/Player.lua"
+times = 1

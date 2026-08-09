@@ -11,6 +11,7 @@ pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
 payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 # Ctrl + i menu resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -20,6 +21,7 @@ pattern = '''9999)'''
 payload = '''9999, mods.beattools.config.fullSize and "max" or nil)'''
 position = "at"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
@@ -40,6 +42,7 @@ function helpers.InputTextMultiline(label, text, size, size2)
 '''
 position = "at"
 target = "lib/imguihelper.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -48,6 +51,7 @@ pattern = '''imgui.InputTextMultiline(label, buffer, size)'''
 payload = '''imgui.InputTextMultiline(label, buffer, size, size2)'''
 position = "at"
 target = "lib/imguihelper.lua"
+times = 1
 
 # Input resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -60,6 +64,7 @@ local length = utilitools.imguiHelpers.getWidth(imguiUniqueName) - ((not mods.be
 '''
 position = "after"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -68,6 +73,7 @@ pattern = '''imgui.PushItemWidth(100)'''
 payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length) end'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 6
 
 [[patches]]
 [patches.pattern]
@@ -83,6 +89,7 @@ local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
 '''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -91,6 +98,7 @@ pattern = '''imgui.Text(propertyName)'''
 payload = '''imgui.Text(utilitools.imguiHelpers.visibleLabel(label))'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 3
 
 [[patches]]
 [patches.pattern]
@@ -99,6 +107,7 @@ pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%
 payload = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format(mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or "%.3f", event[propertyName]))'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -107,6 +116,7 @@ pattern = '''imgui.PushItemWidth(60)'''
 payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length * 1 - 4 * 2 - 19 * 2 + imgui.GetStyle().ItemInnerSpacing.x - imgui.GetStyle().ItemSpacing.x) end -- Penta: these values are hard coded in the parser lol'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.regex]
@@ -139,3 +149,4 @@ payload = '''
 '''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1

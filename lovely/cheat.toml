@@ -13,6 +13,7 @@ pattern = '''function GameManager:resetLevel()'''
 payload = '''	self.CHEATmaxBeat = nil'''
 position = "after"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -29,6 +30,7 @@ end
 '''
 position = "before"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -55,6 +57,7 @@ cs.cBeat = tempTime
 '''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 # Lag back in option ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -64,6 +67,7 @@ pattern = '''self.innerOptionsMenu:addOption('back', function() self.inOptionsMe
 payload = '''self.innerOptionsMenu:addBoolean({'beattoolsOptionsLagback', 'optionsEnabled', 'optionsDisabled'}, mods.beattools.config, 'lagBack', ySpacing * 6)'''
 position = "before"
 target = "states/SongSelect.lua"
+times = 1
 
 # Cheat in results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -73,6 +77,7 @@ pattern = '''cs.songOffset = 0'''
 payload = '''self.CHEATlagBack = 0'''
 position = "before"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -81,6 +86,7 @@ pattern = '''cs.levelinfo = self.levelinfo'''
 payload = '''cs.CHEATlagBack = self.gm.CHEATlagBack'''
 position = "after"
 target = "states/Game.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -89,6 +95,7 @@ pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
 payload = '''self.CHEATlagBack ~= 0 or'''
 position = "before"
 target = "states/Results.lua"
+times = 3
 
 [[patches]]
 [patches.pattern]
@@ -102,3 +109,4 @@ end
 '''
 position = "before"
 target = "states/Results.lua"
+times = 1

@@ -15,6 +15,7 @@ end
 '''
 position = "after"
 target = "lib/helpers.lua"
+times = 1
 
 # Undo save all ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -28,6 +29,7 @@ payload = '''
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -38,6 +40,7 @@ utilitools.files.beattools.undo.update()
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 # Undo true or nil ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -50,3 +53,4 @@ utilitools.files.beattools.undo.fakeRepeating = true
 '''
 position = "after"
 target = "obj/GameManager.lua"
+times = 1

@@ -18,6 +18,7 @@ payload = '''
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -26,6 +27,7 @@ pattern = '''love.graphics.setColor(0.75, 0.75, 0.75, 1)'''
 payload = '''love.graphics.setColor(mods.beattools.config.editorSnapColor.r, mods.beattools.config.editorSnapColor.g, mods.beattools.config.editorSnapColor.b, 1)'''
 position = "at"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
@@ -34,6 +36,7 @@ pattern = '''color('black')'''
 payload = '''love.graphics.setColor(mods.beattools.config.editorBlackColor.r, mods.beattools.config.editorBlackColor.g, mods.beattools.config.editorBlackColor.b, 1)'''
 position = "at"
 target = "states/Editor.lua"
+times = 3
 
 [[patches]]
 [patches.pattern]
@@ -42,6 +45,7 @@ pattern = '''color()'''
 payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 position = "at"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
@@ -50,6 +54,7 @@ pattern = '''color('white')'''
 payload = '''love.graphics.setColor(mods.beattools.config.editorBgColor.r, mods.beattools.config.editorBgColor.g, mods.beattools.config.editorBgColor.b, 1)'''
 position = "at"
 target = "states/Editor.lua"
+times = 2
 
 # Player colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -77,3 +82,4 @@ end, {
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

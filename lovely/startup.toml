@@ -19,6 +19,7 @@ utilitools.files.beattools.startup()
 '''
 position = "after"
 target = "main.lua"
+times = 1
 
 # Imgui colors ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -51,3 +52,4 @@ end
 '''
 position = "after"
 target = "main.lua"
+times = 1

@@ -21,6 +21,7 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -36,6 +37,7 @@ end
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
@@ -56,6 +58,7 @@ payload = '''
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 # Menumusicmanager in Song Select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -71,6 +74,7 @@ cLevel = filename
 '''
 position = "at"
 target = "states/SongSelect.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -85,6 +89,7 @@ end
 '''
 position = "after"
 target = "states/SongSelect.lua"
+times = 1
 
 # Inject on playtest ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -100,6 +105,7 @@ payload = '''
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -115,6 +121,7 @@ function st:stopLevel(dontUnmute)
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 # Playtest restart and lagback fix  ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -138,3 +145,4 @@ if maininput:pressed("back") then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

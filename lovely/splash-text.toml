@@ -141,6 +141,7 @@ beattools.splashes.additional = additionalSplashes
 '''
 position = "before"
 target = "preload/splashes.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -155,6 +156,7 @@ beattools.splashes.added = helpers.copy(splashes)
 '''
 position = "after"
 target = "preload/splashes.lua"
+times = 1
 
 # Birthdays and date stuff ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -164,6 +166,7 @@ pattern = '''text = "Happy birthday, yeetyote!",'''
 payload = '''text = "Happy birthday, {yeetyote|Gotchfutchian}!",'''
 position = "at"
 target = "preload/splashes.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -209,6 +212,7 @@ payload = '''
 '''
 position = "before"
 target = "preload/splashes.lua"
+times = 1
 
 # Adds splashes to splash selector ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -221,6 +225,7 @@ beattools.splashes.crankful = crankful
 '''
 position = "before"
 target = "preload/splashes.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -235,6 +240,7 @@ beattools.splashes.specialConditionLib = specialCondition
 '''
 position = "before"
 target = "preload/splashes.lua"
+times = 1
 
 # Adds splashes to randomiser ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -369,6 +375,7 @@ else
 '''
 position = "at"
 target = "preload/splashes.lua"
+times = 1
 
 # Splash selector ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -382,3 +389,4 @@ utilitools.files.beattools.splashes.imgui()
 '''
 position = "after"
 target = "states/Menu.lua"
+times = 1

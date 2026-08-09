@@ -8,15 +8,17 @@ version = "1.0.0"
 [patches.pattern]
 match_indent = true
 pattern = '''self.overlappingEvents = {}'''
-payload = '''local prevOverlapping = self.overlappingEvents
+payload = '''
+local prevOverlapping = self.overlappingEvents
 local prevBounceSelect = self.bounceSelected
 local prevBounceSelectTime = self.bounceSelectTime
 self.bounceSelected = false
 self.bounceSelectTime = 0
 self.bounceSelectAccumulation = 0
-local bounceSelection = {}'''
+'''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -27,36 +29,39 @@ payload = '''
 if mods.beattools.config.bounceDragging and v.type == "bounce" and (v.bounces or 1) > 0 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then
 	for ii = 1, (v.bounces or 1) do
 		local pos2 = self:getPosition((mods.beattools.config.displayEndAngle and v.endAngle or v.angle) + (v.rotation or 0) * ii, v.time + (v.delay or 1) * ii)
-		if helpers.collide(
+		if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
 			{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 			{ x = pos2[1] - 8, y = pos2[2] - 8, width = 16, height = 16 }) then
-			table.insert(self.overlappingEvents, i)
-			table.insert(bounceSelection, { i, ii })
+			if overlap then
+				table.insert(overlap, i)
+			else
+				table.insert(self.overlappingEvents, { event = i, bounceSelected = ii })
+			end
 		end
 	end
 end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.pattern]
 match_indent = true
 pattern = '''for _, v in ipairs(holdEndSelection) do'''
 payload = '''
-for _, v in ipairs(bounceSelection) do
-	if v[1] == self.overlappingEvents[1] then
-		self.bounceSelected = v[2]
-		self.bounceSelectTime = love.timer.getTime()
-		if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1] == self.overlappingEvents[1] and prevBounceSelectTime and prevBounceSelectTime ~= 0 and self.bounceSelectTime - prevBounceSelectTime <= 0.5 then
-			modlog(mods.beattools, "Double clicked bounce")
-		end
-		break
+if self.overlappingEvents[1].bounceSelected then
+	self.bounceSelected = self.overlappingEvents[1].bounceSelected
+	self.bounceSelectTime = love.timer.getTime()
+	if prevOverlapping and #prevOverlapping == 1 and prevOverlapping[1].event == self.overlappingEvents[1].event and prevOverlapping[1].bounceSelected == self.overlappingEvents[1].bounceSelected and prevBounceSelectTime and prevBounceSelectTime ~= 0 and self.bounceSelectTime - prevBounceSelectTime <= 0.5 then
+		self.bounceSelectTime = -1
+		modlog(mods.beattools, "Double clicked bounce")
 	end
 end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -83,6 +88,7 @@ elseif not self.holdEndSelected then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -112,3 +118,4 @@ elseif not self.holdEndSelected then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

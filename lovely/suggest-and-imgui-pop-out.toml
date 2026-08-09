@@ -21,6 +21,7 @@ end
 '''
 position = "after"
 target = "obj/GameManager.lua"
+times = 2
 
 # Pop out ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -30,7 +31,7 @@ pattern = '''return ffi.string(buffer)'''
 payload = '''return utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(buffer))'''
 position = "at"
 target = "lib/imguihelper.lua"
-
+times = 3
 
 [[patches]]
 [patches.pattern]
@@ -45,14 +46,22 @@ return utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(buffer), t
 '''
 position = "at"
 target = "lib/imguihelper.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''event[propertyName] = ffi.string(numptr)'''
-payload = '''event[propertyName] = utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(numptr), propertyType == "multiline")'''
+pattern = '''
+imgui.InputText(imguiUniqueName, numptr, 9999)
+event[propertyName] = ffi.string(numptr)
+'''
+payload = '''
+imgui.InputText(imguiUniqueName, numptr, 9999)
+event[propertyName] = utilitools.files.beattools.imguiPopOut.imgui(label, ffi.string(numptr), propertyType == "multiline")
+'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 # Math parsor is not worth it and not easy to establish compat with
 # [[patches]]
@@ -62,3 +71,4 @@ target = "obj/GameManager.lua"
 # payload = '''local newPropertyValue = utilitools.files.beattools.imguiPopOut.imgui("##"..imguiUniqueName, ffi.string(numptr))'''
 # position = "at"
 # target = "obj/GameManager.lua"
+# times = 1

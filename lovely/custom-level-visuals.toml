@@ -13,6 +13,7 @@ local beattoolsNoColors = true
 '''
 position = "after"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -43,6 +44,8 @@ end
 '''
 position = "before"
 target = "obj/GameManager.lua"
+times = 1
+
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -55,3 +58,4 @@ end
 '''
 position = "before"
 target = "obj/GameManager.lua"
+times = 1

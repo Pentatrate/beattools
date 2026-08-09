@@ -17,6 +17,7 @@ mods.beattools.config.customAngleSnap = self.customAngleSnap
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -31,6 +32,7 @@ self.customAngleSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattool
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -43,6 +45,7 @@ mods.beattools.config.customBeatSnap = self.customBeatSnap
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -57,3 +60,4 @@ self.customBeatSnap = mods.beattools.config.saveAngleBeatSnap and mods.beattools
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

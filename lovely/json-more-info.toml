@@ -11,6 +11,7 @@ pattern = '''error(string.format("%s at line %d col %d", msg, line_count, col_co
 payload = '''error(string.format("%s: %s at line %d col %d: %s", json.file or "UNKNOWN FILE", msg, line_count, col_count, str))'''
 position = "at"
 target = "lib/json.lua"
+times = 1
 
 # File data ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -24,6 +25,8 @@ json.file = nil
 '''
 position = "at"
 target = "lib/dpf.lua"
+times = 1
+
 [[patches]]
 [patches.pattern]
 match_indent = true
@@ -36,3 +39,4 @@ return e
 '''
 position = "at"
 target = "lib/dpf.lua"
+times = 1

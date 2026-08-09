@@ -11,6 +11,7 @@ pattern = '''self:leave()'''
 payload = '''utilitools.config.save(mods.beattools)'''
 position = "before"
 target = "states/Editor.lua"
+times = 2
 
 # Dont save parameters ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
@@ -24,3 +25,4 @@ target = "states/Editor.lua"
 # '''
 # position = "after"
 # target = "obj/LevelManager.lua"
+# times = 1

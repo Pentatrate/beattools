@@ -24,6 +24,7 @@ I'll just do both for now?
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -37,6 +38,7 @@ payload = '''
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -56,6 +58,7 @@ I'll just do both for now?
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -66,6 +69,7 @@ st:setFgDraw(function(self)
 payload = ''']]'''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 # Removing redundant original visuals code ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -146,6 +150,7 @@ end
 payload = ''''''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -158,6 +163,7 @@ end
 payload = ""
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -181,3 +187,4 @@ end
 payload = ""
 position = "at"
 target = "states/Editor.lua"
+times = 1

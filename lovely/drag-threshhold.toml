@@ -11,3 +11,4 @@ pattern = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.r
 payload = '''if helpers.distance({ self.lastClickX, self.lastClickY }, { mouse.rx, mouse.ry }) >= mods.beattools.config.dragThreshhold then'''
 position = "at"
 target = "states/Editor.lua"
+times = 1

@@ -15,6 +15,7 @@ else event.repeatDelay = nil end
 '''
 position = "at"
 target = "levelformat/events/Vfx/ease.lua"
+times = 1
 
 # Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -55,3 +56,4 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1

@@ -20,6 +20,7 @@ if self.variant then
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.regex]
@@ -35,3 +36,4 @@ pattern = '''charter = 'Charter','''
 payload = '''charter = mods.beattools.config.charter,'''
 position = "at"
 target = "obj/LevelManager.lua"
+times = 1

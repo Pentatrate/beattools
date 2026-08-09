@@ -11,6 +11,7 @@ pattern = '''oldval = event[propertyName] or false'''
 payload = '''-- oldval = event[propertyName] or (properties.trueOrNil and nil or false) -- disabled this line for proper undo true or nil tracking'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -25,6 +26,7 @@ event[propertyName] = numptr[0] or (properties.trueOrNil and nil or false)
 '''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -33,3 +35,4 @@ pattern = '''oldval = oldval == nil and properties.default or oldval'''
 payload = '''oldval = (oldval == nil and properties.default) or (oldval ~= nil and oldval)'''
 position = "at"
 target = "obj/GameManager.lua"
+times = 1

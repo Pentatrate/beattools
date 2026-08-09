@@ -11,6 +11,7 @@ pattern = '''if not v.hidden then'''
 payload = '''if not v.hidden or mods.beattools.config.unhideVariants then'''
 position = "at"
 target = "states/SongSelect.lua"
+times = 1
 
 # Song select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -20,6 +21,7 @@ pattern = '''if variant.hidden then'''
 payload = '''if variant.hidden and not mods.beattools.config.unhideVariants then'''
 position = "at"
 target = "obj/Map/LevelQuark.lua"
+times = 1
 
 # Song select ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -30,3 +32,4 @@ pattern = '''variant.display = 'HIDDEN VARIANT!!!'
 payload = '''if not mods.beattools.config.unhideVariants then variant.display = 'HIDDEN VARIANT!!!' end'''
 position = "at"
 target = "obj/LevelManager.lua"
+times = 1

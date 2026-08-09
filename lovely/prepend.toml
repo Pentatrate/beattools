@@ -17,3 +17,4 @@ pattern = '''local st = Gamestate:new('Editor')'''
 payload = ''''''
 position = "at"
 target = "states/Editor.lua"
+times = 1

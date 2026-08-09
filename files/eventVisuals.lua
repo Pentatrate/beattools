@@ -1,7 +1,7 @@
 local eventVisuals = {
 	step = 4,
 	eventCache = {},
-	holds = { hold = true, mineHold = true, trace = true, tashold = true },
+	holds = { hold = true, mineHold = true, trace = true, tashold = true, inverseHold = true },
 	hasRepeat = {
 		ease = true,
 		tag = true,
@@ -354,14 +354,20 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 
 		if isVisible(time) then
-			if inBounds(pos, 11) then
+			local pos2 = pos
+			if cs.holdEndSelected and eventVisuals.holds[event.type] then
+				pos2 = cs:getPosition(event.angle2, event.time + event.duration)
+			elseif cs.bounceSelected and event.type == "bounce" then
+				pos2 = cs:getPosition(event.angle + event.rotation * cs.bounceSelected, event.time + event.delay * cs.bounceSelected)
+			end
+			if inBounds(pos2, 11) then
 				if mod.config.whiteSelected ~= "off" then
 					setColor(mod.config.selectedBorderColor.r, mod.config.selectedBorderColor.g, mod.config.selectedBorderColor.b, mod.config.selectedBorderColor.a)
 				else
 					setColor(1, 1, 1, 1)
 				end
 				local sprite = sprites.editor[mod.config.whiteSelected ~= "off" and (mod.config.whiteSelected == "on" and "whiteSelected" or "whiteSelectedCut") or "selected"]
-				love.graphics.draw(sprite, pos[1], pos[2], 0, 1, 1, 11, 11)
+				love.graphics.draw(sprite, pos2[1], pos2[2], 0, 1, 1, 11, 11)
 			end
 		end
 	end

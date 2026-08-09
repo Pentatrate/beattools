@@ -11,6 +11,7 @@ pattern = "a"
 payload = "a"
 position = "at"
 target = "thisDoesntExist.lua"
+times = 1
 
 # Results ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
@@ -20,6 +21,7 @@ target = "thisDoesntExist.lua"
 # payload = "local minInvisAt, maxInvisAt, minStartInvis, maxStartInvis, minCombo, maxCombo = utilitools.files.beattools.noiseDither.clamp(mods.beattools.config.minInvisAt, mods.beattools.config.maxInvisAt, mods.beattools.config.minStartInvis, mods.beattools.config.maxStartInvis, mods.beattools.config.minCombo, mods.beattools.config.maxCombo)"
 # position = "before"
 # target = "states/Results.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -27,6 +29,7 @@ target = "thisDoesntExist.lua"
 # payload = "minStartInvis ~= 0 or maxStartInvis ~= 0 or"
 # position = "after"
 # target = "states/Results.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -60,6 +63,7 @@ target = "thisDoesntExist.lua"
 # '''
 # position = "before"
 # target = "states/Results.lua"
+# times = 1
 
 # # Block Fading ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # # Simple Sprites
@@ -70,6 +74,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self, self.missed)"
 # position = "before"
 # target = "obj/notes/Block.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -77,6 +82,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Block.lua"
+# times = 1
 
 # # Taps
 # [[patches]]
@@ -86,6 +92,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self)"
 # position = "after"
 # target = "obj/notes/Block.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -96,6 +103,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Block.lua"
+# times = 1
 
 # # Chevron
 # [[patches]]
@@ -105,6 +113,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self)"
 # position = "before"
 # target = "obj/notes/Block.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -112,6 +121,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Block.lua"
+# times = 1
 
 # # Extrataps
 # [[patches]]
@@ -121,6 +131,7 @@ target = "thisDoesntExist.lua"
 # payload = "\tutilitools.files.beattools.noiseDither.dither(self)"
 # position = "after"
 # target = "obj/notes/ExtraTap.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -128,6 +139,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/ExtraTap.lua"
+# times = 1
 
 # # Side Taps
 # [[patches]]
@@ -137,6 +149,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self)"
 # position = "after"
 # target = "obj/notes/Side.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -147,6 +160,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Side.lua"
+# times = 1
 
 # # Bounces
 # [[patches]]
@@ -156,6 +170,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self)"
 # position = "before"
 # target = "obj/notes/Bounce.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -166,6 +181,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Bounce.lua"
+# times = 1
 
 # # Traces
 # [[patches]]
@@ -175,6 +191,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self, self.doDithering)"
 # position = "at"
 # target = "obj/notes/Trace.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -182,6 +199,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "at"
 # target = "obj/notes/Trace.lua"
+# times = 1
 
 # # Holds
 # [[patches]]
@@ -191,6 +209,7 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(self, self.missed)"
 # position = "after"
 # target = "obj/notes/Hold.lua"
+# times = 1
 # [[patches]]
 # [patches.pattern]
 # match_indent = true
@@ -201,3 +220,4 @@ target = "thisDoesntExist.lua"
 # payload = "utilitools.files.beattools.noiseDither.dither(false)"
 # position = "after"
 # target = "obj/notes/Hold.lua"
+# times = 1

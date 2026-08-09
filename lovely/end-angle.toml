@@ -13,6 +13,7 @@ pattern = '''Event.property(self.selectedEvent, 'decimal', 'time', 'Beat to acti
 payload = '''local beattoolsTemp1 = self.selectedEvent.endAngle'''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -27,6 +28,7 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 # End angle drawing fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

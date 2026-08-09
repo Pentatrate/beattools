@@ -675,21 +675,22 @@ function compare.checkMerge()
 			end
 		end
 	end
-	local function checkEvent(event1)
-		if compare.new2Stats.map.missing[tostring(event1)] then
-			modlog(mod, "EVENT", event1.time, event1.angle, event1.type, event1.var)
+	local checked = {}
+	local function checkEvent(event, text)
+		if checked[tostring(event)] then
+			modlog(mod, "EVENT", text, checked[tostring(event)], event.time, event.angle, event.type, event.var)
 		end
+		checked[tostring(event)] = text
 	end
-	local function checkEvent2(event2)
-		if compare.new2Stats.map.changed2[tostring(event2)] then
-			modlog(mod, "EVENT", event2.time, event2.angle, event2.type, event2.var)
-		end
-	end
-	for _, event1 in ipairs(compare.new1Stats.mapConverted.missing) do
-		checkEvent(event1)
-	end
+	for _, event1 in ipairs(compare.new1Stats.mapConverted.missing) do checkEvent(event1, "deleted 1") end
 	for _, event2 in ipairs(compare.new1Stats.mapConverted.changed2) do
-		checkEvent2(event2)
+		checkEvent(compare.new1Stats.map.changed[tostring(event2)], "changed 1.1")
+		checkEvent(event2, "changed 1.2")
+	end
+	for _, event1 in ipairs(compare.new2Stats.mapConverted.missing) do checkEvent(event1, "deleted 2") end
+	for _, event2 in ipairs(compare.new2Stats.mapConverted.changed2) do
+		checkEvent(compare.new2Stats.map.changed[tostring(event2)], "changed 2.1")
+		checkEvent(event2, "changed 2.2")
 	end
 	if not (compare.new1Stats.part == "merged" and compare.new2Stats.part == "merged") then
 		for _, id in ipairs(compare.new1Stats.setConverted.decoIds) do

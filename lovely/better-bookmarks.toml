@@ -15,7 +15,7 @@ elseif self.currentlyDragging == "timelineSlider" and mods.beattools.config.bett
 '''
 position = "before"
 target = "states/Editor.lua"
-times = 1
+times = 1 ## Locked
 
 # Bookmark angle getting ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -36,6 +36,7 @@ cAngle = cAngle or 2 * math.pi * (self.editorBeat - currBookmarkBeat) / (nextBoo
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 3
 
 # Bookmark Visuals ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -55,7 +56,7 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
-times = 1
+times = 1 ## Locked
 
 [[patches]]
 [patches.pattern]
@@ -70,7 +71,7 @@ end
 '''
 position = "after"
 target = "states/Editor.lua"
-times = 1
+times = 1 ## Locked
 
 [[patches]]
 [patches.pattern]
@@ -102,7 +103,7 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
-times = 1
+times = 1 ## Locked
 
 [[patches]]
 [patches.pattern]
@@ -118,4 +119,4 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
-times = 1
+times = 1 ## Locked

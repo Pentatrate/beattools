@@ -16,6 +16,7 @@ end
 '''
 position = "before" # must be before for compat with ctrlSelect
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -30,3 +31,4 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1

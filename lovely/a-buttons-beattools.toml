@@ -1,6 +1,6 @@
 [manifest]
 dump_lua = true
-priority = 0
+priority = -1
 version = "1.0.0"
 
 # Fake repeat and (un)tagging buttons ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -76,3 +76,4 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1

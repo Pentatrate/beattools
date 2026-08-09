@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0" 
+version = "1.0.0"
 
 # Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -11,6 +11,7 @@ pattern = '''pos[1],pos[2] = math.floor(pos[1]),math.floor(pos[2])'''
 payload = '''pos[1],pos[2] = helpers.round(pos[1]),helpers.round(pos[2])'''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 # Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -20,6 +21,7 @@ pattern = '''if floor ~= false then'''
 payload = '''if beattools.stacking.stacking then pos[1], pos[2] = pos[1] + beattools.stacking.x, pos[2] + beattools.stacking.y end'''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 # Making the seletion hitbox offset as well ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -36,14 +38,24 @@ if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 3
 
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 then'''
-payload = '''if ((v.type == "hold") or (v.type == "mineHold") or (v.type == "trace")) and v.angle2 and ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] then'''
+pattern = '''
+if helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos2[1] - 8, y = pos2[2] - 8, width = 16, height = 16 }) and v.time + v.duration >= cs.cBeat then
+'''
+payload = '''
+if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
+	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
+	{ x = pos2[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos2[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }) and v.time + v.duration >= cs.cBeat then
+'''
 position = "at"
 target = "states/Editor.lua"
+times = 2
 
 [[patches]]
 [patches.regex]

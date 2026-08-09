@@ -16,6 +16,7 @@ payload = '''
 '''
 position = "after"
 target = "states/SongSelect.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -24,3 +25,4 @@ pattern = '''yTotal = yTotal + myHeight'''
 payload = '''if y - myHeight * 0.5 < 360 or y + myHeight * 0.5 > 0 then'''
 position = "after"
 target = "states/SongSelect.lua"
+times = 1

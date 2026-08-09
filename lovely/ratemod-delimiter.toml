@@ -11,6 +11,7 @@ pattern = '''self.innerOptionsMenu:addNumber('ratemod', self, 'rateMod', 0, 0.1,
 payload = '''self.innerOptionsMenu:addNumber('ratemod', self, 'rateMod', 0, 0.1, mods.beattools.config.rateModLimits and {0.01, 50} or {0.5, 5}, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
 position = "at"
 target = "states/SongSelect.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -19,3 +20,4 @@ pattern = '''self.innerOptionsMenu:addNumber("ratemod", self, "rateMod", 0, 0.1,
 payload = '''self.innerOptionsMenu:addNumber("ratemod", self, "rateMod", 0, 0.1, mods.beattools.config.rateModLimits and { 0.01, 50 } or { 0.5, 5 }, function() if cs.source then cs.source:setPitch(cs.rateMod) end end)'''
 position = "at"
 target = "states/AtomMap.lua"
+times = 1

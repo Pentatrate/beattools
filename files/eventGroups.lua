@@ -411,6 +411,8 @@ function eventGroups.officialLayers()
 				end
 			end
 		end
+	elseif layerStateNames[cs.layers.gameplay] ~= "show" or layerStateNames[cs.layers.vfx] ~= "show" then
+		eventGroups.initMinimal()
 	end
 end
 

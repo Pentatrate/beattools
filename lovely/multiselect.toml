@@ -11,6 +11,7 @@ pattern = '''self.multieditdeltamode = false'''
 payload = '''self.multieditdeltamode = (function () if mods.beattools.config.rememberMultiselectDelta then return mods.beattools.config.multiselectDelta end return false end)()'''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]
@@ -26,6 +27,7 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 # Multiselect angle range movement fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -43,6 +45,7 @@ end
 '''
 position = "at"
 target = "states/Editor.lua"
+times = 1
 
 # Better multiselect move ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -56,6 +59,7 @@ end
 '''
 position = "before"
 target = "states/Editor.lua"
+times = 1
 
 # Fix multiselect bug with untagger ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 # [[patches]]
@@ -65,6 +69,7 @@ target = "states/Editor.lua"
 # payload = '''if (function () for k, v in pairs(changed) do return true end return false end)() then'''
 # position = "at"
 # target = "states/Editor.lua" dont know, but i think this was fixed in 1.4.0?
+# times = 1
 
 [[patches]]
 [patches.pattern]
@@ -73,3 +78,4 @@ pattern = '''if first[k] ~= v then'''
 payload = '''if tostring(first[k]) ~= tostring(v) then'''
 position = "at"
 target = "states/Editor.lua"
+times = 1

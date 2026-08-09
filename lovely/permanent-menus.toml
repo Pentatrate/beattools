@@ -43,3 +43,4 @@ payload = '''
 imgui.DockSpace(imgui.GetID_Str("DockSpace"), imgui.ImVec2_Float(0.0, 0.0), imgui.ImGuiDockNodeFlags_PassthruCentralNode + (mods.beattools.config.stopImGuiResize and imgui.ImGuiDockNodeFlags_NoResize or 0) + (mods.beattools.config.stopImGuiMove and imgui.ImGuiDockNodeFlags_NoUndocking or 0), nil)
 '''
 match_indent = true
+times = 1

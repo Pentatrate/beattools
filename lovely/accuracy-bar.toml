@@ -102,3 +102,4 @@ end
 '''
 position = "before"
 target = "obj/GameManager.lua"
+times = 1

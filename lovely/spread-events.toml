@@ -12,14 +12,14 @@ payload = '''
 if mods.beattools.config.spreadButtons then
 	local beattoolsShowSpreadPrompt = true
 	for i, v in ipairs(self.overlappingEvents) do
-		if utilitools.files.beattools.eventStacking.getType(self.level.events[v]) == "img" and self.level.events[v].time ~= self.level.events[self.overlappingEvents[1]].time then
+		if utilitools.files.beattools.eventStacking.getType(self.level.events[v.event]) == "img" and self.level.events[v.event].time ~= self.level.events[self.overlappingEvents[1].event].time then
 			beattoolsShowSpreadPrompt = false
 		end
 	end
 	if beattoolsShowSpreadPrompt then
 		local function beattoolsGetSameTime(sameTime)
 			for i, v in ipairs(self.level.events) do
-				if v.time == self.level.events[self.overlappingEvents[1]].time then
+				if v.time == self.level.events[self.overlappingEvents[1].event].time then
 					table.insert(sameTime, v)
 				end
 			end
@@ -77,13 +77,13 @@ if mods.beattools.config.spreadButtons then
 			local beattoolsSameTime = {}
 			beattoolsGetSameTime(beattoolsSameTime)
 			for i, v in ipairs(self.overlappingEvents) do
-				v = self.level.events[v]
+				v = self.level.events[v.event]
 				if utilitools.files.beattools.eventStacking.getType(v) == "img" and beattoolsSameAngle(v, beattoolsSameTime) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
 			end
 			for i, v in ipairs(self.overlappingEvents) do
-				v = self.level.events[v]
+				v = self.level.events[v.event]
 				if utilitools.files.beattools.eventStacking.getType(v) == "img" and v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) then
 					v.angle = beattoolsSpread(mods.beattools.config.spreadSnap, beattoolsSameTime, nil, v)
 				end
@@ -95,13 +95,13 @@ if mods.beattools.config.spreadButtons then
 
 		beattoolsShowSpreadPrompt = true
 		for i, v in ipairs(self.overlappingEvents) do
-			if self.level.events[v].angle % 360 ~= self.level.events[self.overlappingEvents[1]].angle % 360 then
+			if self.level.events[v.event].angle % 360 ~= self.level.events[self.overlappingEvents[1].event].angle % 360 then
 				beattoolsShowSpreadPrompt = false
 			end
 		end
 		if beattoolsShowSpreadPrompt then
 			if imgui.Button("Spread all events at angle") then
-				local beattoolsSameTime, beattoolsAngle = {}, self.level.events[self.overlappingEvents[1]].angle % 360
+				local beattoolsSameTime, beattoolsAngle = {}, self.level.events[self.overlappingEvents[1].event].angle % 360
 				beattoolsGetSameTime(beattoolsSameTime)
 				for i, v in ipairs(beattoolsSameTime) do
 					if utilitools.files.beattools.eventStacking.getType(v) == "img" and v.angle % 360 == beattoolsAngle and (v.angle % 360 ~= beattoolsSnapAngle(v.angle, mods.beattools.config.spreadSnap) or beattoolsSameAngle(v, beattoolsSameTime)) then
@@ -135,3 +135,4 @@ end
 '''
 position = "after"
 target = "states/Editor.lua"
+times = 1
