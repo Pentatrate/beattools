@@ -113,6 +113,8 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			configHelpers.input("testKey")
 			configHelpers.input("testKey2")
 			configHelpers.input("testKey3")
+			configHelpers.input("testKey4")
+			configHelpers.input("testKey5")
 			imgui.Separator()
 			configHelpers.input("tooly")
 			configHelpers.input("compareWindow")

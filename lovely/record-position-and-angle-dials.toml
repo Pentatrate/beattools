@@ -95,7 +95,7 @@ if mods.beattools.config.mouseCoordsButton then
 end
 '''
 position = "after"
-target = "levelformat/events/Vfx/deco.lua"
+target = "levelformat/events/Vfx/Deco/deco.lua"
 times = 1
 
 [[patches]]
@@ -212,7 +212,7 @@ Event.property(event,'decimal','r', 'Rotation', {step = mods.beattools.config.de
 if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattools.angleSnap) end
 '''
 position = "at"
-target = "levelformat/events/Vfx/deco.lua"
+target = "levelformat/events/Vfx/Deco/deco.lua"
 times = 1
 
 # Paddles
@@ -258,5 +258,5 @@ match_indent = true
 pattern = '''Event.property(event,'decimal', 'r', 'Text rotation', {step = 1, optional = true, default = 0})'''
 payload = '''if mods.beattools.config.angleDials and event.r then event.r = utilitools.suggest.dial(event.r, "selectedEventR", beattools.angleSnap) end'''
 position = "after"
-target = "levelformat/events/Vfx/textdeco.lua"
+target = "levelformat/events/Vfx/Deco/textdeco.lua"
 times = 1

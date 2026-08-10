@@ -1,0 +1,54 @@
+-- Penta: copied from BBP and modified
+local function getLovelyInjectorWarnings()
+	local lovelyLogsPath = "Mods/lovely/log"
+
+	-- get the newest log file
+	local logPath = nil
+	local newestTime = 0
+	for _, item in ipairs(love.filesystem.getDirectoryItems(lovelyLogsPath)) do
+		if item:match("%.log$") then
+			local path = lovelyLogsPath .. "/" .. item
+			local info = love.filesystem.getInfo(path)
+
+			if info and info.modtime > newestTime then
+				newestTime = info.modtime
+				logPath = path
+			end
+		end
+	end
+
+	local warnList = {}
+
+	if logPath then
+		local content = love.filesystem.read(logPath)
+		for line in content:gmatch("[^\r\n]+") do
+			-- lovely warnings sometimes accidentally break up into two lines and this combines them again
+			local warning, count = line:gsub("^WARN %- %[♥%] ' on target '", "", 1)
+			if count > 0 and #warnList > 0 then
+				warnList[#warnList] = warnList[#warnList].."' on target '"..warning
+			else
+				-- regular warnings
+				warning, count = line:gsub("^WARN %- %[♥%]", "", 1)
+				if count > 0 then
+					table.insert(warnList, warning)
+				end
+			end
+		end
+	else
+		return "log file not found"
+	end
+
+	for i = #warnList, 1, -1 do
+		if not (warnList[i]:find("beattools\\lovely", 1, true) or warnList[i]:find("utilitools\\lovely", 1, true) or warnList[i]:find("quick-playtest\\lovely", 1, true) or warnList[i]:find("overdetailed_events_golden\\lovely", 1, true)) then
+			table.remove(warnList, i)
+		end
+	end
+
+	if #warnList == 0 then
+		return nil
+	end
+
+	return table.concat(warnList, "\n")
+end
+local warnings = getLovelyInjectorWarnings()
+if warnings then modlog(mod, "BEATTOOLS LOVELY WARNINGS:\n" .. warnings) end

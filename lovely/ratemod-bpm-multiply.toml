@@ -28,10 +28,7 @@ times = 2
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''
-*
-love.graphics.line(xBorder,bpmY+17,project.res.x,bpmY+17)
-'''
+pattern = '''love.graphics.printf(*,xBorder+xOffset,bpmY,wrapLimit*,'left')'''
 payload = '''
 local str2
 if str then
@@ -45,8 +42,7 @@ elseif mods.beattools.config.levelSelectMultiplyBpm and self.rateMod and self.ra
 else
 	str2 = level.bpm
 end
-love.graphics.printf(str2, xBorder + xOffset, bpmY, wrapLimit, "left")
-love.graphics.line(xBorder,bpmY+17,project.res.x,bpmY+17)
+love.graphics.printf(str2, xBorder + xOffset, bpmY, wrapLimit + 200, "left")
 '''
 position = "at"
 target = "states/SongSelect.lua"

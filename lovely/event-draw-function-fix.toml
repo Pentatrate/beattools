@@ -16,7 +16,7 @@ end
 '''
 payload = '''local editorDraw = sprites.editor.events.textdeco'''
 position = "at"
-target = "levelformat/events/Vfx/textdeco.lua"
+target = "levelformat/events/Vfx/Deco/textdeco.lua"
 times = 1
 
 [[patches]]
@@ -31,7 +31,7 @@ end
 '''
 payload = '''local editorDraw = sprites.editor.events.advancetextdeco'''
 position = "at"
-target = "levelformat/events/Vfx/advancetextdeco.lua"
+target = "levelformat/events/Vfx/Deco/advancetextdeco.lua"
 times = 1
 
 # Bookmark inconsistency fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====

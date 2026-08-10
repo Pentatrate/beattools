@@ -145,6 +145,18 @@
 			"extension": "lua",
 			"load": true
 		},
+		"test3": {
+			"extension": "lua",
+			"load": true
+		},
+		"test4": {
+			"extension": "lua",
+			"load": true
+		},
+		"test5": {
+			"extension": "lua",
+			"load": true
+		},
 		"noiseDither": {
 			"extension": "lua",
 			"load": true,

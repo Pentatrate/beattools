@@ -56,7 +56,8 @@ local tooly = {
 	allEvents = {},
 	alreadyInvalid = {},
 	path = nil,
-	eventCache = {}
+	eventCache = {},
+	rateMod = 1
 }
 
 local function isBetween(x, low, high)
@@ -74,7 +75,7 @@ function tooly.checkPaddleId(paddleId)
 end
 function tooly.msToBeat(time, ms)
 	local bpm, bpmC = utilitools.files.beattools.easing.getEase("setBPM", nil, time, nil, nil)
-	return GameManager:msToBeat(ms, bpm.bpm)
+	return GameManager:msToBeat(ms, bpm.bpm * tooly.rateMod)
 end
 function tooly.getWidth(range)
 	local a1, a2 = range[1], range[2]
@@ -1386,8 +1387,9 @@ end
 
 
 function tooly.calculatePath()
-	if not (cs.name == "Editor" and not cs.editMode) or not mod.config.tooly then return end
+	if not (cs.name == "Editor" and cs.editMode) or not mod.config.tooly then return end
 	if not cs or not cs.level or not cs.level.events then return end
+	tooly.rateMod = cs.rateMod
 	tooly.alreadyInvalid = {}
 	tooly.eventCache = {}
 

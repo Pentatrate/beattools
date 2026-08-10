@@ -913,7 +913,21 @@ return {
 	testKey3 = {
 		type = "key",
 		name = "Test Hotkey 3",
-		tooltips = { short = "Nothing" },
+		tooltips = { short = "Tooly" },
+		default = {},
+		off = {}
+	},
+	testKey4 = {
+		type = "key",
+		name = "Test Hotkey 4",
+		tooltips = { short = "Show lovely warnings" },
+		default = {},
+		off = {}
+	},
+	testKey5 = {
+		type = "key",
+		name = "Test Hotkey 5",
+		tooltips = { short = "Misc" },
 		default = {},
 		off = {}
 	},

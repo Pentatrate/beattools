@@ -1,7 +1,7 @@
 local eventVisuals = {
 	step = 4,
 	eventCache = {},
-	holds = { hold = true, mineHold = true, trace = true, tashold = true, inverseHold = true },
+	holds = { hold = true, mineHold = true, trace = true, tashold = true, ["inverse-holds:inverseHold"] = true },
 	hasRepeat = {
 		ease = true,
 		tag = true,
