@@ -78,3 +78,39 @@ payload = '-- log("lovebpm end")'
 position = "at"
 target = "lib/lovebpm.lua"
 times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('level has ' .. #menuItem.variants .. ' variants')"
+payload = "-- log('level has ' .. #menuItem.variants .. ' variants')"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "print('init colour is ' .. self.colour)"
+payload = "-- print('init colour is ' .. self.colour)"
+position = "at"
+target = "obj/deco/TextDeco.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "--load states"
+payload = "log:setEnvironment(\"BBP_silent\")"
+position = "before"
+target = "preload/states.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "bs.new('JoystickColorCalibration')"
+payload = "log:setEnvironment()"
+position = "after"
+target = "preload/states.lua"
+times = 1

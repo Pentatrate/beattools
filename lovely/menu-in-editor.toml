@@ -9,7 +9,7 @@ version = "1.0.0"
 match_indent = true
 pattern = '''if self.goToBeatDialogue then'''
 payload = '''
-if true then
+do
 	if mods.beattools.config.showEventGroups and utilitools.files.beattools.eventGroupWindow then
 		utilitools.files.beattools.eventGroupWindow(window_flag, inputFlag)
 	end

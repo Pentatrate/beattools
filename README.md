@@ -1,6 +1,7 @@
 # Beattools
 
 (EA Mod)
+
 by Pentatrate (more contributors in full mod description)
 
 ## Info
@@ -17,9 +18,7 @@ It has a dedicated post named `Beattools` in the `ea-mods` forum
 1. Download zip:
 	Either directly download the repository as a zip (**I recommend this**)
 
-	Then rename the mod folder to `utilitools`
-
-	![Screenshot downloading as zip](https://github.com/user-attachments/assets/0653e3ef-cfe0-4b41-825f-a7e786feda4d)
+	[Download link](https://github.com/Pentatrate/beattools/archive/refs/heads/main.zip)
 
 	or download the "latest" release (The latest release may not have features added in later commits)
 
