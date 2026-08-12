@@ -216,6 +216,11 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	local pos
 	local function drawEvent()
 		setColor(1, 1, 1, 1)
+		if isNote then
+			setColor(1, 1, 1, 1)
+			love.graphics.setCanvas(canv2)
+			love.graphics.clear()
+		end
 		if type(eventDraw) == "function" then
 			local event2 = helpers.copy(event)
 			event2.type = eventVisuals.getEventType(event.type)
@@ -223,6 +228,26 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			color.r, color.g, color.b, color.a = love.graphics.getColor()
 		else
 			love.graphics.draw(eventDraw, pos[1], pos[2], 0, 1, 1, 8, 8)
+		end
+		if isNote then
+			love.graphics.setCanvas(canv)
+
+			shuv.showBadColors = true
+			shuv.updatepal()
+			shuv.drawWithPalette(function()
+				love.graphics.draw(canv2)
+			end, {
+				[0] = { r = mod.config.noteWhiteColor.r * 255, g = mod.config.noteWhiteColor.g * 255, b = mod.config.noteWhiteColor.b * 255},
+				[1] = { r = mod.config.noteBlackColor.r * 255, g = mod.config.noteBlackColor.g * 255, b = mod.config.noteBlackColor.b * 255},
+				[2] = {r=127,g=127,b=127},
+				[3] = {r=191,g=191,b=191},
+				[4] = {r=0,g=0,b=0},
+				[5] = {r=0,g=0,b=0},
+				[6] = {r=0,g=0,b=0},
+				[7] = {r=0,g=0,b=0},
+			})
+			shuv.showBadColors = false
+			shuv.updatepal()
 		end
 	end
 
@@ -250,7 +275,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 		-- Kaks code end
 	end
-	if utilitools.files.beattools.eventStacking.getType(event) == "func" then
+	if isNote then
 		if mod.config.displayEndAngle and event.endAngle then
 			utilitools.files.beattools.undo.dontTrack(function()
 				event.angle = event.endAngle
@@ -261,7 +286,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	end
 	if isVisible(event.time) then
 		if inBounds(pos, 8) then
-			if utilitools.files.beattools.eventStacking.getType(event) == "img" then
+			if not isNote then
 				drawEvent()
 			end
 
@@ -269,7 +294,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			-- copied from her mod "Editor Outline" for compatibility, modified for outlines
 			if mod.config.editorOutlines and event.editorOutline then
 				-- https://www.codestudy.net/blog/formula-to-determine-perceived-brightness-of-rgb-color/#1-simplified-weighted-sum-30-59-11-rule
-				local r, g, b = love.math.colorFromBytes(event.editorOutline.r, event.editorOutline.g, event.editorOutline.b)
+				local r, g, b = event.editorOutline.r / 255, event.editorOutline.g / 255, event.editorOutline.b / 255
 
 				if mod.config.editorOutlineInlines then
 					local thin = 7.5
@@ -296,7 +321,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 			eventVisuals.drawParam(event, pos)
 		end
 	end
-	if utilitools.files.beattools.eventStacking.getType(event) == "func" and mod.config.displayEndAngle and event.endAngle then
+	if isNote and mod.config.displayEndAngle and event.endAngle then
 		utilitools.files.beattools.undo.dontTrack(function()
 			event.angle = beattoolsTemp2
 		end)
@@ -308,36 +333,9 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	end
 
 	if alpha ~= 1 or isNote then
-		if isNote then
-			setColor(1, 1, 1, 1)
-			love.graphics.setCanvas(canv2)
-			love.graphics.clear()
-
-			shuv.showBadColors = true
-			shuv.updatepal()
-			shuv.drawWithPalette(function()
-				love.graphics.draw(canv)
-			end, {
-				[0] = { r = mod.config.noteWhiteColor.r * 255, g = mod.config.noteWhiteColor.g * 255, b = mod.config.noteWhiteColor.b * 255},
-				[1] = { r = mod.config.noteBlackColor.r * 255, g = mod.config.noteBlackColor.g * 255, b = mod.config.noteBlackColor.b * 255},
-				[2] = {r=127,g=127,b=127},
-				[3] = {r=191,g=191,b=191},
-				[4] = {r=0,g=0,b=0},
-				[5] = {r=0,g=0,b=0},
-				[6] = {r=0,g=0,b=0},
-				[7] = {r=0,g=0,b=0},
-			})
-			shuv.showBadColors = false
-			shuv.updatepal()
-
-			setColor(1, 1, 1, alpha)
-			love.graphics.setCanvas(cs.canv)
-			love.graphics.draw(canv2)
-		else
-			setColor(1, 1, 1, alpha)
-			love.graphics.setCanvas(cs.canv)
-			love.graphics.draw(canv)
-		end
+		setColor(1, 1, 1, alpha)
+		love.graphics.setCanvas(cs.canv)
+		love.graphics.draw(canv)
 		setColor(1, 1, 1, 1)
 	end
 

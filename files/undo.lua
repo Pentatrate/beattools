@@ -218,10 +218,12 @@ undo.newChangeSub = function()
 end
 
 undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
-	dontRepeat = dontRepeat or {}
-	dontRepeat[tostring(list1)] = true
-	dontRepeat[tostring(list2)] = true
+	if type(path or "") ~= "string" then modwarn(mod, "undo.areSimilar: invalid path", path) path = nil end
+	if type(dontRepeat or {}) ~= "table" then modwarn(mod, "undo.areSimilar: invalid dontRepeat", dontRepeat) dontRepeat = nil end
 	path = path or "base"
+	dontRepeat = dontRepeat or {}
+	dontRepeat[tostring(list1)] = path .. " (A)"
+	dontRepeat[tostring(list2)] = path .. " (B)"
 
 	local reason = doReason and (doReason == 1 and {} or "") or nil
 
@@ -237,8 +239,11 @@ undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
 		end
 	end
 
+	local recheck = {}
 	local function compare(list3, list4)
 		local valid = true
+		local first = list3 == list1
+		local path2 = "[" .. path .. (first and "" or " (2)") .. "] "
 
 		if type(list3) ~= "table" or type(list4) ~= "table" then
 			addReason("[" .. path .. "] expected table: " .. tostring(list3) .. ", " .. tostring(list4))
@@ -246,16 +251,24 @@ undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
 		end
 		for k, v in pairs(list3) do
 			if undo.keyTracked(k) then
-				if type(list4[k]) ~= type(v) then
-					addReason("[" .. path .. "] different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+				if list4[k] == nil then
+					addReason(path2 .. "undefined: " .. tostring(k) .. ": " .. tostring(v))
 					if doReason ~= 1 then return false else valid = false end
-				elseif type(v) == "table" and not dontRepeat[tostring(v)] and not dontRepeat[tostring(list4[k])] then
-					if not undo.areSimilar(v, list4[k], dontRepeat, doReason, path .. "." .. tostring(k)) then
+				elseif first then
+					if type(list4[k]) ~= type(v) then
+						addReason(path2 .. "different type: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 						if doReason ~= 1 then return false else valid = false end
-					end
-				else
-					if list4[k] ~= v then
-						addReason("[" .. path .. "] different: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
+					elseif type(v) == "table" then
+						if dontRepeat[tostring(v)] or dontRepeat[tostring(list4[k])] then
+							if list4[k] ~= v then
+								addReason(path2 .. "circular: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]) .. " | " .. dontRepeat[tostring(v)] .. ", " .. dontRepeat[tostring(list4[k])])
+								if doReason ~= 1 then return false else valid = false end
+							end
+						else
+							recheck[k] = true
+						end
+					elseif list4[k] ~= v then
+						addReason(path2 .. "different: " .. tostring(k) .. ": " .. tostring(v) .. " ~= " .. tostring(list4[k]))
 						if doReason ~= 1 then return false else valid = false end
 					end
 				end
@@ -263,7 +276,24 @@ undo.areSimilar = function(list1, list2, dontRepeat, doReason, path)
 		end
 		return valid
 	end
-	return compare(list1, list2) and compare(list2, list1), reason
+	local valid1, valid2 = compare(list1, list2), compare(list2, list1)
+	local valid = valid1 and valid2
+	for k, _ in ipairs(recheck) do
+		local valid3, reasons = undo.areSimilar(list1[k], list2[k], dontRepeat, doReason, path .. "." .. tostring(k))
+		if not valid3 then
+			valid = false
+			if doReason ~= 1 then
+				if type(reasons) == "table" then modwarn(mod, "undo.areSimilar: doReason ~= 1 but reasons is a table?!?", reasons) end
+				addReason(reasons)
+				break
+			elseif type(reasons) == "table" then
+				for _, reason2 in ipairs(reasons) do
+					addReason(reason2)
+				end
+			else modwarn(mod, "undo.areSimilar: doReason == 1 but reasons is not a table?!?", reasons) end
+		end
+	end
+	return valid, reason
 end
 undo.setParams = function(event, params)
 	for k, v in pairs(event) do event[k] = nil end

@@ -39,7 +39,7 @@ if beattools and beattools.test and beattools.test.compare then
 end
 
 compare.parts = {
-	velocity = { -2, 132, 260, 420, 596, 788, 948, 1012, 1124 }
+	velocity = { -2, 132, 260, 420, 596, 788, 948, 1012, 1124, 1184.5 }
 }
 compare.currentCollab = "velocity"
 
@@ -373,10 +373,21 @@ function compare.compare(new2)
 	local function inTime(event)
 		return compare.inTime(event, part)
 	end
+	local foundCount = 0
 	local function found(event1, event2, text)
+		foundCount = foundCount + 1
 		newStats.set.origEventsMatched[tostring(event1)] = true
 		newStats.set.newEventsMatched[tostring(event2)] = true
-		local check, reason = utilitools.files.beattools.undo.areSimilar(event1, event2, nil, 1)
+		local event1Changed, event2Changed = event1, event2
+		if event1.editorOutline then
+			event1Changed = helpers.copy(event1)
+			event1Changed.editorOutline = nil
+		end
+		if event2.editorOutline then
+			event2Changed = helpers.copy(event2)
+			event2Changed.editorOutline = nil
+		end
+		local check, reason = utilitools.files.beattools.undo.areSimilar(event1Changed, event2Changed, nil, 1)
 		if text and not check then
 			if text == "CHANGED ANGLE" then
 				if #reason <= 1 then
@@ -456,21 +467,29 @@ function compare.compare(new2)
 		progress.index = newIndex
 	end
 
-	startProgress("ORIG", #compare.orig)
-	for i, event in ipairs(compare.orig) do
-		doProgress()
-		if search(event) then
-			if search(event, { "type", "time", "angle", "var" }, "CHANGED") then
-				if search(event, { "type", "time", "var" }, "CHANGED ANGLE") then
-				end
-			end
-		end
-
-		if not newStats.set.origEventsMatched[tostring(event)] then
-			newStats.map.missing[tostring(event)] = event
+	startProgress("ORIG EXACT", #compare.orig - foundCount)
+	for i, event1 in ipairs(compare.orig) do
+		if not newStats.set.origEventsMatched[tostring(event1)] then
+			doProgress()
+			search(event1)
 		end
 	end
-	startProgress("NEW", #new)
+	startProgress("ORIG CHANGED", #compare.orig - foundCount, 0.25)
+	for i, event1 in ipairs(compare.orig) do
+		if not newStats.set.origEventsMatched[tostring(event1)] then
+			doProgress()
+			search(event1, { "type", "time", "angle", "order", "var", "color" }, "CHANGED")
+		end
+	end
+	startProgress("ORIG CHANGED ANGLE", #compare.orig - foundCount, 0.25)
+	for i, event1 in ipairs(compare.orig) do
+		if not newStats.set.origEventsMatched[tostring(event1)] then
+			doProgress()
+			search(event1, { "type", "time", "order", "var", "color" }, "CHANGED ANGLE")
+			if not newStats.set.origEventsMatched[tostring(event1)] then newStats.map.missing[tostring(event1)] = event1 end
+		end
+	end
+	startProgress("NEW", #new, 0.25)
 	for i, event2 in ipairs(new) do
 		doProgress()
 		newStats.map.newIndex[tostring(event2)] = i

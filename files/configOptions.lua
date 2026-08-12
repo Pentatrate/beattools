@@ -2,7 +2,7 @@ return {
 	-- Penta: I'm sorry I really cannot be bothered to update the order of this table to match the new config order and grouping :(
 	-- General
 	--   Menu Options
-    editorMenu = {
+	editorMenu = {
 		type = "bool",
 		name = "Configs in Editor",
 		tooltips = { long = "Adjust the configs directly in the editor in the same menu format", short = "Show this menu in the editor" },

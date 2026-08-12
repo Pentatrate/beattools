@@ -1,0 +1,18 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Sorting fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if a.isLevel and b.isLevel then'''
+payload = '''
+if _a or _b then
+	return _b -- fix sorting for special buttons - Penta
+end
+'''
+position = "before"
+target = "states/SongSelect.lua"
+times = 1

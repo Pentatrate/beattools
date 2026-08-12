@@ -23,6 +23,60 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = "log('ran ' .. oLTotal .. ' events')"
+payload = "-- log('ran ' .. oLTotal .. ' events')"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('GM reset for ' .. cLevel)"
+payload = "-- log('GM reset for ' .. cLevel)"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('running onLoad events...')"
+payload = "-- log('running onLoad events...')"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('retime ' .. v.time .. ' ' .. v.offset)"
+payload = "-- log('retime ' .. v.time .. ' ' .. v.offset))"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('changed cBeat from ' .. oldCBeat .. ' to ' .. cs.cBeat)"
+payload = "-- log('changed cBeat from ' .. oldCBeat .. ' to ' .. cs.cBeat)"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('retimes detected!')"
+payload = "-- log('retimes detected!')"
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = "print(valueString)"
 payload = "print('['..tostring(environment)..'] '..valueString)"
 position = "at"
@@ -84,6 +138,60 @@ times = 1
 match_indent = true
 pattern = "log('level has ' .. #menuItem.variants .. ' variants')"
 payload = "-- log('level has ' .. #menuItem.variants .. ' variants')"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('Variant not found! ' .. (variantname or '') .. ' ' .. (menuItem.name or ''),'warning')"
+payload = "-- log('Variant not found! ' .. (variantname or '') .. ' ' .. (menuItem.name or ''),'warning')"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "print(\"hidden detected\")"
+payload = "-- print(\"hidden detected\")"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('sanitized name \"' .. menuItem.name .. '\" to \"' .. sanitizedName .. '\"')"
+payload = "-- log('sanitized name \"' .. menuItem.name .. '\" to \"' .. sanitizedName .. '\"')"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('sanitized artist \"' .. menuItem.artist .. '\" to \"' .. sanitizedArtist .. '\"')"
+payload = "-- log('sanitized artist \"' .. menuItem.artist .. '\" to \"' .. sanitizedArtist .. '\"')"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "print(levelMetadata.metadata.songName .. ' has game source ' .. levelMetadata.metadata.source)"
+payload = "-- print(levelMetadata.metadata.songName .. ' has game source ' .. levelMetadata.metadata.source)"
+position = "at"
+target = "states/SongSelect.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "log('Changing directory from ' .. self.currentDirectory .. ' to ' .. newDirectory)"
+payload = "-- log('Changing directory from ' .. self.currentDirectory .. ' to ' .. newDirectory)"
 position = "at"
 target = "states/SongSelect.lua"
 times = 1
