@@ -18,6 +18,9 @@ end
 if event.type == "tag" and propertyName == "tag" then
 	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), utilitools.files.beattools.tag.getList())
 end
+if event.type == "deco" and propertyName == "id" then
+	event[propertyName] = utilitools.suggest.suggest(ffi.string(numptr), utilitools.files.beattools.moreSuggestions.getDecoIds(event))
+end
 '''
 position = "after"
 target = "obj/GameManager.lua"

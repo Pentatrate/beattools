@@ -387,7 +387,7 @@ function compare.compare(new2)
 			event2Changed = helpers.copy(event2)
 			event2Changed.editorOutline = nil
 		end
-		local check, reason = utilitools.files.beattools.undo.areSimilar(event1Changed, event2Changed, nil, 1)
+		local check, reason = utilitools.files.beattools.undo.areSimilar(event1Changed, event2Changed, "readableTable")
 		if text and not check then
 			if text == "CHANGED ANGLE" then
 				if #reason <= 1 then
@@ -782,9 +782,9 @@ function compare.merge()
 
 	table.sort(toRemove, function(a, b) return a.i < b.i end)
 	for i = #toRemove, 1, -1 do
-		local check, reason = utilitools.files.beattools.undo.areSimilar(toRemove[i].event, merged[toRemove[i].i], nil, 1)
+		local check, reasons = utilitools.files.beattools.undo.areSimilar(toRemove[i].event, merged[toRemove[i].i], "readableTable")
 		if not check then
-			modlog(mod, toRemove[i].i, reason --[[ , toRemove[i].event, merged[toRemove[i].i] ]] )
+			modlog(mod, toRemove[i].i, "\n", table.concat(reasons, " | \n | ") --[[ , toRemove[i].event, merged[toRemove[i].i] ]] )
 		end
 		table.remove(merged, toRemove[i].i)
 	end

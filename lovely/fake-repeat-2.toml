@@ -1,0 +1,69 @@
+[manifest]
+dump_lua = true
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0"
+
+# Dummy
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "a"
+payload = "a"
+position = "at"
+target = "thisDoesntExist.lua"
+times = 1
+
+# Patterns copied from custom events api
+
+# Unpack custom events before saving ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# [[patches]]
+# [patches.pattern]
+# target = "obj/LevelManager.lua"
+# pattern = "function LevelManager:saveLevel(level, filename, saveBothFiles, variant)"
+# position = "after"
+# payload = '''
+# local oldLevelEvents2 = level.events
+# level.events = utilitools.files.beattools.fakeRepeat2.unpack(oldLevelEvents2, variant)
+# '''
+# match_indent = true
+# times = 1
+
+# [[patches]]
+# [patches.pattern]
+# target = "obj/LevelManager.lua"
+# pattern = "return upgraded"
+# position = "before"
+# payload = "level.events = oldLevelEvents2"
+# match_indent = true
+# times = 1
+
+
+
+# # Pack into custom events when loading into the editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# [[patches]]
+# [patches.pattern]
+# target = "obj/LevelManager.lua"
+# pattern = "if project.strictLoading then"
+# position = "before"
+# payload = "if cs.name == 'Editor' then level.events = utilitools.files.beattools.fakeRepeat2.pack(level.events, variant, true) end"
+# match_indent = true
+# times = 1
+
+
+# # Unpack custom events on play ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# [[patches]]
+# [patches.pattern]
+# target = "obj/GameManager.lua"
+# pattern = "cs.offset = cs.level.properties.offset"
+# position = "before"
+# payload = "local levelEvents2 = utilitools.files.beattools.fakeRepeat2.unpack(levelEvents or cs.level.events, cs.variant)"
+# match_indent = true
+# times = 1
+
+# [[patches]] # TODO: this patch feels hacky, is there any better way to do this? Penta: looks fine to me :crankless:
+# [patches.pattern] # Penta: The wildcard usage for compat is making this worse and worse lol
+# target = "obj/GameManager.lua"
+# pattern = "for i,v in ipairs(*level*vents) do" # Matches both cs.level.events and levelEvents for compat
+# position = "at"
+# payload = "for i,v in ipairs(levelEvents2) do"
+# match_indent = true

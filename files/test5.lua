@@ -57,7 +57,7 @@ end ]]
 end ]]
 
 -- compare the first two events
---[[ local check, reason = utilitools.files.beattools.undo.areSimilar(cs.level.events[1], cs.level.events[2], nil, 1)
+--[[ local check, reason = utilitools.files.beattools.undo.areSimilar(cs.level.events[1], cs.level.events[2], "readableTable")
 if not check then
 	modlog(mod, reason)
 end ]]
@@ -92,9 +92,15 @@ local function levelsPaletteFromFolder(palette, folder, total)
 					end
 					local saveName2 = (saveName):gsub("/", "."):gsub("\\", "."):gsub(":", "."):gsub("%*", "."):gsub("%?", "."):gsub("\"", "."):gsub("<", "."):gsub(">", "."):gsub("|", "."):gsub("[^%w%s%p]", ".")
 					local newLevel = {
-						songName = saveName,
+						data = level,
+						manifest = manifest,
+						variant = variant,
+						songName = level.metadata.songName,
+						name = level.metadata.songName,
 						saveName = saveName2,
 						newPath = prefix .. "{All}/" .. saveName2,
+						newDir = prefix .. "{All}/",
+						root = prefix,
 						orig = prefix .. "{All}/" .. saveName,
 						path = itemPath,
 						realPath = prefix:sub(1, -2) .. itemPath
@@ -127,24 +133,106 @@ local function levelsPaletteFromFolder(palette, folder, total)
 			end
 		end
 	end
-	_G.globalLevelsPalette = palette
 end
 
 if cs and cs.name == "Menu" then
 	local total = {}
 	levelsPaletteFromFolder({ "" }, "Custom Levels/", total)
+	cs.playedLevelsJson = LevelManager:loadPlayedLevels()
+	utilitools.folderManager.delete("Custom Levels/{Ranks}")
+	utilitools.folderManager.delete("Custom Levels/{ABC}")
+	utilitools.folderManager.delete("Custom Levels/{Diff}")
+	utilitools.folderManager.delete("Custom Levels/{Variants}")
+	utilitools.folderManager.delete("Custom Levels/{Song Name}")
 	for _, level in ipairs(total or {}) do
 		if not level.duplicate then
 			if level.realPath ~= level.newPath then
+				modlog(mod, "Moving", level.name)
 				-- modlog(mod, level.newPath, level.realPath)
 				-- modlog(mod, level.realPath:sub(1, -1 - #level.realPath:match("([^/]+)$")) .. level.saveName, level.newPath .. "/")
 				-- utils.moveDirectory(level.realPath, level.newPath)
 				utilitools.folderManager.copy(level.newPath, level.realPath)
 				utilitools.folderManager.delete(level.realPath)
+				love.filesystem.createDirectory(level.newDir)
 				local redirectPath = level.realPath:sub(1, -1 - #level.realPath:match("([^/]+)$")) .. level.saveName .. ".redirect"
 				local success, e = love.filesystem.write(redirectPath, level.newPath .. "/")
 				if not success then forceprint(e) end
 			end
+			local function doStuffCrankless(variant)
+				do -- rank
+					local saveName = LevelManager:getLevelSaveName(level.data, variant)
+					local playedData = cs.playedLevelsJson[saveName]
+					local rank, add = nil, "none"
+					if playedData then
+						rank, add = GameManager:gradeCalc(playedData.pctGrade)
+						if playedData.gotShinyPRank and rank == "perfect" then
+							add = "plus"
+						end
+						if playedData.misses == 0 and rank ~= "perfect" then
+							rank, add = "FC", "none"
+						end
+						local almost = mods["happy-almost-rank"] and mods["happy-almost-rank"].enabled and ({ owo = ";3", happy = ";)" })[mods["happy-almost-rank"].config.face] or ";("
+						if playedData.misses + playedData.barelies == 1 then
+							rank, add = almost, "none"
+							if playedData.misses == 0 and mods.expanded_almost_ranks and mods.expanded_almost_ranks.enabled then
+								add = "plus"
+							end
+						end
+					end
+					rank = ({ what = "WHAT", perfect = "P" })[rank or "Unplayed"] or rank
+					add = ({ none = "", plus = "+", minus = "-" })[add] or "."
+					rank = rank and rank:upper() .. add or "Unplayed"
+
+					local path = "Custom Levels/{Ranks}/{" .. rank .. "}/"
+
+					love.filesystem.createDirectory(path)
+
+					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
+					if not success then forceprint(e) end
+				end
+
+				do -- difficulty
+					local diff = variant and variant.difficulty or level.data.metadata.difficulty or "Invalid"
+
+					diff = ({ [-1] = "Unknown", [-2] = "PH", [-3] = "" })[diff] or diff
+
+					local path = "Custom Levels/{Diff}/{" .. diff .. "}/"
+
+					love.filesystem.createDirectory(path)
+
+					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
+					if not success then forceprint(e) end
+				end
+
+				do -- variant
+					local hasVariants = variant ~= nil and (#level.data.variants) or "None"
+
+					local path = "Custom Levels/{Variants}/{" .. hasVariants .. "}/"
+
+					love.filesystem.createDirectory(path)
+
+					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
+					if not success then forceprint(e) end
+				end
+			end
+			if level.manifest and level.data.variants then
+				for _, variant in ipairs(level.data.variants) do
+					doStuffCrankless(variant)
+				end
+			else
+				doStuffCrankless()
+			end
+			do -- first letter
+				local firstLetter = rtf:sanitize_text(level.saveName):sub(1, 1):upper()
+				local path = "Custom Levels/{ABC}/{" .. firstLetter .. "}/"
+
+				love.filesystem.createDirectory(path)
+
+				local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
+				if not success then forceprint(e) end
+			end
+		else
+			modlog(mod, "Duplicate", level.name, level.realPath)
 		end
 	end
 else
