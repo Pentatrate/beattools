@@ -1229,8 +1229,8 @@ return {
 	},
 	compareWindow = {
 		type = "bool",
-		name = "Merge Manager Window",
-		tooltips = { short = "Made for the velocity collab\nHelps with merging parts that have events in common, bc they are built on the same gameplay file" },
+		name = "Nitt's Corner",
+		tooltips = { short = "Made for nittneuk related code\nCollab Merger:\nHelps with merging parts that have events in common, bc they are built on the same gameplay file, made for Velocity\nText 2 Chart:\nUses specific syntax to convert text to gameplay" },
 		default = false,
 		off = false
 	},

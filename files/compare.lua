@@ -221,7 +221,9 @@ function compare.window(window_flag, inputFlag)
 	if mod.config.compareWindow then
 		helpers.SetNextWindowPos(750, 400, window_flag)
 		helpers.SetNextWindowSize(200, 320, window_flag)
-		mod.config.compareWindow = imgui.Begin("Merge Manager", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
+		mod.config.compareWindow = imgui.Begin("Nitt's Corner", true, (inputFlag or 0) + (mod.config.stopImGuiMove and imgui.ImGuiWindowFlags_NoMove or 0) + (mod.config.stopImGuiResize and imgui.ImGuiWindowFlags_NoResize or 0))
+
+		imgui.Text("Collab Merger")
 
 		if imgui.Button("Cache") then
 			beattools.test = beattools.test or {}
@@ -266,6 +268,9 @@ function compare.window(window_flag, inputFlag)
 
 		compare.showChanges()
 		compare.showChanges(true)
+
+		imgui.Separator()
+		utilitools.files.beattools.textChart.imgui()
 
 		imgui.End()
 	end

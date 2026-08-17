@@ -216,6 +216,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"textChart": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

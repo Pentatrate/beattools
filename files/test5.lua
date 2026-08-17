@@ -135,7 +135,8 @@ local function levelsPaletteFromFolder(palette, folder, total)
 	end
 end
 
-if cs and cs.name == "Menu" then
+if not cs then return end
+if cs.name == "Menu" then
 	local total = {}
 	levelsPaletteFromFolder({ "" }, "Custom Levels/", total)
 	cs.playedLevelsJson = LevelManager:loadPlayedLevels()
@@ -235,5 +236,4 @@ if cs and cs.name == "Menu" then
 			modlog(mod, "Duplicate", level.name, level.realPath)
 		end
 	end
-else
 end

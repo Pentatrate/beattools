@@ -4,159 +4,166 @@ configHelpers.setMod(mod)
 
 if imgui.BeginTabBar("beattoolsConfig") then
 	if imgui.BeginTabItem("General##beattoolsConfig") then
-		configHelpers.treeNode("Menu Options", function()
-			configHelpers.doc("general_menuOptions")
-			configHelpers.presets.menuOptions()
-			imgui.Separator()
-			configHelpers.presets.menuButtons()
-			imgui.Separator()
-			configHelpers.presets.updateOptions()
-		end, 2 ^ 5)
-		configHelpers.treeNode("Advanced", function()
-			configHelpers.doc("general_advanced")
-			configHelpers.input("speedScrolling")
-			configHelpers.input("toggleMenuMusic")
-			imgui.Separator()
-			configHelpers.input("keyHandling")
-			imgui.Separator()
-			configHelpers.input("randomizeWindows")
-			configHelpers.input("imguiGuide")
-			if imgui.Button("Style Manager##beattools") then
-				local imguiStyleManager = utilitools.files.beattools.imguiStyle
-				utilitools.prompts.custom({
-					title = "Style Manager", message = "Choose an action.",
-					buttonsTable = {
-						{ "Apply style", function() utilitools.prompts.custom({
-							title = "Style Manager > Apply", message = "Choose style",
-							func = function()
-								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
-									if imgui.Button(v .. "##beattoolsChooseStyle") then
-										imguiStyleManager.applyStyle(v)
+		if imgui.BeginTabBar("GeneralBar##beattoolsConfigGeneralBar") then
+			if imgui.BeginTabItem("Menu##beattoolsConfigGeneralBar") then
+				configHelpers.doc("general_menuOptions")
+				configHelpers.presets.menuOptions()
+				imgui.Separator()
+				configHelpers.presets.menuButtons()
+				imgui.Separator()
+				configHelpers.presets.updateOptions()
+				imgui.EndTabItem("Menu##beattoolsConfigGeneralBar")
+				configHelpers.input("speedScrolling")
+				configHelpers.input("toggleMenuMusic")
+			end
+			if imgui.BeginTabItem("Advanced##beattoolsConfigGeneralBar") then
+				configHelpers.doc("general_advanced")
+				configHelpers.input("keyHandling")
+				imgui.Separator()
+				configHelpers.input("imguiGuide")
+				imgui.Separator()
+				if imgui.Button("Style Manager##beattools") then
+					local imguiStyleManager = utilitools.files.beattools.imguiStyle
+					utilitools.prompts.custom({
+						title = "Style Manager", message = "Choose an action.",
+						buttonsTable = {
+							{ "Apply style", function() utilitools.prompts.custom({
+								title = "Style Manager > Apply", message = "Choose style",
+								func = function()
+									for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+										if imgui.Button(v .. "##beattoolsChooseStyle") then
+											imguiStyleManager.applyStyle(v)
+										end
 									end
 								end
-							end
-						}) end },
-						{ "New Style", function() utilitools.prompts.custom({
-							title = "Style Manager > New", message = "Choose creation method",
-							buttonsTable = {
-								{ "Save current style", function()
-									imguiStyleManager.promptStyleName(imguiStyleManager.saveStyle)
-								end },
-								{ "Import from clipboard", function()
-									utilitools.prompts.custom({
-										title = "Style Manager > Import",
-										message = "Choose import format",
-										buttonsTable = {
-											{ "Beattools Format", function() utilitools.try(mod, function()
-												local jsonData = json.decode(love.system.getClipboardText())
-												if ({ [""] = true, default = true, ["from old format"] = true })[jsonData.name] then
-													jsonData = "default"
-												end
-												if mods.beattools.config.imguiStyles[jsonData.name] ~= nil then
-													imguiStyleManager.promptStyleName(function(styleName)
-														jsonData.name = styleName
+							}) end },
+							{ "New Style", function() utilitools.prompts.custom({
+								title = "Style Manager > New", message = "Choose creation method",
+								buttonsTable = {
+									{ "Save current style", function()
+										imguiStyleManager.promptStyleName(imguiStyleManager.saveStyle)
+									end },
+									{ "Import from clipboard", function()
+										utilitools.prompts.custom({
+											title = "Style Manager > Import",
+											message = "Choose import format",
+											buttonsTable = {
+												{ "Beattools Format", function() utilitools.try(mod, function()
+													local jsonData = json.decode(love.system.getClipboardText())
+													if ({ [""] = true, default = true, ["from old format"] = true })[jsonData.name] then
+														jsonData = "default"
+													end
+													if mods.beattools.config.imguiStyles[jsonData.name] ~= nil then
+														imguiStyleManager.promptStyleName(function(styleName)
+															jsonData.name = styleName
+															mods.beattools.config.imguiStyles[jsonData.name] = jsonData
+															modlog(mod, "Imported beattools format " .. tostring(jsonData.name))
+														end)
+													else
 														mods.beattools.config.imguiStyles[jsonData.name] = jsonData
 														modlog(mod, "Imported beattools format " .. tostring(jsonData.name))
-													end)
-												else
-													mods.beattools.config.imguiStyles[jsonData.name] = jsonData
-													modlog(mod, "Imported beattools format " .. tostring(jsonData.name))
-												end
-											end) end },
-											{ "ImGui Colors Format", imguiStyleManager.promptStyleName(imguiStyleManager.imguiColorsFormat) }
-										}
-									})
-								end }
-							}
-						}) end },
-						{ "Remove style", function() utilitools.prompts.custom({
-							title = "Style Manager > Remove", message = "Choose style",
-							func = function()
-								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
-									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
-										imguiStyleManager.removeStyle(v)
+													end
+												end) end },
+												{ "ImGui Colors Format", imguiStyleManager.promptStyleName(imguiStyleManager.imguiColorsFormat) }
+											}
+										})
+									end }
+								}
+							}) end },
+							{ "Remove style", function() utilitools.prompts.custom({
+								title = "Style Manager > Remove", message = "Choose style",
+								func = function()
+									for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+										if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+											imguiStyleManager.removeStyle(v)
+										end
 									end
 								end
-							end
-						}) end },
-						{ "Rename style", function() utilitools.prompts.custom({
-							title = "Style Manager > Rename", message = "Choose style",
-							func = function()
-								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
-									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
-										imguiStyleManager.promptStyleName(function(styleName)
-											mod.config.imguiStyles[styleName] = mod.config.imguiStyles[v]
-											mod.config.imguiStyles[v] = nil
-											mod.config.imguiStyles[styleName].name = styleName
+							}) end },
+							{ "Rename style", function() utilitools.prompts.custom({
+								title = "Style Manager > Rename", message = "Choose style",
+								func = function()
+									for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+										if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+											imguiStyleManager.promptStyleName(function(styleName)
+												mod.config.imguiStyles[styleName] = mod.config.imguiStyles[v]
+												mod.config.imguiStyles[v] = nil
+												mod.config.imguiStyles[styleName].name = styleName
 
-											if v == mod.config.currentImguiStyle then mod.config.currentImguiStyle = styleName end
-											imguiStyleManager.updateAllSavedStyles()
-										end)
+												if v == mod.config.currentImguiStyle then mod.config.currentImguiStyle = styleName end
+												imguiStyleManager.updateAllSavedStyles()
+											end)
+										end
 									end
 								end
-							end
-						}) end },
-						{ "Export style", function() utilitools.prompts.custom({
-							title = "Style Manager > Export", message = "Choose style",
-							func = function()
-								for _, v in ipairs(imguiStyleManager.allSavedStyles) do
-									if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
-										utilitools.string.toClipboard(json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end))
+							}) end },
+							{ "Export style", function() utilitools.prompts.custom({
+								title = "Style Manager > Export", message = "Choose style",
+								func = function()
+									for _, v in ipairs(imguiStyleManager.allSavedStyles) do
+										if v ~= "default" and imgui.Button(v .. "##beattoolsChooseStyle") then
+											utilitools.string.toClipboard(json.encode(mod.config.imguiStyles[v], function(a, b) return a < b end))
+										end
 									end
 								end
-							end
-						}) end }
-					}
-				})
-			end
-			imgui.Separator()
-			configHelpers.input("testKey")
-			configHelpers.input("testKey2")
-			configHelpers.input("testKey3")
-			configHelpers.input("testKey4")
-			configHelpers.input("testKey5")
-			imgui.Separator()
-			configHelpers.input("tooly")
-			configHelpers.input("compareWindow")
-			--[[ imgui.Separator()
-			local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
-			if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
-				if hasCombo then
-					mod.config.maxStartInvis = mod.config.maxStartInvis + 1
-					mod.config.maxInvisAt = mod.config.maxInvisAt + 1
-					mod.config.maxCombo = 1
-				else
-					mod.config.minCombo = 0
-					mod.config.maxCombo = 0
+							}) end }
+						}
+					})
 				end
+				imgui.Separator()
+				imgui.Text("Unfinished")
+				configHelpers.input("tooly")
+				configHelpers.input("compareWindow")
+				imgui.Separator()
+				configHelpers.input("testKey")
+				configHelpers.input("testKey2")
+				configHelpers.input("testKey3")
+				configHelpers.input("testKey4")
+				configHelpers.input("testKey5")
+				--[[ imgui.Separator()
+				local hasCombo = utilitools.imguiHelpers.inputBool("Combo Based", mod.config.minCombo ~= mod.config.maxCombo, false, "...")
+				if hasCombo ~= (mod.config.minCombo ~= mod.config.maxCombo) then
+					if hasCombo then
+						mod.config.maxStartInvis = mod.config.maxStartInvis + 1
+						mod.config.maxInvisAt = mod.config.maxInvisAt + 1
+						mod.config.maxCombo = 1
+					else
+						mod.config.minCombo = 0
+						mod.config.maxCombo = 0
+					end
+				end
+				if hasCombo then
+					configHelpers.input("minInvisAt")
+				end
+				configHelpers.input("maxInvisAt")
+				if hasCombo then
+					configHelpers.input("minStartInvis")
+				end
+				configHelpers.input("maxStartInvis")
+				if hasCombo then
+					configHelpers.input("minCombo")
+					configHelpers.input("maxCombo")
+				end ]]
+				-- mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
+				imgui.EndTabItem("Advanced##beattoolsConfigGeneralBar")
 			end
-			if hasCombo then
-				configHelpers.input("minInvisAt")
+			if imgui.BeginTabItem("Jokes##beattoolsConfigGeneralBar") then
+				configHelpers.treeNode("Professor Gearshift", function()
+					configHelpers.input("alwaysGearshift")
+					configHelpers.input("gearshiftPopulation")
+				end)
+				configHelpers.input("moreSplashes")
+				configHelpers.input("randomizeWindows")
+				configHelpers.condTreeNode("Full Mod Description (Deprecated)", "documentation", "none", false, function()
+					configHelpers.doc("general_fullDescription")
+				end)
+				configHelpers.condTreeNode("ImGui User Guide", "documentation", "long", true, function()
+					imgui.ShowUserGuide()
+				end)
+				imgui.EndTabItem("Jokes##beattoolsConfigGeneralBar")
 			end
-			configHelpers.input("maxInvisAt")
-			if hasCombo then
-				configHelpers.input("minStartInvis")
-			end
-			configHelpers.input("maxStartInvis")
-			if hasCombo then
-				configHelpers.input("minCombo")
-				configHelpers.input("maxCombo")
-			end ]]
-			-- mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo = utilitools.files.beattools.noiseDither.clamp(mod.config.minInvisAt, mod.config.maxInvisAt, mod.config.minStartInvis, mod.config.maxStartInvis, mod.config.minCombo, mod.config.maxCombo)
-		end)
-		configHelpers.treeNode("Jokes", function()
-			configHelpers.treeNode("Professor Gearshift", function()
-				configHelpers.input("alwaysGearshift")
-				configHelpers.input("gearshiftPopulation")
-			end)
-			configHelpers.input("moreSplashes")
-		end)
-		configHelpers.condTreeNode("Full Mod Description", "documentation", "none", false, function()
-			configHelpers.doc("general_fullDescription")
-		end)
-		configHelpers.condTreeNode("ImGui User Guide", "documentation", "long", true, function()
-			imgui.ShowUserGuide()
-		end)
+			imgui.EndTabBar()
+		end
 		imgui.EndTabItem("General##beattoolsConfig")
 	end
 	if imgui.BeginTabItem("Game##beattoolsConfig") then

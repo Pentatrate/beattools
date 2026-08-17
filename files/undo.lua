@@ -364,10 +364,10 @@ undo.insert = function(list, pos, value)
 			else
 				-- modlog(mod, tostring(undo.changes[undo.index]) .. " " .. tostring(undo.changes[undo.index].type == "remove") .. " " .. tostring(undo.changes[undo.index].index == pos) .. " " .. tostring(undo.areSimilar(undo.changes[undo.index].ref, value)))
 				undo.newChangePre()
-				--[[ modlog(mod,
+				modlog(mod,
 					"Adding: " ..
 					"\tindex: " .. tostring(pos)
-				) ]]
+				)
 				table.insert(undo.changes, {
 					type = "add",
 					event = helpers.copy(value),
@@ -380,6 +380,7 @@ undo.insert = function(list, pos, value)
 
 			undo.shiftIndices(true, pos, value)
 			beattools.moremetamethods.insert(list, pos, value)
+			undo.events[tostring(list[pos])] = pos
 			undo.link(value)
 
 			if not undo.fakeRepeating then
@@ -454,7 +455,7 @@ undo.change = function(t, k, v, hidden)
 		if undo.keyTracked(k) then
 			if undo.fakeRepeating or (hidden.beattoolsRepeatChild == nil and k ~= "beattoolsRepeatChild") then
 				if undo.events[tostring(t)] == nil then
-					modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!")
+					modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!", t, k, v, hidden)
 					undo.injectSub()
 					-- utilitools.files.beattools.fakeRepeat.updateList()
 				end
