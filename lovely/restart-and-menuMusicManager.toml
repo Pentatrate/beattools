@@ -99,8 +99,8 @@ pattern = '''function st:playLevel()'''
 payload = '''
 	beattools.restartBeat = self.startBeat
 	if mods.beattools.config.randomizeWindows == "playtest" then beattools.randomizeWindows = true end
-	beattools.playerSprite = ""
 	self.p.forceSprite = ""
+	cs.p.useFaceStencil = false
 	if self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then self.menuMusicManager:forceMute() end
 '''
 position = "after"
@@ -113,13 +113,26 @@ match_indent = true
 pattern = '''function st:stopLevel()'''
 payload = '''
 function st:stopLevel(dontUnmute)
-	beattools.playerSprite = "><"
-	beattools.lastSpriteChange = love.timer.getTime()
+	utilitools.files.beattools.livelyCranky.startAnim("afterPlaytest")
 	if not dontUnmute and self.menuMusicManager and mods.beattools.config.menuMusicInEditor and savedata.options.audio.playMenuMusic then
 		self.menuMusicManager:forceUnmute()
 	end
 '''
 position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.errorHeader = "An error has occured during playback."
+self:stopLevel()
+'''
+payload = '''
+utilitools.files.beattools.livelyCranky.startAnim("afterError")
+'''
+position = "after"
 target = "states/Editor.lua"
 times = 1
 

@@ -221,6 +221,11 @@
 			"extension": "lua",
 			"load": true,
 			"call": true
+		},
+		"livelyCranky": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

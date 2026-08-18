@@ -9,13 +9,7 @@ beattools.angleSnap = 4
 beattoolsRecordPosition = false -- record position
 beattoolsRecordFunc = nil
 
-local beattoolsPlayerSpriteChanged = {}
-local beattoolsLastSpriteModified = 0
-
 beattools.randomizeWindows = mods.beattools.config.randomizeWindows ~= "off"
-
-beattools.playerSprite = "idle"
-beattools.lastSpriteChange = 0
 
 function st:eventIndex(event)
 	if event == nil then return end

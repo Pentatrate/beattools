@@ -9,69 +9,7 @@ version = "1.0.0"
 match_indent = true
 pattern = '''st:setUpdate(function(self, dt)'''
 payload = '''
-	if self.editMode then
-		local timeNow = love.timer.getTime()
-		--[[if beattools.playerSprite == "idle" then
-			if timeNow - beattools.lastSpriteChange > 8 - 0.1 then
-				beattools.playerSprite = "closed"
-				beattools.lastSpriteChange = timeNow
-			end
-		elseif beattools.playerSprite == "closed" then
-			if timeNow - beattools.lastSpriteChange > 0.1 then
-				beattools.playerSprite = "idle"
-				beattools.lastSpriteChange = timeNow
-			end
-		else]]if beattools.playerSprite == "><" then
-			if timeNow - beattools.lastSpriteChange > 1 then
-				beattools.playerSprite = "idle"
-				beattools.lastSpriteChange = timeNow
-			end
-		end
-		local currentSprite
-		if mods.beattools.config.currentSprite then
-			currentSprite = utilitools.files.beattools.easing.getEase("forcePlayerSprite", nil, cs.editorBeat, nil, nil)
-		end
-
-		-- Penta: This code is not optimised, but it doesnt have to be, "lively cranky" is just for fun
-		if mods.beattools.config.livelyCranky and beattools.playerSprite == "><" then
-			self.p.forceSprite = beattools.playerSprite
-		elseif mods.beattools.config.livelyCranky and maininput:down("modifier") then
-			self.p.forceSprite = "happy"
-		else
-			local forcedSprite = false
-			if mods.beattools.config.currentSprite and currentSprite.spriteName ~= "" then
-				local spriteName = currentSprite.spriteName
-				if spriteName:sub(-4):lower() == ".png" then
-					local filename = cLevel .. spriteName
-					if love.filesystem.exists(filename) then
-						local modTime = love.filesystem.getInfo(cLevel .. spriteName, "file").modtime
-						if beattoolsPlayerSpriteChanged[spriteName] ~= modTime then
-							beattoolsLastSpriteModified = timeNow
-							beattoolsPlayerSpriteChanged[spriteName] = modTime
-						end
-						if cs.p.spr[spriteName] == nil or timeNow - beattoolsLastSpriteModified > 1 then
-							cs.p.spr[spriteName] = love.graphics.newImage(filename)
-						end
-					end
-				end
-
-				if ({ [""] = true, none = true, idle = true, happy = true, miss = true, ["><"] = true, [":3"] = true })[spriteName] or cs.p.spr[spriteName] ~= nil then
-					cs.p.forceSprite = spriteName
-					cs.p.useFaceStencil = currentSprite.useFaceStencil
-					forcedSprite = true
-				end
-			end
-			if not forcedSprite then
-				--[[if mods.beattools.config.livelyCranky and timeNow - ((#beattoolsChangeList > 0 and beattoolsChangeList[#beattoolsChangeList].time) or 0) > 60 then
-					self.p.forceSprite = "sleep"
-				else]]if mods.beattools.config.livelyCranky then
-					self.p.forceSprite = beattools.playerSprite
-				else
-					self.p.forceSprite = ""
-				end
-			end
-		end
-	end
+	utilitools.files.beattools.livelyCranky.update()
 '''
 position = "after"
 target = "states/Editor.lua"
