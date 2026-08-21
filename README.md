@@ -1,8 +1,10 @@
 # Beattools
 
-(EA Mod)
+EA Mod for the game Beatblock
 
 by Pentatrate (more contributors in full mod description)
+
+![GitHub Downloads](https://img.shields.io/github/downloads/Pentatrate/beattools/total)
 
 ## Info
 
