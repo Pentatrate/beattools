@@ -9,16 +9,17 @@ version = "1.0.0"
 match_indent = true
 pattern = '''self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{time = self.cursorBeat, angle = angle})'''
 payload = '''
-if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat > self.selectedEvent.time + self.selectedEvent.duration then
+local isHold = utilitools.files.beattools.eventVisuals.holds[self.selectedEvent.type]
+if isHold and mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat > self.selectedEvent.time + self.selectedEvent.duration then
 	self.holdEndSelected = true
 	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
 		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
 	})
 else
-	local time = mods.beattools.config.betterHoldDragging and math.min(self.cursorBeat, self.selectedEvent.time + self.selectedEvent.duration) or self.cursorBeat
+	local time = isHold and mods.beattools.config.betterHoldDragging and math.min(self.cursorBeat, self.selectedEvent.time + self.selectedEvent.duration) or self.cursorBeat
 	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
 		time = time, angle = angle,
-		duration = mods.beattools.config.betterHoldDragging and self.selectedEvent.duration - (time - self.selectedEvent.time) or nil
+		duration = isHold and mods.beattools.config.betterHoldDragging and self.selectedEvent.duration - (time - self.selectedEvent.time) or nil
 	})
 end
 '''
@@ -41,7 +42,8 @@ self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
 )
 '''
 payload = '''
-if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat < self.selectedEvent.time then
+local isHold = utilitools.files.beattools.eventVisuals.holds[self.selectedEvent.type
+if isHold and mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat < self.selectedEvent.time then
 	self.holdEndSelected = false
 	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
 		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
@@ -49,7 +51,7 @@ if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwappi
 else
 	self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
 		angle2 = angle,
-		duration = math.max(self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)), 0)
+		duration = isHold and math.max(self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)), 0) or nil
 	})
 end
 '''
