@@ -1,0 +1,58 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Hold start dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{time = self.cursorBeat, angle = angle})'''
+payload = '''
+if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat > self.selectedEvent.time + self.selectedEvent.duration then
+	self.holdEndSelected = true
+	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
+		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
+	})
+else
+	local time = mods.beattools.config.betterHoldDragging and math.min(self.cursorBeat, self.selectedEvent.time + self.selectedEvent.duration) or self.cursorBeat
+	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
+		time = time, angle = angle,
+		duration = mods.beattools.config.betterHoldDragging and self.selectedEvent.duration - (time - self.selectedEvent.time) or nil
+	})
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+# Hold end dragging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
+	angle2 = angle,
+	duration = math.max(
+	self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)),
+	0
+)
+}
+)
+'''
+payload = '''
+if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat < self.selectedEvent.time then
+	self.holdEndSelected = false
+	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
+		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
+	})
+else
+	self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
+		angle2 = angle,
+		duration = math.max(self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)), 0)
+	})
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1

@@ -236,4 +236,6 @@ if cs.name == "Menu" then
 			modlog(mod, "Duplicate", level.name, level.realPath)
 		end
 	end
+else
+	modlog(mod, utilitools.modUpdater2.getLink("commitMsg", mod))
 end

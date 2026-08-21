@@ -1327,6 +1327,34 @@ return {
 		default = false,
 		off = false
 	},
+	betterHoldPlacing = {
+		type = "bool",
+		name = "Hold Placing",
+		tooltips = { short = "Drag to place a hold instead of tapping" },
+		default = true,
+		off = false
+	},
+	placeNoDuration = {
+		type = "bool",
+		name = "No Duration Placing",
+		tooltips = { short = "The default hold has 0 duration instead of 1" },
+		default = false,
+		off = false
+	},
+	betterHoldDragging = {
+		type = "bool",
+		name = "Hold Dragging",
+		tooltips = { short = "Leaves the other hold end static when dragging" },
+		default = true,
+		off = false
+	},
+	holdSwapping = {
+		type = "bool",
+		name = "Hold Swapping",
+		tooltips = { short = "Swaps hold start and end when dragging too far" },
+		default = true,
+		off = false
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

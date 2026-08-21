@@ -1,0 +1,14 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# 0 duration placing ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''Event.property(event,'decimal', 'duration', 'How many beats the hold lasts', {step = cs:getBeatStep(), default = 1,min = 0})'''
+payload = '''Event.property(event,'decimal', 'duration', 'How many beats the hold lasts', {step = cs:getBeatStep(), default = mods.beattools.config.placeNoDuration and 0 or 1,min = 0})'''
+position = "before"
+target = "obj/GameManager.lua"
+times = 1
