@@ -27,7 +27,7 @@ pattern = '''self.holdEndSelected = false'''
 payload = '''self.placedHold = nil'''
 position = "after"
 target = "states/Editor.lua"
-times = 1
+times = 2
 
 [[patches]]
 [patches.pattern]

@@ -1,0 +1,40 @@
+[manifest]
+dump_lua = true
+priority = -1
+version = "1.0.0"
+
+# Delete functionality ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if oldSelectedEvent == nil and self.selectedEvent == nil then'''
+payload = '''if #self.overlappingEvents == 0 and oldSelectedEvent == nil and self.selectedEvent == nil then'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+self.selectedEvent = self.level.events[v]
+-- Changes cursor angle to match event angle
+self.cursorAngle = self.selectedEvent.angle
+'''
+payload = '''
+if self.deletePending then -- Penta: random comment for pattern match prevention
+	self:noSelection()
+	self.selectedEvent = self.level.events[v]
+	self:deleteSelectedEvent()
+	self.deletePending = false
+	break
+else -- Penta: random comment for pattern match detection
+	self:noSelection()
+	self.selectedEvent = self.level.events[v]
+	-- Changes cursor angle to match event angle
+	self.cursorAngle = self.selectedEvent.angle
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1

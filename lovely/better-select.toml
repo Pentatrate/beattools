@@ -3,6 +3,30 @@ dump_lua = true
 priority = 1
 version = "1.0.0"
 
+# Hold dragging redundancy removal ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if #self.overlappingEvents == 1 then'''
+payload = '''
+if #self.overlappingEvents == 1 or (
+	mods.beattools.config.betterHoldDragging and
+	mods.beattools.config.holdSwapping and
+	#self.overlappingEvents == 2 and
+	self.overlappingEvents[1].event == self.overlappingEvents[2].event and
+	utilitools.files.beattools.eventVisuals.holds[self.level.events[self.overlappingEvents[1].event].type] and
+	self.overlappingEvents[1].holdEndSelected ~= self.overlappingEvents[2].holdEndSelected and
+	self.level.events[self.overlappingEvents[1]].duration == 0 and
+	self.level.events[self.overlappingEvents[1]].angle == self.level.events[self.overlappingEvents[1]].angle2
+) then
+	if #self.overlappingEvents == 2 then
+		modlog(mods.beattools, "remove redundancy", self.overlappingEvents)
+	end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 2
+
 # Hold detect ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -101,7 +125,7 @@ if v2.bounceSelected then self.bounceSelected = v2.bounceSelected self.bounceSel
 '''
 position = "after"
 target = "states/Editor.lua"
-times = 1
+times = 2
 
 # Event editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]

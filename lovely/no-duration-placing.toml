@@ -9,6 +9,6 @@ version = "1.0.0"
 match_indent = true
 pattern = '''Event.property(event,'decimal', 'duration', 'How many beats the hold lasts', {step = cs:getBeatStep(), default = 1,min = 0})'''
 payload = '''Event.property(event,'decimal', 'duration', 'How many beats the hold lasts', {step = cs:getBeatStep(), default = mods.beattools.config.placeNoDuration and 0 or 1,min = 0})'''
-position = "before"
+position = "at"
 target = "obj/GameManager.lua"
 times = 1

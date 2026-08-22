@@ -12,8 +12,11 @@ payload = '''
 local isHold = utilitools.files.beattools.eventVisuals.holds[self.selectedEvent.type]
 if isHold and mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat > self.selectedEvent.time + self.selectedEvent.duration then
 	self.holdEndSelected = true
+	angle = helpers.closestAngle(self.cursorAngle, self.selectedEvent.angle or 0)
 	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
-		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
+		angle = self.selectedEvent.angle2, angle2 = angle,
+		time = self.selectedEvent.time + self.selectedEvent.duration,
+		duration = self.cursorBeat - self.selectedEvent.time - self.selectedEvent.duration
 	})
 else
 	local time = isHold and mods.beattools.config.betterHoldDragging and math.min(self.cursorBeat, self.selectedEvent.time + self.selectedEvent.duration) or self.cursorBeat
@@ -42,16 +45,18 @@ self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
 )
 '''
 payload = '''
-local isHold = utilitools.files.beattools.eventVisuals.holds[self.selectedEvent.type]
-if isHold and mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat < self.selectedEvent.time then
+if mods.beattools.config.betterHoldDragging and mods.beattools.config.holdSwapping and self.cursorBeat < self.selectedEvent.time then
 	self.holdEndSelected = false
+	angle = helpers.closestAngle(self.cursorAngle, self.selectedEvent.angle2 or 0)
 	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
-		angle = self.selectedEvent.angle2, angle2 = self.selectedEvent.angle
+		angle = angle, angle2 = self.selectedEvent.angle,
+		time = self.cursorBeat,
+		duration = self.selectedEvent.time - self.cursorBeat
 	})
 else
-	self.cmd:executeNew(cmd.ModifyKeys,self.selectedEvent,{
+	self.cmd:executeNew(cmd.ModifyKeys, self.selectedEvent, {
 		angle2 = angle,
-		duration = isHold and math.max(self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)), 0) or nil
+		duration = math.max(self.selectedEvent.duration + (self.cursorBeat - (self.selectedEvent.time + self.selectedEvent.duration)), 0)
 	})
 end
 '''
