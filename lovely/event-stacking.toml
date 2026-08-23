@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0"
+version = "1.0.0" 
 
 # Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -38,7 +38,7 @@ if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and
 '''
 position = "at"
 target = "states/Editor.lua"
-times = 3
+# times = 3
 
 [[patches]]
 [patches.pattern]

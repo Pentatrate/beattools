@@ -1,8 +1,8 @@
 {
-	"version": "3.9.50",
-	"config": {},
 	"id": "beattools",
-	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
 	"name": "Beattools",
-	"author": "Pentatrate"
+	"version": "3.9.51",
+	"author": "Pentatrate",
+	"description": "Huge (mainly) editor quality-of-life mod that aims for maximum compatibility with other mods.\nSee the full description in the configs for contributor info.",
+	"config": {}
 }

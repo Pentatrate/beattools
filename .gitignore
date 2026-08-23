@@ -3,3 +3,4 @@
 .nolovelyignore
 config.json
 unused/
+*pdn

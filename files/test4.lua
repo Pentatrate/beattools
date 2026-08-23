@@ -39,7 +39,7 @@ local function getLovelyInjectorWarnings()
 	end
 
 	for i = #warnList, 1, -1 do
-		if not (warnList[i]:find("beattools\\lovely", 1, true) or warnList[i]:find("utilitools\\lovely", 1, true) or warnList[i]:find("quick-playtest\\lovely", 1, true) or warnList[i]:find("overdetailed_events_golden\\lovely", 1, true)) then
+		if not (warnList[i]:find("beattools\\lovely", 1, true) or warnList[i]:find("utilitools\\lovely", 1, true) or warnList[i]:find("quick-playtest\\lovely", 1, true) or warnList[i]:find("overdetailed_events_golden\\lovely", 1, true) or warnList[i]:find("BetterCostumes\\lovely", 1, true)) then
 			table.remove(warnList, i)
 		end
 	end

@@ -5,7 +5,7 @@ EA Mod for the game Beatblock
 by Pentatrate (more contributors in full mod description)
 
 ![GitHub Downloads](https://img.shields.io/github/downloads/Pentatrate/beattools/total)
-![Commit Activity](https://img.shields.io/github/commit-activity/w/Pentatrate/beattools)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/Pentatrate/beattools)
 ![Commits Since Release](https://img.shields.io/github/commits-since/Pentatrate/beattools/latest)
 
 ## Info

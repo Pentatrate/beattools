@@ -16,8 +16,8 @@ if #self.overlappingEvents == 1 or (
 	self.overlappingEvents[1].event == self.overlappingEvents[2].event and
 	utilitools.files.beattools.eventVisuals.holds[self.level.events[self.overlappingEvents[1].event].type] and
 	self.overlappingEvents[1].holdEndSelected ~= self.overlappingEvents[2].holdEndSelected and
-	self.level.events[self.overlappingEvents[1]].duration == 0 and
-	self.level.events[self.overlappingEvents[1]].angle == self.level.events[self.overlappingEvents[1]].angle2
+	self.level.events[self.overlappingEvents[1].event].duration == 0 and
+	self.level.events[self.overlappingEvents[1].event].angle == self.level.events[self.overlappingEvents[1].event].angle2
 ) then
 	if #self.overlappingEvents == 2 then
 		modlog(mods.beattools, "remove redundancy", self.overlappingEvents)

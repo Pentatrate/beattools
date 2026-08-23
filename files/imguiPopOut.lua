@@ -15,7 +15,7 @@ function imguiPopOut.imgui(label, value, multiline)
 	if imguiPopOut.inUse or not mod.config.textPopOut then return value end
 
 	local imguiHelpers = utilitools.imguiHelpers
-	local necessaryWidth = imgui.GetFontSize() * 7 / 13 * (imguiHelpers.stringLength(tostring(value)) + imguiPopOut.itemPadding) + imgui.GetStyle().FramePadding.x * 2
+	local necessaryWidth = imgui.CalcTextSize(tostring(value), nil, true, nil).x + imgui.GetFontSize() * 7 / 13 * imguiPopOut.itemPadding + imgui.GetStyle().FramePadding.x * 2
 	local usedWidth = imgui.CalcItemWidth()
 
 	local itemHovered = imgui.IsItemHovered() or imgui.IsItemActive()

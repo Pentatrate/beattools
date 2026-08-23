@@ -182,7 +182,7 @@ function eventGroups.process()
 			end
 		end
 
-		local size = imgui.GetFontSize() * 7 / 13 * #group.name + imgui.GetStyle().WindowPadding.x + imgui.GetStyle().ItemInnerSpacing.x
+		local size = imgui.CalcTextSize(group.name, nil, false, nil).x + imgui.GetStyle().WindowPadding.x + imgui.GetStyle().ItemInnerSpacing.x
 		if eventGroups.length < size then eventGroups.length = size end
 
 		if type(group.events) ~= "table" then

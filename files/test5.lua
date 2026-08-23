@@ -135,6 +135,37 @@ local function levelsPaletteFromFolder(palette, folder, total)
 	end
 end
 
+local function setModChunkEnvironment(chunk, mod, setDeprecated)
+	local env = setmetatable({}, {
+		__index = function(t, k)
+			if k == "mod" then
+				return mod
+			end
+
+			-- TODO: remove this later due to deprecation
+			-- all of this information is accessible through 'mod'
+			if setDeprecated then
+				if k == "modId" then
+					log("The mod " .. mod.id .. " is using the deprecated 'modId' variable which will be removed in a future version. You should use 'mod.id' instead!","BBP")
+					return mod.id
+				end
+				if k == "modPath" then
+					log("The mod " .. mod.id .. " is using the deprecated 'modPath' variable which will be removed in a future version. You should use 'mod.path' instead!","BBP")
+					return mod.path
+				end
+				if k == "modData" then
+					log("The mod " .. mod.id .. " is using the deprecated 'modData' variable which will be removed in a future version. You should use 'mod' instead!","BBP")
+					return mod
+				end
+			end
+
+			return _G[k]
+		end,
+		__newindex = _G
+	})
+	return setfenv(chunk, env)
+end
+
 if not cs then return end
 if cs.name == "Menu" then
 	local total = {}
@@ -236,6 +267,14 @@ if cs.name == "Menu" then
 			modlog(mod, "Duplicate", level.name, level.realPath)
 		end
 	end
+elseif cs.name == "BetterCostumes" then
+	local path = utilitools.folderManager.modPath(mods["better-costumes"]) .. "/states/BetterCostumes.lua"
+	bs.fromPath("BetterCostumes", path)
+	if bs.states.BetterCostumes then
+		setModChunkEnvironment(bs.states.BetterCostumes, mods["better-costumes"])
+	else
+
+		log("failed to inject state " .. path,"BBP")
+	end
 else
-	modlog(mod, utilitools.modUpdater2.getLink("commitMsg", mod))
 end
