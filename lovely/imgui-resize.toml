@@ -3,16 +3,6 @@ dump_lua = true
 priority = 1 # run after true-or-nil-fix.toml
 version = "1.0.0"
 
-# Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
-payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
-position = "at"
-target = "obj/GameManager.lua"
-times = 1
-
 # Ctrl + i menu resize ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -78,36 +68,11 @@ times = 6
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''
-local truncatedResult = math.floor(1000*result+0.5)/1000
-local truncatedProperty = math.floor(1000*propertyOld+0.5)/1000
-'''
-payload = '''
-local precision = mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and 1e12 or 1e3
-local truncatedResult = math.floor(precision * result + 0.5) / precision
-local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
-'''
-position = "at"
-target = "obj/GameManager.lua"
-times = 1
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = '''imgui.Text(propertyName)'''
 payload = '''imgui.Text(utilitools.imguiHelpers.visibleLabel(label))'''
 position = "at"
 target = "obj/GameManager.lua"
 times = 3
-
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%.3f", event[propertyName]))'''
-payload = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format(mods.beattools.config.preciseTimeInput and imguiUniqueName == "time" and "%.12f" or "%.3f", event[propertyName]))'''
-position = "at"
-target = "obj/GameManager.lua"
-times = 1
 
 [[patches]]
 [patches.pattern]

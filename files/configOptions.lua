@@ -320,10 +320,10 @@ return {
 		default = true,
 		off = false
 	},
-	preciseTimeInput = {
+	preciseInputs = {
 		type = "bool",
-		name = "Precise Time",
-		tooltips = { short = "More decimals for the time parameter" },
+		name = "Precise Inputs",
+		tooltips = { short = "More decimals for event parameters" },
 		default = false,
 		off = false
 	},

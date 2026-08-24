@@ -16,6 +16,7 @@ local function config()
 end
 
 local function checkEase(different)
+	easeList = beattools.easeList
 	if mod.config.easeListUse and easeList.unsorted.uselessEases[different] then return false end
 	if mod.config.easeListSerious and easeList.unsorted.troll[different] then return false end
 	if mod.config.easeListSelected and not easeList.selected[different] then return false end
@@ -29,6 +30,7 @@ local function checkEase(different)
 end
 
 local function drawEase(different)
+	easeList = beattools.easeList
 	local ease, count = checkEase(different)
 	if not ease or not count then return end
 
@@ -75,6 +77,7 @@ local function drawEase(different)
 end
 
 local function doList()
+	easeList = beattools.easeList
 	config()
 
 	local hasStuff

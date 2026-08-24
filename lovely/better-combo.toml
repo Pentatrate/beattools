@@ -1,0 +1,14 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Combo adjust ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName]) then'''
+payload = '''if imgui.BeginCombo(imguiUniqueName, event[propertyName], mods.beattools.config.betterCombo and 2^4 + 2^5 + 2^7 or nil) then'''
+position = "at"
+target = "obj/GameManager.lua"
+times = 1

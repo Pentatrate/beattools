@@ -1,0 +1,33 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Precise ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+local truncatedResult = math.floor(1000*result+0.5)/1000
+local truncatedProperty = math.floor(1000*propertyOld+0.5)/1000
+'''
+payload = '''
+local precision = mods.beattools.config.preciseInputs and 1e12 or 1e3
+local truncatedResult = math.floor(precision * result + 0.5) / precision
+local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
+'''
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%.3f", event[propertyName]))'''
+payload = '''
+local precision = mods.beattools.config.preciseInputs and "%.12f" or "%.3f"
+numptr = ffi.new('char[' .. propertyLength .. ']', string.format(precision, event[propertyName]))
+'''
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
