@@ -94,8 +94,9 @@ local easing = {
 	track = {
 		ease = {
 			different = "var", parallel = false, duration = { value = true }, start = { value = "start" }, repeats = true,
-			add = { value = true },
-			params = { value = true, start = true },
+			add = { value = true }, addRandom = true,
+			random = "random", setRandom = { value = { "valueMin", "valueMax" }, start = { "startMin", "startMax" } }, allowDecimals = "allowDecimals",
+			params = { value = true, start = true, mode = true, valueMin = true, valueMax = true, startMin = true, startMax = true, allowDecimals = true },
 			default = function(different)
 				local v = beattools.easeList.unsorted.all[different]
 				if v == "nil" then return { value = nil } else return { value = v } end
@@ -464,16 +465,52 @@ function easing.getEase(eventId, different, time, order, index)
 				end
 
 				local withinDuration = track.duration and track.duration[param] and event.duration and event.duration ~= 0 and time < event.time + event.duration
-				local isAdd = track.add and track.add[param] and originalEvent.mode == "add"
+				local isAdd = track.add and track.add[param] and (event.mode == "add" or (track.addRandom and event.mode == "addRandom")) and true
+				local canBeRandom = track.random and track.setRandom and track.setRandom[param] and true
+				local isRandom = canBeRandom and (event.mode == "setRandom" or (isAdd and track.addRandom and event.mode == "addRandom")) and true
+				local allowDecimals = isRandom and track.allowDecimals and event[track.allowDecimals] and 1000 or 1
+				local startRandom = false
+
+				local paramMin, paramMax = canBeRandom and track.setRandom[param][1], canBeRandom and track.setRandom[param][2]
+
 				local getPrev = withinDuration or isAdd
 				if getPrev then
-					if not isAdd and track.start and track.start[param] and event[track.start[param]] ~= nil then
-						-- start cannot be parallel
-						prevValues[param] = event[track.start[param]]
-					elseif list[i - 1] then
+					local prevMin, prevMax
+					local hasStart = not isAdd and track.start and track.start[param]
+					if hasStart then
+						if isRandom then
+							hasStart = track.setRandom[track.start[param]] and event[track.setRandom[track.start[param]][1]] and event[track.setRandom[track.start[param]][2]]
+							if hasStart then
+								prevMin, prevMax = event[track.setRandom[track.start[param]][1]], event[track.setRandom[track.start[param]][2]]
+								hasStart = type(prevMin) == "number" and type(prevMax) == "number"
+								if hasStart then
+									prevMin, prevMax = math.ceil(prevMin * allowDecimals) / allowDecimals, math.floor(prevMax * allowDecimals) / allowDecimals
+								end
+							end
+						else
+							hasStart = event[track.start[param]] ~= nil
+						end
+					end
+					if hasStart then
+						if isRandom then
+							prevValues[param] = (prevMin + prevMax) / 2
+							if allowDecimals == 1 then prevValues[param] = helpers.round(prevValues[param]) end
+							prevValues[paramMin] = prevMin
+							prevValues[paramMax] = prevMax
+							startRandom = true
+						else
+							-- start cannot be parallel
+							prevValues[param] = event[track.start[param]]
+						end
+					elseif list[i - 1] then -- getEase
 						local prevEase = easing.getEase(eventId, different, event.time, event.order, easing.getIndex(originalEvent) - 1)
 						if prevEase then
 							prevValues[param] = prevEase[param]
+							if canBeRandom then
+								prevValues[paramMin] = prevEase[paramMin]
+								prevValues[paramMax] = prevEase[paramMax]
+								if prevEase[track.random] then startRandom = true end
+							end
 						else
 							modwarn(mod, "easing.getEase: This shouldnt happen 2: [", parallel, "] [", param, "] ", eventId, different, time, order, index)
 						end
@@ -482,7 +519,23 @@ function easing.getEase(eventId, different, time, order, index)
 					end
 				end
 
+				if isRandom then
+					local min, max = event[paramMin], event[paramMax]
+					min, max = math.ceil(tonumber(min or 0) * allowDecimals) / allowDecimals, math.floor(tonumber(max or 0) * allowDecimals) / allowDecimals
+					event[param] = (min + max) / 2
+					if allowDecimals == 1 then event[param] = helpers.round(event[param]) end
+					event[paramMin], event[paramMax] = min, max
+				end
+
 				if getPrev then
+					if not startRandom ~= not isRandom then
+						if not startRandom then
+							prevValues[paramMin], prevValues[paramMax] = prevValues[param], prevValues[param]
+						end
+						if not isRandom then
+							event[paramMin], event[paramMax] = event[param], event[param]
+						end
+					end
 					if not (type(event[param]) == "number" and type(prevValues[param]) == "number") then
 						modwarn(mod, "[" .. parallel .. "] [" .. param .. "] NaN " .. values[param])
 						values[param] = event[param]
@@ -492,19 +545,28 @@ function easing.getEase(eventId, different, time, order, index)
 						if isAdd then
 							event[param] = prevValues[param] + event[param]
 							values[param] = event[param]
+							if startRandom or isRandom then
+								event[paramMin], event[paramMax] = prevValues[paramMin] + event[paramMin], prevValues[paramMax] + event[paramMax]
+								values[paramMin], values[paramMax] = event[paramMin], event[paramMax]
+								values[track.random] = true
+							end
 						end
 						if withinDuration then
 							local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
 							values[param] = helpers.interpolate(prevValues[param], event[param], completion, event.ease)
+							if startRandom or isRandom then
+								values[paramMin] = helpers.interpolate(prevValues[paramMin], event[paramMin], completion, event.ease)
+								values[paramMax] = helpers.interpolate(prevValues[paramMax], event[paramMax], completion, event.ease)
+								values[track.random] = true
+							end
 						end
 					end
 				else
 					values[param] = event[param]
+					if isRandom then values[paramMin], values[paramMax], values[track.random] = event[paramMin], event[paramMax], true end
 					event.duration = nil
 					event.ease = nil
 				end
-
-
 			end
 
 			if track.parallel then get2(parallel) else for param2, _ in pairs(track.params) do get2(param2) end end
