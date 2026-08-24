@@ -94,6 +94,7 @@ local easing = {
 	track = {
 		ease = {
 			different = "var", parallel = false, duration = { value = true }, start = { value = "start" }, repeats = true,
+			add = { value = true },
 			params = { value = true, start = true },
 			default = function(different)
 				local v = beattools.easeList.unsorted.all[different]
@@ -415,7 +416,7 @@ function easing.getEase(eventId, different, time, order, index)
 	end
 
 	local values = track.default(different)
-	local prevValues = track.duration and helpers.copy(values)
+	local prevValues = helpers.copy(values)
 	local count = {}
 	if track.parallel then
 		count.event = {}
@@ -462,24 +463,40 @@ function easing.getEase(eventId, different, time, order, index)
 					count.event = originalEvent
 				end
 
-				if track.duration and track.duration[param] and event.duration and event.duration ~= 0 and time < event.time + event.duration then
-					if track.start and track.start[param] and event[track.start[param]] ~= nil then
+				local withinDuration = track.duration and track.duration[param] and event.duration and event.duration ~= 0 and time < event.time + event.duration
+				local isAdd = track.add and track.add[param] and originalEvent.mode == "add"
+				local getPrev = withinDuration or isAdd
+				if getPrev then
+					if not isAdd and track.start and track.start[param] and event[track.start[param]] ~= nil then
 						-- start cannot be parallel
 						prevValues[param] = event[track.start[param]]
 					elseif list[i - 1] then
-						prevValues[param] = list[i - 1].event[param]
+						local prevEase = easing.getEase(eventId, different, event.time, event.order, easing.getIndex(originalEvent) - 1)
+						if prevEase then
+							prevValues[param] = prevEase[param]
+						else
+							modwarn(mod, "easing.getEase: This shouldnt happen 2: [", parallel, "] [", param, "] ", eventId, different, time, order, index)
+						end
 					elseif i - 1 ~= 0 then
-						modwarn(mod, "easing.getEase: This shouldnt happen 2: [", parallel, "] [", param, "] ", eventId, different, time, order, index)
+						modwarn(mod, "easing.getEase: This shouldnt happen 3: [", parallel, "] [", param, "] ", eventId, different, time, order, index)
 					end
+				end
 
-					if type(event[param]) == "number" and type(prevValues[param]) == "number" then
-						local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
-						values[param] = helpers.interpolate(prevValues[param], event[param], completion, event.ease)
-					else
-						values[param] = event[param]
+				if getPrev then
+					if not (type(event[param]) == "number" and type(prevValues[param]) == "number") then
 						modwarn(mod, "[" .. parallel .. "] [" .. param .. "] NaN " .. values[param])
+						values[param] = event[param]
 						event.duration = nil
 						event.ease = nil
+					else
+						if isAdd then
+							event[param] = prevValues[param] + event[param]
+							values[param] = event[param]
+						end
+						if withinDuration then
+							local completion = helpers.clamp((time - event.time) / event.duration, 0, 1)
+							values[param] = helpers.interpolate(prevValues[param], event[param], completion, event.ease)
+						end
 					end
 				else
 					values[param] = event[param]
@@ -492,7 +509,7 @@ function easing.getEase(eventId, different, time, order, index)
 
 			if track.parallel then get2(parallel) else for param2, _ in pairs(track.params) do get2(param2) end end
 		elseif i ~= 0 then
-			modwarn(mod, "easing.getEase: This shouldnt happen 2: [", parallel, "] ", eventId, different, time, order, index)
+			modwarn(mod, "easing.getEase: This shouldnt happen 1: [", parallel, "] ", eventId, different, time, order, index)
 		end
 	end
 
