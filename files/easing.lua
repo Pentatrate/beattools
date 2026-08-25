@@ -139,7 +139,7 @@ local easing = {
 	convert = {
 		paddles = {
 			type = false,
-			different = function(event) if event.paddle == 0 then return { 1, 2, 3, 4, 5, 6, 7, 8 } else return { event.paddle } end end,
+			different = function(event, parallel) if parallel == "newHeight" then return { 1 } elseif event.paddle == 0 then return { 1, 2, 3, 4, 5, 6, 7, 8 } else return { event.paddle } end end,
 			convert = false
 		},
 		setBoolean = {
@@ -150,19 +150,19 @@ local easing = {
 		},
 		outline = {
 			type = "ease",
-			different = function(event) return { "outline" } end,
+			different = function(event, parallel) return { "outline" } end,
 			convert = function(event, different, parallel) return { value = event.enable and event.color or nil } end,
 			params = { enable = true }
 		},
 		hom = {
 			type = "ease",
-			different = function(event) return { "vfx.hom" } end,
+			different = function(event, parallel) return { "vfx.hom" } end,
 			convert = function(event, different, parallel) return { value = event.enable } end,
 			params = { enable = true }
 		},
 		setBgColor = {
 			type = "ease",
-			different = function(event)
+			different = function(event, parallel)
 				local t = {}
 				if event.color ~= nil then table.insert(t, "bgColor") end
 				if event.voidColor ~= nil then table.insert(t, "voidColor") end
@@ -173,7 +173,7 @@ local easing = {
 		},
 		noise = {
 			type = "ease",
-			different = function(event)
+			different = function(event, parallel)
 				local t = { "vfx.bgNoise", "vfx.bgNoiseColor" }
 				if event.timeStep ~= nil then table.insert(t, "vfx.bgNoiseTimeStep") end
 				if event.pixelate ~= nil then table.insert(t, "vfx.bgNoisePixelate") end
@@ -184,7 +184,7 @@ local easing = {
 		},
 		toggleParticles = {
 			type = "ease",
-			different = function(event)
+			different = function(event, parallel)
 				local t = {}
 				if event.block ~= nil then table.insert(t, "vfx.noteParticles.block") end
 				if event.miss ~= nil then table.insert(t, "vfx.noteParticles.miss") end
@@ -313,15 +313,14 @@ function easing.getArr(event, k, fakeDifferent)
 		return
 	end
 
-	local differents = track.different and (fakeDifferent and { fakeDifferent } or (convert and convert.different and convert.different(event)) or { event[track.different] }) or { "_" }
-
 	local function init(arr, k2) arr[k2] = arr[k2] or {} return arr[k2] end
 	init(easing.list, type)
 
 	local tables = {}
-	for _, different in ipairs(differents) do
+	for parallel, _ in pairs(track.parallel and track.params or { ["_"] = true }) do
+		local differents = track.different and (fakeDifferent and { fakeDifferent } or (convert and convert.different and convert.different(event, parallel)) or { event[track.different] }) or { "_" }
+		for _, different in ipairs(differents) do
 		local arr = init(easing.list[type], different)
-		for parallel, _ in pairs(track.parallel and track.params or { ["_"] = true }) do
 			if fakeDifferent or not track.parallel or ((convert and convert.convert and convert.convert(event, different, parallel) or event)[parallel] ~= nil and (not k or not track.params[k] or parallel == k)) then
 				tables[parallel] = tables[parallel] == nil and {} or tables[parallel]
 				table.insert(tables[parallel], init(arr, parallel))

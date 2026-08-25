@@ -9,13 +9,14 @@ version = "1.0.0"
 match_indent = true
 pattern = '''em.draw()'''
 payload = '''
+local paddle1, paddleC1 = utilitools.files.beattools.easing.getEase("paddles", 1, cs.editorBeat, nil, nil)
 for i = 1, 8 do
 	if mods.beattools.config.currentPaddle then
-		local paddle, paddleC = utilitools.files.beattools.easing.getEase("paddles", i, cs.editorBeat, nil, nil)
+		local paddle, paddleC = unpack(i == 1 and { paddle1, paddleC1 } or { utilitools.files.beattools.easing.getEase("paddles", i, cs.editorBeat, nil, nil) })
 		self.p.paddles[i].enabled = paddle.enabled
 		self.p.paddles[i].paddleSize = paddle.newWidth
 		self.p.paddles[i].baseAngle = paddle.newAngle
-		self.p.paddles[i].paddleWidth = 11
+		self.p.paddles[i].paddleWidth = mods.beattools.config.currentPaddleHeight and paddle1.newHeight or 11
 	else
 		self.p.paddles[i].enabled = i == 1
 		self.p.paddles[i].paddleSize = 70

@@ -348,6 +348,13 @@ return {
 		default = true,
 		off = false
 	},
+	currentPaddleHeight = {
+		type = "bool",
+		name = "Current Paddle Height",
+		tooltips = { long = "Shows how the paddle height looks like ingame at this beat", short = "Visualizes paddle height in the editor" },
+		default = false,
+		off = false
+	},
 	currentSprite = {
 		type = "bool",
 		name = "Current Sprite",

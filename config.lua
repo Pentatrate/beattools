@@ -337,6 +337,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 				end)
 				imgui.Separator()
 				configHelpers.input("currentPaddle")
+				configHelpers.input("currentPaddleHeight")
 				configHelpers.input("currentSprite")
 				imgui.Separator()
 				configHelpers.condTreeNode("Coords colors", "mouseCoordsButton", true, true,
