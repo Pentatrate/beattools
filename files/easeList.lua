@@ -1,6 +1,6 @@
 local configHelpers = utilitools.configHelpers
 local imguiHelpers = utilitools.imguiHelpers
-local easeList = beattools.easeList
+local easeList = beattools and beattools.easeList
 
 local function config()
 	configHelpers.setMod(mod)

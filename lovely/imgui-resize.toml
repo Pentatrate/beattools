@@ -97,8 +97,7 @@ pattern = '''
 	event[propertyName] = oldval
 	cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
 end
-
-helpers.imguiHelpMarker(tooltip)'''
+'''
 payload = '''
 		event[propertyName] = oldval
 		utilitools.files.beattools.undo.undoing = false
@@ -107,10 +106,6 @@ payload = '''
 	end
 	utilitools.files.beattools.undo.undoing = false
 	utilitools.files.beattools.undo.fakeRepeating = false
-
-	if mods.beattools.config.hideHelpMarkers then
-		utilitools.imguiHelpers.tooltip(tooltip)
-	else helpers.imguiHelpMarker(tooltip) end
 '''
 position = "at"
 target = "obj/GameManager.lua"

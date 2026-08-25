@@ -1,0 +1,18 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Tooltip hover ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''helpers.imguiHelpMarker(tooltip)'''
+payload = '''
+if mods.beattools.config.hideHelpMarkers then
+	utilitools.imguiHelpers.tooltip(tooltip)
+else helpers.imguiHelpMarker(tooltip) end
+'''
+position = "at"
+target = "obj/GameManager.lua"
+times = 1
