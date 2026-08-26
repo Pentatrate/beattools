@@ -7,88 +7,74 @@ It can be both like in the set paddle event
 TODO:
 - deco
 
-local decoDefault = {
-	["sprite"] = "",
-	["parentid"] = "",
-	["rotationinfluence"] = 1,
-	["orbit"] = false,
-	["x"] = 300,
-	["y"] = 180,
-	["r"] = 0,
-	["sx"] = 1,
-	["sy"] = 1,
-	["ox"] = 0,
-	["oy"] = 0,
-	["kx"] = 0,
-	["ky"] = 0,
-	["mirror"] = "none",
-	["exclusiveMirror"] = false,
-	["drawLayer"] = "fg",
-	["drawOrder"] = 0,
-	["recolor"] = -1,
-	["outline"] = false,
-	["hide"] = false,
-	["tiling"] = false,
-	["uvx"] = 0,
-	["uvy"] = 0,
-	["uvdx"] = 0,
-	["uvdy"] = 0,
-	["alphadither"] = false,
-	["ditherpercent"] = 1,
-	["effectCanvas"] = false,
-	["effectCanvasType"] = "recolor",
-	["effectCanvasRaw"] = false,
-	["ecRecolorR"] = 255,
-	["ecRecolorG"] = 255,
-	["ecRecolorB"] = 255,
-	["ecRecolorA"] = 255
-
-}
-local easable = {
-	["rotationinfluence"] = true,
-	["x"] = true,
-	["y"] = true,
-	["r"] = true,
-	["sx"] = true,
-	["sy"] = true,
-	["ox"] = true,
-	["oy"] = true,
-	["kx"] = true,
-	["ky"] = true,
-	["uvx"] = true,
-	["uvy"] = true,
-	["uvdx"] = true,
-	["uvdy"] = true,
-	["ditherpercent"] = true,
-	["ecRecolorR"] = true,
-	["ecRecolorG"] = true,
-	["ecRecolorB"] = true,
-	["ecRecolorA"] = true
-}
-local nonEasable = {
-	["sprite"] = true,
-	["parentid"] = true,
-	["orbit"] = true,
-	["mirror"] = true,
-	["exclusiveMirror"] = true,
-	["drawLayer"] = true,
-	["drawOrder"] = true,
-	["recolor"] = true,
-	["outline"] = true,
-	["hide"] = true,
-	["tiling"] = true,
-	["alphadither"] = true,
-	["effectCanvas"] = true,
-	["effectCanvasType"] = true,
-	["effectCanvasRaw"] = true
-}
 if easable[k] then
 	beattoolsAddEasing("decos", v, i, { k, "duration", "ease" }, v.id, k)
 end
 if nonEasable[k] then
 	beattoolsAddEasing("decos", v, i, { k }, v.id, k)
 end
+
 ]]
+
+local decoDefault = {,
+	id = "",
+	sprite = "",
+	parentid = "",
+	rotationinfluence = 1,
+	orbit = false,
+	x = 300,
+	y = 180,
+	r = 0,
+	sx = 1,
+	sy = 1,
+	ox = 0,
+	oy = 0,
+	kx = 0,
+	ky = 0,
+	mirror = "none",
+	exclusiveMirror = false,
+	drawLayer = "fg",
+	drawOrder = 0,
+	recolor = -1,
+	outline = false,
+	hide = false,
+	tiling = false,
+	uvx = 0,
+	uvy = 0,
+	uvdx = 0,
+	uvdy = 0,
+	alphadither = false,
+	ditherpercent = 1,
+	effectCanvas = false,
+	effectCanvasType = "recolor",
+	effectCanvasRaw = false,
+	ecRecolorR = 255,
+	ecRecolorG = 255,
+	ecRecolorB = 255,
+	ecRecolorA = 255
+}
+local easable = {,
+	id = true,
+	rotationinfluence = true,
+	x = true,
+	y = true,
+	r = true,
+	sx = true,
+	sy = true,
+	ox = true,
+	oy = true,
+	kx = true,
+	ky = true,
+	uv = true,
+	uvy = true,
+	uvdx = true,
+	uvdy = true,
+	ditherpercent = true,
+	ecRecolorR = true,
+	ecRecolorG = true,
+	ecRecolorB = true,
+	ecRecolorA = true
+}
 
 local easing = {
 	track = {
@@ -100,6 +86,13 @@ local easing = {
 			default = function(different)
 				local v = beattools.easeList.unsorted.all[different]
 				if v == "nil" then return { value = nil } else return { value = v } end
+			end
+		},
+		deco = { -- todo: create id. this is actuslly an ease so do that later as well
+			different = "id", parallel = true, duration = easable, start = false,
+			params = decoDefault,
+			default = function(different)
+				return helpers.copy(decoDefault)
 			end
 		},
 		setColor = {
