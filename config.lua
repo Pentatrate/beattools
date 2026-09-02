@@ -8,6 +8,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 			if imgui.BeginTabItem("Menu##beattoolsConfigGeneralBar") then
 				configHelpers.doc("general_menuOptions")
 				configHelpers.presets.menuOptions()
+				configHelpers.input("editorMenu")
 				imgui.Separator()
 				configHelpers.presets.menuButtons()
 				imgui.Separator()
