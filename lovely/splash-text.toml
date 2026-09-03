@@ -39,6 +39,7 @@ local additionalSplashes = {
 	"sevcon these blocks",
 	"[font=terminal]I THINK IVE RUN TOO FAR\nI COLLAPSE BY THE[font=main] bed\n[font=main][rotateY=3.2]ZZZ...",
 	":3333",
+	"OUGH I NEED A MEDIC BAG",
 
 	-- Pentatrate
 	"since i have an autoupdating system in place, adding even more splash text is no problem at all",
@@ -78,6 +79,7 @@ local additionalSplashes = {
 	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn't like it when i say that",
 	"wuh",
 	"(ive tested all fonts in my editor guide, none of them support thunbsup)",
+	"i still take suggestions btw, i will react with thumbsup if they have been implemented in the next update",
 
 	-- the goober AKA pies of lies
 	"craftable with 8 bees and a cranky!",
@@ -91,8 +93,9 @@ local additionalSplashes = {
 	"A pattern is a common arrangement of numbers with only one solution. Learning patterns is important because thinking wastes time. The two most famous patterns are 1-2-1 and 1-2-2-1. You should memorise these immediately.",
 	"In minesweeper, onechording is a technique where you can safely dig any tile adjacent to a one if the one has only one neighbor",
 	"oh god. oh fuck",
+	"Pentatrout (made of trout)",
 
-	-- thatguytheman
+	-- mawl
 	"yoru",
 	"夜", -- cerdef
 	"she empress on my nose ring till I flow",
@@ -100,9 +103,13 @@ local additionalSplashes = {
 	"who the fuck is Mawl",
 	"bleefy chinglestrough",
 	"make that a splash text",
+	"a",
+	"i tried to ask {a girl|a guy|someone}: dang are you beatblock? cuz I wanna take a number, and hopefully it's your phone number, and they stabbed me 31 times",
 
 	-- miguelreal the idea
 	"Also try exploding in real life!",
+	"did nonexistent dev do something",
+	"DID YOU KNOW? beatblock was inspired by a true story about a guy named 'Craig Nkey' who was locked in an arena and forced to slap children named 'Bel Ock' while avoiding guys named 'Mi Knees' and kicking children named 'Ian Verse'",
 
 	-- unity
 	"clamasmgdhs thechs: 5)3ghe splandushengin", -- Penta: no f:sexwords:king clue what drove unity to do this
