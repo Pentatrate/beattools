@@ -12,7 +12,11 @@ local truncatedResult = math.floor(1000*result+0.5)/1000
 local truncatedProperty = math.floor(1000*propertyOld+0.5)/1000
 '''
 payload = '''
-local precision = mods.beattools.config.preciseInputs and 1e12 or 1e3
+local precision = 3
+if mods.beattools.config.preciseInputs then
+	precision = 12
+end
+precision = math.pow(10, precision)
 local truncatedResult = math.floor(precision * result + 0.5) / precision
 local truncatedProperty = math.floor(precision * propertyOld + 0.5) / precision
 '''
@@ -25,8 +29,11 @@ times = 1
 match_indent = true
 pattern = '''numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%.3f", event[propertyName]))'''
 payload = '''
-local precision = mods.beattools.config.preciseInputs and "%.12f" or "%.3f"
-numptr = ffi.new('char[' .. propertyLength .. ']', string.format(precision, event[propertyName]))
+local precision = 3
+if mods.beattools.config.preciseInputs then
+	precision = utilitools.number.decimals(event[propertyName])
+end
+numptr = ffi.new('char[' .. propertyLength .. ']', string.format("%." .. precision .. "f", event[propertyName]))
 '''
 position = "at"
 target = "obj/GameManager.lua"

@@ -277,4 +277,5 @@ elseif cs.name == "BetterCostumes" then
 		log("failed to inject state " .. path,"BBP")
 	end
 else
+	modlog(mod, utilitools.number.decimals(1.000004))
 end
