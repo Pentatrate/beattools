@@ -25,10 +25,10 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)'''
+pattern = '''te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', math.min((event.volume or 1.0), 2.0), event.pitch)'''
 payload = '''
 if not cs.loadingBeats then
-	te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', event.volume, event.pitch)
+	te.playOne(sounds[event.sound] or cs.soundEffects[event.sound], "static",'sfx', math.min((event.volume or 1.0), 2.0), event.pitch)
 end
 '''
 position = "at"

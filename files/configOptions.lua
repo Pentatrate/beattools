@@ -1363,6 +1363,27 @@ return {
 		default = true,
 		off = false
 	},
+	persistentSorting = {
+		type = "bool",
+		name = "Persistant Sorting",
+		tooltips = { short = "Saves sorting mode between game sessions" },
+		default = true,
+		off = false
+	},
+	scrollInOptions = {
+		type = "bool",
+		name = "Options Scrolling",
+		tooltips = { short = "Allows using the scroll wheel to increment options" },
+		default = true,
+		off = false
+	},
+	--[[ scrollStep = {
+		type = "float",
+		name = "Scroll step",
+		tooltips = { short = "Increment step for options\nSet to 0 for default" },
+		default = 0,
+		off = 0
+	}, ]]
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1508,5 +1529,10 @@ return {
 		type = "hidden",
 		name = "[internal] searches",
 		default = {}
+	},
+	savedSorting = {
+		type = "hidden",
+		name = "[internal] savedSorting",
+		default = 1
 	}
 }

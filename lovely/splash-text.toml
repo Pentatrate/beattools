@@ -83,6 +83,9 @@ local additionalSplashes = {
 
 	-- the goober AKA pies of lies
 	"craftable with 8 bees and a cranky!",
+	"use hard hats when its raining. especially when swords are coming from the sky!",
+	"drink uranium",
+	"I GO THROUGH YOU LIKE A MOTHER[glitchtextchangerate=5][glitchslow=100]ERR[glitchslow]ING MINEHOLD!",
 
 	-- rhymeswithpie
 	"WHAT DOES THE CAT REACT MEAN?????",
@@ -94,6 +97,8 @@ local additionalSplashes = {
 	"In minesweeper, onechording is a technique where you can safely dig any tile adjacent to a one if the one has only one neighbor",
 	"oh god. oh fuck",
 	"Pentatrout (made of trout)",
+	"did existent dev do something",
+	-- "Cranky is dead. I killed him. He Died.",
 
 	-- mawl
 	"yoru",
@@ -105,6 +110,11 @@ local additionalSplashes = {
 	"make that a splash text",
 	"a",
 	"i tried to ask {a girl|a guy|someone}: dang are you beatblock? cuz I wanna take a number, and hopefully it's your phone number, and they stabbed me 31 times",
+	"the {last splash was|next splash is} {a lie|the truth}",
+	"crankys pronouns are [glitchtextchangerate=5][glitchslow=100]garbled mess you'll figure it out",
+	"to crank or not to crank, that is the real question",
+	"work on your FUCKING levels",
+	"whenever I join a jury, it becomes a hung jury, wink wink\n[font=undocrash]I am very indecisive",
 
 	-- miguelreal the idea
 	"Also try exploding in real life!",

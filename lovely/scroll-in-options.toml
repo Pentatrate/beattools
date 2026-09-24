@@ -1,0 +1,22 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Scroll in options ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Idea copied from demo eren mod "Scroll in Options", code is different
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''maininput:pressed\('menu_left'\)'''
+payload = ''' or (mods.beattools.config.scrollInOptions and mouse.sy < 0)'''
+position = "after"
+target = "obj/OptionsList.lua"
+
+[[patches]]
+[patches.regex]
+line_prepend = "$indent"
+pattern = '''maininput:pressed\('menu_right'\)'''
+payload = ''' or (mods.beattools.config.scrollInOptions and mouse.sy > 0)'''
+position = "after"
+target = "obj/OptionsList.lua"
