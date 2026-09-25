@@ -18,17 +18,6 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''currentSorting = 1'''
-payload = '''
-currentSorting = mods.beattools.config.persistentSorting and mods.beattools.config.savedSorting or 1
-'''
-position = "at"
-target = "obj/SortingButton.lua"
-times = 1
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = '''currentSorting = i'''
 payload = '''
 mods.beattools.config.savedSorting = i

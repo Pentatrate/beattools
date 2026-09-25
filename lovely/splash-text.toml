@@ -86,6 +86,9 @@ local additionalSplashes = {
 	"use hard hats when its raining. especially when swords are coming from the sky!",
 	"drink uranium",
 	"I GO THROUGH YOU LIKE A MOTHER[glitchtextchangerate=5][glitchslow=100]ERR[glitchslow]ING MINEHOLD!",
+	"now in strange color that eases your eyes",
+	"WARNING! this disc is for the CRAN-KY only!",
+	"at the core of a strategy called the '999 notes'",
 
 	-- rhymeswithpie
 	"WHAT DOES THE CAT REACT MEAN?????",
@@ -386,8 +389,13 @@ else
 				splash = additionalSplashes[num - 2 - #splashes - #pool]
 			end
 		else
-			splash = splashes[num - 1]
+			if num <= #splashes + 2 then
+				splash = splashes[num - 2]
+			elseif num <= #splashes + #pool + 2 then
+				splash = pool[num - 2 - #splashes]
+			end
 		end
+		if not splash then modlog(mods.beattools, "Please share this info with penta if you see this and your game crashes i guess", splash, num, #splashes + 2, #splashes + #pool + 2, mods and mods.beattools and mods.beattools.config and mods.beattools.config.moreSplashes) end
 	end
 '''
 position = "at"
@@ -400,10 +408,21 @@ times = 1
 match_indent = true
 pattern = '''
 love.graphics.print(version, project.res.cx * 2 - fonts.digitalDisco:getWidth(version) - 10 ,6 + self.logoY )
-color()'''
-payload = '''
-utilitools.files.beattools.splashes.imgui()
+color()
 '''
+payload = '''utilitools.files.beattools.splashes.imgui()'''
 position = "after"
 target = "states/Menu.lua"
 times = 1
+
+# Crash diagnosis patch ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+# Code by Kakadu, modified
+[[patches]]
+[patches.pattern]
+target = "states/Menu.luaTURN THIS PATCH OFF"
+pattern = '''st:setUpdate(function(self,dt)'''
+position = "after"
+payload = '''
+    self.splash = splashes.gen()
+'''
+match_indent = true
