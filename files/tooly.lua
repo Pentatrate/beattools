@@ -1986,8 +1986,8 @@ function tooly.play(data, time)
 							-- helpers.interpolate(startAngle, v.angle2 + (v.tesAngle or 0), t, v.holdEase)
 							beat = beat + stepSize
 						end
-						considerNote(event.angle, event.hb, "basic")
-						considerNote(event.angle2 + (event.tesAngle or 0), holdEnd, "basic")
+						-- considerNote(event.angle, event.hb, "basic")
+						-- considerNote(event.angle2 + (event.tesAngle or 0), holdEnd, "basic")
 					end
 				elseif event.name == "bounce" and not event.hitYet then
 					-- angle
@@ -2000,16 +2000,16 @@ function tooly.play(data, time)
 					if event.duration == 0 then
 						local a1 = event.angle
 						local a2 = event.angle2 + (event.tesAngle or 0)
-						local halfPaddle = smallestPaddle/2
-						local step = math.max(halfPaddle - 1, 1)
+						-- local halfPaddle = smallestPaddle/2
+						-- local step = math.max(halfPaddle - 1, 1)
 
 						local arcDiff = a2 - a1
-						local steps = math.ceil(math.abs(arcDiff) / step)
-						for i = 0, steps do
+						-- local steps = math.ceil(math.abs(arcDiff) / step)
+						--[[ for i = 0, steps do
 							local t = steps > 0 and (i / steps) or 0
 							local ang = (a1 + arcDiff * t) % 360
 							considerNote(ang % 360, event.hb, "mines")
-						end
+						end ]]
 					else
 						--im going to kill myself
 						--i know im going to have to do this unless penta finishes tooly which is more likely then me finishing bonky

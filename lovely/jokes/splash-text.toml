@@ -75,7 +75,7 @@ local additionalSplashes = {
 	"Dshambbeets",
 	"Solve your skill issue with a skill solution!",
 	"Love cats? I have the right level for you!\n[offset=50][font=undocrash]Ultimate, obviously",
-	"Beattools is incompatible with Beatblock", -- originally from thatguytheman
+	"Beattools is incompatible with Beatblock", -- originally from mawl
 	"oh hello, good-looking!\n[font=terminalTall]omfg stop sounding like the manscape ad :skull:\n[font]:skull:\nlol elitwe also doesn't like it when i say that",
 	"wuh",
 	"(ive tested all fonts in my editor guide, none of them support thunbsup)",
@@ -89,6 +89,8 @@ local additionalSplashes = {
 	"now in strange color that eases your eyes",
 	"WARNING! this disc is for the CRAN-KY only!",
 	"at the core of a strategy called the '999 notes'",
+	"RECONSTRUCT WHAT?!",
+	"eat sponges",
 
 	-- rhymeswithpie
 	"WHAT DOES THE CAT REACT MEAN?????",
@@ -191,16 +193,21 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
+pattern = '''text = "Happy birthday, Het!",'''
+payload = '''text = "{It's april fools guys trust me|Happy birthday, Het!}",'''
+position = "at"
+target = "preload/splashes.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
 pattern = '''-- BiomanticBeast'''
 payload = '''
+-- Other Beattools datespecific splashes
 {
 	text = "It's april fools guys trust me",
 	month = 3, day = 31,
-	birthday = true
-},
-{
-	text = "It's april fools guys trust me",
-	month = 4, day = 2,
 	birthday = true
 },
 {
@@ -208,7 +215,18 @@ payload = '''
 	month = 12, day = 25,
 	birthday = true
 },
--- Beattools Birthday PPL
+
+-- Beattools birthday ppl
+{
+	text = "Happy birthday, Kakadu!",
+	month = 3, day = 1,
+	birthday = true
+},
+{
+	text = "Happy birthday, Nittneuk!",
+	month = 3, day = 7,
+	birthday = true
+},
 {
 	text = "Happy birthday, aykarain!",
 	month = 4, day = 28,
@@ -220,7 +238,7 @@ payload = '''
 	priority = math.huge, chance = 1 -- Yes, I am that petty
 },
 {
-	text = "Happy birthday, ThatGuyTheMan!",
+	text = "Happy birthday, Mawl!",
 	month = 10, day = 2,
 	birthday = true
 },
@@ -270,7 +288,7 @@ pattern = '''
 if type(num) ~= "number" then num = nil end
 
 local splash
-if splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
+if not num and splashes.dateSpecificChance and math.random() < splashes.dateSpecificChance then
 	splash = splashes.dateSpecific
 else
 	local pool = {}

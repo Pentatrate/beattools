@@ -60,10 +60,19 @@ times = 1
 [patches.pattern]
 match_indent = true
 pattern = '''imgui.PushItemWidth(100)'''
-payload = '''if not mods.beattools.config.fullSize then imgui.PushItemWidth(mods.beattools.config.inputSize) else imgui.PushItemWidth(length) end'''
+payload = '''imgui.PushItemWidth(not mods.beattools.config.fullSize and mods.beattools.config.inputSize or length)'''
 position = "at"
 target = "obj/GameManager.lua"
-times = 6
+times = 5
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''itemWidth = itemWidth or 100'''
+payload = '''itemWidth = not mods.beattools.config.fullSize and mods.beattools.config.inputSize or utilitools.imguiHelpers.getWidth(text) - ((not mods.beattools.config.hideHelpMarkers) and 29 or 0)'''
+position = "at"
+target = "lib/imguihelper.lua"
+times = 1
 
 [[patches]]
 [patches.pattern]

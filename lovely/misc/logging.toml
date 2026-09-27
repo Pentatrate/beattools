@@ -154,15 +154,6 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = "print(\"hidden detected\")"
-payload = "-- print(\"hidden detected\")"
-position = "at"
-target = "states/SongSelect.lua"
-times = 1
-
-[[patches]]
-[patches.pattern]
-match_indent = true
 pattern = "log('sanitized name \"' .. menuItem.name .. '\" to \"' .. sanitizedName .. '\"')"
 payload = "-- log('sanitized name \"' .. menuItem.name .. '\" to \"' .. sanitizedName .. '\"')"
 position = "at"

@@ -219,7 +219,7 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''Event.property(event,'int', 'newWidth', 'New width to ease to', {default = 70, optional=true})'''
+pattern = '''Event.property(event,'decimal', 'newWidth', 'New width to ease to', {default = 70, optional=true})'''
 payload = '''if mods.beattools.config.angleDials and event.newWidth then event.newWidth = utilitools.suggest.dial(event.newWidth, "selectedEventNewWidth", beattools.angleSnap) end'''
 position = "after"
 target = "levelformat/events/Gameplay/paddles.lua"
@@ -227,7 +227,7 @@ times = 1
 [[patches]]
 [patches.pattern]
 match_indent = true
-pattern = '''Event.property(event,'int', 'newAngle', 'New angle to ease to', {default = 0, optional=true})'''
+pattern = '''Event.property(event,'decimal', 'newAngle', 'New angle to ease to', {default = 0, optional=true})'''
 payload = '''if mods.beattools.config.angleDials and event.newAngle then event.newAngle = utilitools.suggest.dial(event.newAngle, "selectedEventNewAngle", beattools.angleSnap) end'''
 position = "after"
 target = "levelformat/events/Gameplay/paddles.lua"

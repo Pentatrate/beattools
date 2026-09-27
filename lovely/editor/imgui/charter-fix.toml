@@ -24,8 +24,8 @@ times = 1
 
 [[patches]]
 [patches.regex]
-pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantName, difficulty = 0, charter = '',slot ?=0 ?\}'''
-payload = '''self.variant = { name = self.newVariantName, display = self.newVariantName, difficulty = 0, charter = mods.beattools.config.charter }'''
+pattern = '''self\.variant = \{ ?name = self\.newVariantName, display = self\.newVariantNameRaw, difficulty = 0, charter = '',slot ?=0 ?\}'''
+payload = '''self.variant = { name = self.newVariantName, display = self.newVariantNameRaw, difficulty = 0, charter = mods.beattools.config.charter }'''
 position = "at"
 target = "states/Editor.lua"
 
