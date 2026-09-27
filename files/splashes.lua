@@ -33,11 +33,11 @@ function splashes.imgui()
 					if value.init ~= nil then
 						value.init(value)
 					end
-					table.insert(beattools.splashes.specialCondition, value.text)
-					if beattools.splashes.specialCondition2[value.text] then
-						modlog(mod, "[splashes] Duplicate special splash", value.text, beattools.splashes.specialCondition2[value.text], #beattools.splashes.specialCondition)
+					table.insert(beattools.splashes.specialCondition, value)
+					if beattools.splashes.specialCondition2[value] then
+						modlog(mod, "[splashes] Duplicate special splash", value, beattools.splashes.specialCondition2[value], #beattools.splashes.specialCondition)
 					end
-					beattools.splashes.specialCondition2[value.text] = #beattools.splashes.specialCondition
+					beattools.splashes.specialCondition2[value] = #beattools.splashes.specialCondition
 				end
 			end
 
@@ -151,8 +151,10 @@ function splashes.imgui()
 
 				imgui.Text((index and "Nr. " .. index or "Not in splash pool") .. (data.vanilla and " (Vanilla)" or " (Modded)"))
 				imgui.SameLine()
-				if imgui.Button(tostring(splash)) then
+				local text = type(splash) == "table" and splash.text or tostring(splash)
+				if imgui.Button(text .. "##" .. category .. tostring(splash)) then
 					if realSplashes.gen then
+						modlog(mod, index or splash)
 						cs.splash = realSplashes.gen(index or splash)
 					end
 				end
