@@ -277,5 +277,6 @@ elseif cs.name == "BetterCostumes" then
 		log("failed to inject state " .. path,"BBP")
 	end
 else
-	modlog(mod, utilitools.number.decimals(1.000004))
+	local filePath = "C:/Users/penta/AppData/Roaming/beatblock/Mods/beattools/files/test5.lua"
+	modlog(mod, filePath:sub(#filePath - (filePath:reverse():find("/") or 0) + 2))
 end

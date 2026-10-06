@@ -13,6 +13,15 @@ position = "at"
 target = "lib/json.lua"
 times = 1
 
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''log("json is nil!!!!",'error')'''
+payload = '''log(string.format("%s: json is nil!!!!", json.file or "UNKNOWN FILE"),'error')'''
+position = "at"
+target = "lib/json.lua"
+times = 1
+
 # File data ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]

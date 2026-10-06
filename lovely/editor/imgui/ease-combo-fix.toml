@@ -1,0 +1,23 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Ease fix ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+end
+
+easeDirection = helpers.dropdown('##'..imguiUniqueName,easeDirection,easeDirectionChoices,60)
+imgui.SameLine(0, 4)
+'''
+payload = '''
+	easeDirection = helpers.dropdown('##'..imguiUniqueName,easeDirection,easeDirectionChoices,60)
+	imgui.SameLine(0, 4)
+end
+'''
+position = "at"
+target = "obj/GameManager.lua"
+times = 1

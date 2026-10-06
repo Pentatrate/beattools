@@ -218,6 +218,16 @@ payload = '''
 
 -- Beattools birthday ppl
 {
+	text = "Happy birthday, PiesofLies!",
+	month = 1, day = 8,
+	birthday = true
+},
+{
+	text = "Happy birthday, Red!",
+	month = 2, day = 29,
+	birthday = true
+},
+{
 	text = "Happy birthday, Kakadu!",
 	month = 3, day = 1,
 	birthday = true
@@ -225,6 +235,11 @@ payload = '''
 {
 	text = "Happy birthday, Nittneuk!",
 	month = 3, day = 7,
+	birthday = true
+},
+{
+	text = "Happy birthday, Flowrence!",
+	month = 4, day = 24,
 	birthday = true
 },
 {
@@ -245,6 +260,11 @@ payload = '''
 {
 	text = "Happy birthday, Unity!",
 	month = 10, day = 10,
+	birthday = true
+},
+{
+	text = "Happy birthday, Flare!",
+	month = 12, day = 27,
 	birthday = true
 },
 '''

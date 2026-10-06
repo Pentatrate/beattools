@@ -7,13 +7,13 @@
 					"2.0.0"
 				]
 			],
-			"reason": "You need to update this mod."
+			"reason": "You may need to update this mod."
 		},
 		"utilitools": {
 			"versions": [
 				[
 					">=",
-					"1.3.12"
+					"1.3.15"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."
@@ -44,120 +44,7 @@
 			"extension": "lua",
 			"load": true
 		},
-		"config": {
-			"extension": "lua",
-			"load": true
-		},
-		"configOptions": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"documentation": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
 		"keys": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"editorKeys": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"imguiStyle": {
-			"extension": "lua",
-			"call": true
-		},
-		"undo": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"fakeRepeat": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"eventStacking": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"eventGroups": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"eventVisuals": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"easing": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"biggestBeat": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"easeList": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"undoHistory": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"calculator": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"bookmarkList": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"eventGroupWindow": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"editorKeysWindow": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"test": {
-			"extension": "lua",
-			"load": true
-		},
-		"test2": {
-			"extension": "lua",
-			"load": true
-		},
-		"test3": {
-			"extension": "lua",
-			"load": true
-		},
-		"test4": {
-			"extension": "lua",
-			"load": true
-		},
-		"test5": {
-			"extension": "lua",
-			"load": true
-		},
-		"noiseDither": {
 			"extension": "lua",
 			"load": true,
 			"call": true
@@ -167,65 +54,213 @@
 			"load": true,
 			"call": true
 		},
+		"config": {
+			"extension": "lua",
+			"load": true
+		},
+		"configOptions": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "config"
+		},
+		"documentation": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "config"
+		},
+		"editorKeys": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor"
+		},
+		"undo": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor"
+		},
 		"ctrlSelect": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor"
 		},
-		"betterBookmarks": {
+		"easing": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor"
 		},
-		"tooly": {
+		"eventGroups": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor"
 		},
-		"intersection": {
+		"eventVisuals": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/events"
 		},
-		"splashes": {
+		"eventStacking": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/events"
 		},
-		"imguiPopOut": {
+		"fakeRepeat": {
 			"extension": "lua",
 			"load": true,
-			"call": true
-		},
-		"compare": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"tag": {
-			"extension": "lua",
-			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/events"
 		},
 		"fakeRepeat2": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/events"
+		},
+		"tag": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/events"
+		},
+		"imguiStyle": {
+			"extension": "lua",
+			"call": true,
+			"path": "editor/imgui"
 		},
 		"moreSuggestions": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/imgui"
 		},
-		"textChart": {
+		"imguiPopOut": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/imgui"
+		},
+		"bookmarkList": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"calculator": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"easeList": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"editorKeysWindow": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"eventGroupWindow": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"undoHistory": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/imgui/windows"
+		},
+		"betterBookmarks": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/visuals"
+		},
+		"biggestBeat": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "editor/visuals"
 		},
 		"livelyCranky": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "editor/visuals"
+		},
+		"intersection": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "tooly"
+		},
+		"tooly": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "tooly"
+		},
+		"textChart": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "nittsCorner"
+		},
+		"compare": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "nittsCorner"
+		},
+		"noiseDither": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "jokes"
+		},
+		"splashes": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "jokes"
+		},
+		"test": {
+			"extension": "lua",
+			"load": true,
+			"path": "test"
+		},
+		"test2": {
+			"extension": "lua",
+			"load": true,
+			"path": "test"
+		},
+		"test3": {
+			"extension": "lua",
+			"load": true,
+			"path": "test"
+		},
+		"test4": {
+			"extension": "lua",
+			"load": true,
+			"path": "test"
+		},
+		"test5": {
+			"extension": "lua",
+			"load": true,
+			"path": "test"
 		}
 	},
 	"config": true,
