@@ -7,11 +7,6 @@ return {
 			_G.beattoolsRecordPrecision = 1
 		end
 	end,
-	selectNone = function()
-		if cs.placeEvent ~= "" then
-			cs.placeEvent = ""
-		end
-	end,
 	tagSelection = function()
 		-- tag selection
 		if (cs.multiselect or cs.selectedEvent) and (not maininput:down("shift")) and (not maininput:down("ctrl")) then
@@ -60,5 +55,12 @@ return {
 			_G.beattoolsRecordPosition = not beattoolsRecordPosition
 			_G.beattoolsRecordFunc = nil
 		end
-	end
+	end,
+	blockKey = function() local event = "block" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	inverseKey = function() local event = "inverse" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	sideKey = function() local event = "side" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	mineKey = function() local event = "mine" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	holdKey = function() local event = "hold" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	mineHoldKey = function() local event = "mineHold" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	bounceKey = function() local event = "bounce" cs.placeEvent = cs.placeEvent ~= event and event or "" end
 }

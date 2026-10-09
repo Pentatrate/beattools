@@ -965,13 +965,6 @@ return {
 		default = { { {}, "key:r" } },
 		off = {}
 	},
-	selectNone = {
-		type = "key",
-		name = "Deselect Hotkey",
-		tooltips = { long = "Hotkey to select \"None\" in the event palette (default: n)", short = "Deselect placing" },
-		default = { { {}, "key:n" } },
-		off = {}
-	},
 	tagSelection = {
 		type = "key",
 		name = "(Un)Tagging Hotkeys",
@@ -1163,8 +1156,8 @@ return {
 	["hardCodedEditorKeybind show navigation wheel"] = {
 		type = "key",
 		name = "[internal] hardCodedEditorKeybind show navigation wheel",
-		default = { { { }, "bind:alt" } },
-		off = { { { }, "bind:alt" } }
+		default = { { {}, "bind:alt" } },
+		off = { { {}, "bind:alt" } }
 	},
 	["hardCodedEditorKeybind jump to previous section"] = {
 		type = "key",
@@ -1384,6 +1377,125 @@ return {
 		default = 0,
 		off = 0
 	}, ]]
+	blockKey = {
+		type = "key",
+		name = "Block Hotkey",
+		tooltips = { short = "Selects a block to place in the editor" },
+		default = { { {}, "key:n" } },
+		off = {}
+	},
+	inverseKey = {
+		type = "key",
+		name = "Inverse Hotkey",
+		tooltips = { short = "Selects a inverse to place in the editor" },
+		default = { { {}, "key:i" } },
+		off = {}
+	},
+	sideKey = {
+		type = "key",
+		name = "Side Hotkey",
+		tooltips = { short = "Selects a side to place in the editor" },
+		default = { { {}, "key:s" } },
+		off = {}
+	},
+	mineKey = {
+		type = "key",
+		name = "Mine Hotkey",
+		tooltips = { short = "Selects a mine to place in the editor" },
+		default = { { {}, "key:m" } },
+		off = {}
+	},
+	holdKey = {
+		type = "key",
+		name = "Hold Hotkey",
+		tooltips = { short = "Selects a hold to place in the editor" },
+		default = { { {}, "key:h" } },
+		off = {}
+	},
+	mineHoldKey = {
+		type = "key",
+		name = "Minehold Hotkey",
+		tooltips = { short = "Selects a minehold to place in the editor" },
+		default = { { {}, "key:w" } },
+		off = {}
+	},
+	bounceKey = {
+		type = "key",
+		name = "Bounce Hotkey",
+		tooltips = { short = "Selects a bounce to place in the editor" },
+		default = { { {}, "key:b" } },
+		off = {}
+	},
+	key0 = {
+		type = "key",
+		name = "0 Hotkey",
+		tooltips = { short = "Hotkey for 0" },
+		default = { { {}, "key:0" } },
+		off = {}
+	},
+	key1 = {
+		type = "key",
+		name = "1 Hotkey",
+		tooltips = { short = "Hotkey for 1" },
+		default = { { {}, "key:1" } },
+		off = {}
+	},
+	key2 = {
+		type = "key",
+		name = "2 Hotkey",
+		tooltips = { short = "Hotkey for 2" },
+		default = { { {}, "key:2" } },
+		off = {}
+	},
+	key3 = {
+		type = "key",
+		name = "3 Hotkey",
+		tooltips = { short = "Hotkey for 3" },
+		default = { { {}, "key:3" } },
+		off = {}
+	},
+	key4 = {
+		type = "key",
+		name = "4",
+		tooltips = { short = "Hotkey for 4" },
+		default = { { {}, "key:4" } },
+		off = {}
+	},
+	key5 = {
+		type = "key",
+		name = "5 Hotkey",
+		tooltips = { short = "Hotkey for 5" },
+		default = { { {}, "key:5" } },
+		off = {}
+	},
+	key6 = {
+		type = "key",
+		name = "6 Hotkey",
+		tooltips = { short = "Hotkey for 6" },
+		default = { { {}, "key:6" } },
+		off = {}
+	},
+	key7 = {
+		type = "key",
+		name = "7 Hotkey",
+		tooltips = { short = "Hotkey for 7" },
+		default = { { {}, "key:7" } },
+		off = {}
+	},
+	key8 = {
+		type = "key",
+		name = "8 Hotkey",
+		tooltips = { short = "Hotkey for 8" },
+		default = { { {}, "key:8" } },
+		off = {}
+	},
+	key9 = {
+		type = "key",
+		name = "9 Hotkey",
+		tooltips = { short = "Hotkey for 9" },
+		default = { { {}, "key:9" } },
+		off = {}
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
