@@ -277,6 +277,11 @@ elseif cs.name == "BetterCostumes" then
 		log("failed to inject state " .. path,"BBP")
 	end
 else
-	local filePath = "C:/Users/penta/AppData/Roaming/beatblock/Mods/beattools/files/test5.lua"
-	modlog(mod, filePath:sub(#filePath - (filePath:reverse():find("/") or 0) + 2))
+	-- local filePath = "C:/Users/penta/AppData/Roaming/beatblock/Mods/beattools/files/test5.lua"
+	-- modlog(mod, filePath:sub(#filePath - (filePath:reverse():find("/") or 0) + 2))
+	eventVisuals = utilitools.files.beattools.eventVisuals
+	modlog(mod, utilitools.table.tableAmount(eventVisuals.eventCache))
+	for _, t in pairs(eventVisuals.eventCache) do
+		modlog(mod, "e", utilitools.table.tableAmount(t))
+	end
 end

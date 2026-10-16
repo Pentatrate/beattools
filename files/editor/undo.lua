@@ -170,6 +170,11 @@ undo.shiftIndices = function(up, pos, event)
 			if undo.events[k] >= pos then
 				undo.events[k] = undo.events[k] + 1
 			end
+			if tostring(cs.level.events[undo.events[k]]) ~= k then
+				modlog(mod, "mismatch", undo.events[k], k, tostring(cs.level.events[undo.events[k]]))
+				undo.injectSub()
+				break
+			end
 		end
 		undo.events[tostring(event)] = pos
 	else
@@ -178,12 +183,18 @@ undo.shiftIndices = function(up, pos, event)
 			if undo.events[k] > pos then
 				undo.events[k] = undo.events[k] - 1
 			end
+			if tostring(cs.level.events[undo.events[k]]) ~= k then
+				modlog(mod, "mismatch", undo.events[k], k, tostring(cs.level.events[undo.events[k]]))
+				undo.injectSub()
+				break
+			end
 		end
 	end
 end
 
 undo.injectSub = function ()
 	local amount = 0
+	undo.events = {}
 	for i, event in ipairs(cs.level.events) do
 		if getmetatable(event) == nil then
 			setmetatable(event, nil)
@@ -192,7 +203,7 @@ undo.injectSub = function ()
 		end
 		undo.events[tostring(cs.level.events[i])] = i
 	end
-	-- modlog(mod, "Injected metatable into " .. amount .. " events")
+	modlog(mod, "Injected metatable into " .. amount .. " events")
 end
 undo.inject = function()
 	setmetatable(cs.level.events, {
@@ -364,10 +375,10 @@ undo.insert = function(list, pos, value)
 			else
 				-- modlog(mod, tostring(undo.changes[undo.index]) .. " " .. tostring(undo.changes[undo.index].type == "remove") .. " " .. tostring(undo.changes[undo.index].index == pos) .. " " .. tostring(undo.areSimilar(undo.changes[undo.index].ref, value)))
 				undo.newChangePre()
-				modlog(mod,
+				--[[ modwarn(mod,
 					"Adding: " ..
 					"\tindex: " .. tostring(pos)
-				)
+				) ]]
 				table.insert(undo.changes, {
 					type = "add",
 					event = helpers.copy(value),

@@ -30,8 +30,8 @@ fakeRepeat.removeChild = function(index, event)
 	end
 	fakeRepeat.indices[index].amount = fakeRepeat.indices[index].amount - 1
 end
-fakeRepeat.remove = function(index, onlyChildren, indicesIncomplete)
-	if not mods.beattools.config.fakeRepeat then return end
+fakeRepeat.remove = function(index, onlyChildren, indicesIncomplete, irreversible)
+	if not mods.beattools.config.fakeRepeat and not irreversible then return end
 	if not fakeRepeat.indices[index] then return end
 
 	utilitools.files.beattools.undo.fakeRepeating = true
@@ -54,6 +54,7 @@ fakeRepeat.remove = function(index, onlyChildren, indicesIncomplete)
 	utilitools.files.beattools.undo.fakeRepeating = false
 end
 fakeRepeat.updateList = function()
+	if not mods.beattools.config.fakeRepeat then return end
 	fakeRepeat.indices = {}
 
 	for _, v in ipairs(cs.level.events) do
@@ -97,6 +98,7 @@ fakeRepeat.updateList = function()
 	end
 end
 fakeRepeat.reGenerate = function(event, irreversible, first)
+	if not mods.beattools.config.fakeRepeat and not irreversible then return end
 	local index = first or event.beattoolsRepeatParent
 	if index == nil then return end
 
@@ -142,7 +144,7 @@ fakeRepeat.updateChildren = function(index, key, value)
 	utilitools.files.beattools.undo.fakeRepeating = false
 end
 fakeRepeat.update = function(event, irreversible, key, value)
-	if (not mods.beattools.config.fakeRepeat) and (not irreversible) then return end
+	if not mods.beattools.config.fakeRepeat and not irreversible then return end
 	if utilitools.files.beattools.eventVisuals.hasRepeat[event.type] then event.beattoolsRepeatParent = nil fakeRepeat.updateList() return end
 	-- forceprint("CALLED THIS SHIT METHTABLE MY ASS")
 
@@ -156,7 +158,7 @@ fakeRepeat.update = function(event, irreversible, key, value)
 		elseif key == "repeats" then
 			if event.repeats == nil or event.repeats == 0 then
 				-- forceprint("no parent")
-				fakeRepeat.remove(event.beattoolsRepeatParent, true)
+				fakeRepeat.remove(event.beattoolsRepeatParent, true, nil, irreversible)
 				utilitools.files.beattools.undo.fakeRepeating = true
 				event.repeatDelay = nil
 				utilitools.files.beattools.undo.fakeRepeating = false
