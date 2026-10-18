@@ -48,9 +48,7 @@ times = 1
 match_indent = true
 pattern = '''local enabled = true'''
 payload = '''
-utilitools.files.beattools.undo.undoing = true
-utilitools.files.beattools.undo.fakeRepeating = true
-'''
+utilitools.files.beattools.undo.undoing = true'''
 position = "after"
 target = "obj/GameManager.lua"
 times = 1

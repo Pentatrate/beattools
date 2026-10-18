@@ -3,14 +3,18 @@ local eventVisuals = {
 	eventCache = {},
 	holds = { hold = true, mineHold = true, trace = true, tashold = true, ["inverse-holds:inverseHold"] = true },
 	hasRepeat = {
-		ease = true,
 		tag = true,
-		setJoystickColor = true,
 		["c-me_b-me_iconsEase"] = true,
 		shinamon_offset = true,
 		shinamon_offsetAll = true,
 		shinamon_offsetEvenOdd = true,
-		shader_uniform = true
+		ease = true,
+		setColor = true,
+		setJoystickColor = true,
+		advancetextdeco = true,
+		deco = true,
+		shader_uniform = true,
+		textdeco = true
 	},
 	listen = { type = true, time = true, duration = true, bounces = true, delay = true, repeats = true, repeatDelay = true }
 }
@@ -63,9 +67,13 @@ local function inBounds(pos, width)
 end
 local function beattoolsSameEasing(event, selected)
 	if not (mod.config.markSameEasing and selected and event ~= selected and eventVisuals.getEventType(event.type) == selected.type) then return false end
-	local paramForType = { ease = "var", setColor = "color", deco = "id" }
-	if paramForType[eventVisuals.getEventType(event.type)] == nil then return false end
-	return event[paramForType[eventVisuals.getEventType(event.type)]] == selected[paramForType[eventVisuals.getEventType(event.type)]]
+	local paramForType = { ease = { "var" }, setColor = { "color" }, deco = { "id" }, shader_uniform = { "shader", "var" } }
+	local params = paramForType[eventVisuals.getEventType(event.type)]
+	if not params then return false end
+	for _, param in ipairs(params) do
+		if event[param] ~= selected[param] then return false end
+	end
+	return true
 end
 
 function eventVisuals.init()
@@ -91,7 +99,7 @@ function eventVisuals.cacheEvent(event, remove)
 
 	local duration = event.duration or 0
 	local bounces = eventVisuals.getEventType(event.type) == "bounce" and (event.bounces or 1) * (event.delay or 1) or 0
-	local repeated = eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and (event.repeats or 0) * (event.repeatDelay or 1) or 0
+	local repeated = ((event.repeats or 0) * (event.repeatDelay or 1)) or 0
 
 	for i = eventVisuals.getTime(event.time), eventVisuals.getTime(event.time + duration + bounces + repeated), eventVisuals.step do
 		add(i)
@@ -168,7 +176,7 @@ function eventVisuals.drawDuration(event, beattoolsLayer)
 		return
 	end
 
-	for i = 0, (eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and event.repeats and event.repeats > 0 and event.repeatDelay ~= 0 and event.repeats) or 0 do
+	for i = 0, ((eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] or mods.beattools.config.fakeRepeat) and event.repeats and event.repeats > 0 and event.repeatDelay ~= 0 and event.repeats) or 0 do
 		local time = event.time + i * (event.repeatDelay or 1)
 		if isVisible(time, time + event.duration) then
 			local pos1 = cs:getPosition(event.angle, math.max(time, cs.editorBeat))
@@ -186,7 +194,7 @@ function eventVisuals.drawRepeat(event, beattoolsLayer)
 	end
 
 	local sprite = (beattoolsLayer == "repeatMarker" and sprites.editor.repeatMarker) or (beattoolsLayer == "sameEasingRepeatMarker" and sprites.editor.repeatMarkerSameEasing) or sprites.editor.repeatMarkerSelected
-	local repeating = eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] and event.repeats and event.repeats > 0 and (not event.repeatDelay or event.repeatDelay >= 0)
+	local repeating = (eventVisuals.hasRepeat[eventVisuals.getEventType(event.type)] or mods.beattools.config.fakeRepeat) and event.repeats and event.repeats > 0 and (not event.repeatDelay or event.repeatDelay >= 0)
 
 	if not repeating then startStack(event) end
 	for i = repeating and 1 or 0, repeating and event.repeats or 0 do
@@ -393,22 +401,16 @@ function eventVisuals.drawEvents()
 	for _, v in pairs(eventsToDraw) do
 		if Event.info[eventVisuals.getEventType(v.type)] and utilitools.files.beattools.eventGroups.eventVisibility(v) ~= "hide" then
 			local visibility = utilitools.files.beattools.eventGroups.eventVisibility(v)
-			local selected = v == cs.selectedEvent or selectedEvents[tostring(v)] or (mod.config.fakeRepeat and cs.selectedEvent and cs.selectedEvent.beattoolsRepeatParent and v.beattoolsRepeatChild == cs.selectedEvent.beattoolsRepeatParent)
+			local selected = v == cs.selectedEvent or selectedEvents[tostring(v)]
 			local sameEase = selected or beattoolsSameEasing(v, cs.selectedEvent)
 
 			-- ok this is horrible, so limit it to 100
 			if not selected and cs.multiselect and cs.multiselect.events and #cs.multiselect.events <= 100 then
 				for _, vv in ipairs(cs.multiselect.events) do
-					if mod.config.fakeRepeat and vv.beattoolsRepeatParent and v.beattoolsRepeatChild == vv.beattoolsRepeatParent then
-						selected = true
-						break
-					end
-					if beattoolsSameEasing(v, cs.selectedEvent) then
-						sameEase = true
-					end
+					if beattoolsSameEasing(v, vv) then sameEase = true end
 				end
 			end
-			local repeating = eventVisuals.hasRepeat[eventVisuals.getEventType(v.type)] and v.repeats and v.repeats > 0 and (not v.repeatDelay or v.repeatDelay >= 0) and v.time + v.repeats * (v.repeatDelay or 1)
+			local repeating = (eventVisuals.hasRepeat[eventVisuals.getEventType(v.type)] or mods.beattools.config.fakeRepeat) and v.repeats and v.repeats > 0 and (not v.repeatDelay or v.repeatDelay >= 0) and v.time + v.repeats * (v.repeatDelay or 1)
 
 			local function addTo(list)
 				list[visibility] = list[visibility] or {}
@@ -433,54 +435,34 @@ function eventVisuals.drawEvents()
 					end
 				end
 			end
-			if mod.config.fakeRepeat and v.beattoolsRepeatChild then -- is child
-				if isVisible(v.time) then
-					if checkMarkerSelected("markRepeat") then
-						addTo(layerSelectedRepeatMarker)
-					elseif checkMarker("markRepeat") then
-						if sameEase then
-							addTo(layerSameEasingRepeatMarker)
-						else
-							addTo(layerRepeatMarker)
-						end
+
+			if Event.checkActiveRange[eventVisuals.getEventType(v.type)](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
+				if selected then -- cannot be child, must be selected parent
+					addTo(layerSelected)
+					if v.endAngle and checkMarkerSelected("markEndAnglePosition") and isVisible(v.time) then
+						addTo(layerSelectedEndAngleMarker)
 					end
-					if v.endAngle then
-						if checkMarkerSelected("markEndAnglePosition") then
-							addTo(layerSelectedEndAngleMarker)
-						elseif checkMarker("markEndAnglePosition") then
+				elseif sameEase then
+					addTo(layerSameEasing)
+				else
+					if utilitools.files.beattools.eventStacking.getType(v) == "func" then
+						addTo(layerNote)
+						if v.endAngle and checkMarker("markEndAnglePosition") and isVisible(v.time) then
 							addTo(layerEndAngleMarker)
 						end
-					end
-				end
-			else
-				if Event.checkActiveRange[eventVisuals.getEventType(v.type)](v, cs.editorBeat, cs.editorBeat + cs.drawDistance) then
-					if selected then -- cannot be child, must be selected parent
-						addTo(layerSelected)
-						if v.endAngle and checkMarkerSelected("markEndAnglePosition") and isVisible(v.time) then
-							addTo(layerSelectedEndAngleMarker)
-						end
-					elseif sameEase then
-						addTo(layerSameEasing)
 					else
-						if utilitools.files.beattools.eventStacking.getType(v) == "func" then
-							addTo(layerNote)
-							if v.endAngle and checkMarker("markEndAnglePosition") and isVisible(v.time) then
-								addTo(layerEndAngleMarker)
-							end
-						else
-							addTo(layerEvent)
-						end
+						addTo(layerEvent)
 					end
 				end
-				if repeating and isVisible(v.time + (v.repeatDelay or 1), repeating) then
-					if checkMarkerSelected("markRepeat") then
-						addTo(layerSelectedRepeatMarker)
-					elseif checkMarker("markRepeat") then
-						if sameEase then
-							addTo(layerSameEasingRepeatMarker)
-						else
-							addTo(layerRepeatMarker)
-						end
+			end
+			if repeating and isVisible(v.time + (v.repeatDelay or 1), repeating) then
+				if checkMarkerSelected("markRepeat") then
+					addTo(layerSelectedRepeatMarker)
+				elseif checkMarker("markRepeat") then
+					if sameEase then
+						addTo(layerSameEasingRepeatMarker)
+					else
+						addTo(layerRepeatMarker)
 					end
 				end
 			end

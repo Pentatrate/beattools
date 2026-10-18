@@ -1,0 +1,111 @@
+[manifest]
+dump_lua = true 
+priority = 2147483643 # 2147483647 - 4
+version = "1.0.0" 
+
+# Dummy
+# [[patches]]
+# [patches.pattern]
+# match_indent = true
+# pattern = "a"
+# payload = "a"
+# position = "at"
+# target = "thisDoesntExist.lua"
+# times = 1
+
+# Patterns copied and adapted from custom events api
+
+# Unpack custom events before saving ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "function LevelManager:saveLevel(level, filename, saveBothFiles, variant)"
+payload = '''
+	local oldLevelEvents2 = level.events
+	level.events = utilitools.files.beattools.eventPacking.unpack(oldLevelEvents2)
+'''
+position = "after"
+target = "obj/LevelManager.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "return upgraded"
+payload = "level.events = oldLevelEvents2"
+position = "before"
+target = "obj/LevelManager.lua"
+times = 1
+
+# Pack into custom events when loading into the editor ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "if project.strictLoading then"
+payload = '''if cs.name == "Editor" then level.events = utilitools.files.beattools.eventPacking.pack(level.events) end'''
+position = "before"
+target = "obj/LevelManager.lua"
+times = 1
+
+# Unpack custom events on play ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "cs.songOffset = 0"
+payload = '''local levelEvents2 = cs.name == "Editor" and utilitools.files.beattools.eventPacking.unpack(levelEvents or cs.level.events) or levelEvents or cs.level.events'''
+position = "before"
+target = "obj/GameManager.lua"
+times = 1
+
+[[patches]] # TODO: this patch feels hacky, is there any better way to do this? Penta: looks fine to me :crankless:
+[patches.pattern] # Penta: The wildcard usage for compat is making this worse and worse lol
+match_indent = true 
+pattern = "for i,v in ipairs(*level*vents) do" # Matches both cs.level.events and levelEvents for compat
+payload = "for i,v in ipairs(levelEvents2) do" 
+position = "at" 
+target = "obj/GameManager.lua" 
+
+# Tag compatibility ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''for i, v in ipairs(tagEvents) do
+	v.time = v.time - self.multiselectStartBeat'''
+payload = '''
+utilitools.files.beattools.eventPacking.unpack(tagEvents, nil, true)
+for i, v in ipairs(tagEvents) do
+	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)'''
+position = "at"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''for i,v in ipairs(events) do'''
+payload = '''utilitools.files.beattools.eventPacking.pack(events, nil, true)'''
+position = "before"
+target = "levelformat/events/Editor/tag.lua"
+times = 1
+
+# Copy compatibility ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''
+end,
+'copy','''
+payload = '''
+	utilitools.files.beattools.eventPacking.unpack(self.copy, nil, true)'''
+position = "before"
+target = "states/Editor.lua"
+times = 1
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''local newEvents = helpers.copy(self.copy)'''
+payload = '''utilitools.files.beattools.eventPacking.pack(newEvents, nil, true)'''
+position = "after"
+target = "states/Editor.lua"
+times = 1

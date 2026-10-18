@@ -31,7 +31,7 @@ end ]]
 -- change editor outline color
 --[[ for _, event in ipairs(cs.level.events) do
 	if event.editorOutline and event.editorOutline.r == 255 and event.editorOutline.g == 0 and event.editorOutline.b == 255 then
-		event.editorOutline = { r = 255, g = 255,   b = 0 }
+		event.editorOutline = { r = 255, g = 255, b = 0 }
 	end
 end ]]
 
@@ -277,11 +277,12 @@ elseif cs.name == "BetterCostumes" then
 		log("failed to inject state " .. path,"BBP")
 	end
 else
-	-- local filePath = "C:/Users/penta/AppData/Roaming/beatblock/Mods/beattools/files/test5.lua"
-	-- modlog(mod, filePath:sub(#filePath - (filePath:reverse():find("/") or 0) + 2))
-	eventVisuals = utilitools.files.beattools.eventVisuals
-	modlog(mod, utilitools.table.tableAmount(eventVisuals.eventCache))
-	for _, t in pairs(eventVisuals.eventCache) do
-		modlog(mod, "e", utilitools.table.tableAmount(t))
-	end
+	modlog(mod, utilitools.files.beattools.undo.changes)
 end
+
+-- log cached event count
+-- eventVisuals = utilitools.files.beattools.eventVisuals
+-- modlog(mod, utilitools.table.tableAmount(eventVisuals.eventCache))
+-- for _, t in pairs(eventVisuals.eventCache) do
+-- 	modlog(mod, "e", utilitools.table.tableAmount(t))
+-- end

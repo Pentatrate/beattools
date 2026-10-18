@@ -110,11 +110,9 @@ end
 payload = '''
 		event[propertyName] = oldval
 		utilitools.files.beattools.undo.undoing = false
-		utilitools.files.beattools.undo.fakeRepeating = false
 		cs.cmd:executeNew(cmd.ModifyKeys,event,{[propertyName] = newval})
 	end
 	utilitools.files.beattools.undo.undoing = false
-	utilitools.files.beattools.undo.fakeRepeating = false
 '''
 position = "at"
 target = "obj/GameManager.lua"

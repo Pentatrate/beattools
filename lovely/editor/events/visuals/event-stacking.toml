@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483643 # 2147483647 - 4
-version = "1.0.0" 
+version = "1.0.0"
 
 # Event stacking in getPosition ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -32,7 +32,7 @@ if helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8, y = pos[2] - 8, width = 16, height = 16 }'''
 payload = '''
-if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
+if not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }
 '''
@@ -49,7 +49,7 @@ if helpers.collide(
 	{ x = pos2[1] - 8, y = pos2[2] - 8, width = 16, height = 16 }) and v.time + v.duration >= cs.cBeat then
 '''
 payload = '''
-if ((not mods.beattools.config.fakeRepeat) or v.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
+if not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility(v)] and helpers.collide(
 	{ x = mouse.rx, y = mouse.ry, width = 0, height = 0 },
 	{ x = pos2[1] - 8 + utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.xOffset, y = pos2[2] - 8 - utilitools.files.beattools.eventStacking.getIndex(v) * mods.beattools.config.yOffset, width = 16, height = 16 }) and v.time + v.duration >= cs.cBeat then
 '''
@@ -60,6 +60,6 @@ times = 2
 [[patches]]
 [patches.regex]
 pattern = '''(?<func>table\.insert\(\w+?)\.multiselect\.events, ?(?<event>[\s\S]+?)\)(?<end>(\s|--\[\[[\s\S]*?\]\]|--[\s\S]*?\n)*?\w+)'''
-payload = '''if ((not mods.beattools.config.fakeRepeat) or $event.beattoolsRepeatChild == nil) and not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
+payload = '''if not ({ ghost = true, hide = true })[utilitools.files.beattools.eventGroups.eventVisibility($event)] then $func .multiselect.events, $event ) end $end'''
 position = "at"
 target = "states/Editor.lua"

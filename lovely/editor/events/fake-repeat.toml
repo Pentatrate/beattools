@@ -14,46 +14,18 @@ if event.repeats and event.repeats > 0 then
 else event.repeatDelay = nil end
 '''
 position = "at"
-target = "levelformat/events/Vfx/ease.lua"
-times = 1
-
-# Tag and blueprint compatibility without Editor Shortcuts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
-[[patches]]
-[patches.pattern]
-match_indent = true
-pattern = '''for i, v in ipairs(tagEvents) do
-	v.time = v.time - self.multiselectStartBeat
-end'''
-payload = '''
-if mods.beattools.config.fakeRepeat then
-	for i = #tagEvents, 1, -1 do
-		local v = tagEvents[i]
-		if v.beattoolsRepeatChild ~= nil then
-			table.remove(tagEvents, i)
-		end
-	end
-end
-for i = 1, #tagEvents do
-	local v = tagEvents[i]
-	v.time = v.time - (self.multiselectStartBeat or self.selectedEvent.time)
-	if mods.beattools.config.fakeRepeat then
-		if v.beattoolsRepeatParent and v.repeats ~= nil and v.repeats > 0 and not utilitools.files.beattools.eventVisuals.hasRepeat[v.type] then
-			for i = 1, v.repeats do
-				local newEvent = helpers.copy(v)
-
-				newEvent.beattoolsRepeatParent, newEvent.repeats, newEvent.repeatDelay = nil, nil, nil
-				newEvent.time = v.time + i * (v.repeatDelay or 1)
-				newEvent.beattoolsRepeatChild = v.beattoolsRepeatParent
-
-				table.insert(tagEvents, 1, newEvent)
-				i = i + 1
-			end
-		else
-			v.beattoolsRepeatParent = nil
-		end
-	end
-end
-'''
-position = "at"
-target = "states/Editor.lua"
+target = [
+  "levelformat/events/Editor/tag.lua",
+  "levelformat/events/level/c-me_b-me/iconsEase.lua",
+  "levelformat/events/level/shinamon/offset.lua",
+  "levelformat/events/level/shinamon/offsetAll.lua",
+  "levelformat/events/level/shinamon/offsetEvenOdd.lua",
+  "levelformat/events/Vfx/ease.lua",
+  "levelformat/events/Vfx/setColor.lua",
+  "levelformat/events/Vfx/setJoystickColor.lua",
+  "levelformat/events/Vfx/Deco/advanceTextDeco.lua",
+  "levelformat/events/Vfx/Deco/deco.lua",
+  "levelformat/events/Vfx/Deco/ShaderUniform.lua",
+  "levelformat/events/Vfx/Deco/textdeco.lua",
+]
 times = 1

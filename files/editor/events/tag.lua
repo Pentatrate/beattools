@@ -19,6 +19,8 @@ function tag.init()
 	tag.events = {}
 	tag.bounds = {}
 	tag.modtime = {}
+	tag.lastModtimeChecked = {}
+	tag.lastModtimeChanged = {}
 	tag.clearCache()
 end
 function tag.cacheEvent(event, remove, k)
@@ -77,10 +79,11 @@ function tag.getEvents(tagName)
 	if tag.initTag(tagName) then return {} end
 	return tag.events[tagName]
 end
-function tag.moveEvents(tagName, time, angle, cache)
+function tag.moveEvents(tagName, time, angle, repeats, repeatDelay, cache)
 	if tag.initTag(tagName) then return {} end
 	if angle == 0 then angle = nil end
-	local keys = table.concat({ time, angle or 0 }, " | ")
+	repeatDelay = repeatDelay or 1
+	local keys = table.concat({ time, angle or 0, repeats or 0, repeatDelay or 1 }, " | ")
 
 	while tag.cache[1] and tag.cache[1].time + 1 < love.timer.getTime() do
 		local element = table.remove(tag.cache)
@@ -97,8 +100,10 @@ function tag.moveEvents(tagName, time, angle, cache)
 	end
 
 	local events = helpers.copy(tag.getEvents(tagName))
+	utilitools.files.beattools.eventPacking.pack(events, nil, true)
 
-	for _, event in ipairs(events) do
+	for i = #events, 1, -1 do
+		local event = events[i]
 		event.time = event.time + time
 		event.angle = event.angle or 0
 		if angle then
@@ -106,6 +111,14 @@ function tag.moveEvents(tagName, time, angle, cache)
 			if mod.config.betterUntagging then
 				if event.angle2 then event.angle2 = event.angle2 + angle end
 				if event.endAngle then event.endAngle = event.endAngle + angle end
+			end
+		end
+		if repeats and repeats > 0 then
+			for ii = 1, repeats do
+				local newEvent = helpers.copy(event)
+				newEvent.time = event.time + ii * (repeatDelay or 1)
+
+				table.insert(events, newEvent)
 			end
 		end
 	end
@@ -117,11 +130,11 @@ function tag.moveEvents(tagName, time, angle, cache)
 
 	return events
 end
-function tag.placeEvents(tagName, time, angle, multiselect)
+function tag.placeEvents(tagName, time, angle, repeats, repeatDelay, multiselect)
 	if tag.initTag(tagName) then return end
 	if angle == 0 then angle = nil end
 
-	local events = tag.moveEvents(tagName, time, angle)
+	local events = tag.moveEvents(tagName, time, angle, repeats, repeatDelay)
 
 	for i, event in ipairs(events) do
 		table.insert(cs.level.events, event)
@@ -141,7 +154,7 @@ function tag.untag(event, multiselect) -- true is successful, nil if failed
 	local tagName = event.tag
 	if tag.initTag(tagName) then return end
 
-	tag.placeEvents(tagName, event.time, event.angleOffset and event.angle, multiselect)
+	tag.placeEvents(tagName, event.time, event.angleOffset and event.angle, event.repeats, event.repeatDelay, multiselect)
 	table.remove(cs.level.events, cs:eventIndex(event))
 	return true
 end

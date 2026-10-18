@@ -14,10 +14,20 @@ if self.selectedEvent and mods.beattools.config.fakeRepeat and not utilitools.fi
 	Event.property(self.selectedEvent, "int", "repeats", "Times to repeat", {optional = true, default = 0})
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 then
 		Event.property(self.selectedEvent, "decimal", "repeatDelay", "Beats between repeats", {step = cs:getBeatStep(), default = 1})
-	else self.selectedEvent.repeatDelay = nil end
+		self.selectedEvent.beattoolsRepeatParent = self.selectedEvent.beattoolsRepeatParent or utilitools.files.beattools.eventPacking.makeNewIndex()
+		self.selectedEvent.beattoolsRepeatHandler = "fakeRepeat2"
+	else
+		self.selectedEvent.repeatDelay = nil
+		self.selectedEvent.beattoolsRepeatParent = nil
+		self.selectedEvent.beattoolsRepeatHandler = nil
+	end
 	if self.selectedEvent.repeats and self.selectedEvent.repeats > 0 and self.selectedEvent.repeatDelay and imgui.Button("Convert##beattools") then
 		utilitools.prompts.confirm("Converting to real events will lose the functionality of changes of the main event cascading to repeated events", function ()
-			utilitools.files.beattools.fakeRepeat.update(self.selectedEvent, true)
+			utilitools.files.beattools.eventPacking.unpack(nil, self.selectedEvent.beattoolsRepeatParent, true, true)
+			self.selectedEvent.repeats = nil
+			self.selectedEvent.repeatDelay = nil
+			self.selectedEvent.beattoolsRepeatParent = nil
+			self.selectedEvent.beattoolsRepeatHandler = nil
 		end)
 	end
 	imgui.Separator()

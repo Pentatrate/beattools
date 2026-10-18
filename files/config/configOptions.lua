@@ -466,7 +466,7 @@ return {
 		type = "combo",
 		name = "Quick Property",
 		tooltips = { long = "Draws one property of an event as a number on its sprite", short = "Draws numbers on events" },
-		values = { "none", "order", "speedMult", "beattoolsRepeatParent" },
+		values = { "none", "order", "speedMult", "beattoolsRepeatParent", "repeats" },
 		valueTooltips = {},
 		default = "order",
 		off = "none"

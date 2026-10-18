@@ -112,7 +112,7 @@
 			"call": true,
 			"path": "editor/events"
 		},
-		"fakeRepeat": {
+		"eventPacking": {
 			"extension": "lua",
 			"load": true,
 			"call": true,

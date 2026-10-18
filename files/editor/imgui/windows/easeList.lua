@@ -30,6 +30,7 @@ local function checkEase(different)
 end
 
 local function drawEase(different)
+	local canBeNil = { outline = true }
 	easeList = beattools.easeList
 	local ease, count = checkEase(different)
 	if not ease or not count then return end
@@ -40,7 +41,7 @@ local function drawEase(different)
 	text, default = ease.value, defaultValues.value or "?"
 	if ease.random then min, max = ease.valueMin, ease.valueMax end
 	-- if type(easeList.unsorted.all[different]) == "boolean" then
-	if type(easeList.unsorted.all[different]) == "number" or different == "outline" then
+	if type(easeList.unsorted.all[different]) == "number" or canBeNil[different] then
 		if text ~= nil and mod.config.easeListRound then
 			text = helpers.round(text * 1e3) / 1e3
 			default = defaultValues.value and helpers.round(defaultValues.value * 1e3) / 1e3 or default
@@ -53,7 +54,13 @@ local function drawEase(different)
 	end
 	text, default = tostring(text), tostring(default)
 
-	if mod.config.easeListSelectChanged then easeList.selected[different] = ease.value ~= easeList.unsorted.all[different] or nil end
+	if mod.config.easeListSelectChanged then
+		if canBeNil[different] and type(ease.value) == "nil" then
+			easeList.selected[different] = tostring(ease.value) ~= easeList.unsorted.all[different] or nil
+		else
+			easeList.selected[different] = ease.value ~= easeList.unsorted.all[different] or nil
+		end
+	end
 
 	imgui.TableNextRow()
 	imgui.TableNextColumn()

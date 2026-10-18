@@ -194,7 +194,7 @@ function compare.showChanges(new2)
 					update()
 				end
 			end ]]
-			--[[ imgui.SameLine()
+			imgui.SameLine()
 			if imgui.Button("10 NEW") then
 				for i = 1, 10 do
 					change.resolved = "NEW"
@@ -203,7 +203,7 @@ function compare.showChanges(new2)
 					index = compare["new" .. (new2 and "2" or "1") .. "Index"]
 					change = changes[index]
 				end
-			end ]]
+			end
 			imgui.SameLine()
 			if imgui.Button("100 NEW") then
 				for i = 1, 100 do
@@ -755,11 +755,13 @@ function compare.merge()
 	local function setColor(event, r, g, b)
 		event.editorOutline = { r = r, g = g, b = b }
 	end
+	local e
 	local function getColor(new2)
 		local newStats = compare["new" .. (new2 and "2" or "1") .. "Stats"]
 		if type(newStats.part) ~= "number" then
 			return
 		end
+		if e then modlog(mod, "EEEEEEEEEEEEEE", new2, newStats.part, colors[newStats.part % #colors]) e = false end
 		return unpack(colors[newStats.part % #colors])
 	end
 	local function doRemove(event1)
