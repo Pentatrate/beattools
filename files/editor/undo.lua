@@ -140,7 +140,7 @@ function undo.checkLink(event, remove, k, from, to)
 			if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
 				if utilitools.files.beattools[file].checkEvent then
 					local denied = utilitools.files.beattools[file].checkEvent(event, remove, k, from, to)
-					deny = deny or denied
+					deny = denied or deny
 				end
 			end
 		end
@@ -519,7 +519,7 @@ undo.change = function(t, k, v, hidden)
 
 			undo.link(t, true, k, hidden[k], v)
 			hidden[k] = v
-			undo.link(t, nil, hidden[k], hidden[k], v)
+			undo.link(t, nil, k, hidden[k], v)
 
 			if undo.keyTracked(k) then cs:updateBiggestBeat() end
 		end

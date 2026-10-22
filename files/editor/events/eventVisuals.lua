@@ -99,7 +99,7 @@ function eventVisuals.cacheEvent(event, remove, k, from, to, isFullSave)
 
 	local duration = event.duration or 0
 	local bounces = eventVisuals.getEventType(event.type) == "bounce" and (event.bounces or 1) * (event.delay or 1) or 0
-	local repeated = ((event.repeats or 0) * (event.repeatDelay or 1)) or 0
+	local repeated = (event.repeats or 0) * (event.repeatDelay or 1)
 
 	for i = eventVisuals.getTime(event.time), eventVisuals.getTime(event.time + duration + bounces + repeated), eventVisuals.step do
 		add(i)
