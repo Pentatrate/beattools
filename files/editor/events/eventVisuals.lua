@@ -83,7 +83,7 @@ end
 function eventVisuals.getTime(time)
 	return time - time % eventVisuals.step
 end
-function eventVisuals.cacheEvent(event, remove)
+function eventVisuals.cacheEvent(event, remove, k, from, to, isFullSave)
 	local function add(time)
 		time = eventVisuals.getTime(time)
 		if remove then

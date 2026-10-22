@@ -65,7 +65,7 @@ function compare.getPart()
 end
 function compare.getPartBounds(part)
 	if part == "merged" then
-		return -2, 1012
+		return -2, 1184.5
 	end
 	return compare.parts[compare.currentCollab][part], compare.parts[compare.currentCollab][part + 1]
 end
@@ -325,7 +325,8 @@ function compare.load()
 		map = {
 			origIndex = {}
 		},
-		mapConverted = {}
+		mapConverted = {},
+		part = compare.getPart()
 	}
 
 	for i, event in ipairs(compare.orig) do
@@ -376,7 +377,7 @@ function compare.compare(new2)
 	}
 
 	local function inTime(event)
-		return compare.inTime(event, part)
+		return compare.inTime(event, part ~= "merged" and part or compare.origStats.part)
 	end
 	local foundCount = 0
 	local function found(event1, event2, text)
@@ -670,7 +671,9 @@ function compare.compare(new2)
 	compare["new" .. (new2 and "2" or "1") .. "Stats"] = newStats
 	compare["new" .. (new2 and "2" or "1") .. "Index"] = 1
 	modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
+	modlog(mod, compare.origStats.part, compare.new1Stats.part, compare.new1Stats.part ~= "merged" and compare.new1Stats.part or compare.origStats.part)
 end
+modlog(mod, compare.origStats.part, compare.new1Stats.part, compare.new1Stats.part ~= "merged" and compare.new1Stats.part or compare.origStats.part)
 
 function compare.checkMerge()
 	modlog(mod, "STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING")
@@ -702,7 +705,7 @@ function compare.checkMerge()
 	local checked = {}
 	local function checkEvent(event, text)
 		if checked[tostring(event)] then
-			modlog(mod, "EVENT", text, checked[tostring(event)], event.time, event.angle, event.type, event.var)
+			modlog(mod, "EVENT", text, checked[tostring(event)], event.time, event.angle, utilitools.string.concat(utilitools.string.concat(event.type, event.var), event.id))
 		end
 		checked[tostring(event)] = text
 	end

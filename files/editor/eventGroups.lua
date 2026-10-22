@@ -226,10 +226,10 @@ function eventGroups.eventVisibility(event)
 				eventGroups.eventCache[tostring(event)].visibility = visibility
 				if eventGroups.type[visibility] == 1 then
 					utilitools.files.beattools.eventVisuals.cacheEvent(event)
-					utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
+					utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, nil, nil, nil, true)
 				else
 					utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-					utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, true)
+					utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, nil, nil, nil, true)
 				end
 			end
 			eventGroups.eventCache[tostring(event)].visibility = visibility
@@ -268,10 +268,10 @@ function eventGroups.eventVisibility(event)
 		if visibility ~= visibility2 and eventGroups.type[visibility] ~= eventGroups.type[visibility2] then
 			if eventGroups.type[visibility] == 1 then
 				utilitools.files.beattools.eventVisuals.cacheEvent(event)
-				utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, true)
+				utilitools.files.beattools.eventStacking.cacheEvent(event, nil, nil, nil, nil, nil, true)
 			else
 				utilitools.files.beattools.eventVisuals.cacheEvent(event, true)
-				utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, true)
+				utilitools.files.beattools.eventStacking.cacheEvent(event, true, nil, nil, nil, nil, true)
 			end
 		end
 	end
@@ -465,7 +465,7 @@ function eventGroups.updateEventVisibilities(group, moveDown)
 	end
 end
 
-function eventGroups.cacheEvent(event, remove, _k)
+function eventGroups.cacheEvent(event, remove, _k, from, to, isFullSave)
 	if remove and eventGroups.eventCache[tostring(event)] then
 		for groupName, group in pairs(eventGroups.groups) do
 			local groupCache = eventGroups.groupCache[groupName]

@@ -111,10 +111,9 @@ undo = {
 		biggestBeat = false,
 		eventGroups = false,
 		tag = false,
-		fakeRepeat2 = true,
 		moreSuggestions = false,
-		eventPacking = true,
-		undo = true
+		eventPacking = false,
+		undo = false
 	}
 }
 
@@ -125,22 +124,22 @@ function undo.dontTrack(func)
 	undo.undoing = false
 end
 
-undo.link = function(event, remove, k)
+function undo.link(event, remove, k, from, to, isFullSave)
 	for file, _ in pairs(undo.linkFiles) do
 		if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
 			if utilitools.files.beattools[file].cacheEvent then
-				utilitools.files.beattools[file].cacheEvent(event, remove, k)
+				utilitools.files.beattools[file].cacheEvent(event, remove, k, from, to, isFullSave)
 			end
 		end
 	end
 end
-undo.checkLink = function(event, remove, k)
+function undo.checkLink(event, remove, k, from, to)
 	local deny = false
 	for file, denyable in pairs(undo.linkFiles) do
 		if not denyable then
 			if not k or type(utilitools.files.beattools[file].listen) ~= "table" or utilitools.files.beattools[file].listen[k] then
 				if utilitools.files.beattools[file].checkEvent then
-					local denied = utilitools.files.beattools[file].checkEvent(event, remove, k)
+					local denied = utilitools.files.beattools[file].checkEvent(event, remove, k, from, to)
 					deny = deny or denied
 				end
 			end
@@ -149,7 +148,7 @@ undo.checkLink = function(event, remove, k)
 	return deny
 end
 
-function undo.cacheEvent(event, remove, k)
+function undo.cacheEvent(event, remove, k, from, to, isFullSave)
 	undo.eventAccess[tostring(event)] = not remove and event or nil
 end
 
@@ -353,60 +352,57 @@ undo.insert = function(list, pos, value)
 		pos = #list + 1
 	end
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
-		if true then
-			if getmetatable(value) == nil or not getmetatable(value).beattoolsUndoInject then
-				undo.meta(value)
-			end
-
-			if
-				undo.changes[undo.index + 1] and
-				undo.changes[undo.index + 1].type == "add" and
-				-- undo.changes[undo.index + 1].ref == value and
-				-- undo.changes[undo.index + 1].index == pos and
-				undo.areSimilar(undo.changes[undo.index + 1].ref, value)
-			then
-				value = undo.changes[undo.index + 1].ref
-				undo.changes[undo.index + 1].index = pos
-
-				-- modlog(mod, "Manual redo insert")
-				undo.index = undo.index + 1
-			elseif
-				undo.changes[undo.index] and
-				undo.changes[undo.index].type == "remove" and
-				-- undo.changes[undo.index].ref == value and
-				-- undo.changes[undo.index].index == pos and
-				undo.areSimilar(undo.changes[undo.index].ref, value)
-			then
-				value = undo.changes[undo.index].ref
-				undo.changes[undo.index].index = pos
-
-				-- modlog(mod, "Manual undo delete")
-				undo.index = undo.index - 1
-			else
-				undo.newChangePre()
-				--[[ modlog(mod,
-					"Adding: " ..
-					"\tindex: " .. tostring(pos)
-				) ]]
-				table.insert(undo.changes, {
-					type = "add",
-					event = helpers.copy(value),
-					ref = value,
-					index = pos,
-					time = undo.lastCheck
-				})
-				undo.newChangeSub()
-			end
-
-			beattools.moremetamethods.insert(list, pos, value)
-			undo.shiftIndices(true, pos, value)
-
-			undo.link(value)
-
-			cs:updateBiggestBeat()
-		else
+		if getmetatable(value) == nil or not getmetatable(value).beattoolsUndoInject then undo.meta(value) end
+		if undo.checkLink(value) then
 			forceprint("add refused " .. pos)
+			return false
 		end
+		if
+			undo.changes[undo.index + 1] and
+			undo.changes[undo.index + 1].type == "add" and
+			-- undo.changes[undo.index + 1].ref == value and
+			-- undo.changes[undo.index + 1].index == pos and
+			undo.areSimilar(undo.changes[undo.index + 1].ref, value)
+		then
+			value = undo.changes[undo.index + 1].ref
+			undo.changes[undo.index + 1].index = pos
+
+			-- modlog(mod, "Manual redo insert")
+			undo.index = undo.index + 1
+		elseif
+			undo.changes[undo.index] and
+			undo.changes[undo.index].type == "remove" and
+			-- undo.changes[undo.index].ref == value and
+			-- undo.changes[undo.index].index == pos and
+			undo.areSimilar(undo.changes[undo.index].ref, value)
+		then
+			value = undo.changes[undo.index].ref
+			undo.changes[undo.index].index = pos
+
+			-- modlog(mod, "Manual undo delete")
+			undo.index = undo.index - 1
+		else
+			undo.newChangePre()
+			--[[ modlog(mod,
+				"Adding: " ..
+				"\tindex: " .. tostring(pos)
+			) ]]
+			table.insert(undo.changes, {
+				type = "add",
+				event = helpers.copy(value),
+				ref = value,
+				index = pos,
+				time = undo.lastCheck
+			})
+			undo.newChangeSub()
+		end
+
+		beattools.moremetamethods.insert(list, pos, value)
+		undo.shiftIndices(true, pos, value)
+
+		undo.link(value)
+
+		cs:updateBiggestBeat()
 
 		return false
 	end
@@ -415,50 +411,51 @@ end
 undo.remove = function(list, pos)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events and list[pos] then
 		local returnValue
-		if true then
-			if
-				undo.changes[undo.index + 1] and
-				undo.changes[undo.index + 1].type == "remove" and
-				undo.changes[undo.index + 1].ref == list[pos] and
-				undo.changes[undo.index + 1].index == pos and
-				undo.areSimilar(undo.changes[undo.index + 1].ref, list[pos])
-			then
-				-- modlog(mod, "Manual redo delete")
-				undo.index = undo.index + 1
-			elseif
-				undo.changes[undo.index] and
-				undo.changes[undo.index].type == "add" and
-				undo.changes[undo.index].ref == list[pos] and
-				undo.changes[undo.index].index == pos and
-				undo.areSimilar(undo.changes[undo.index].ref, list[pos])
-			then
-				-- modlog(mod, "Manual undo insert")
-				undo.index = undo.index - 1
-			else
-				undo.newChangePre()
-				--[[ modlog(mod,
-					"Removing:" ..
-					"\tindex: " .. tostring(pos)
-				) ]]
-				table.insert(undo.changes, {
-					type = "remove",
-					event = helpers.copy(list[pos]),
-					ref = list[pos],
-					index = pos,
-					time = undo.lastCheck
-				})
-				undo.newChangeSub()
-			end
-
-			undo.link(list[pos], true)
-
-			returnValue = beattools.moremetamethods.remove(list, pos)
-			undo.shiftIndices(false, pos, returnValue)
-
-			cs:updateBiggestBeat()
-		else
+		if undo.checkLink(list[pos], true) then
 			forceprint("remove refused " .. pos)
+			return false, returnValue
 		end
+		if
+			undo.changes[undo.index + 1] and
+			undo.changes[undo.index + 1].type == "remove" and
+			undo.changes[undo.index + 1].ref == list[pos] and
+			undo.changes[undo.index + 1].index == pos and
+			undo.areSimilar(undo.changes[undo.index + 1].ref, list[pos])
+		then
+			-- modlog(mod, "Manual redo delete")
+			undo.index = undo.index + 1
+		elseif
+			undo.changes[undo.index] and
+			undo.changes[undo.index].type == "add" and
+			undo.changes[undo.index].ref == list[pos] and
+			undo.changes[undo.index].index == pos and
+			undo.areSimilar(undo.changes[undo.index].ref, list[pos])
+		then
+			-- modlog(mod, "Manual undo insert")
+			undo.index = undo.index - 1
+		else
+			undo.newChangePre()
+			--[[ modlog(mod,
+				"Removing:" ..
+				"\tindex: " .. tostring(pos)
+			) ]]
+			table.insert(undo.changes, {
+				type = "remove",
+				event = helpers.copy(list[pos]),
+				ref = list[pos],
+				index = pos,
+				time = undo.lastCheck
+			})
+			undo.newChangeSub()
+		end
+
+		undo.link(list[pos], true)
+
+		returnValue = beattools.moremetamethods.remove(list, pos)
+		undo.shiftIndices(false, pos, returnValue)
+
+		cs:updateBiggestBeat()
+
 		return false, returnValue
 	end
 	return true
@@ -468,65 +465,63 @@ undo.change = function(t, k, v, hidden)
 	if type(v) == "table" then same, reasons = undo.areSimilar(hidden[k], v, true) else same = hidden[k] == v end
 	if not undo.undoing and cs and cs.name == "Editor" and cs.level and cs.level.events and not same then
 		if undo.keyTracked(k) then
-			if true then
-				if undo.events[tostring(t)] == nil then
-					modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!", t, k, v, hidden)
-					undo.fullIndex()
-				end
-				if
-					undo.changes[undo.index + 1] and
-					undo.changes[undo.index + 1].type == "change" and
-					undo.changes[undo.index + 1].ref == t and
-					undo.changes[undo.index + 1].index == undo.events[tostring(t)] and
-					undo.changes[undo.index + 1].key == k and
-					undo.changes[undo.index + 1].from == hidden[k] and
-					undo.changes[undo.index + 1].to == v
-				then
-					-- modlog(mod, "Manual redo change")
-					undo.index = undo.index + 1
-				elseif
-					undo.changes[undo.index] and
-					undo.changes[undo.index].type == "change" and
-					undo.changes[undo.index].ref == t and
-					undo.changes[undo.index].index == undo.events[tostring(t)] and
-					undo.changes[undo.index].key == k and
-					undo.changes[undo.index].from == v and
-					undo.changes[undo.index].to == hidden[k]
-				then
-					-- modlog(mod, "Manual undo change")
-					undo.index = undo.index - 1
-				else
-					undo.newChangePre()
-					--[[ modwarn(mod,
-						"Changing:" ..
-						"\tindex: " .. tostring(undo.events[tostring(t)]) .. "\n"..
-						"\tkey: " .. tostring(k) .. "\n"..
-						"\tfrom: " .. tostring(hidden[k]) .. "\n"..
-						"\tto: " .. tostring(v) ..
-						"\tchanged: " .. tostring(reasons)
-					) ]]
-					table.insert(undo.changes, {
-						type = "change",
-						ref = t,
-						index = undo.events[tostring(t)],
-						key = k,
-						from = hidden[k],
-						to = v,
-						time = undo.lastCheck
-					})
-					undo.newChangeSub()
-				end
-
-				undo.link(t, true, k)
-				hidden[k] = v
-				undo.link(t, nil, k)
-
-				if undo.keyTracked(k) then
-					cs:updateBiggestBeat()
-				end
-			else
-				forceprint("change refused " .. k .. " from " .. tostring(hidden[k]) .. " to " .. tostring(v))
+			if undo.events[tostring(t)] == nil then
+				modwarn(mod, "INDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!\nINDEX IS NIL!!!", t, k, v, hidden)
+				undo.fullIndex()
 			end
+			if undo.checkLink(t, nil, k, hidden[k], v) then
+				forceprint("change refused " .. k .. " from " .. tostring(hidden[k]) .. " to " .. tostring(v))
+				return
+			end
+			if
+				undo.changes[undo.index + 1] and
+				undo.changes[undo.index + 1].type == "change" and
+				undo.changes[undo.index + 1].ref == t and
+				undo.changes[undo.index + 1].index == undo.events[tostring(t)] and
+				undo.changes[undo.index + 1].key == k and
+				undo.changes[undo.index + 1].from == hidden[k] and
+				undo.changes[undo.index + 1].to == v
+			then
+				-- modlog(mod, "Manual redo change")
+				undo.index = undo.index + 1
+			elseif
+				undo.changes[undo.index] and
+				undo.changes[undo.index].type == "change" and
+				undo.changes[undo.index].ref == t and
+				undo.changes[undo.index].index == undo.events[tostring(t)] and
+				undo.changes[undo.index].key == k and
+				undo.changes[undo.index].from == v and
+				undo.changes[undo.index].to == hidden[k]
+			then
+				-- modlog(mod, "Manual undo change")
+				undo.index = undo.index - 1
+			else
+				undo.newChangePre()
+				--[[ modwarn(mod,
+					"Changing:" ..
+					"\tindex: " .. tostring(undo.events[tostring(t)]) .. "\n"..
+					"\tkey: " .. tostring(k) .. "\n"..
+					"\tfrom: " .. tostring(hidden[k]) .. "\n"..
+					"\tto: " .. tostring(v) ..
+					"\tchanged: " .. tostring(reasons)
+				) ]]
+				table.insert(undo.changes, {
+					type = "change",
+					ref = t,
+					index = undo.events[tostring(t)],
+					key = k,
+					from = hidden[k],
+					to = v,
+					time = undo.lastCheck
+				})
+				undo.newChangeSub()
+			end
+
+			undo.link(t, true, k, hidden[k], v)
+			hidden[k] = v
+			undo.link(t, nil, hidden[k], hidden[k], v)
+
+			if undo.keyTracked(k) then cs:updateBiggestBeat() end
 		end
 	else
 		hidden[k] = v
@@ -583,7 +578,7 @@ undo.fullSave = function()
 	local events = {}
 	for i, v in ipairs(cs.level.events) do
 		events[i] = { event = helpers.copy(v), ref = v, index = i }
-		undo.link(v)
+		undo.link(v, nil, nil, nil, nil, true)
 	end
 	table.insert(undo.changes, {
 		type = "fullSave",
@@ -690,9 +685,9 @@ undo.keybind = function(doUndo, doMultiple)
 						if cs.level.events[change.index][change.key] == change[doUndo and "to" or "from"] then
 							-- forceprint((doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
 
-							undo.link(cs.level.events[change.index], true, change.key)
+							undo.link(cs.level.events[change.index], true, change.key, change[doUndo and "to" or "from"], change[doUndo and "from" or "to"])
 							cs.level.events[change.index][change.key] = helpers.copy(change[doUndo and "from" or "to"])
-							undo.link(cs.level.events[change.index], nil, change.key)
+							undo.link(cs.level.events[change.index], nil, change.key, change[doUndo and "to" or "from"], change[doUndo and "from" or "to"])
 
 							return true
 						else

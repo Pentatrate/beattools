@@ -7,7 +7,7 @@ function moreSuggestions.init()
 	moreSuggestions.decoIds = {}
 end
 
-function moreSuggestions.cacheEvent(event, remove, k)
+function moreSuggestions.cacheEvent(event, remove, k, from, to, isFullSave)
 	if event.type == "deco" and event.id and event.id ~= "" then
 		moreSuggestions.decoIds[event.id] = moreSuggestions.decoIds[event.id] or {}
 		if remove then

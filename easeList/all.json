@@ -398,5 +398,7 @@
 	"rtf.rngSeed": 4,
 	"rtf.time": 0,
 	"rtf.timeScale": 1,
-	"rtf.timeThresholdChangeRate": 30
+	"rtf.timeThresholdChangeRate": 30,
+
+	"vfx.oldDitherLogic": false
 }

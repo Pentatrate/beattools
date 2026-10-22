@@ -19,7 +19,7 @@ function biggestBeat.init()
 	biggestBeat.drawMultiselect = false
 end
 
-function biggestBeat.cacheEvent(event, remove, k)
+function biggestBeat.cacheEvent(event, remove, k, from, to, isFullSave)
 	local eventVisuals = utilitools.files.beattools.eventVisuals
 
 	local duration = event.duration or 0

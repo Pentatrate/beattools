@@ -23,7 +23,7 @@ function tag.init()
 	tag.lastModtimeChanged = {}
 	tag.clearCache()
 end
-function tag.cacheEvent(event, remove, k)
+function tag.cacheEvent(event, remove, k, from, to, isFullSave)
 	tag.clearCache()
 	if event.type == "tag" then
 		if remove then

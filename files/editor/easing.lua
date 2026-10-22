@@ -330,7 +330,7 @@ function easing.getArr(event, k, fakeDifferent)
 	return tables, track, convert
 end
 
-function easing.cacheEvent(event, remove, k)
+function easing.cacheEvent(event, remove, k, from, to, isFullSave)
 	-- if true then return end
 	local arr, track, convert = easing.getArr(event, k)
 	if not arr or not track then --[[ modwarn(mod, "Invalid input") ]] return end
@@ -453,7 +453,7 @@ function easing.getEase(eventId, different, time, order, index)
 				event.order = originalEvent.order
 
 				local repeated = list[i].repeated
-				event.time = originalEvent.time + (track.repeats and repeated and repeated * originalEvent.repeatDelay or 0)
+				event.time = originalEvent.time + (track.repeats and repeated and repeated * (originalEvent.repeatDelay or 1) or 0)
 
 				if track.parallel then
 					count[param].index = i

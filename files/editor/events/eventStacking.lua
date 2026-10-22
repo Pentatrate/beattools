@@ -46,7 +46,7 @@ function eventStacking.getAngle(event)
 	return (mods.beattools.config.displayEndAngle and event.endAngle or event.angle) % 360
 end
 
-function eventStacking.cacheEvent(event, remove, _k, dontCheck)
+function eventStacking.cacheEvent(event, remove, _k, from, to, isFullSave, dontCheck)
 	if not (event and event.type and event.time and event.angle) then modwarn(mod, "eventStacking.cacheEvent: Invalid event: ", event) return end
 	local k = eventStacking.getType(event)
 	local angle = eventStacking.getAngle(event)
