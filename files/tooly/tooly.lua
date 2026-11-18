@@ -1942,97 +1942,99 @@ function tooly.play(data, time)
 	local ranges = tooly.tunnelsGetRanges(tooly.data.tunnels, tooly.data.antiTunnels, time)
 	for _, event in ipairs(entities) do
 		if event.hb then
-			local type = event.type
-			local eventTime = event.hb
-			local angle = event.endAngle or event.angle
+			local type = event.name
+			if tooly.supported[type] then
+				local eventTime = event.hb
+				local angle = event.endAngle or event.angle
 
-			local angle2 = event.angle2
-			local duration = event.duration
-			local holdEase = event.holdEase
+				local angle2 = event.angle2
+				local duration = event.duration
+				local holdEase = event.holdEase
 
-			local bounces = event.bounces
-			local delay = event.delay
-			local rotation = event.rotation
+				local bounces = event.bounces
+				local delay = event.delay
+				local rotation = event.rotation
 
-			local eventTypes = {
-				block = function()
-					if not event.hitYet and checkHit(eventTime) then eventTime = time end
-				end,
-				hold = function ()
-					if not event.hitYet and checkHit(eventTime) then eventTime = time end
-					if checkHit(event.hb + duration) then duration = time - eventTime end
-				end,
-				mine = function ()
-					if not event.hitYet and checkHit(eventTime) then eventTime = time end
-				end,
-				mineHold = function ()
-					if not event.hitYet and checkHit(eventTime) then eventTime = time end
-					if checkHit(event.hb + duration) then duration = time - eventTime end
-				end
-			}
+				local eventTypes = {
+					block = function()
+						if not event.hitYet and checkHit(eventTime) then eventTime = time end
+					end,
+					hold = function ()
+						if not event.hitYet and checkHit(eventTime) then eventTime = time end
+						if checkHit(event.hb + duration) then duration = time - eventTime end
+					end,
+					mine = function ()
+						if not event.hitYet and checkHit(eventTime) then eventTime = time end
+					end,
+					mineHold = function ()
+						if not event.hitYet and checkHit(eventTime) then eventTime = time end
+						if checkHit(event.hb + duration) then duration = time - eventTime end
+					end
+				}
 
-			if eventTypes[type] then eventTypes[type]() end
+				if eventTypes[type] then eventTypes[type]() end
 
-			if false then
-				if event.name == "hold" and event.duration and (not event.hitYet or event.started) then
-					if event.duration == 0 then
-					else
-						local holdEnd = event.hb + event.duration
-						local stepSize = math.max((event.leniencyFrames + cs.extraHoldLeniency) / 60, 0.001)
-						local startAngle = event.startAngle or event.angle
-						local beat = event.hb
-						while beat < holdEnd do
-							local t = (beat - event.hb) / event.duration
-							-- helpers.interpolate(startAngle, v.angle2 + (v.tesAngle or 0), t, v.holdEase)
-							beat = beat + stepSize
+				if false then
+					if event.name == "hold" and event.duration and (not event.hitYet or event.started) then
+						if event.duration == 0 then
+						else
+							local holdEnd = event.hb + event.duration
+							local stepSize = math.max((event.leniencyFrames + cs.extraHoldLeniency) / 60, 0.001)
+							local startAngle = event.startAngle or event.angle
+							local beat = event.hb
+							while beat < holdEnd do
+								local t = (beat - event.hb) / event.duration
+								-- helpers.interpolate(startAngle, v.angle2 + (v.tesAngle or 0), t, v.holdEase)
+								beat = beat + stepSize
+							end
+							-- considerNote(event.angle, event.hb, "basic")
+							-- considerNote(event.angle2 + (event.tesAngle or 0), holdEnd, "basic")
 						end
-						-- considerNote(event.angle, event.hb, "basic")
-						-- considerNote(event.angle2 + (event.tesAngle or 0), holdEnd, "basic")
-					end
-				elseif event.name == "bounce" and not event.hitYet then
-					-- angle
-				elseif event.name == "mine" and not event.hitYet then
-					-- event.angle
-				elseif event.name == "mineHold" and event.duration and (not event.hitYet or (event.hb < cs.cBeat and not ((event.hb + event.duration) < cs.cBeat))) then
-					local holdEnd = event.hb + event.duration
-					--local stepSize = 0.005
-					local startAngle = event.startAngle or event.angle
-					if event.duration == 0 then
-						local a1 = event.angle
-						local a2 = event.angle2 + (event.tesAngle or 0)
-						-- local halfPaddle = smallestPaddle/2
-						-- local step = math.max(halfPaddle - 1, 1)
+					elseif event.name == "bounce" and not event.hitYet then
+						-- angle
+					elseif event.name == "mine" and not event.hitYet then
+						-- event.angle
+					elseif event.name == "mineHold" and event.duration and (not event.hitYet or (event.hb < cs.cBeat and not ((event.hb + event.duration) < cs.cBeat))) then
+						local holdEnd = event.hb + event.duration
+						--local stepSize = 0.005
+						local startAngle = event.startAngle or event.angle
+						if event.duration == 0 then
+							local a1 = event.angle
+							local a2 = event.angle2 + (event.tesAngle or 0)
+							-- local halfPaddle = smallestPaddle/2
+							-- local step = math.max(halfPaddle - 1, 1)
 
-						local arcDiff = a2 - a1
-						-- local steps = math.ceil(math.abs(arcDiff) / step)
-						--[[ for i = 0, steps do
-							local t = steps > 0 and (i / steps) or 0
-							local ang = (a1 + arcDiff * t) % 360
-							considerNote(ang % 360, event.hb, "mines")
-						end ]]
-					else
-						--im going to kill myself
-						--i know im going to have to do this unless penta finishes tooly which is more likely then me finishing bonky
-						--who im i kidding penta is definately finishing tooly before i finish bonky he already got mineholds down pretty much in like a 3 days since saying he was... WHAT ITS BEEN ONLY 3 DAYS?
+							local arcDiff = a2 - a1
+							-- local steps = math.ceil(math.abs(arcDiff) / step)
+							--[[ for i = 0, steps do
+								local t = steps > 0 and (i / steps) or 0
+								local ang = (a1 + arcDiff * t) % 360
+								considerNote(ang % 360, event.hb, "mines")
+							end ]]
+						else
+							--im going to kill myself
+							--i know im going to have to do this unless penta finishes tooly which is more likely then me finishing bonky
+							--who im i kidding penta is definately finishing tooly before i finish bonky he already got mineholds down pretty much in like a 3 days since saying he was... WHAT ITS BEEN ONLY 3 DAYS?
+						end
+					elseif event.name == "side" and not event.sideHitYet then
+						-- angle
 					end
-				elseif event.name == "side" and not event.sideHitYet then
-					-- angle
 				end
+
+				tooly.holdLeniency = true
+				tooly.noSides = true
+
+				local check = tooly.checkEventTime(time, type, eventTime, duration, bounces, delay)
+
+				if check then
+					local moreRanges = tooly.getEventMoreRanges(time, type, eventTime, angle, angle2, duration, holdEase, delay, rotation)
+
+					ranges = tooly.overlapRanges(ranges, moreRanges, false)
+				end
+
+				tooly.noSides = false
+				tooly.holdLeniency = false
 			end
-
-			tooly.holdLeniency = true
-			tooly.noSides = true
-
-			local check = tooly.checkEventTime(time, type, eventTime, duration, bounces, delay)
-
-			if check then
-				local moreRanges = tooly.getEventMoreRanges(time, type, eventTime, angle, angle2, duration, holdEase, delay, rotation)
-
-				ranges = tooly.overlapRanges(ranges, moreRanges, false)
-			end
-
-			tooly.noSides = false
-			tooly.holdLeniency = false
 		end
 	end
 

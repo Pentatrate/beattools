@@ -45,10 +45,11 @@ if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBe
 	forceprint("LAG DETECTED!!!")
 	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
 	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
-	if cs.cBeat - tempTime >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click', soundObject = sounds['click']}) end
-	if cs.cBeat - tempTime >= 2 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 2, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
-	if cs.cBeat - tempTime >= 1 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 1, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side', soundObject = sounds['side']}) end
-	if cs.cBeat - tempTime >= 0 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 0, type = 'playSound', volume = '1', pitch = '1.75', sound = 'side', soundObject = sounds['side']}) end
+	local timeDiff = cs.cBeat - tempTime
+	if timeDiff >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click'}) end
+	if timeDiff >= 2 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 2, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side'}) end
+	if timeDiff >= 1 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 1, type = 'playSound', volume = '1', pitch = '1.5', sound = 'side'}) end
+	if timeDiff >= 0 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 0, type = 'playSound', volume = '1', pitch = '1.75', sound = 'side'}) cs.playEventsSorted = false end
 	cs.pauseBeat = cs.cBeat
 	cs.source:setBeat(tempTime)
 	self.CHEATlagBack = (self.CHEATlagBack or 0) + 1
@@ -102,7 +103,7 @@ times = 3
 match_indent = true
 pattern = '''local textWidth = fonts.digitalDisco:getWidth(str)'''
 payload = '''
-if self.CHEATlagBack ~= 0 then
+if self.CHEATlagBack and self.CHEATlagBack ~= 0 then
 	if str ~= '' then str = str .. ', ' end
 	str = str .. "Lagged " .. self.CHEATlagBack .. " times"
 end

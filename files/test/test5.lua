@@ -276,8 +276,8 @@ elseif cs.name == "BetterCostumes" then
 
 		log("failed to inject state " .. path,"BBP")
 	end
+elseif cs.name == "Editor" then
 else
-	modlog(mod, utilitools.files.beattools.undo.changes)
 end
 
 -- log cached event count

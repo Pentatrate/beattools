@@ -116,7 +116,7 @@ function compare.showChanges(new2)
 			if imgui.Button("ORIG") then
 				change.resolved = "ORIG"
 				local function orig(array, event2)
-					function eventIndex()
+					local function eventIndex()
 						if event2 == nil then return -1 end
 						for i, v in ipairs(array) do
 							if v == event2 then return i end
@@ -673,7 +673,6 @@ function compare.compare(new2)
 	modlog(mod, "DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE! DANDADAN! DONE! DONE! DONE! DONE! DONE! DONEDODONE! DONE! DONE! DONE! DONE! DONE!")
 	modlog(mod, compare.origStats.part, compare.new1Stats.part, compare.new1Stats.part ~= "merged" and compare.new1Stats.part or compare.origStats.part)
 end
-modlog(mod, compare.origStats.part, compare.new1Stats.part, compare.new1Stats.part ~= "merged" and compare.new1Stats.part or compare.origStats.part)
 
 function compare.checkMerge()
 	modlog(mod, "STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING STARTING")
@@ -744,7 +743,7 @@ function compare.merge()
 	local merged = helpers.copy(compare.orig)
 	local toRemove = {}
 	setmetatable(merged, nil)
-	function eventIndex(event)
+	local function eventIndex(event)
 		if event == nil then
 			modwarn(mod, "NO EVENT")
 			return -1

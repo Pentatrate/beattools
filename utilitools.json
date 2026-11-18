@@ -13,7 +13,7 @@
 			"versions": [
 				[
 					">=",
-					"1.3.15"
+					"1.3.20"
 				]
 			],
 			"reason": "Required API. You may need to update this mod."

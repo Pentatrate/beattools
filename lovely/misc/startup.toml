@@ -37,10 +37,11 @@ payload = '''
 -- i cannot need this
 -- yet it crashes
 -- so ill put this here
+if not mods.beattools.config.imguiStyles then modwarn(mod, mods.beattools.config.imguiStyles, "IS NIL FOR SOME REASON") end
 mods.beattools.config.imguiStyles = mods.beattools.config.imguiStyles or {}
 
 mods.beattools.config.imguiStyles.default = nil
-utilitools.fileManager.beattools.imguiStyle.load()
+utilitools.fileData.beattools.imguiStyle.load()
 
 if type(mods.beattools.config.imguiColors) == "table" then
 	mods.beattools.config.imguiStyles["from old format"] = { colors = {}, vars = mods.beattools.config.imguiStyles.default.vars }

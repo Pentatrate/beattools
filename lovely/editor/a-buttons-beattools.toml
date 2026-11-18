@@ -87,3 +87,17 @@ end
 position = "before"
 target = "states/Editor.lua"
 times = 1
+
+# Multiselect untagging buttons ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''if imgui.Button('Delete selected events') then'''
+payload = '''
+if self.selectedEvent and mods.beattools.config.showEventGroups then
+	-- utilitools.files.beattools.eventGroups.eventCustomGroup(self.selectedEvent)
+end
+'''
+position = "before"
+target = "states/Editor.lua"
+times = 1

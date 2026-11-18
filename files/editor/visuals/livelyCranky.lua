@@ -104,7 +104,7 @@ function livelyCranky.updateCurrent()
 
 	if spriteName:sub(-4):lower() == ".png" then
 		local filename = cLevel .. spriteName
-		if love.filesystem.exists(filename) then
+		if love.filesystem.getInfo(filename) then
 			local modTime = love.filesystem.getInfo(cLevel .. spriteName, "file").modtime
 			if not livelyCranky.faceSprites[spriteName] or livelyCranky.faceSprites[spriteName].modTime ~= modTime then
 				livelyCranky.faceSprites[spriteName] = {

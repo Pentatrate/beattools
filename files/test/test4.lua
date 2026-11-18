@@ -38,10 +38,25 @@ local function getLovelyInjectorWarnings()
 		return "log file not found"
 	end
 
-	for i = #warnList, 1, -1 do
-		if not (warnList[i]:find("beattools\\lovely", 1, true) or warnList[i]:find("utilitools\\lovely", 1, true) or warnList[i]:find("quick-playtest\\lovely", 1, true) or warnList[i]:find("overdetailed_events_golden\\lovely", 1, true) or warnList[i]:find("BetterCostumes\\lovely", 1, true)) then
-			table.remove(warnList, i)
+	local pentasMods = {}
+	local addedMods = {}
+	for modId, data in pairs(utilitools.modLinks) do
+		local function addMod(modId)
+			if addedMods[modId] then return end
+			table.insert(pentasMods, modId)
+			addedMods[modId] = true
 		end
+		if data.organisation == "Pentatrate" or data.fork and data.fork.Pentatrate then
+			addMod(modId)
+			addMod(data.repository)
+		end
+	end
+	for i = #warnList, 1, -1 do
+		local remove = true
+		for _, modId in ipairs(pentasMods) do
+			if warnList[i]:find(modId .. "\\lovely", 1, true) then remove = false break end
+		end
+		if remove then table.remove(warnList, i) end
 	end
 
 	if #warnList == 0 then

@@ -23,7 +23,7 @@ function eventPacking.cacheEvent(event, remove, k, from, to, isFullSave)
 			event.beattoolsRepeatParent = eventPacking.makeNewIndex()
 			eventPacking.ids[temp] = temp2
 		end
-		eventPacking.ids[event.beattoolsRepeatParent] = not remove and event or nil
+		if event.beattoolsRepeatParent then eventPacking.ids[event.beattoolsRepeatParent] = not remove and event or nil end
 	end
 end
 

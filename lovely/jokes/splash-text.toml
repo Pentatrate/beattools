@@ -81,7 +81,7 @@ local additionalSplashes = {
 	"(ive tested all fonts in my editor guide, none of them support thunbsup)",
 	"i still take suggestions btw, i will react with thumbsup if they have been implemented in the next update",
 
-	-- the goober AKA pies of lies
+	-- pies of lies
 	"craftable with 8 bees and a cranky!",
 	"use hard hats when its raining. especially when swords are coming from the sky!",
 	"drink uranium",
@@ -91,6 +91,41 @@ local additionalSplashes = {
 	"at the core of a strategy called the '999 notes'",
 	"RECONSTRUCT WHAT?!",
 	"eat sponges",
+	"check out my costumes in the steam workshop! - PiesofLies",
+	"twenty. thousand. bees.",
+	"they pirated this game. get the vbs-chan ready",
+	"so, i theorize that cranky is a block in disguise",
+	"Beatblock: Just The Facts",
+	"pull up with the fo fo",
+	"damn, cranky got moves",
+	"I JUST WANTED TO KNOW WHAT A SKULL MEANS... WHAT THE [font = censorblock]XXXX[font] DOES IT MEAN",
+	"Reminder: go to a shelter before writing last will or the rain will come",
+	"i lost my holy card, i got no mantle now",
+	"I want it to be beat, to be like block!",
+	"I have block and beat",
+	"King to G5",
+	"uhh, tonight you will get your dick ripped out. That doesn't sound good does it?", -- Penta: wtf
+	"the  uh you know.",
+	"2BEAT2BLOCK",
+	"Arbitrary Code Execution, or ACE for short, is the coolest way to mod your game with no mods.",
+	":flag_br:",
+	"manual breathing.",
+	"hahaha! 3 days.",
+	"sigmund",
+	"i put on my touke",
+	"IS THAT BUBBLETABBY-",
+	"I love this game!",
+	"I'm the beatblocker, catch me if you can!",
+	"i'm so bleak",
+	"holy FRICK! so aweomse!",
+	"@eren., piesoflies just found ANOTHER GAME CRASHING BUG!!! HOW EXPECTED!!! THIS MAN'S LIBRARY IS JUST BULL[font = censorblock]XXXX[font] IN A KETTLE!!!!!",
+	"Y'ALL WANNA C-B, Y'ALL WANNA ミ-ミ",
+	"eles falam que eu deveria parar de jogar beatblock... vou ficar jogando",
+	"they say i should stop playing beatblock... i'll keep playing",
+	"he who scraps and runs away... lives to see another day! skedaddles away",
+	"vro vlock yo veats",
+	"If I can get out of this, I'll take myself to Beatblock",
+	"Uhhh...",
 
 	-- rhymeswithpie
 	"WHAT DOES THE CAT REACT MEAN?????",
@@ -104,6 +139,8 @@ local additionalSplashes = {
 	"Pentatrout (made of trout)",
 	"did existent dev do something",
 	-- "Cranky is dead. I killed him. He Died.",
+	"what does a skull mean", -- quote of pies of lies
+	"80 Interesting Beatblock Splashes: #7 Will Blow Your Dick Clean Off", -- Penta: wtf
 
 	-- mawl
 	"yoru",
@@ -120,16 +157,27 @@ local additionalSplashes = {
 	"to crank or not to crank, that is the real question",
 	"work on your FUCKING levels",
 	"whenever I join a jury, it becomes a hung jury, wink wink\n[font=undocrash]I am very indecisive",
+	"my blood soaks into the floor (its birthday blood)", -- Penta: wtf
+	"i hate this game!",
+	"oh- thats not...",
 
 	-- miguelreal the idea
 	"Also try exploding in real life!",
 	"did nonexistent dev do something",
 	"DID YOU KNOW? beatblock was inspired by a true story about a guy named 'Craig Nkey' who was locked in an arena and forced to slap children named 'Bel Ock' while avoiding guys named 'Mi Knees' and kicking children named 'Ian Verse'",
+	"Jump",
+	"Spikes tend to kill you, this is not one of those times",
 
 	-- unity
 	"clamasmgdhs thechs: 5)3ghe splandushengin", -- Penta: no f:sexwords:king clue what drove unity to do this
 	"why so serious",
 	":thumbsup:", -- thumbsup, i dont think any font supports the emote version currently 👍
+	"manual blinking.",
+	"mrraoooww",
+	"yup yup {beatblock|cranky|tutorial|damoclism|huxley|commatose} is coderotted god save us all",
+
+	-- dps
+	"This is a canon bubbletabby-created splash, but it's only for modders!",
 
 	-- ayka47 AKA aykarain
 	"When sweeping mines, you should probably bring a broom.",
@@ -457,10 +505,10 @@ times = 1
 # Code by Kakadu, modified
 [[patches]]
 [patches.pattern]
-target = "states/Menu.luaTURN THIS PATCH OFF"
+match_indent = true
 pattern = '''st:setUpdate(function(self,dt)'''
-position = "after"
 payload = '''
     self.splash = splashes.gen()
 '''
-match_indent = true
+position = "after"
+target = "states/Menu.luaTURN THIS PATCH OFF"
