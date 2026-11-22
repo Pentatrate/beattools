@@ -38,7 +38,8 @@ local function setColor(r, g, b, a)
 end
 
 local function startStack(event)
-	beattools.stacking.stacking, beattools.stacking.x, beattools.stacking.y = true, utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.xOffset, -utilitools.files.beattools.eventStacking.getIndex(event) * mod.config.yOffset
+	local eventStacking = utilitools.files.beattools.eventStacking
+	beattools.stacking.stacking, beattools.stacking.x, beattools.stacking.y = true, eventStacking.getIndex(event) * mod.config.xOffset, -eventStacking.getIndex(event) * mod.config.yOffset
 end
 local function endStack()
 	beattools.stacking.stacking, beattools.stacking.x, beattools.stacking.y = false, 0, 0
@@ -107,6 +108,9 @@ function eventVisuals.cacheEvent(event, remove, k, from, to, isFullSave)
 end
 
 local function drawEventOnLayer(event, beattoolsLayer)
+	local eventStacking = utilitools.files.beattools.eventStacking
+	local eventGroups = utilitools.files.beattools.eventGroups
+
 	if beattoolsLayer == nil then
 		modlog(mod, "beattoolsDrawEvent: Invalid beattoolsLayer")
 		return
@@ -119,9 +123,9 @@ local function drawEventOnLayer(event, beattoolsLayer)
 			eventVisuals.drawRepeat(event, beattoolsLayer)
 		else
 			local alpha = 1
-			if utilitools.files.beattools.eventStacking.inStack(event) then alpha = alpha * mod.config.alpha end
+			if eventStacking.inStack(event) then alpha = alpha * mod.config.alpha end
 			local t = { transparent = mod.config.alphaTransparent, ghost = mod.config.alphaGhost }
-			if t[utilitools.files.beattools.eventGroups.eventVisibility(event)] then alpha = alpha * t[utilitools.files.beattools.eventGroups.eventVisibility(event)] end
+			if t[eventGroups.eventVisibility(event)] then alpha = alpha * t[eventGroups.eventVisibility(event)] end
 
 			eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
@@ -213,6 +217,10 @@ function eventVisuals.drawRepeat(event, beattoolsLayer)
 	if not repeating then endStack() end
 end
 function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
+	local eventStacking = utilitools.files.beattools.eventStacking
+	local undo = utilitools.files.beattools.undo
+	local tag = utilitools.files.beattools.tag
+
 	if beattoolsLayer ~= "note" and beattoolsLayer ~= "event" and beattoolsLayer ~= "sameEasing" and beattoolsLayer ~= "selected" then
 		modlog(mod, "eventVisuals.drawSprite: Invalid beattoolsLayer: " .. beattoolsLayer)
 		return
@@ -220,7 +228,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	alpha = alpha or 1
 
 	local eventDraw = Event.editorDraw[eventVisuals.getEventType(event.type)] or sprites.editor.genericevent
-	local isNote = beattoolsLayer == "note" or (beattoolsLayer == "selected" and utilitools.files.beattools.eventStacking.getType(event) == "func")
+	local isNote = beattoolsLayer == "note" or (beattoolsLayer == "selected" and eventStacking.getType(event) == "func")
 	local pos
 	local function drawEvent()
 		setColor(1, 1, 1, 1)
@@ -285,7 +293,7 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 	end
 	if isNote then
 		if mod.config.displayEndAngle and event.endAngle then
-			utilitools.files.beattools.undo.dontTrack(function()
+			undo.dontTrack(function()
 				event.angle = event.endAngle
 			end)
 		end
@@ -330,12 +338,12 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 		end
 	end
 	if isNote and mod.config.displayEndAngle and event.endAngle then
-		utilitools.files.beattools.undo.dontTrack(function()
+		undo.dontTrack(function()
 			event.angle = beattoolsTemp2
 		end)
 	end
 
-	if mod.config.invalidTags and eventVisuals.getEventType(event.type) == "tag" and utilitools.files.beattools.tag.initTag(event.tag) then
+	if mod.config.invalidTags and eventVisuals.getEventType(event.type) == "tag" and tag.initTag(event.tag) then
 		setColor(mod.config.durationSameEasingColor.r, mod.config.durationSameEasingColor.g, mod.config.durationSameEasingColor.b, 1)
 		love.graphics.draw(sprites.editor.warning, pos[1], pos[2], 0, 1, 1, 11, 11)
 	end
@@ -382,6 +390,9 @@ function eventVisuals.drawSprite(event, alpha, beattoolsLayer)
 end
 
 function eventVisuals.drawEvents()
+	local eventStacking = utilitools.files.beattools.eventStacking
+	local eventGroups = utilitools.files.beattools.eventGroups
+
 	-- Penta: beattools layer code
 	local layerNote, layerEndAngleMarker, layerDuration, layerEvent, layerRepeatMarker, layerSameEasingDuration, layerSameEasing, layerSameEasingRepeatMarker, layerSelectedDuration, layerSelectedRepeatMarker, layerSelected, layerSelectedEndAngleMarker = {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 
@@ -399,8 +410,8 @@ function eventVisuals.drawEvents()
 		end
 	end
 	for _, v in pairs(eventsToDraw) do
-		if Event.info[eventVisuals.getEventType(v.type)] and utilitools.files.beattools.eventGroups.eventVisibility(v) ~= "hide" then
-			local visibility = utilitools.files.beattools.eventGroups.eventVisibility(v)
+		if Event.info[eventVisuals.getEventType(v.type)] and eventGroups.eventVisibility(v) ~= "hide" then
+			local visibility = eventGroups.eventVisibility(v)
 			local selected = v == cs.selectedEvent or selectedEvents[tostring(v)]
 			local sameEase = selected or beattoolsSameEasing(v, cs.selectedEvent)
 
@@ -445,7 +456,7 @@ function eventVisuals.drawEvents()
 				elseif sameEase then
 					addTo(layerSameEasing)
 				else
-					if utilitools.files.beattools.eventStacking.getType(v) == "func" then
+					if eventStacking.getType(v) == "func" then
 						addTo(layerNote)
 						if v.endAngle and checkMarker("markEndAnglePosition") and isVisible(v.time) then
 							addTo(layerEndAngleMarker)
@@ -482,7 +493,7 @@ function eventVisuals.drawEvents()
 				setColor(drawColor.r, drawColor.g, drawColor.b, (alphaOverride or drawColor.a or 1) * alpha)
 			end
 			table.sort(array[visibility], function(a, b)
-				return utilitools.files.beattools.eventStacking.getIndex(a) < utilitools.files.beattools.eventStacking.getIndex(b)
+				return eventStacking.getIndex(a) < eventStacking.getIndex(b)
 			end)
 			for _, v in ipairs(array[visibility]) do
 				drawEventOnLayer(v, layer)
@@ -497,10 +508,10 @@ function eventVisuals.drawEvents()
 	-- Penta: Stacked notes marker
 	if mod.config.stackingNotes then
 		setColor(1, 1, 1, 1) -- add coloring
-		for time, angles in pairs(utilitools.files.beattools.eventStacking.gameplayStack) do
+		for time, angles in pairs(eventStacking.gameplayStack) do
 			if time >= cs.editorBeat and time <= cs.editorBeat + cs.drawDistance then
 				for angle, _ in pairs(angles) do
-					local pos = cs:getPosition(angle, time, false)
+					local pos = cs:getPosition(angle, time)
 					love.graphics.draw(sprites.editor.stackingNotes, helpers.round(pos[1]), helpers.round(pos[2]), 0, 1, 1, 11, 11)
 				end
 			end

@@ -272,6 +272,7 @@ if imgui.BeginTabBar("beattoolsConfig") then
 		configHelpers.treeNode("Visuals", function()
 			configHelpers.treeNode("General", function()
 				configHelpers.doc("editor_visuals_general")
+				configHelpers.input("editorNoteRadius")
 				configHelpers.treeNode("Editor Colors", function()
 					configHelpers.input("editorBgColor")
 					configHelpers.input("editorSnapColor")

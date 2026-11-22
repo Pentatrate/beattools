@@ -1509,6 +1509,13 @@ return {
 		tooltips = { short = "Set Imgui Default Positions" },
 		default = {}
 	},
+	editorNoteRadius = {
+		type = "float",
+		name = "Editor Note Radius",
+		tooltips = { short = "The radius of notes in the editor" },
+		default = 8,
+		off = 8
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {

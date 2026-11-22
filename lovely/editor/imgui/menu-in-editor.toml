@@ -133,6 +133,7 @@ do
 					self.angleSnapValues = mods.beattools.config.angleSnapValues
 					self.beatSnapValues = mods.beattools.config.beatSnapValues
 				end
+				if self.noteRadius ~= mods.beattools.config.editorNoteRadius then modlog(mods.beattols, "CHANGED NOTE RADIUS") self.noteRadius = mods.beattools.config.editorNoteRadius end
 			end
 
 			imgui.End()
