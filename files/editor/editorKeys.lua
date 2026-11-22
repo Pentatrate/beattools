@@ -62,5 +62,15 @@ return {
 	mineKey = function() local event = "mine" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
 	holdKey = function() local event = "hold" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
 	mineHoldKey = function() local event = "mineHold" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
-	bounceKey = function() local event = "bounce" cs.placeEvent = cs.placeEvent ~= event and event or "" end
+	bounceKey = function() local event = "bounce" cs.placeEvent = cs.placeEvent ~= event and event or "" end,
+	setWindowDefaults = function()
+		if not (cs and cs.name == "Editor") then return end
+		modlog(mod, "setWindowDefaults")
+
+		local cInt, cString = imgui.SaveIniSettingsToMemory()
+		mod.config.defaultImguiIni = ffi.string(cString, cInt)
+		utilitools.config.save(mod)
+
+		-- imgui.SaveIniSettingsToDisk("imguiDefault.ini")
+	end
 }

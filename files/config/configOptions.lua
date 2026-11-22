@@ -1033,14 +1033,14 @@ return {
 		name = "Transparent",
 		tooltips = { long = "Alpha value of transparent events\n(1 = opaque)", short = "Alpha value of transparent events" },
 		default = 0.75,
-		off = 1
+		off = 0.3
 	},
 	alphaGhost = {
 		type = "float",
 		name = "Ghost",
 		tooltips = { long = "Alpha value of ghost events\n(1 = opaque)", short = "Alpha value of ghost events" },
 		default = 0.25,
-		off = 1
+		off = 0.3
 	},
 	focusEventEditor = {
 		type = "bool",
@@ -1496,6 +1496,19 @@ return {
 		default = { { {}, "key:9" } },
 		off = {}
 	},
+	windowDefaults = {
+		type = "bool",
+		name = "Imgui Default Positions",
+		tooltips = { short = "Imgui Default Positions" },
+		default = false,
+		off = false
+	},
+	setWindowDefaults = {
+		type = "key",
+		name = "Set Imgui Default Positions",
+		tooltips = { short = "Set Imgui Default Positions" },
+		default = {}
+	},
 
 	-- Internal Variables (as a replacement instead of using global variables)
 	keysWhiteList = {
@@ -1646,5 +1659,10 @@ return {
 		type = "hidden",
 		name = "[internal] savedSorting",
 		default = 1
+	},
+	defaultImguiIni = {
+		type = "hidden",
+		name = "[internal] defaultImguiIni",
+		default = ""
 	}
 }

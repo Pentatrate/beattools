@@ -56,12 +56,13 @@ function editorKeysWindow.imgui(text)
 			i = i + 1
 		end
 	end
+	local gen = utilitools.keybinds.text.generate
 	-- replacing text
 	replace("jump to next/previous section", "\nAlt + Left/Right - Jump to next/previous section\n", "\nAlt + Left - Jump to previous section\nAlt + Right - Jump to next section\n")
 	replace("ctrl click", "\nAlt + LMB + drag - Multi select events (alternate)\n  Selects events only in the highlighted area\n", "\nAlt + LMB + drag - Multi select events (alternate)\n  Selects events only in the highlighted area\nCtrl (modded) -  + LMB on an event - Ctrl select events\n  Add/remove events to/from the selection one by one\n")
 
 	-- inserting keybind text
-	split("Ctrl + LMB", nil, nil, nil, (mod.config.ctrlSelect and utilitools.keybinds.text.generate("controltable", "c", false, true) or utilitools.keybinds.text.generate("keyboardEditor", "modifier", false, true)) .. " + LMB on an event")
+	split("Ctrl + LMB", nil, nil, nil, (mod.config.ctrlSelect and gen("controltable", "c", false, true) or gen("keyboardEditor", "modifier", false, true)) .. " + LMB on an event")
 
 	-- inserting modded keybinds
 	split("Ctrl (modded)", mods.beattools, "ctrlSelectKey", true)
@@ -71,8 +72,8 @@ function editorKeysWindow.imgui(text)
 	split("S", "keyboardEditor", "save", false)
 
 	split("P", "keyboardEditor", "play", false)
-	split("Shift + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "shift", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
-	split("Ctrl + P", nil, nil, nil, utilitools.keybinds.text.generate("controltable", "ctrl", false, true) .. " + " .. utilitools.keybinds.text.generate("keyboardEditor", "play", false, true))
+	split("Shift + P", nil, nil, nil, gen("controltable", "shift", false, true) .. " + " .. gen("keyboardEditor", "play", false, true))
+	split("Ctrl + P", nil, nil, nil, gen("controltable", "ctrl", false, true) .. " + " .. gen("keyboardEditor", "play", false, true))
 
 	-- inserting custom editor keybinds
 	split("F", mods.beattools, "editorKeybind jump to event position", true)
@@ -90,7 +91,7 @@ function editorKeysWindow.imgui(text)
 		if part.type == "text" then
 			imgui.Text(part.text)
 		elseif part.type == "key" then
-			utilitools.imguiHelpers.inputKey(part.label, part.category, part.key, utilitools.keybinds.text.generate(part.category, part.key, part.modded, false), part.modded)
+			utilitools.imguiHelpers.inputKey(part.label, part.category, part.key, gen(part.category, part.key, part.modded, false), part.modded)
 		end
 	end
 end

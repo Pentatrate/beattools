@@ -140,7 +140,7 @@ function tag.placeEvents(tagName, time, angle, repeats, repeatDelay, multiselect
 		table.insert(cs.level.events, event)
 		if multiselect then
 			if not cs.multiselect or not cs.multiselect.events or not cs.multiselect.eventTypes then
-				modlog(mods.beattools, "Multiselect nil - What?", i, tagName, time, angle, multiselect)
+				modlog(mod, "Multiselect nil - What?", i, tagName, time, angle, multiselect)
 			elseif multiselect then
 				table.insert(cs.multiselect.events, event)
 				cs.multiselect.eventTypes[event.type] = true

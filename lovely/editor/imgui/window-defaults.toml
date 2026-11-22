@@ -1,0 +1,28 @@
+[manifest]
+dump_lua = true
+priority = 0
+version = "1.0.0"
+
+# Window Defaults ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = '''self.resetwindows = true'''
+payload = '''
+if mods.beattools.config.windowDefaults and mods.beattools.config.defaultImguiIni ~= "" then
+	modlog(mod, "getWindowDefaults")
+
+	-- local buffer = ffi.new("char[?]", #mods.beattools.config.defaultImguiIni)
+	-- ffi.copy(buffer, mods.beattools.config.defaultImguiIni, #mods.beattools.config.defaultImguiIni)
+	-- imgui.LoadIniSettingsFromMemory(buffer, ffi.sizeof(buffer))
+
+	imgui.LoadIniSettingsFromMemory(mods.beattools.config.defaultImguiIni)
+
+	-- imgui.LoadIniSettingsFromDisk("imguiDefault.ini")
+else
+	self.resetwindows = true
+end
+'''
+position = "at"
+target = "states/Editor.lua"
+times = 1

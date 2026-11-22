@@ -3,8 +3,6 @@ dump_lua = true
 priority = 0
 version = "1.0.0"
 
-# in use in a-menus-beattools.toml
-
 # Adjusting zoom limits ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
@@ -26,7 +24,7 @@ times = 1
 
 [[patches]]
 [patches.regex]
-pattern = '''self\.zoom, self\.smallestBeat\)'''
-payload = '''self.zoom, self.smallestBeat - mods.beattools.config.scrollPast)'''
+pattern = '''zoom, self\.smallestBeat\)'''
+payload = '''zoom, self.smallestBeat - mods.beattools.config.scrollPast)'''
 position = "at"
 target = "states/Editor.lua"
