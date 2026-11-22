@@ -1919,7 +1919,7 @@ end
 function tooly.setForClosestDelta(a1, a2)
 	return a1 + tooly.getClosestDelta(a1, a2)
 end
-function tooly.play(data, time)
+function tooly.play(data, time, dt)
 	if not mod.config.tooly or not data or not data.timedRanges or not time or not cs.p then return end
 	if not (cs.name == "Game" or (cs.name == "Editor" and not cs.editMode)) then return end
 
@@ -1936,10 +1936,9 @@ function tooly.play(data, time)
 	cs.p.angle = autoPlayAngle
 
 	-- tooly adapts
-	local function checkHit(t)
-		return t - cs.cBeat <= 0
-	end
+	local function checkHit(t) return t <= cs.cBeat end
 	local ranges = tooly.tunnelsGetRanges(tooly.data.tunnels, tooly.data.antiTunnels, time)
+	local temp = {}
 	for _, event in ipairs(entities) do
 		if event.hb then
 			local type = event.name
@@ -1961,14 +1960,14 @@ function tooly.play(data, time)
 					end,
 					hold = function ()
 						if not event.hitYet and checkHit(eventTime) then eventTime = time end
-						if checkHit(event.hb + duration) then duration = time - eventTime end
+						if event.progress < 1 and checkHit(event.hb + duration) then duration = time - eventTime end
 					end,
 					mine = function ()
 						if not event.hitYet and checkHit(eventTime) then eventTime = time end
 					end,
 					mineHold = function ()
 						if not event.hitYet and checkHit(eventTime) then eventTime = time end
-						if checkHit(event.hb + duration) then duration = time - eventTime end
+						if event.progress < 1 and checkHit(event.hb + duration) then duration = time - eventTime end
 					end
 				}
 
@@ -2030,6 +2029,7 @@ function tooly.play(data, time)
 					local moreRanges = tooly.getEventMoreRanges(time, type, eventTime, angle, angle2, duration, holdEase, delay, rotation)
 
 					ranges = tooly.overlapRanges(ranges, moreRanges, false)
+					table.insert(temp, type)
 				end
 
 				tooly.noSides = false
@@ -2061,7 +2061,8 @@ function tooly.play(data, time)
 
 		cs.p.angle = d
 
-		modlog(mod, time, "adjusted player angle from", autoPlayAngle, autoPlayAngle % 360, "to", d, d % 360)
+		local function round(v) return helpers.round(v * 10) / 10 end
+		modlog(mod, round(time), "adjusted player angle from", round(autoPlayAngle), "to", round(d), temp, ranges)
 	end
 end
 

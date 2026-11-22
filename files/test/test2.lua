@@ -4,7 +4,7 @@ utilitools.try(mod, function()
 	local function recursion(t, prev, recursions)
 		prev = prev or ""
 		recursions = recursions and recursions + 1 or 0
-		if recursions > 20 then modlog(mod, "too much recursions!!!") forceprint(prev) return end
+		if recursions > 20 then modlog(mod, "too much recursions!!!") modlog(mod, prev) return end
 		for k, v in pairs(t) do
 			if type(k) == "string" and ({ table = true, boolean = true, number = true, ["nil"] = true })[type(v)] and k ~= "__index" and k ~= "class" and not ({ playedLevelsJson = true, beattools = true, utilitools = true, replay = true, beattoolsPrevAcc = true, CHEATlagBack = true, lastReplayState = true })[k] then
 				local path = (prev ~= "" and prev .. "." or "") .. k
@@ -35,13 +35,13 @@ utilitools.try(mod, function()
 		end
 	end
 	jsonText = jsonText:sub(1, -3) .. "\n}"
-	forceprint(jsonText)
+	modlog(mod, jsonText)
 
 	if cLevel == "Custom Levels/###test/" then
-		forceprint("SAVINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGg")
+		modlog(mod, "SAVINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGg")
 		if not love.filesystem.inSaveData(cLevel) then love.filesystem.forceSaveInSource(true) end
 		local success, e = love.filesystem.write(cLevel .. "test2.json", jsonText)
-		if not success then forceprint(e) end
+		if not success then modlog(mod, e) end
 		love.filesystem.forceSaveInSource(false)
 	end
 end)

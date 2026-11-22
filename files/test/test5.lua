@@ -188,7 +188,7 @@ if cs.name == "Menu" then
 				love.filesystem.createDirectory(level.newDir)
 				local redirectPath = level.realPath:sub(1, -1 - #level.realPath:match("([^/]+)$")) .. level.saveName .. ".redirect"
 				local success, e = love.filesystem.write(redirectPath, level.newPath .. "/")
-				if not success then forceprint(e) end
+				if not success then modlog(mod, e) end
 			end
 			local function doStuffCrankless(variant)
 				do -- rank
@@ -220,7 +220,7 @@ if cs.name == "Menu" then
 					love.filesystem.createDirectory(path)
 
 					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
-					if not success then forceprint(e) end
+					if not success then modlog(mod, e) end
 				end
 
 				do -- difficulty
@@ -233,7 +233,7 @@ if cs.name == "Menu" then
 					love.filesystem.createDirectory(path)
 
 					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
-					if not success then forceprint(e) end
+					if not success then modlog(mod, e) end
 				end
 
 				do -- variant
@@ -244,7 +244,7 @@ if cs.name == "Menu" then
 					love.filesystem.createDirectory(path)
 
 					local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
-					if not success then forceprint(e) end
+					if not success then modlog(mod, e) end
 				end
 			end
 			if level.manifest and level.data.variants then
@@ -261,7 +261,7 @@ if cs.name == "Menu" then
 				love.filesystem.createDirectory(path)
 
 				local success, e = love.filesystem.write(path .. level.saveName .. ".redirect", level.newPath .. "/")
-				if not success then forceprint(e) end
+				if not success then modlog(mod, e) end
 			end
 		else
 			modlog(mod, "Duplicate", level.name, level.realPath)

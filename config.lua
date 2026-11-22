@@ -256,9 +256,9 @@ if imgui.BeginTabBar("beattoolsConfig") then
 						scanDuplicates("Custom Levels")
 						for k, v in pairs(levels) do
 							if #v > 1 then
-								forceprint('"' .. k .. '"')
+								modlog(mod, '"' .. k .. '"')
 								for i, vv in ipairs(v) do
-									forceprint("   " .. vv.path .. " (" .. vv.type .. ")")
+									modlog(mod, "   " .. vv.path .. " (" .. vv.type .. ")")
 								end
 							end
 						end

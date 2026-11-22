@@ -354,7 +354,7 @@ undo.insert = function(list, pos, value)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events then
 		if getmetatable(value) == nil or not getmetatable(value).beattoolsUndoInject then undo.meta(value) end
 		if undo.checkLink(value) then
-			forceprint("add refused " .. pos)
+			modlog(mod, "add refused " .. pos)
 			return false
 		end
 		if
@@ -412,7 +412,7 @@ undo.remove = function(list, pos)
 	if cs and cs.name == "Editor" and cs.level and cs.level.events and list == cs.level.events and list[pos] then
 		local returnValue
 		if undo.checkLink(list[pos], true) then
-			forceprint("remove refused " .. pos)
+			modlog(mod, "remove refused " .. pos)
 			return false, returnValue
 		end
 		if
@@ -470,7 +470,7 @@ undo.change = function(t, k, v, hidden)
 				undo.fullIndex()
 			end
 			if undo.checkLink(t, nil, k, hidden[k], v) then
-				forceprint("change refused " .. k .. " from " .. tostring(hidden[k]) .. " to " .. tostring(v))
+				modlog(mod, "change refused " .. k .. " from " .. tostring(hidden[k]) .. " to " .. tostring(v))
 				return
 			end
 			if
@@ -683,7 +683,7 @@ undo.keybind = function(doUndo, doMultiple)
 				if cs.level.events[change.index] then
 					if cs.level.events[change.index] == change.ref then
 						if cs.level.events[change.index][change.key] == change[doUndo and "to" or "from"] then
-							-- forceprint((doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
+							-- modlog(mod, (doUndo and "un" or "re") .. "do " .. change.key .. " from " .. tostring(cs.level.events[change.index][change.key]) .. " to " .. tostring(change[doUndo and "from" or "to"]))
 
 							undo.link(cs.level.events[change.index], true, change.key, change[doUndo and "to" or "from"], change[doUndo and "from" or "to"])
 							cs.level.events[change.index][change.key] = helpers.copy(change[doUndo and "from" or "to"])
@@ -741,7 +741,7 @@ end
 
 if cs and cs.name == "Editor" and cs.level and cs.level.events then
 	setmetatable(cs.level.events, nil)
-	-- forceprint("setting it to nothing")
+	-- modlog(mod, "setting it to nothing")
 end
 
 return undo

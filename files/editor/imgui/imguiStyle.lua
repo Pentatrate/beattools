@@ -100,7 +100,7 @@ imguiStyle.imguiColorsFormat = function(styleName)
 						table.insert(values, tonumber(ww))
 					end
 					if #values == 4 then
-						-- forceprint(string.sub(w, 1, i1 - 1) .. " " .. values[1] .. " " .. values[2] .. " " .. values[3] .. " " .. tostring(values[4]))
+						-- modlog(mod, string.sub(w, 1, i1 - 1) .. " " .. values[1] .. " " .. values[2] .. " " .. values[3] .. " " .. tostring(values[4]))
 						-- imgui.PushStyleColor_Vec4(imgui[string.sub(w, 1, i1 - 1)], imgui.ImVec4_Float(values[1], values[2], values[3], values[4]))
 						mod.config.imguiStyles[styleName].colors[tostring(imgui[string.sub(w, 1, i1 - 1)])] = values
 						-- mod.config.imguiColors[string.sub(w, 1, i1 - 1)] = values

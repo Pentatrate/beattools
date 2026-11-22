@@ -22,7 +22,7 @@ pattern = '''function GameManager:update(dt)'''
 payload = '''
 function GameManager:CHEATconvertToBeat(number, forceSeconds)
 	if forceSeconds or mods.beattools.config.lagUseSeconds then
-		return number / (60 / GameManager:getBPM() / (GameManager.rateMod or 1))
+		return number / (60 / (self:getBPM() or 100) / (self.rateMod or 1))
 	end
 	return number
 end
@@ -42,8 +42,8 @@ local tempTime = cs.source:getBeat()
 -- cs.cBeat is the old one
 -- tempTime is the new one
 if mods.beattools.config.lagBack and (not maininput:down("modifier")) and cs.cBeat + self:CHEATconvertToBeat(mods.beattools.config.lagThreshhold) <= tempTime then
-	forceprint("LAG DETECTED!!!")
-	if self.CHEATmaxBeat == nil or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
+	modlog(mods.beattools, "LAG DETECTED!!!")
+	if not self.CHEATmaxBeat or cs.cBeat > self.CHEATmaxBeat then self.CHEATmaxBeat = cs.cBeat end
 	tempTime = (self.CHEATmaxBeat or 0) - self:CHEATconvertToBeat(mods.beattools.config.lagOffset)
 	local timeDiff = cs.cBeat - tempTime
 	if timeDiff >= 3 then table.insert(cs.playEvents, { angle = 0, time = cs.cBeat - 3, type = 'playSound', volume = '1', pitch = '0.5', sound = 'click'}) end
@@ -93,7 +93,7 @@ times = 1
 [patches.pattern]
 match_indent = true
 pattern = '''savedata.options.accessibility.sides ~= 'default' or'''
-payload = '''self.CHEATlagBack ~= 0 or'''
+payload = '''(self.CHEATlagBack and self.CHEATlagBack ~= 0) or'''
 position = "before"
 target = "states/Results.lua"
 times = 3

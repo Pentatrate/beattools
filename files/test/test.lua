@@ -274,7 +274,7 @@ local function boxes()
 		})
 	end
 
-	for i = 0, repeats, repeatDelay do if i > 7 then hasBeams = false end createBox(i) forceprint(i) end
+	for i = 0, repeats, repeatDelay do if i > 7 then hasBeams = false end createBox(i) modlog(mod, i) end
 	createBox(22) createBox(22.5) createBox(22.5)
 
 	if not love.filesystem.inSaveData(cLevel) then love.filesystem.forceSaveInSource(true) end

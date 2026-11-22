@@ -6,9 +6,10 @@ version = "1.0.0"
 # Tooly plays ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-match_indent = true
+match_indent = false
 pattern = '''prof.push("player update")'''
-payload = '''utilitools.files.beattools.tooly.play(beattools and beattools.test, cs.cBeat)'''
+payload = '''
+	utilitools.files.beattools.tooly.play(beattools and beattools.test, cs.cBeat, dt)'''
 position = "after"
 target = "obj/Player.lua"
 times = 1
@@ -26,8 +27,7 @@ elseif mods.beattools.config.tooly and (cs.name == "Game" or cs.name == "Editor"
 		t.hit = true
 		self:addToScore(t.score)
 		table.insert(cs.tapTiming,0)
-	end
-'''
+	end'''
 match_indent = true
 times = 1
 
@@ -40,8 +40,7 @@ position = "at"
 payload = '''
 if not mods.beattools.config.tooly then
 	sdfunc.save()
-end
-'''
+end'''
 match_indent = true
 times = 1
 
@@ -50,9 +49,7 @@ times = 1
 target = "states/Results.lua"
 pattern = '''self.playedLevelsJson[saveName] = {'''
 position = "before"
-payload = '''
-if not mods.beattools.config.tooly then
-'''
+payload = '''if not mods.beattools.config.tooly then'''
 match_indent = true
 times = 1
 
@@ -61,9 +58,7 @@ times = 1
 target = "states/Results.lua"
 pattern = '''self.zoomIn = 1'''
 position = "before"
-payload = '''
-end
-'''
+payload = '''end'''
 match_indent = true
 times = 1
 
@@ -76,7 +71,6 @@ position = "at"
 payload = '''
 if not mods.beattools.config.tooly then
 	self:changeToHidden()
-end
-'''
+end'''
 match_indent = true
 # times = 2
